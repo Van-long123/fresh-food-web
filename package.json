@@ -7,11 +7,16 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@primevue/nuxt-module": "^4.5.4",
     "@primevue/themes": "^4.5.4",
+    "axios": "^1.13.6",
+    "dayjs": "^1.11.20",
+    "lodash": "^4.17.23",
     "nuxt": "^4.4.2",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
@@ -19,7 +24,9 @@
     "vue-router": "^5.0.3"
   },
   "devDependencies": {
+    "@nuxt/eslint": "^1.15.2",
     "@tailwindcss/vite": "^4.2.2",
+    "eslint": "^10.1.0",
     "tailwindcss": "^4.2.2"
   }
 }
