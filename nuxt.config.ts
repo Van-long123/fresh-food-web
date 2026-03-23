@@ -7,8 +7,15 @@ import Aura from '@primevue/themes/aura';
 
     modules: [
       '@primevue/nuxt-module',
-      '@nuxt/eslint'
+      '@nuxt/eslint',
+      '@nuxtjs/google-fonts'
     ],
+
+    googleFonts: {
+      families: {
+        Roboto: [300, 400, 500, 700, 900]
+      }
+    },
 
   primevue: {
     options: {

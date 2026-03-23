@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-    /* Customize Tailwind v4 here */
+    --font-sans: 'Roboto', sans-serif;
+}
+
+:root {
+    --p-font-family: 'Roboto', sans-serif;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
 }
