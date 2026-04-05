@@ -13,7 +13,7 @@ import Aura from '@primevue/themes/aura';
 
     googleFonts: {
       families: {
-        Roboto: [300, 400, 500, 700, 900]
+        Inter: [300, 400, 500, 600, 700, 900]
       }
     },
 

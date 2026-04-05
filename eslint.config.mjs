@@ -21,12 +21,7 @@ export default withNuxt({
     // 1. Cảnh báo biến khai báo nhưng không bao giờ sử dụng (giúp loại bỏ code rác hoặc logic nhầm lẫn)
     '@typescript-eslint/no-unused-vars': 'warn',
     
-    // 2. Ép buộc các thẻ HTML/Component phải đóng ngắn gọn nếu không có nội dung (Vd: <Button /> thay vì <Button></Button>)
-    'vue/html-self-closing': ['error', {
-      html: { void: 'always', normal: 'always', component: 'always' },
-      svg: 'always',
-      math: 'always'
-    }],
+    'vue/no-v-model-argument': 'off',
     
     // 3. Giới hạn số lượng thuộc tính (props/attributes) trên 1 dòng của thẻ HTML để code không bị dài theo chiều dọc, dễ đọc hơn.
     'vue/max-attributes-per-line': ['warn', {
@@ -35,6 +30,9 @@ export default withNuxt({
     }],
     
     // 4. Cảnh báo khi bạn khai báo kiểu dữ liệu 'any' (Tránh lạm dụng 'any' làm mất đi ý nghĩa của TypeScript)
-    '@typescript-eslint/no-explicit-any': 'warn'
+    '@typescript-eslint/no-explicit-any': 'warn',
+
+    // Tắt quy tắc yêu cầu/không cho phép tự đóng thẻ (Ví dụ: <img />)
+    'vue/html-self-closing': 'off'
   }
 })
