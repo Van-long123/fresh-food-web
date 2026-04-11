@@ -8,16 +8,15 @@
 <script setup lang="ts">
 import PrivacyPolicy from "~/components/PrivacyPolicy.vue";
 
-// SEO meta handled via Nuxt auto-imported useHead
 useHead({
-  title: "Chính Sách Bảo Mật — SmartFood",
+  title: 'Chính sách bảo mật - SmartFood',
   meta: [
-    {
-      name: "description",
-      content: "Chi tiết chính sách bảo mật của SmartFood, GDPR-inspired, bảo vệ quyền riêng tư của người dùng."
-    }
+    { name: 'description', content: 'Trang Chính sách bảo mật của SmartFood' }
   ]
 });
+
+
+
 </script>
 
 <style scoped>

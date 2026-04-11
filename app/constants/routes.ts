@@ -22,6 +22,7 @@ export const ROUTES = {
   // ── Main navigation ─────────────────────────────────────────
   SUPPORT: '/support',
   NEWS: '/news',
+  NEWS_DETAIL: (slug?: string) => `/news/${slug || ''}`,
   ABOUT: '/about',
   VISION_MISSION: '/vision-mission',
   TERMS_OF_SERVICE: '/terms-of-service',

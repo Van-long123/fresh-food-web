@@ -34,9 +34,9 @@
             aria-label="Breadcrumb"
             class="mb-4 flex items-center gap-2 text-sm text-slate-500"
           >
-            <NuxtLink to="/" class="hover:text-orange-600">Trang chu</NuxtLink>
+            <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600">Trang chu</NuxtLink>
             <i class="pi pi-angle-right text-xs" />
-            <NuxtLink to="/news" class="hover:text-orange-600"
+            <NuxtLink :to="ROUTES.NEWS" class="hover:text-orange-600"
               >Tin tuc</NuxtLink
             >
             <i class="pi pi-angle-right text-xs" />
@@ -319,7 +319,7 @@
             <NuxtLink
               v-for="(item, idx) in popularArticles"
               :key="item.id"
-              :to="`/news/${item.slug}`"
+              :to="ROUTES.NEWS_DETAIL(item.slug)"
               class="popular-row"
             >
               <span>{{ String(idx + 1).padStart(2, "0") }}</span>
@@ -338,7 +338,7 @@
           <NuxtLink
             v-for="item in relatedArticles"
             :key="item.id"
-            :to="`/news/${item.slug}`"
+            :to="ROUTES.NEWS_DETAIL(item.slug)"
             class="related-card"
           >
             <img
@@ -365,6 +365,7 @@
 </template>
 
 <script setup lang="ts">
+import { ROUTES } from '~/constants/routes';
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute } from "vue-router";
 

@@ -2,7 +2,7 @@
   <div class="cp-page">
     <!-- Breadcrumb -->
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <NuxtLink to="/" class="bc-link">Tài khoản</NuxtLink>
+      <NuxtLink :to="ROUTES.HOME" class="bc-link">Tài khoản</NuxtLink>
       <i class="pi pi-chevron-right bc-sep" />
       <span class="bc-link bc-dim">Bảo mật</span>
       <i class="pi pi-chevron-right bc-sep" />
@@ -168,10 +168,21 @@
 </template>
 
 <script setup lang="ts">
+
+
 import { ref, reactive, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { usePasswordStrength } from '~/composables/usePasswordStrength'
+import { ROUTES } from '~/constants/routes'
+
+useHead({
+  title: 'Đổi mật khẩu - SmartFood',
+  meta: [
+    { name: 'description', content: 'Trang Đổi mật khẩu của SmartFood' }
+  ]
+});
+
 
 definePageMeta({ layout: 'default' })
 
@@ -239,7 +250,7 @@ const startRedirect = () => {
     if (redirectCountdown.value <= 0) {
       clearInterval(redirectTimer!)
       redirectTimer = null
-      router.push('/')
+      router.push(ROUTES.HOME)
     }
   }, 1000)
 }

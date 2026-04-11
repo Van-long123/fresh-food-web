@@ -35,7 +35,7 @@
       <!-- Brand content -->
       <div class="brand-content">
         <!-- Logo -->
-        <NuxtLink to="/">
+        <NuxtLink :to="ROUTES.HOME">
           <div class="logo-wrap">
             <div class="logo-box">
               <svg
@@ -146,7 +146,7 @@
               <label for="password" class="field-label">
                 Mật khẩu <span class="required">*</span>
               </label>
-              <NuxtLink to="/auth/forgot-password" class="forgot-link"
+              <NuxtLink :to="ROUTES.AUTH.FORGOT_PASSWORD" class="forgot-link"
                 >Quên mật khẩu?</NuxtLink
               >
             </div>
@@ -260,7 +260,7 @@
         <!-- Register link -->
         <p class="field-item register-link-text" style="--delay: 700ms">
           Chưa có tài khoản?
-          <NuxtLink to="/auth/register" class="register-link"
+          <NuxtLink :to="ROUTES.AUTH.REGISTER" class="register-link"
             >Đăng ký ngay →</NuxtLink
           >
         </p>
@@ -270,8 +270,19 @@
 </template>
 
 <script setup lang="ts">
+
+
 import { ref, reactive } from "vue";
+import { ROUTES } from "~/constants/routes";
 import { useToast } from "primevue/usetoast";
+
+useHead({
+  title: 'Đăng nhập - SmartFood',
+  meta: [
+    { name: 'description', content: 'Trang Đăng nhập của SmartFood' }
+  ]
+});
+
 
 definePageMeta({ layout: false });
 

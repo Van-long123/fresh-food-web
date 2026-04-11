@@ -69,7 +69,7 @@
             </button>
           </form>
 
-          <NuxtLink to="/auth/login" class="back-link">
+          <NuxtLink :to="ROUTES.AUTH.LOGIN" class="back-link">
             <i class="pi pi-arrow-left" /> Quay lại đăng nhập
           </NuxtLink>
         </div>
@@ -172,7 +172,7 @@
             <i class="pi pi-refresh" /> Thử email khác
           </button>
 
-          <NuxtLink to="/auth/register" class="back-link mt-3 block">
+          <NuxtLink :to="ROUTES.AUTH.REGISTER" class="back-link mt-3 block">
             Chưa có tài khoản? <strong>Đăng ký ngay →</strong>
           </NuxtLink>
         </div>
@@ -183,14 +183,25 @@
     <!-- Footer link -->
     <p class="page-footer-link">
       Nhớ mật khẩu rồi?
-      <NuxtLink to="/auth/login" class="orange-link">Đăng nhập</NuxtLink>
+      <NuxtLink :to="ROUTES.AUTH.LOGIN" class="orange-link">Đăng nhập</NuxtLink>
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
+
+
 import { ref, computed, onBeforeUnmount } from 'vue'
+import { ROUTES } from "~/constants/routes"
 import { useToast } from 'primevue/usetoast'
+
+useHead({
+  title: 'Quên mật khẩu - SmartFood',
+  meta: [
+    { name: 'description', content: 'Trang Quên mật khẩu của SmartFood' }
+  ]
+});
+
 
 definePageMeta({ layout: false })
 

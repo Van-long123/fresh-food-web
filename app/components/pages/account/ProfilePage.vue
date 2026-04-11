@@ -44,6 +44,7 @@
 
             <button
               class="rounded-full border border-[#f47f20] px-4 py-2 text-sm font-semibold text-[#f47f20] transition hover:bg-[#f47f20] hover:text-white"
+              @click="activeMenu = 'profile'"
             >
               ✎ Chỉnh sửa hồ sơ
             </button>
@@ -72,175 +73,236 @@
         </aside>
 
         <main class="space-y-5">
-          <section class="rounded-2xl bg-white p-5 shadow-sm">
-            <h2 class="text-lg font-bold">Thông tin cá nhân</h2>
-            <form
-              class="mt-4 grid gap-4 md:grid-cols-2"
-              @submit.prevent="saveProfile"
-            >
-              <label class="field">
-                <span>Họ tên</span>
-                <input v-model="editForm.name" class="input" />
-              </label>
-
-              <label class="field">
-                <span>Ngày sinh</span>
-                <input v-model="editForm.birthday" type="date" class="input" />
-              </label>
-
-              <label class="field">
-                <span>Email</span>
-                <div class="relative">
-                  <input
-                    v-model="editForm.email"
-                    disabled
-                    class="input bg-gray-100"
-                  />
-                  <span
-                    class="absolute right-2 top-2 rounded-full bg-gray-200 px-2 py-0.5 text-[10px]"
-                    >Không thể thay đổi</span
-                  >
-                </div>
-              </label>
-
-              <label class="field">
-                <span>Số điện thoại</span>
-                <input v-model="editForm.phone" class="input" />
-              </label>
-
-              <label class="field">
-                <span>Giới tính</span>
-                <div class="mt-1 flex gap-2">
-                  <button
-                    v-for="g in ['Nam', 'Nữ', 'Khác']"
-                    :key="g"
-                    type="button"
-                    class="rounded-full border px-3 py-1 text-sm"
-                    :class="
-                      editForm.gender === g
-                        ? 'border-[#f47f20] bg-[#f47f20] text-white'
-                        : 'border-gray-200'
-                    "
-                    @click="editForm.gender = g"
-                  >
-                    {{ g }}
+          <template v-if="activeMenu === 'profile'">
+            <section class="rounded-2xl bg-white p-5 shadow-sm">
+              <h2 class="text-lg font-bold">Thông tin cá nhân</h2>
+              <form
+                class="mt-4 grid gap-4 md:grid-cols-2"
+                @submit.prevent="saveProfile"
+              >
+                <label class="field">
+                  <span>Họ tên</span>
+                  <input v-model="editForm.name" class="input" />
+                </label>
+  
+                <label class="field">
+                  <span>Ngày sinh</span>
+                  <input v-model="editForm.birthday" type="date" class="input" />
+                </label>
+  
+                <label class="field">
+                  <span>Email</span>
+                  <div class="relative">
+                    <input
+                      v-model="editForm.email"
+                      disabled
+                      class="input bg-gray-100"
+                    />
+                    <span
+                      class="absolute right-2 top-2 rounded-full bg-gray-200 px-2 py-0.5 text-[10px]"
+                      >Không thể thay đổi</span
+                    >
+                  </div>
+                </label>
+  
+                <label class="field">
+                  <span>Số điện thoại</span>
+                  <input v-model="editForm.phone" class="input" />
+                </label>
+  
+                <label class="field">
+                  <span>Giới tính</span>
+                  <div class="mt-1 flex gap-2">
+                    <button
+                      v-for="g in ['Nam', 'Nữ', 'Khác']"
+                      :key="g"
+                      type="button"
+                      class="rounded-full border px-3 py-1 text-sm"
+                      :class="
+                        editForm.gender === g
+                          ? 'border-[#f47f20] bg-[#f47f20] text-white'
+                          : 'border-gray-200'
+                      "
+                      @click="editForm.gender = g"
+                    >
+                      {{ g }}
+                    </button>
+                  </div>
+                </label>
+  
+                <label class="field">
+                  <span>Tỉnh/Thành</span>
+                  <select v-model="editForm.city" class="input">
+                    <option>Hồ Chí Minh</option>
+                    <option>Hà Nội</option>
+                    <option>Đà Nẵng</option>
+                  </select>
+                </label>
+  
+                <div class="md:col-span-2">
+                  <button class="save-btn" :disabled="saving">
+                    <span
+                      v-if="saving"
+                      class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                    />
+                    <span v-if="saveDone">✓ Đã lưu</span>
+                    <span v-else>{{
+                      saving ? "Đang lưu..." : "Lưu thay đổi"
+                    }}</span>
                   </button>
                 </div>
-              </label>
-
-              <label class="field">
-                <span>Tỉnh/Thành</span>
-                <select v-model="editForm.city" class="input">
-                  <option>Hồ Chí Minh</option>
-                  <option>Hà Nội</option>
-                  <option>Đà Nẵng</option>
-                </select>
-              </label>
-
-              <div class="md:col-span-2">
-                <button class="save-btn" :disabled="saving">
-                  <span
-                    v-if="saving"
-                    class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-                  />
-                  <span v-if="saveDone">✓ Đã lưu</span>
-                  <span v-else>{{
-                    saving ? "Đang lưu..." : "Lưu thay đổi"
-                  }}</span>
-                </button>
-              </div>
-            </form>
-          </section>
-
-          <section class="rounded-2xl bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between">
-              <h2 class="text-lg font-bold">Đơn hàng gần đây</h2>
-              <button class="text-sm font-semibold text-[#006ee6]">
-                Xem tất cả
-              </button>
-            </div>
-
-            <article
-              v-for="(order, idx) in orders"
-              :key="order.code"
-              class="order-card mt-3 rounded-xl border border-gray-100 p-4"
-              :style="{ animationDelay: `${idx * 80}ms` }"
+              </form>
+            </section>
+  
+            <section
+              class="rounded-2xl bg-linear-to-r from-[#e8f5e9] to-[#f4fff4] p-5 shadow-sm"
             >
-              <div
-                class="flex flex-wrap items-center justify-between gap-2 text-sm"
-              >
-                <p class="font-semibold">#{{ order.code }}</p>
-                <p class="text-gray-500">{{ order.date }}</p>
-                <span
-                  class="rounded-full px-2 py-1 text-xs font-semibold"
-                  :class="statusClass(order.status)"
-                >
-                  {{ order.status }}
-                </span>
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold">Điểm thưởng & Hạng thành viên</h2>
+                <span class="text-2xl">⭐</span>
               </div>
-              <div class="mt-3 flex items-center justify-between gap-3">
-                <div class="flex -space-x-2">
-                  <img
-                    v-for="img in order.images"
-                    :key="img"
-                    :src="img"
-                    alt="item"
-                    class="h-10 w-10 rounded-lg border-2 border-white object-cover"
-                  />
-                </div>
-                <p class="font-bold text-[#f47f20]">
-                  {{ formatVnd(order.total) }}đ
-                </p>
+              <p class="mt-2 text-4xl font-black text-[#4caf50]">
+                {{ user.points }}
+              </p>
+              <p class="text-sm">
+                Hạng hiện tại: <strong>{{ user.rank }}</strong>
+              </p>
+              <div class="mt-4 h-3 overflow-hidden rounded-full bg-white/70">
+                <div
+                  class="h-full bg-[#4caf50] transition-all duration-700"
+                  :style="{ width: rankProgressVisible ? '72%' : '0%' }"
+                />
               </div>
-              <div class="mt-3 flex items-center justify-between">
+              <p class="mt-1 text-sm text-gray-600">
+                Còn 280 điểm để lên hạng Vàng
+              </p>
+            </section>
+          </template>
+
+          <template v-if="activeMenu === 'orders'">
+            <section class="rounded-2xl bg-white p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold">Đơn hàng gần đây</h2>
                 <button class="text-sm font-semibold text-[#006ee6]">
-                  Xem chi tiết
-                </button>
-                <button
-                  class="rounded-full bg-[#f47f20] px-3 py-1 text-sm font-semibold text-white"
-                >
-                  Mua lại
+                  Xem tất cả
                 </button>
               </div>
-            </article>
-          </section>
-
-          <section
-            class="rounded-2xl bg-linear-to-r from-[#e8f5e9] to-[#f4fff4] p-5 shadow-sm"
-          >
-            <div class="flex items-center justify-between">
-              <h2 class="text-lg font-bold">Điểm thưởng & Hạng thành viên</h2>
-              <span class="text-2xl">⭐</span>
-            </div>
-            <p class="mt-2 text-4xl font-black text-[#4caf50]">
-              {{ user.points }}
-            </p>
-            <p class="text-sm">
-              Hạng hiện tại: <strong>{{ user.rank }}</strong>
-            </p>
-            <div class="mt-4 h-3 overflow-hidden rounded-full bg-white/70">
-              <div
-                class="h-full bg-[#4caf50] transition-all duration-700"
-                :style="{ width: rankProgressVisible ? '72%' : '0%' }"
-              />
-            </div>
-            <p class="mt-1 text-sm text-gray-600">
-              Còn 280 điểm để lên hạng Vàng
-            </p>
-          </section>
-
-          <section class="rounded-2xl bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between">
-              <h2 class="text-lg font-bold">Địa chỉ</h2>
-              <button
-                class="rounded-full border border-[#f47f20] px-3 py-1 text-sm font-semibold text-[#f47f20]"
-                @click="showAddressModal = true"
+  
+              <article
+                v-for="(order, idx) in orders"
+                :key="order.code"
+                class="order-card mt-3 rounded-xl border border-gray-100 p-4"
+                :style="{ animationDelay: `${idx * 80}ms` }"
               >
-                + Thêm địa chỉ
-              </button>
+                <div
+                  class="flex flex-wrap items-center justify-between gap-2 text-sm"
+                >
+                  <p class="font-semibold">#{{ order.code }}</p>
+                  <p class="text-gray-500">{{ order.date }}</p>
+                  <span
+                    class="rounded-full px-2 py-1 text-xs font-semibold"
+                    :class="statusClass(order.status)"
+                  >
+                    {{ order.status }}
+                  </span>
+                </div>
+                <div class="mt-3 flex items-center justify-between gap-3">
+                  <div class="flex -space-x-2">
+                    <img
+                      v-for="img in order.images"
+                      :key="img"
+                      :src="img"
+                      alt="item"
+                      class="h-10 w-10 rounded-lg border-2 border-white object-cover"
+                    />
+                  </div>
+                  <p class="font-bold text-[#f47f20]">
+                    {{ formatVnd(order.total) }}đ
+                  </p>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                  <button class="text-sm font-semibold text-[#006ee6]">
+                    Xem chi tiết
+                  </button>
+                  <button
+                    class="rounded-full bg-[#f47f20] px-3 py-1 text-sm font-semibold text-white"
+                  >
+                    Mua lại
+                  </button>
+                </div>
+              </article>
+            </section>
+          </template>
+
+          <template v-if="activeMenu === 'address'">
+            <section class="rounded-2xl bg-white p-5 shadow-sm">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold">Địa chỉ</h2>
+                <button
+                  class="rounded-full border border-[#f47f20] px-3 py-1 text-sm font-semibold text-[#f47f20]"
+                  @click="showAddressModal = true"
+                >
+                  + Thêm địa chỉ
+                </button>
+              </div>
+              <p class="mt-2 text-sm text-gray-600">{{ defaultAddress }}</p>
+            </section>
+          </template>
+
+          <template v-if="activeMenu === 'voucher'">
+            <section class="rounded-2xl bg-white p-5 shadow-sm">
+              <h2 class="text-lg font-bold">Mã giảm giá</h2>
+              <div class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500">
+                <span class="mb-2 text-4xl">🏷️</span>
+                <p>Bạn chưa có mã giảm giá nào.</p>
+              </div>
+            </section>
+          </template>
+
+          <template v-if="activeMenu === 'favorite'">
+            <section class="rounded-2xl bg-white p-5 shadow-sm">
+              <h2 class="text-lg font-bold">Sản phẩm yêu thích</h2>
+              <div class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500">
+                <span class="mb-2 text-4xl">⭐</span>
+                <p>Danh sách yêu thích đang trống.</p>
+              </div>
+            </section>
+          </template>
+
+          <template v-if="activeMenu === 'notify'">
+            <section class="rounded-2xl bg-white p-5 shadow-sm">
+              <h2 class="text-lg font-bold">Thông báo</h2>
+              <div class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500">
+                <span class="mb-2 text-4xl">🔔</span>
+                <p>Bạn không có thông báo mới.</p>
+              </div>
+            </section>
+          </template>
+
+          <template v-if="activeMenu === 'security'">
+            <section class="rounded-2xl bg-white p-5 shadow-sm">
+              <h2 class="text-lg font-bold">Bảo mật tài khoản</h2>
+              <div class="mt-4">
+                <p class="text-sm text-gray-600">Quản lý các thông tin đăng nhập và phương thức bảo mật.</p>
+              </div>
+            </section>
+          </template>
+
+          <template v-if="activeMenu === 'changePassword'">
+            <div class="change-password-wrapper overflow-hidden rounded-2xl bg-white shadow-sm p-0">
+              <ChangePasswordPage />
             </div>
-            <p class="mt-2 text-sm text-gray-600">{{ defaultAddress }}</p>
-          </section>
+          </template>
+
+          <template v-if="activeMenu === 'logout'">
+            <section class="flex flex-col items-center justify-center rounded-2xl bg-white p-5 py-10 shadow-sm">
+              <h2 class="mb-4 text-xl font-bold">Bạn chắc chắn muốn đăng xuất?</h2>
+              <div class="flex gap-4">
+                <button class="px-6 py-2 rounded-full border border-gray-300 font-semibold text-gray-700 hover:bg-gray-50" @click="activeMenu = 'profile'">Hủy</button>
+                <button class="px-6 py-2 rounded-full bg-red-500 font-semibold text-white hover:bg-red-600">Đăng xuất</button>
+              </div>
+            </section>
+          </template>
         </main>
       </div>
     </div>
@@ -333,6 +395,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import ChangePasswordPage from "~/pages/auth/change-password.vue";
 
 const user = {
   name: "Nguyễn Minh Anh",
@@ -348,30 +411,32 @@ const avatarPreview = ref("https://i.pravatar.cc/180?img=47");
 const avatarInput = ref<HTMLInputElement | null>(null);
 
 const menuItems = [
+  { key: "profile", icon: "👤", label: "Hồ sơ cá nhân" },
   { key: "orders", icon: "📋", label: "Đơn hàng của tôi" },
   { key: "voucher", icon: "🏷️", label: "Mã giảm giá" },
   { key: "favorite", icon: "⭐", label: "Sản phẩm yêu thích" },
   { key: "address", icon: "📍", label: "Địa chỉ" },
   { key: "notify", icon: "🔔", label: "Thông báo" },
   { key: "security", icon: "🔐", label: "Bảo mật" },
+  { key: "changePassword", icon: "🔑", label: "Đổi mật khẩu" },
   { key: "logout", icon: "🚪", label: "Đăng xuất" },
 ] as const;
 
 type MenuKey = (typeof menuItems)[number]["key"];
 
 const mobileTabs = [
+  { key: "profile", icon: "👤", label: "Hồ sơ" },
   { key: "orders", icon: "📋", label: "Đơn hàng" },
-  { key: "voucher", icon: "🏷️", label: "Voucher" },
   { key: "favorite", icon: "⭐", label: "Yêu thích" },
+  { key: "changePassword", icon: "🔑", label: "Mật khẩu" },
   { key: "address", icon: "📍", label: "Địa chỉ" },
-  { key: "security", icon: "🔐", label: "Bảo mật" },
 ] as const satisfies ReadonlyArray<{
   key: MenuKey;
   icon: string;
   label: string;
 }>;
 
-const activeMenu = ref<MenuKey>("orders");
+const activeMenu = ref<MenuKey>("profile");
 const saving = ref(false);
 const saveDone = ref(false);
 const rankProgressVisible = ref(false);
@@ -561,5 +626,21 @@ onMounted(() => {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.change-password-wrapper :deep(.cp-page) {
+  min-height: auto;
+  padding: 0;
+  background: white;
+}
+.change-password-wrapper :deep(.breadcrumb) {
+  display: none;
+}
+.change-password-wrapper :deep(.cp-card) {
+  box-shadow: none;
+  max-width: 100%;
+  padding: 1.5rem;
+  border-radius: 0;
+  animation: none;
 }
 </style>

@@ -452,9 +452,19 @@
 </template>
 
 <script setup lang="ts">
+
+
 import { ref, reactive, computed } from "vue";
 import { useToast } from "primevue/usetoast";
 import { ROUTES } from "~/constants/routes";
+
+useHead({
+  title: 'Đăng ký - SmartFood',
+  meta: [
+    { name: 'description', content: 'Trang Đăng ký của SmartFood' }
+  ]
+});
+
 
 definePageMeta({ layout: false });
 

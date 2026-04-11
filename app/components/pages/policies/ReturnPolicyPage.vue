@@ -176,7 +176,7 @@
               <p class="mt-2 text-sm">{{ item.desc }}</p>
               <div
                 v-if="idx < timelines.length - 1"
-                class="absolute -right-2 top-1/2 hidden h-0.5 w-4 -translate-y-1/2 bg-[#FDBA74] md:block"
+                class="absolute -right-4 top-1/2 hidden h-0.5 w-6 -translate-y-1/2 bg-[#FDBA74] md:block"
               />
             </article>
           </div>
@@ -191,20 +191,10 @@
             <article
               v-for="(step, idx) in processSteps"
               :key="step.title"
-              class="relative rounded-xl border p-4"
-              :class="
-                idx <= activeStep
-                  ? 'border-[#F97316] bg-[#FFF7ED]'
-                  : 'border-[#E5E7EB] bg-[#F9FAFB]'
-              "
+              class="relative rounded-xl border p-4 border-[#E5E7EB] bg-[#F9FAFB]"
             >
               <div
                 class="mb-3 grid h-9 w-9 place-items-center rounded-full text-sm font-bold"
-                :class="
-                  idx <= activeStep
-                    ? 'bg-[#F97316] text-white'
-                    : 'bg-gray-200 text-gray-600'
-                "
               >
                 {{ idx + 1 }}
               </div>
@@ -213,12 +203,7 @@
               <div
                 v-if="idx < processSteps.length - 1"
                 class="absolute -right-4 top-8 hidden h-0.5 w-8 overflow-hidden bg-[#FDBA74] md:block"
-              >
-                <div
-                  class="h-full bg-[#F97316] transition-all duration-500"
-                  :style="{ width: idx < activeStep ? '100%' : '0%' }"
-                />
-              </div>
+              ></div>
             </article>
           </div>
         </section>
@@ -384,12 +369,6 @@ const processSteps = [
 
 const refundMethods = [
   {
-    icon: "💳",
-    title: "Hoàn vào ví SmartFood",
-    time: "Ngay lập tức",
-    note: "Ưu tiên cho đơn hàng trên app/web",
-  },
-  {
     icon: "🏦",
     title: "Chuyển khoản ngân hàng",
     time: "1-3 ngày làm việc",
@@ -409,11 +388,11 @@ const specialCases = [
     content:
       "Các mặt hàng đặt riêng sẽ được hỗ trợ đổi trả theo biên bản xác nhận trước khi đặt.",
   },
-  {
-    title: "Combo/Set sản phẩm",
-    content:
-      "Nếu combo có sản phẩm lỗi, SmartFood xử lý đổi từng phần hoặc đổi trọn bộ tùy tình trạng hàng.",
-  },
+  // {
+  //   title: "Combo/Set sản phẩm",
+  //   content:
+  //     "Nếu combo có sản phẩm lỗi, SmartFood xử lý đổi từng phần hoặc đổi trọn bộ tùy tình trạng hàng.",
+  // },
   {
     title: "Sản phẩm khuyến mãi / flash sale",
     content:

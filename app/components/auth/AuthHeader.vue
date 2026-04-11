@@ -2,7 +2,7 @@
   <div class="text-center mb-8">
     <!-- Logo -->
     <NuxtLink
-      to="/"
+      :to="ROUTES.HOME"
       class="inline-flex items-center justify-center mb-6 hover:opacity-80 transition-opacity"
     >
       <div
@@ -36,7 +36,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ROUTES } from '~/constants/routes';
+
 defineProps({
   title: { type: String, required: true },
   subtitle: { type: String, default: "" },

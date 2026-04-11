@@ -9,16 +9,16 @@
         <p
           class="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-emerald-100"
         >
-          SmartFood Journal
+          Tạp chí SmartFood
         </p>
         <h1 class="text-balance text-3xl font-black leading-tight sm:text-5xl">
-          Fresh Stories For Better Eating
+          Câu Chuyện Tươi Mới Cho Bữa Ăn Thú Vị Hơn
         </h1>
         <p
           class="mt-4 max-w-2xl text-sm leading-7 text-emerald-50 sm:text-base"
         >
-          Nutrition insights, food trends, healthy cooking notes, and seasonal
-          updates from SmartFood.
+          Kiến thức dinh dưỡng, xu hướng ẩm thực, mẹo nấu ăn lành mạnh và cập
+          nhật theo mùa từ SmartFood.
         </p>
 
         <label
@@ -28,9 +28,9 @@
           <input
             v-model="keyword"
             type="text"
-            placeholder="Search topics, ingredients, or article titles..."
+            placeholder="Tìm kiếm chủ đề, nguyên liệu hoặc tiêu đề bài viết..."
             class="w-full bg-transparent text-sm text-white placeholder:text-emerald-100 focus:outline-none"
-            aria-label="Search articles"
+            aria-label="Tìm kiếm bài viết"
           />
         </label>
       </div>
@@ -60,16 +60,16 @@
         </div>
 
         <div class="flex items-center gap-2 text-sm">
-          <label for="newsSort" class="text-slate-500">Sort by</label>
+          <label for="newsSort" class="text-slate-500">Sắp xếp theo</label>
           <select
             id="newsSort"
             v-model="sortBy"
             class="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 focus:border-emerald-500 focus:outline-none"
-            aria-label="Sort articles"
+            aria-label="Sắp xếp bài viết"
           >
-            <option value="latest">Latest</option>
-            <option value="popular">Popular</option>
-            <option value="readTime">Read Time</option>
+            <option value="latest">Mới nhất</option>
+            <option value="popular">Phổ biến</option>
+            <option value="readTime">Thời gian đọc</option>
           </select>
         </div>
       </div>
@@ -81,10 +81,10 @@
       <div class="space-y-10">
         <section>
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-2xl font-black text-slate-900">Featured Stories</h2>
+            <h2 class="text-2xl font-black text-slate-900">Bài Viết Nổi Bật</h2>
             <span
               class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
-              >Editor Picks</span
+              >Biên Tập Viên Chọn</span
             >
           </div>
 
@@ -100,7 +100,7 @@
 
           <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-5">
             <NuxtLink
-              :to="`/news/${featured[0]?.slug}`"
+              :to="ROUTES.NEWS_DETAIL(featured[0]?.slug)"
               class="group relative overflow-hidden rounded-2xl bg-slate-900 p-6 text-white md:col-span-3"
             >
               <img
@@ -130,7 +130,7 @@
               <NuxtLink
                 v-for="item in featured.slice(1, 3)"
                 :key="item.id"
-                :to="`/news/${item.slug}`"
+                :to="ROUTES.NEWS_DETAIL(item.slug)"
                 class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <img
@@ -155,9 +155,11 @@
 
         <section>
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-2xl font-black text-slate-900">Latest Articles</h2>
+            <h2 class="text-2xl font-black text-slate-900">
+              Bài Viết Mới Nhất
+            </h2>
             <span class="text-sm font-semibold text-slate-500"
-              >{{ filteredArticles.length }} posts</span
+              >{{ filteredArticles.length }} bài viết</span
             >
           </div>
 
@@ -185,7 +187,7 @@
             <NuxtLink
               v-for="(article, index) in pagedArticles"
               :key="article.id"
-              :to="`/news/${article.slug}`"
+              :to="ROUTES.NEWS_DETAIL(article.slug)"
               class="news-card group overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
               :data-index="index + (currentPage - 1) * pageSize"
             >
@@ -223,7 +225,7 @@
                   </div>
                 </div>
                 <span class="text-xs font-semibold text-slate-500"
-                  >{{ article.readTime }} min</span
+                  >{{ article.readTime }} phút</span
                 >
               </div>
             </NuxtLink>
@@ -234,7 +236,7 @@
             class="mt-6 flex flex-wrap items-center justify-center gap-2"
           >
             <Button
-              label="Prev"
+              label="Trước"
               severity="secondary"
               outlined
               :disabled="currentPage === 1"
@@ -253,7 +255,7 @@
             />
 
             <Button
-              label="Next"
+              label="Sau"
               severity="secondary"
               outlined
               :disabled="currentPage === totalPages"
@@ -267,12 +269,12 @@
         <section
           class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
         >
-          <h3 class="text-base font-black text-slate-900">Popular Posts</h3>
+          <h3 class="text-base font-black text-slate-900">Bài Viết Phổ Biến</h3>
           <div class="mt-3 space-y-3">
             <NuxtLink
               v-for="(post, idx) in popularPosts"
               :key="post.id"
-              :to="`/news/${post.slug}`"
+              :to="ROUTES.NEWS_DETAIL(post.slug)"
               class="flex items-start gap-3"
             >
               <span class="mt-0.5 text-lg font-black text-emerald-500">{{
@@ -288,35 +290,52 @@
         <section
           class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
         >
-          <h3 class="text-base font-black text-slate-900">Hot Tags</h3>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <span
-              v-for="tag in hotTags"
-              :key="tag"
-              class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"
+          <h3 class="text-base font-black text-slate-900">Chủ Đề Nổi Bật</h3>
+          <div class="mt-3 space-y-2">
+            <div
+              v-for="(topic, idx) in [
+                { label: 'Dinh dưỡng cân bằng', count: '24 bài' },
+                { label: 'Công thức lành mạnh', count: '18 bài' },
+                { label: 'Mua sắm thông minh', count: '12 bài' },
+                { label: 'Ăn theo mùa', count: '9 bài' },
+                { label: 'Sức khoẻ tiêu hoá', count: '7 bài' },
+              ]"
+              :key="idx"
+              class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2"
             >
-              #{{ tag }}
-            </span>
+              <span class="text-sm font-semibold text-slate-700">{{
+                topic.label
+              }}</span>
+              <span class="text-xs font-bold text-emerald-600">{{
+                topic.count
+              }}</span>
+            </div>
           </div>
         </section>
 
         <section
-          class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm"
+          class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
         >
-          <h3 class="text-base font-black text-emerald-800">Newsletter</h3>
-          <p class="mt-2 text-sm leading-6 text-emerald-700">
-            Get weekly nutrition and healthy recipe updates.
+          <h3 class="text-base font-black text-slate-900">Về SmartFood</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">
+            SmartFood là tạp chí ẩm thực & dinh dưỡng, nơi chia sẻ kiến thức
+            khoa học, công thức thực tiễn và lối sống lành mạnh dành cho mọi gia
+            đình Việt.
           </p>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            class="mt-3 w-full rounded-xl border border-emerald-200 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-            aria-label="Newsletter email"
-          />
-          <Button
-            label="Subscribe"
-            class="mt-3! w-full! rounded-xl! border-0! bg-emerald-600! hover:bg-emerald-700!"
-          />
+          <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-xl bg-emerald-50 px-2 py-3">
+              <p class="text-lg font-black text-emerald-600">120+</p>
+              <p class="text-[11px] font-semibold text-slate-500">Bài viết</p>
+            </div>
+            <div class="rounded-xl bg-emerald-50 px-2 py-3">
+              <p class="text-lg font-black text-emerald-600">8</p>
+              <p class="text-[11px] font-semibold text-slate-500">Chuyên gia</p>
+            </div>
+            <div class="rounded-xl bg-emerald-50 px-2 py-3">
+              <p class="text-lg font-black text-emerald-600">4k+</p>
+              <p class="text-[11px] font-semibold text-slate-500">Độc giả</p>
+            </div>
+          </div>
         </section>
       </aside>
     </main>
@@ -324,6 +343,7 @@
 </template>
 
 <script setup lang="ts">
+import { ROUTES } from "~/constants/routes";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 type Article = {
@@ -342,7 +362,7 @@ type Article = {
 
 const keyword = ref("");
 const sortBy = ref<"latest" | "popular" | "readTime">("latest");
-const activeCategory = ref("All");
+const activeCategory = ref("Tất cả");
 const loading = ref(true);
 const currentPage = ref(1);
 const pageSize = 6;
@@ -351,13 +371,13 @@ const articles = ref<Article[]>([
   {
     id: 1,
     slug: "immune-foods-everyday",
-    title: "5 Foods That Naturally Strengthen Your Immune System",
+    title: "5 Thực Phẩm Tự Nhiên Tăng Cường Miễn Dịch",
     excerpt:
-      "Discover daily ingredients that support immunity, digestion, and balanced energy throughout the week.",
-    category: "Nutrition",
+      "Khám phá các nguyên liệu hỗ trợ hệ miễn dịch, tiêu hóa và cân bằng năng lượng hàng ngày.",
+    category: "Dinh dưỡng",
     author: "Lena Nguyen",
     authorInitial: "L",
-    date: "Apr 03, 2026",
+    date: "03 Th04, 2026",
     readTime: 6,
     cover:
       "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
@@ -366,13 +386,13 @@ const articles = ref<Article[]>([
   {
     id: 2,
     slug: "smart-grocery-budget",
-    title: "How To Cut Grocery Costs Without Compromising Nutrition",
+    title: "Cách Cắt Giảm Chi Phí Mua Sắm Không Ảnh Hưởng Dinh Dưỡng",
     excerpt:
-      "A practical framework to shop smarter, avoid waste, and keep healthy meals affordable.",
-    category: "Shopping Tips",
+      "Nguyên tắc mua sắm thông minh, tránh lãng phí và giữ được chi phí hợp lý.",
+    category: "Mẹo mua sắm",
     author: "Mina Tran",
     authorInitial: "M",
-    date: "Apr 02, 2026",
+    date: "02 Th04, 2026",
     readTime: 5,
     cover:
       "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80",
@@ -381,13 +401,13 @@ const articles = ref<Article[]>([
   {
     id: 3,
     slug: "quick-healthy-lunches",
-    title: "7 Quick Lunch Ideas For Busy Weekdays",
+    title: "7 Ý Tưởng Bữa Trưa Nhanh Chóng Cho Ngày Bận Rộn",
     excerpt:
-      "Balanced lunch ideas that take under 20 minutes and still taste fresh and vibrant.",
-    category: "Recipes",
+      "Bữa ăn sáng tạo chỉ tốn chưa đầy 20 phút mà vẫn đảm bảo độ tươi ngon.",
+    category: "Công thức",
     author: "Quynh Le",
     authorInitial: "Q",
-    date: "Apr 01, 2026",
+    date: "01 Th04, 2026",
     readTime: 4,
     cover:
       "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=80",
@@ -396,13 +416,13 @@ const articles = ref<Article[]>([
   {
     id: 4,
     slug: "fiber-and-gut-health",
-    title: "Why Fiber Is Essential For Long-Term Gut Health",
+    title: "Tại Sao Chất Xơ Là Thiết Yếu Cho Tiêu Hóa Khỏe Mạnh",
     excerpt:
-      "Learn how fiber-rich foods help your microbiome and improve satiety over time.",
-    category: "Nutrition",
+      "Tìm hiểu cách thực phẩm giàu chất xơ hỗ trợ hệ vi sinh đường ruột và cải thiện độ no.",
+    category: "Dinh dưỡng",
     author: "Lena Nguyen",
     authorInitial: "L",
-    date: "Mar 30, 2026",
+    date: "30 Th03, 2026",
     readTime: 7,
     cover:
       "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?auto=format&fit=crop&w=1200&q=80",
@@ -411,13 +431,12 @@ const articles = ref<Article[]>([
   {
     id: 5,
     slug: "meal-prep-for-families",
-    title: "Meal Prep For Families: Simple Weekly System",
-    excerpt:
-      "Build a reliable prep routine with reusable ingredient blocks and fast assembly dinners.",
-    category: "Lifestyle",
+    title: "Chuẩn Bị Bữa Ăn Cho Gia Đình: Hệ Thống Đơn Giản Hàng Tuần",
+    excerpt: "Lập thói quen chuẩn bị nhanh chóng cho các bữa tối tuyệt đỉnh.",
+    category: "Lối sống",
     author: "Hao Vo",
     authorInitial: "H",
-    date: "Mar 29, 2026",
+    date: "29 Th03, 2026",
     readTime: 8,
     cover:
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
@@ -426,13 +445,13 @@ const articles = ref<Article[]>([
   {
     id: 6,
     slug: "seasonal-fruits-guide",
-    title: "Seasonal Fruit Guide: What To Buy This Month",
+    title: "Hướng Dẫn Trái Cây Theo Mùa: Nên Mua Gì Tháng Nay",
     excerpt:
-      "Use this seasonal chart to buy fresher fruit and maximize taste, texture, and value.",
-    category: "Shopping Tips",
+      "Sử dụng bảng theo mùa này để mua trái cây đúng mùa, tươi ngon và nhiều hương vị hơn.",
+    category: "Mẹo mua sắm",
     author: "Mina Tran",
     authorInitial: "M",
-    date: "Mar 28, 2026",
+    date: "28 Th03, 2026",
     readTime: 5,
     cover:
       "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80",
@@ -441,14 +460,14 @@ const articles = ref<Article[]>([
 ]);
 
 const categories = computed(() => [
-  "All",
+  "Tất cả",
   ...new Set(articles.value.map((item) => item.category)),
 ]);
 
 const filteredArticles = computed(() => {
   const query = keyword.value.trim().toLowerCase();
   const byCategory = articles.value.filter((article) =>
-    activeCategory.value === "All"
+    activeCategory.value === "Tất cả"
       ? true
       : article.category === activeCategory.value,
   );
@@ -515,12 +534,12 @@ const popularPosts = computed(() =>
   [...articles.value].sort((a, b) => b.views - a.views).slice(0, 5),
 );
 const hotTags = [
-  "clean-eating",
-  "high-protein",
-  "meal-prep",
-  "seasonal",
-  "gut-health",
-  "smart-shopping",
+  "an-sach",
+  "giau-protein",
+  "chuan-bi-bua-an",
+  "theo-mua",
+  "suc-khoe-tieu-hoa",
+  "mua-sam-thong-minh",
 ];
 
 let observer: IntersectionObserver | null = null;

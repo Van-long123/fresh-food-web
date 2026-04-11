@@ -114,8 +114,8 @@
       </section>
 
       <section class="actions">
-        <NuxtLink to="/" class="btn btn-primary">🏠 Về Trang Chủ</NuxtLink>
-        <NuxtLink to="/category/rau-cu-huu-co" class="btn btn-secondary"
+        <NuxtLink :to="ROUTES.HOME" class="btn btn-primary">🏠 Về Trang Chủ</NuxtLink>
+        <NuxtLink :to="ROUTES.CATEGORY('rau-cu-huu-co')" class="btn btn-secondary"
           >🛒 Xem Sản Phẩm</NuxtLink
         >
         <button type="button" class="back-link" @click="router.back()">
@@ -163,6 +163,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import { ROUTES } from '~/constants/routes';
 
 const router = useRouter();
 const keyword = ref("");

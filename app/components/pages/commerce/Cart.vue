@@ -3,7 +3,7 @@
     <div class="container">
       <!-- HEADER SECTION -->
       <nav class="breadcrumb">
-        <NuxtLink to="/">Trang chủ</NuxtLink>
+        <NuxtLink :to="ROUTES.HOME">Trang chủ</NuxtLink>
         <span>›</span>
         <span>Giỏ hàng</span>
       </nav>
@@ -113,7 +113,7 @@
               </article>
             </TransitionGroup>
 
-            <section class="saved-wrap">
+            <!-- <section class="saved-wrap">
               <button
                 type="button"
                 class="saved-head"
@@ -141,7 +141,7 @@
                   </button>
                 </article>
               </div>
-            </section>
+            </section> -->
           </div>
 
           <!-- RIGHT summary -->
@@ -172,12 +172,9 @@
               <p v-else>🎉 Bạn được miễn phí vận chuyển!</p>
               <div class="bar">
                 <span :style="{ width: `${freeShipPercent}%` }" />
-                <i
-                  v-if="shippingFee === 0"
-                  v-for="n in 4"
-                  :key="n"
-                  :style="{ '--i': `${n}` }"
-                />
+                <template v-if="shippingFee === 0">
+                  <i v-for="n in 4" :key="n" :style="{ '--i': `${n}` }" />
+                </template>
               </div>
             </div>
 
@@ -201,7 +198,7 @@
               <small v-if="voucherState === 'error'" class="error-text"
                 >Mã không hợp lệ</small
               >
-              <NuxtLink to="/vouchers">Xem mã của tôi</NuxtLink>
+              <NuxtLink :to="ROUTES.VOUCHERS">Xem mã của tôi</NuxtLink>
             </div>
 
             <div class="eta-card">🚴 Dự kiến giao: Hôm nay 14:00 - 18:00</div>
@@ -267,12 +264,12 @@
           <circle cx="52" cy="90" r="8" fill="#F97316" />
           <circle cx="84" cy="90" r="8" fill="#F97316" />
         </svg>
-        <h2>Giỏ hàng trống bơ...</h2>
+        <h2>Giỏ hàng trống trơn...</h2>
         <p>Hãy khám phá ngay kho thực phẩm tươi ngon!</p>
-        <NuxtLink to="/" class="shop-btn">🛒 Mua sắm ngay</NuxtLink>
-        <NuxtLink to="/profile" class="fav-link"
+        <NuxtLink :to="ROUTES.HOME" class="shop-btn">🛒 Mua sắm ngay</NuxtLink>
+        <!-- <NuxtLink :to="ROUTES.PROFILE" class="fav-link"
           >Xem sản phẩm yêu thích của bạn</NuxtLink
-        >
+        > -->
       </section>
     </div>
 
@@ -295,6 +292,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { ROUTES } from "~/constants/routes";
 
 type CartRow = {
   id: number;
@@ -374,20 +372,20 @@ const items = ref<CartRow[]>([
   },
 ]);
 
-const savedItems = ref([
-  {
-    id: 201,
-    name: "Nho đen không hạt",
-    price: 98000,
-    gradient: "linear-gradient(135deg,#e9d5ff,#ddd6fe)",
-  },
-  {
-    id: 202,
-    name: "Khoai lang mật",
-    price: 35000,
-    gradient: "linear-gradient(135deg,#ffedd5,#fed7aa)",
-  },
-]);
+// const savedItems = ref([
+//   {
+//     id: 201,
+//     name: "Nho đen không hạt",
+//     price: 98000,
+//     gradient: "linear-gradient(135deg,#e9d5ff,#ddd6fe)",
+//   },
+//   {
+//     id: 202,
+//     name: "Khoai lang mật",
+//     price: 35000,
+//     gradient: "linear-gradient(135deg,#ffedd5,#fed7aa)",
+//   },
+// ]);
 
 const suggestItems = [
   {
@@ -521,25 +519,25 @@ const changeQty = (id: number, delta: number) => {
   }, 250);
 };
 
-const moveToCart = (id: number) => {
-  const idx = savedItems.value.findIndex((it) => it.id === id);
-  if (idx < 0) return;
-  const item = savedItems.value[idx];
-  if (!item) return;
-  items.value.unshift({
-    id: Date.now(),
-    checked: true,
-    name: item.name,
-    brand: "SMARTFOOD",
-    variant: "500g",
-    sku: "SKU-SAVED",
-    qty: 1,
-    price: item.price,
-    gradient: item.gradient,
-  });
-  savedItems.value.splice(idx, 1);
-  showToast("Đã chuyển sản phẩm vào giỏ");
-};
+// const moveToCart = (id: number) => {
+//   const idx = savedItems.value.findIndex((it) => it.id === id);
+//   if (idx < 0) return;
+//   const item = savedItems.value[idx];
+//   if (!item) return;
+//   items.value.unshift({
+//     id: Date.now(),
+//     checked: true,
+//     name: item.name,
+//     brand: "SMARTFOOD",
+//     variant: "500g",
+//     sku: "SKU-SAVED",
+//     qty: 1,
+//     price: item.price,
+//     gradient: item.gradient,
+//   });
+//   savedItems.value.splice(idx, 1);
+//   showToast("Đã chuyển sản phẩm vào giỏ");
+// };
 
 const applyVoucher = () => {
   const code = voucherInput.value.trim().toUpperCase();
@@ -1128,6 +1126,8 @@ onUnmounted(() => {
 }
 
 .error-text {
+  margin-top: 4px;
+  display: block;
   color: #ef4444;
 }
 

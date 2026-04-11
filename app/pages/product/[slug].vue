@@ -4,9 +4,19 @@
 </template>
 
 <script setup lang="ts">
+
+
 import { ref, onMounted } from "vue";
 import ProductDetailPage from "~/components/pages/catalog/ProductDetailPage.vue";
 import SkProductDetailPage from "~/components/skeletons/SkProductDetailPage.vue";
+
+useHead({
+  title: 'Chi tiết sản phẩm - SmartFood',
+  meta: [
+    { name: 'description', content: 'Trang Chi tiết sản phẩm của SmartFood' }
+  ]
+});
+
 
 const isLoading = ref(true);
 

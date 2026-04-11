@@ -9,8 +9,8 @@
       <h2 class="text-[19px] font-bold text-[#222] tracking-tight">
         Bạn Không Nên Bỏ Lỡ
       </h2>
-      <router-link
-        to="#"
+      <NuxtLink
+        :to="ROUTES.NEWS"
         class="flex items-center gap-1 text-[13px] font-semibold text-[#4caf50] hover:underline"
       >
         Xem tất cả
@@ -28,7 +28,7 @@
             d="M9 5l7 7-7 7"
           />
         </svg>
-      </router-link>
+      </NuxtLink>
     </div>
 
     <!-- ── Body: 2 cột ── -->
@@ -116,7 +116,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
+import { ROUTES } from '~/constants/routes'
 
 const primaryPost = ref({
   id: 1,

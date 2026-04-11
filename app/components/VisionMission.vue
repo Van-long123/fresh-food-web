@@ -28,7 +28,7 @@
           class="animate-item badge-enter border border-white/60 rounded-full px-5 py-1.5 text-xs sm:text-sm tracking-wide"
           data-delay="300"
         >
-          ✦ Thành lập 2018 · Đà Nẵng ✦
+          ✦ Thành lập 2025 · Đà Nẵng ✦
         </div>
         <h1 class="animate-item hero-title mt-4" data-delay="0">
           Tầm Nhìn &amp; Sứ Mệnh
@@ -139,7 +139,7 @@
             Tầm nhìn
           </p>
           <h3 class="mt-2 text-2xl font-bold">
-            Trở thành chuỗi thực phẩm sạch #1 miền Trung
+            Trở thành chuỗi thực phẩm sạch #1 Đà Nẵng
           </h3>
           <p class="mt-4 text-[#6B7280] leading-7">
             SmartFood hướng tới tiêu chuẩn bán lẻ hiện đại, ứng dụng công nghệ
@@ -213,7 +213,7 @@
 
         <div class="mt-10 flex justify-center">
           <NuxtLink
-            to="/"
+            :to="ROUTES.HOME"
             class="w-full max-w-xs text-center bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold py-3 px-6 rounded-xl transition"
           >
             Khám phá sản phẩm của chúng tôi ->
@@ -246,6 +246,7 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from "vue";
+import { ROUTES } from "~/constants/routes";
 
 // Du lieu mock cho particles
 const particles = [
@@ -265,7 +266,7 @@ const missionBullets = [
 ];
 
 const visionBullets = [
-  "Mở rộng mạng lưới phủ khắp miền Trung",
+  "Mở rộng mạng lưới phủ khắp Đà Nẵng",
   "Chuẩn hóa trải nghiệm mua sắm đa kênh",
   "Tạo tác động tích cực cho cộng đồng địa phương",
 ];

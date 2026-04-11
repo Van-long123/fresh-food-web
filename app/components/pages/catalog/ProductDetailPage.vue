@@ -2,12 +2,12 @@
   <div class="min-h-screen bg-[#f5f5f5] pb-12 text-[#222]">
     <div class="mx-auto max-w-7xl px-4 pt-4 md:px-6">
       <nav class="text-xs text-[#666]">
-        <NuxtLink to="/" class="hover:underline hover:text-[#4caf50]"
+        <NuxtLink :to="ROUTES.HOME" class="hover:underline hover:text-[#4caf50]"
           >Trang chủ</NuxtLink
         >
         <span class="mx-1 text-[#ccc]">›</span>
         <NuxtLink
-          to="/category/rau-cu"
+          :to="ROUTES.CATEGORY('rau-cu')"
           class="hover:underline hover:text-[#4caf50]"
           >{{ categoryName }}</NuxtLink
         >
@@ -332,6 +332,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { ROUTES } from "~/constants/routes";
 
 const categoryName = "Rau củ";
 const product = {

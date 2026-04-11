@@ -311,10 +311,10 @@ const noteItems = [
     title: "Không áp dụng đồng thời 2 mã giảm giá",
     body: "Hệ thống chỉ ghi nhận một mã tối ưu nhất cho mỗi đơn hàng tại cùng thời điểm.",
   },
-  {
-    title: "Mã freeship không áp dụng với đơn COD",
-    body: "Để dùng mã freeship, vui lòng chọn phương thức thanh toán online khi đặt đơn.",
-  },
+  // {
+  //   title: "Mã freeship không áp dụng với đơn COD",
+  //   body: "Để dùng mã freeship, vui lòng chọn phương thức thanh toán online khi đặt đơn.",
+  // },
   {
     title: "Mã có thể hết lượt trước ngày hết hạn",
     body: "Một số mã giới hạn số lượt nên có thể dừng sớm khi đạt ngưỡng phát hành.",

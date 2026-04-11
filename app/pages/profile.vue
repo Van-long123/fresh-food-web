@@ -8,6 +8,11 @@ import { ref, onMounted } from "vue";
 import ProfilePage from "~/components/pages/account/ProfilePage.vue";
 import SkProfilePage from "~/components/skeletons/SkProfilePage.vue";
 
+useHead({
+  title: "Hồ sơ cá nhân - SmartFood",
+  meta: [{ name: "description", content: "Trang Hồ sơ cá nhân của SmartFood" }],
+});
+
 const isLoading = ref(true);
 
 onMounted(() => {

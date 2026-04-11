@@ -100,7 +100,7 @@
 
                 <NuxtLink
                   v-if="activeStep === steps.length"
-                  to="/auth/register"
+                  :to="ROUTES.AUTH.REGISTER"
                   class="btn-primary flex-1"
                 >
                   Đăng ký ngay <i class="pi pi-arrow-right" />
@@ -115,7 +115,7 @@
 
           <p class="login-link-text">
             Đã có tài khoản?
-            <NuxtLink to="/auth/login" class="login-link">Đăng nhập →</NuxtLink>
+            <NuxtLink :to="ROUTES.AUTH.LOGIN" class="login-link">Đăng nhập →</NuxtLink>
           </p>
         </div>
       </div>
@@ -161,6 +161,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { ROUTES } from '~/constants/routes';
 
 const activeStep = ref(1);
 

@@ -153,39 +153,9 @@
               <span>Quyền Riêng Tư</span>
             </div>
             <p class="csb-rights-desc">
-              Bạn có toàn quyền kiểm soát dữ liệu cá nhân tại SmartFood.
+              Chúng tôi luôn chú trọng đến việc bảo vệ thông tin và quyền riêng
+              tư của người dùng.
             </p>
-            <div class="csb-rights-actions">
-              <button class="csb-rights-btn csb-rights-btn--view">
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  class="csb-btn-icon"
-                >
-                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                  <path
-                    fill-rule="evenodd"
-                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                Xem dữ liệu của tôi
-              </button>
-              <button class="csb-rights-btn csb-rights-btn--delete">
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  class="csb-btn-icon"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                Yêu cầu xóa dữ liệu
-              </button>
-            </div>
           </div>
         </div>
       </aside>
@@ -241,7 +211,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                <h3>Dữ liệu tự động thu thập</h3>
+                <h3>Thông tin hệ thống ghi nhận</h3>
               </div>
               <ul class="csb-info-list">
                 <li v-for="item in autoData" :key="item">
@@ -464,7 +434,7 @@
                 <h4>{{ right.title }}</h4>
                 <p>{{ right.description }}</p>
               </div>
-              <div class="csb-right-action">Thực hiện →</div>
+              <!-- <div class="csb-right-action">Thực hiện →</div> -->
             </div>
           </div>
         </section>
@@ -696,12 +666,12 @@ const providedData = [
   "Họ tên và thông tin liên hệ",
   "Địa chỉ giao hàng và hóa đơn",
   "Tài khoản (username, mật khẩu mã hóa)",
-  "Thông tin thanh toán (mã hóa PCI DSS)",
+  "Thông tin thanh toán",
   "Đánh giá sản phẩm và phản hồi",
 ];
 
 const autoData = [
-  "Địa chỉ IP và ID thiết bị",
+  "Thông tin kết nối mạng",
   "Loại trình duyệt và hệ điều hành",
   "Lịch sử duyệt và xem sản phẩm",
   "Thời gian và thời lượng truy cập",

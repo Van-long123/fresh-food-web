@@ -9,7 +9,7 @@
       >
         <!-- Logo -->
         <NuxtLink
-          to="/"
+          :to="ROUTES.HOME"
           class="shrink-0 flex items-center h-10 w-auto hover:opacity-90 transition-opacity"
         >
           <!-- Sử dụng logo.png trong thư mục public/images thay vì text -->
@@ -26,7 +26,10 @@
           <div
             class="relative flex items-center w-full h-9.5 rounded-full bg-white overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] focus-within:ring-2 focus-within:ring-[#ffd3aa] transition-all"
           >
-            <div class="px-3.5 flex items-center justify-center text-[#2196f3]">
+            <div
+              class="px-3.5 flex items-center justify-center text-[#2196f3] cursor-pointer"
+              @click="handleSearch"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="h-4.5 w-4.5"
@@ -41,7 +44,9 @@
               </svg>
             </div>
             <input
+              v-model="searchQuery"
               type="text"
+              @keyup.enter="handleSearch"
               placeholder="Tìm sản phẩm trong Smartfood..."
               class="w-full h-full outline-none text-[13px] text-gray-800 placeholder-gray-400 bg-transparent font-medium"
             />
@@ -199,14 +204,85 @@
       </div>
     </div>
 
-    <Transition name="cart-toast">
-      <div
-        v-if="visibleNotice"
-        class="fixed right-4 top-20 z-70 rounded-xl bg-[#111827] px-4 py-2 text-sm font-medium text-white shadow-xl"
-      >
-        {{ notice }}
-      </div>
-    </Transition>
+    <!-- Thay thế đoạn notice cũ bằng component này -->
+
+    <!-- Trong <template> -->
+    <Teleport to="body">
+      <Transition name="toast">
+        <div
+          v-if="visibleNotice"
+          class="fixed right-4 top-20 z-[9999] w-80 overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/8"
+        >
+          <!-- Green accent bar -->
+          <div
+            class="h-1 w-full bg-gradient-to-r from-emerald-400 to-green-500"
+          />
+
+          <div class="flex items-start gap-3 p-3.5">
+            <!-- Icon -->
+            <div
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-emerald-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            </div>
+
+            <!-- Text -->
+            <div class="flex-1 pt-0.5">
+              <p class="text-[13px] font-bold text-gray-800">
+                Đã thêm vào giỏ hàng
+              </p>
+              <p class="mt-0.5 line-clamp-1 text-[12px] text-gray-500">
+                {{ notice }}
+              </p>
+            </div>
+
+            <!-- Checkmark -->
+            <div
+              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 mt-0.5"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-3 w-3 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Progress bar countdown -->
+          <div
+            class="mx-3.5 mb-3 h-0.5 overflow-hidden rounded-full bg-gray-100"
+          >
+            <div
+              class="h-full rounded-full bg-emerald-400 transition-none"
+              :key="noticeKey"
+              style="animation: toastProgress 2s linear forwards"
+            />
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <Transition name="cart-backdrop">
       <div
@@ -392,6 +468,12 @@
         <!-- Account Info -->
         <div
           class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors border border-gray-100"
+          @click="
+            () => {
+              isMobileMenuOpen = false;
+              $router.push(ROUTES.AUTH.LOGIN);
+            }
+          "
         >
           <div
             class="bg-orange-100 text-[#f47f20] p-2.5 rounded-full shadow-sm"
@@ -520,9 +602,12 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
 import { useCart } from "~/composables/useCart";
 
+const router = useRouter();
+const searchQuery = ref("");
 const isMobileMenuOpen = ref(false);
 const showCartPanel = ref(false);
 const visibleNotice = ref(false);
@@ -542,6 +627,16 @@ const {
 
 const toggleCartPanel = () => {
   showCartPanel.value = !showCartPanel.value;
+};
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({
+      path: ROUTES.SEARCH,
+      query: { q: searchQuery.value.trim() },
+    });
+    isMobileMenuOpen.value = false;
+  }
 };
 
 const handleClickOutside = (event) => {
@@ -621,5 +716,29 @@ onBeforeUnmount(() => {
 .cart-toast-leave-to {
   opacity: 0;
   transform: translateY(-6px);
+}
+
+.toast-enter-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.toast-leave-active {
+  transition: all 0.2s ease-in;
+}
+.toast-enter-from {
+  opacity: 0;
+  transform: translateX(100%) scale(0.9);
+}
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(12px) scale(0.96);
+}
+
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
 }
 </style>

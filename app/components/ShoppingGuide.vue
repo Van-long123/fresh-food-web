@@ -64,10 +64,6 @@
             <h3 class="mt-3 font-bold">{{ step.title }}</h3>
             <p class="text-sm text-[#6B7280] mt-1">{{ step.subtitle }}</p>
             <p class="tooltip">{{ step.tip }}</p>
-            <div
-              v-if="idx < flowSteps.length - 1"
-              class="hidden lg:block absolute top-7 -right-6 w-12 border-t-2 border-dashed border-[#FB923C]"
-            ></div>
           </article>
         </div>
       </div>
@@ -127,7 +123,7 @@
                 >
               </article>
               <article class="rounded-xl border border-[#E5E7EB] p-4">
-                🏷️ Lọc theo giá / thương hiệu -
+                🏷️ Lọc theo giá -
                 <span class="text-sm text-[#6B7280]"
                   >rút gọn kết quả theo nhu cầu.</span
                 >
@@ -145,21 +141,62 @@
             class="detail-section rounded-2xl border border-[#E5E7EB] bg-white p-5"
           >
             <h3 class="text-xl font-bold">§2 - Xem chi tiết & chọn sản phẩm</h3>
-            <div class="mt-4 rounded-xl border border-[#E5E7EB] p-4 max-w-md">
-              <div class="h-28 bg-gray-100 rounded-lg"></div>
-              <p class="mt-2 font-semibold">Cá hồi Nauy phi lê 300g</p>
-              <p class="text-sm text-gray-400 line-through">210.000đ</p>
-              <p class="text-[#DC2626] font-bold">179.000đ</p>
-              <div class="mt-2 flex items-center justify-between">
-                <span
-                  class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full"
-                  >FLASH SALE</span
-                >
-                <button
-                  class="bg-[#F97316] text-white px-3 py-1.5 rounded-lg text-sm"
-                >
-                  Thêm vào giỏ
-                </button>
+            <div
+              class="mt-4 rounded-xl border border-[#E5E7EB] bg-[#f8fafc] p-4 max-w-2xl"
+            >
+              <div
+                class="grid grid-cols-[120px_1fr] sm:grid-cols-[180px_1fr] gap-4 sm:gap-6 rounded-2xl bg-white p-4 shadow-sm"
+              >
+                <div class="relative">
+                  <span
+                    class="absolute left-2 top-2 z-10 rounded bg-[#fced44] px-1.5 py-0.5 text-[10px] font-black text-black"
+                    >-15%</span
+                  >
+                  <div
+                    class="aspect-square w-full rounded-xl bg-gray-100 border border-gray-50 flex items-center justify-center text-gray-300 text-xs shadow-inner"
+                  >
+                    <svg
+                      class="w-8 h-8 opacity-20"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex flex-col justify-center">
+                  <h4
+                    class="font-bold text-[#222] text-[15px] sm:text-[17px] leading-tight"
+                  >
+                    Cá hồi Nauy phi lê tươi ngon 300g (Giao nhanh 2h)
+                  </h4>
+                  <div class="flex items-center gap-2 text-xs mt-2">
+                    <div class="text-[#f59e0b] tracking-wider">★★★★★</div>
+                    <span class="text-gray-400">(128)</span>
+                  </div>
+                  <div class="mt-3 flex items-end gap-2 sm:gap-3">
+                    <p class="text-xl sm:text-[22px] font-black text-[#f47f20]">
+                      179.000đ
+                    </p>
+                    <p class="text-sm text-gray-400 line-through mb-0.5">
+                      210.000đ
+                    </p>
+                  </div>
+                  <div class="mt-4 flex gap-2">
+                    <button
+                      class="flex-1 max-w-[140px] rounded-full bg-linear-to-r from-[#fc5c22] to-[#f47f20] px-3 py-2 text-xs sm:text-sm font-bold text-white shadow-sm hover:brightness-110 transition-all"
+                    >
+                      🛒 Mua ngay
+                    </button>
+                    <button
+                      class="flex-1 max-w-[140px] rounded-full bg-[#eef5fd] text-[#006ee6] px-3 py-2 text-xs sm:text-sm font-semibold hover:bg-[#d6e7f9] transition-colors"
+                    >
+                      Thêm vào giỏ
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
             <ul class="mt-4 list-disc pl-5 text-sm text-[#4B5563] space-y-1">
@@ -179,26 +216,87 @@
             class="detail-section rounded-2xl border border-[#E5E7EB] bg-white p-5"
           >
             <h3 class="text-xl font-bold">§3 - Giỏ hàng & đặt hàng</h3>
-            <div class="mt-4 rounded-xl border border-[#E5E7EB] p-4">
+            <div
+              class="mt-4 rounded-xl border border-[#E5E7EB] p-4 bg-[#f8fafc]"
+            >
               <div class="space-y-3">
-                <div
+                <article
                   v-for="item in 2"
                   :key="item"
-                  class="flex items-center gap-3"
+                  class="flex items-center gap-3 sm:gap-4 rounded-xl border bg-white p-3 sm:p-4 relative"
+                  :class="item === 1 ? 'border-[#fdba74]' : 'border-[#e5e7eb]'"
                 >
-                  <div class="w-12 h-12 bg-gray-100 rounded"></div>
-                  <div class="flex-1">
-                    <p class="font-medium text-sm">Sản phẩm {{ item }}</p>
-                    <p class="text-xs text-[#6B7280]">89.000đ</p>
+                  <div
+                    class="grid place-items-center w-5 h-5 rounded border"
+                    :class="
+                      item === 1
+                        ? 'border-[#f97316] bg-[#f97316] text-white'
+                        : 'border-gray-300 bg-white'
+                    "
+                  >
+                    <span
+                      v-if="item === 1"
+                      class="text-[10px] font-bold fill-current"
+                      ><svg viewBox="0 0 14 14" class="w-3 h-3">
+                        <path d="M5 10L2 7l1-1 2 2 6-6 1 1-7 7z" /></svg
+                    ></span>
                   </div>
-                  <div class="flex items-center gap-1 text-sm">
-                    <button class="w-6 h-6 rounded bg-gray-200">-</button>
-                    <span>1</span>
-                    <button class="w-6 h-6 rounded bg-gray-200 cart-bounce">
-                      +
+                  <div
+                    class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-300 border border-gray-50 shadow-inner"
+                  >
+                    <svg
+                      class="w-6 h-6 opacity-30"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p
+                      class="font-semibold text-[13px] sm:text-[15px] truncate text-[#111827]"
+                    >
+                      Sản phẩm Demo {{ item }}
+                    </p>
+                    <p class="text-[11px] sm:text-xs text-[#6B7280] mt-0.5">
+                      Loại: Tươi sống · Mã: SP0{{ item }}
+                    </p>
+                    <div class="mt-2 flex items-center gap-2">
+                      <button
+                        class="w-6 h-6 sm:w-7 sm:h-7 rounded-md border border-gray-300 bg-gray-50 flex items-center justify-center hover:bg-[#fff7ed] hover:border-[#f97316] hover:text-[#f97316] transition-colors"
+                      >
+                        -
+                      </button>
+                      <strong
+                        class="text-[13px] sm:text-[14px] w-4 text-center"
+                        >{{ item }}</strong
+                      >
+                      <button
+                        class="w-6 h-6 sm:w-7 sm:h-7 rounded-md border border-gray-300 bg-gray-50 flex items-center justify-center hover:bg-[#fff7ed] hover:border-[#f97316] hover:text-[#f97316] transition-colors"
+                        :class="{
+                          'cart-bounce text-[#f97316] border-[#f97316] bg-[#fff7ed]':
+                            item === 1,
+                        }"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="text-right flex flex-col justify-between h-full items-end self-stretch py-1"
+                  >
+                    <p class="text-[15px] sm:text-lg font-bold text-[#ea580c]">
+                      {{ item * 89 }}.000đ
+                    </p>
+                    <button
+                      class="text-gray-400 hover:text-red-500 hover:bg-red-50 w-7 h-7 rounded-md flex items-center justify-center transition-colors"
+                    >
+                      🗑
                     </button>
                   </div>
-                </div>
+                </article>
               </div>
               <div class="mt-4 flex gap-2">
                 <input
@@ -320,7 +418,7 @@
         <p
           class="mt-3 text-center rounded-lg bg-[#FFF7ED] border border-[#FDBA74] p-3 text-[#C2410C] font-semibold"
         >
-          Miễn phí giao hàng khi đơn >= 150.000đ
+          Miễn phí giao hàng khi đơn >= 200.000đ
         </p>
       </div>
     </section>
@@ -467,23 +565,27 @@ const payments = [
 ];
 
 const deliveryTimeline = [
-  "📧 Xác nhận qua email/SMS (ngay lập tức)",
+  "📧 Xác nhận qua email (ngay lập tức)",
   "🏪 Xử lý đơn & đóng gói (1-2h)",
   "🚴 Shipper lấy hàng & giao (trong ngày hoặc hẹn giờ)",
   "✅ Nhận hàng - kiểm tra trước khi ký",
 ];
 
 const shippingMethods = [
-  { icon: "⚡", title: "Giao nhanh 2h", desc: "Trong nội thành Đà Nẵng." },
+  {
+    icon: "⚡",
+    title: "Giao nhanh.",
+    desc: "Trong nội thành Đà Nẵng.",
+  },
   {
     icon: "📅",
-    title: "Giao hẹn giờ",
-    desc: "Chọn khung 2h phù hợp lịch trình.",
+    title: "Giao theo lịch",
+    desc: "Chọn khung giờ phù hợp lịch trình.",
   },
   {
     icon: "🏪",
     title: "Nhận tại cửa hàng",
-    desc: "Miễn phí, sẵn sàng trong 1h.",
+    desc: "Chủ động đến lấy khi đơn sẵn sàng.",
   },
 ];
 
@@ -508,7 +610,7 @@ const faqs = [
   },
   {
     q: "Tôi ở ngoại thành có giao không?",
-    a: "Có hỗ trợ, thời gian và phí giao sẽ hiển thị khi bạn nhập địa chỉ.",
+    a: "Hiện tại chưa hỗ trợ giao hàng đến khu vực ngoại thành.",
   },
   {
     q: "Làm sao biết shipper đang giao đến đâu?",

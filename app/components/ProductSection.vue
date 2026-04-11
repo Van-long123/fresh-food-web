@@ -10,12 +10,12 @@
           Kết thúc sau 02:45:10
         </div>
       </div>
-      <router-link to="#" class="text-sm font-semibold text-green-600 hover:text-green-700 flex items-center gap-1 group">
-        Xem tất cả
+        <NuxtLink :to="ROUTES.CATEGORY('khuyen-mai-hot')" class="text-sm font-semibold text-green-600 hover:text-green-700 flex items-center gap-1 group">
+          Xem tất cả
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-      </router-link>
+      </NuxtLink>
     </div>
 
     <!-- Layout Horizontal Scroll for Mobile, Grid for Desktop -->
@@ -30,6 +30,7 @@
 </template>
 
 <script setup>
+import { ROUTES } from "~/constants/routes";
 import ProductCard from './ProductCard.vue'
 
 defineProps({

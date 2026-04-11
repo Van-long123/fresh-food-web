@@ -2,7 +2,9 @@
   <div class="min-h-screen bg-[#f5f5f5] pb-14 text-[#111827]">
     <div class="mx-auto max-w-7xl px-4 pt-4 md:px-6">
       <nav class="text-xs text-[#666]">
-        <NuxtLink to="/" class="hover:text-[#4caf50]">Trang chủ</NuxtLink>
+        <NuxtLink :to="ROUTES.HOME" class="hover:text-[#4caf50]"
+          >Trang chủ</NuxtLink
+        >
         <span class="mx-1 text-[#ccc]">›</span>
         <span>Danh mục</span>
         <span class="mx-1 text-[#ccc]">›</span>
@@ -163,7 +165,7 @@
             </div>
           </div>
 
-          <div class="mt-5">
+          <!-- <div class="mt-5">
             <h3 class="text-sm font-bold">Thương hiệu</h3>
             <label
               v-for="brand in brands"
@@ -178,7 +180,7 @@
               />
               <span>{{ brand }}</span>
             </label>
-          </div>
+          </div> -->
         </aside>
 
         <div>
@@ -187,10 +189,7 @@
             class="grid gap-4 grid-cols-2 md:grid-cols-3"
             :class="gridCols === 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'"
           >
-            <SkProductCard
-              v-for="n in 10"
-              :key="n"
-            />
+            <SkProductCard v-for="n in 10" :key="n" />
           </div>
 
           <div
@@ -252,6 +251,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { ROUTES } from "~/constants/routes";
 import SkProductCard from "~/components/skeletons/SkProductCard.vue";
 
 const categoryName = ref("Rau củ tươi");

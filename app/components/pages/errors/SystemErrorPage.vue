@@ -79,7 +79,9 @@ Trace ID: SF-500-{{ nowToken }}</pre
             <button type="button" class="reload-btn" @click="reloadNow">
               Tải lại ngay
             </button>
-            <NuxtLink to="/" class="home-link">Hoặc về trang chủ</NuxtLink>
+            <NuxtLink :to="ROUTES.HOME" class="home-link"
+              >Hoặc về trang chủ</NuxtLink
+            >
           </div>
         </div>
       </section>
@@ -89,7 +91,7 @@ Trace ID: SF-500-{{ nowToken }}</pre
         <div class="contact-cards">
           <article>📞 Hotline: 1800.xxxx (Miễn phí)</article>
           <article>💬 Live Chat: Chat ngay trên app</article>
-          <article>✉️ Email: support@smartfood.vn</article>
+          <article>✉️ Email: hotro@smartfood.vn</article>
         </div>
       </section>
     </main>
@@ -103,6 +105,7 @@ Trace ID: SF-500-{{ nowToken }}</pre
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import { ROUTES } from "~/constants/routes";
 
 const totalSeconds = 30;
 const remaining = ref(totalSeconds);

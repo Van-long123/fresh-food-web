@@ -5,25 +5,7 @@
          ═══════════════════════════════════════ -->
     <section class="hero" ref="heroRef">
       <!-- SVG Pattern lá cây mờ nhạt -->
-      <div class="hero-pattern" aria-hidden="true">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="leaf"
-              width="60"
-              height="60"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M30 10 C40 10 50 20 50 30 C50 40 40 50 30 50 C20 50 10 40 10 30 C10 20 20 10 30 10Z M30 10 Q35 20 30 30 Q25 20 30 10Z"
-                fill="white"
-                fill-opacity="0.08"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#leaf)" />
-        </svg>
-      </div>
+      <div class="hero-pattern" aria-hidden="true"></div>
 
       <div class="hero-content" :class="{ visible: heroVisible }">
         <span class="hero-badge">✦ Thành lập 2026 ✦</span>
@@ -97,7 +79,7 @@
             <span class="story-label">VỀ CHÚNG TÔI</span>
             <h2 class="story-h2">Chúng Tôi Tin Vào<br />Thực Phẩm Sạch</h2>
             <p class="story-p">
-              SmartFood ra đời năm 2018 từ một niềm tin đơn giản: mỗi gia đình
+              SmartFood ra đời năm 2025 từ một niềm tin đơn giản: mỗi gia đình
               Việt Nam xứng đáng được tiếp cận thực phẩm tươi ngon, an toàn và
               rõ nguồn gốc. Chúng tôi bắt đầu từ một cửa hàng nhỏ tại Đà Nẵng,
               với cam kết kết nối trực tiếp nông trại đến bàn ăn.
@@ -341,7 +323,7 @@ const missionCards = [
   {
     title: "Tầm Nhìn",
     icon: `<svg viewBox="0 0 48 48" fill="none" class="mc-svg"><ellipse cx="24" cy="24" rx="20" ry="12" stroke="#F97316" stroke-width="3"/><circle cx="24" cy="24" r="5" fill="#F97316"/><path d="M4 24C4 24 10 10 24 10C38 10 44 24 44 24" stroke="#F97316" stroke-width="2" stroke-dasharray="3 3"/></svg>`,
-    text: "Trở thành nền tảng thương mại điện tử thực phẩm sạch số 1 Việt Nam vào năm 2028, phục vụ 2 triệu gia đình với hơn 5.000 sản phẩm hữu cơ được chứng nhận.",
+    text: "Trở thành nền tảng thương mại điện tử thực phẩm sạch số 1 Việt Nam vào năm 2029, phục vụ 2 triệu gia đình với hơn 5.000 sản phẩm hữu cơ được chứng nhận.",
   },
   {
     title: "Giá Trị",
@@ -360,47 +342,42 @@ const coreValues = [
 // ═══ TIMELINE ════════════════════════════════════════════
 const timeline = [
   {
-    year: "2018",
+    year: "2025",
     title: "Khai sinh SmartFood",
-    desc: "Thành lập tại Đà Nẵng với cửa hàng đầu tiên, cam kết 100% thực phẩm sạch từ nông trại địa phương.",
+    desc: "Thành lập tại Đà Nẵng, cam kết 100% thực phẩm sạch từ nông trại địa phương.",
   },
   {
-    year: "2019",
+    year: "2025",
     title: "Mở rộng danh mục",
-    desc: "Ra mắt hơn 500 sản phẩm từ rau củ, trái cây đến thịt cá hữu cơ, hợp tác cùng 10 trang trại đối tác.",
+    desc: "Ra mắt hơn 200 sản phẩm từ rau củ, trái cây đến thịt cá hữu cơ.",
   },
   {
-    year: "2020",
+    year: "2025",
     title: "Nền tảng online ra đời",
     desc: "Ứng dụng SmartFood ra mắt, mang đến trải nghiệm mua sắm thực phẩm sạch 24/7 ngay trên điện thoại.",
   },
   {
-    year: "2022",
-    title: "100.000 khách hàng",
-    desc: "Cột mốc 100.000 gia đình tin tưởng, mở rộng giao hàng toàn tỉnh Quảng Nam và bắt đầu phủ sóng TP.HCM.",
-  },
-  {
-    year: "2024",
-    title: "Hệ sinh thái 50+ đối tác",
-    desc: "Hợp tác 50+ nhà cung cấp toàn quốc, đạt chứng nhận VSATTP, triển khai chuỗi lạnh tiêu chuẩn quốc tế.",
+    year: "2025",
+    title: "Hệ sinh thái 10+ đối tác",
+    desc: "Hợp tác 10+ nhà cung cấp toàn quốc, đạt chứng nhận VSATTP, triển khai chuỗi lạnh tiêu chuẩn quốc tế.",
   },
 ];
 
 // ═══ ĐỘI NGŨ ═════════════════════════════════════════════
 const team = [
   {
-    name: "Nguyễn Minh Tuấn",
+    name: "Phạm Văn Long",
     role: "CEO & Co-Founder",
-    initials: "NMT",
+    initials: "PVL",
     gradient: "linear-gradient(135deg, #F97316, #EA580C)",
     quote: "Thực phẩm sạch không phải xa xỉ phẩm — đó là quyền cơ bản",
     bio: "10 năm kinh nghiệm ngành FMCG, từng làm việc tại Vincommerce và Big C trước khi sáng lập SmartFood.",
     socials: ["LinkedIn", "Twitter"],
   },
   {
-    name: "Trần Thị Lan Anh",
+    name: "Phạm Văn Long",
     role: "COO & Co-Founder",
-    initials: "TLA",
+    initials: "PVL",
     gradient: "linear-gradient(135deg, #16A34A, #15803D)",
     quote:
       "Vận hành tốt là khi khách hàng nhận hàng mà không nghĩ đến vận hành",
@@ -408,18 +385,18 @@ const team = [
     socials: ["LinkedIn"],
   },
   {
-    name: "Lê Hoàng Nam",
+    name: "Phạm Văn Long",
     role: "CTO",
-    initials: "LHN",
+    initials: "PVL",
     gradient: "linear-gradient(135deg, #6366F1, #4F46E5)",
     quote: "Công nghệ là cầu nối giữa nông trại và bàn ăn",
     bio: "Senior Engineer với kinh nghiệm tại Grab và Tiki, chủ trì xây dựng toàn bộ platform SmartFood từ đầu.",
     socials: ["GitHub", "LinkedIn"],
   },
   {
-    name: "Phạm Đình Khoa",
+    name: "Phạm Văn Long",
     role: "Head of Sourcing",
-    initials: "PDK",
+    initials: "PVL",
     gradient: "linear-gradient(135deg, #F59E0B, #D97706)",
     quote: "Mỗi sản phẩm tốt bắt đầu từ mảnh đất tốt",
     bio: "Kỹ sư nông nghiệp, 12 năm làm việc với nông dân trên khắp Tây Nguyên và miền Trung, am hiểu sâu về canh tác hữu cơ.",

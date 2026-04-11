@@ -18,7 +18,7 @@
 
         <!-- 6 Circular Campaign Badges -->
         <div
-          class="flex items-center gap-4 sm:gap-6 mb-8 overflow-x-auto pb-2 custom-scrollbar hide-scrollbar-mobile px-1"
+          class="flex items-center gap-4 sm:gap-6 mb-8 overflow-x-auto pb-2 custom-scrollbar hide-scrollbar-mobile px-1 pt-1"
         >
           <div
             v-for="cat in categoriesMenu"
@@ -49,9 +49,7 @@
         </div>
 
         <!-- Khuyen Mai HOT section wrapper -->
-        <div
-          class="bg-[#fdebea] rounded-xl p-4 sm:p-5 mb-10 border border-red-100/50 shadow-sm relative group/slider"
-        >
+        <div class="p-4 sm:p-5 mb-10 relative group/slider">
           <!-- Navigation Arrows for Hot Section -->
           <button
             @click="scrollHot('left')"
@@ -103,7 +101,7 @@
 
           <div class="flex justify-center mt-6">
             <NuxtLink
-              to="#"
+              :to="ROUTES.CATEGORY('khuyen-mai-hot')"
               class="text-[#006ee6] text-[13px] font-bold hover:underline flex items-center gap-1 group/link"
             >
               Xem tất cả
@@ -203,7 +201,7 @@
 
         <div class="flex justify-center mb-10 pb-6 border-b border-gray-200">
           <NuxtLink
-            to="#"
+            :to="ROUTES.CATEGORY('the-gioi-trai-cay')"
             class="text-[#006ee6] text-[13px] font-bold hover:underline flex items-center gap-1 group/link"
           >
             Xem tất cả
@@ -236,12 +234,23 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import { ROUTES } from "~/constants/routes";
 import Sidebar from "~/components/layout/Sidebar.vue";
 import ProductCard from "~/components/ProductCard.vue";
 import HeroBanner from "~/components/HeroBanner.vue";
 import BlogSection from "~/components/BlogSection.vue";
 import BackToTop from "~/components/BackToTop.vue";
 import SkHomePage from "~/components/skeletons/SkHomePage.vue";
+
+useHead({
+  title: "SmartFood - Nguồn Thực Phẩm Sạch",
+  meta: [
+    {
+      name: "description",
+      content: "Hệ thống cửa hàng thực phẩm sạch, uy tín hàng đầu",
+    },
+  ],
+});
 
 const isLoading = ref(true);
 
@@ -299,7 +308,7 @@ const hotProducts = ref([
     discountPercent: 24,
     isBestPrice: true,
     isOnlineExclusive: true,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 5,
@@ -323,7 +332,7 @@ const hotProducts = ref([
     discountPercent: 22,
     isBestPrice: true,
     isOnlineExclusive: true,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 7,
@@ -335,7 +344,7 @@ const hotProducts = ref([
     discountPercent: 25,
     isBestPrice: true,
     isOnlineExclusive: true,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 8,
@@ -347,7 +356,7 @@ const hotProducts = ref([
     discountPercent: 27,
     isBestPrice: true,
     isOnlineExclusive: true,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 9,
@@ -359,7 +368,7 @@ const hotProducts = ref([
     discountPercent: 10,
     isBestPrice: true,
     isOnlineExclusive: true,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 10,
@@ -380,19 +389,20 @@ const fruitProducts = ref([
     id: 11,
     name: "Combo bơ & chuối (1 Combo)",
     image:
-      "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=800&q=80",
+      // "https://images.unsplash.com/photo-1528825871115-3581a5387919?auto=format&fit=crop&w=800&q=80",
+      "https://img.onelife.vn/2_BAJtvzjW5_lrRVvYVZt59BwatRGmjRUOG5zTtaB9k/rs:fit:250:250:1/aHR0cHM6Ly9pbWcub25lbGlmZS52bi90UnZPanVNZjNSOHpKM01QNWxDazVfVEF3LWJLMGMzRFN6UFRjN21qQ3dBL3JzOmZpdDoyNTA6MjUwOjEvYUhSMGNITTZMeTl6ZEc5eVlXZGxMbWR2YjJkc1pXRndhWE11WTI5dEwyOXVaV3hwWm1VdGNIVmliR2xqTDA5TU1UYzNNRGMzTmpBd05qZzNPQzVxY0dj",
     price: 60000,
     originalPrice: 114940,
     discountPercent: 47,
-    isBestPrice: true,
+    isBestPrice: false,
     isOnlineExclusive: true,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 12,
     name: "Dưa hấu giống Mỹ trái từ 2.5kg (1 Trái)",
     image:
-      "https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?auto=format&fit=crop&w=800&q=80",
+      "https://img.onelife.vn/wQaZlO5ZbN0EhkiGTtzRGjLgTFS-9eojgpuGiMGTTs0/rs:fit:250:250:1/aHR0cHM6Ly9pbWcub25lbGlmZS52bi9feFpPcDkxMUNEdGlJTXczMlN4Qndfb0xEYy1fMzg3UU5xcEJKTGJscWdRL3JzOmZpdDoyNTA6MjUwOjEvYUhSMGNITTZMeTl6ZEc5eVlXZGxMbWR2YjJkc1pXRndhWE11WTI5dEwzTmpYM0JqYlY5d2NtOWtkV04wTDNCeWIyUXZNakF5TlM4Mkx6TXdMell5TmprME9TMVRkV0ZmTWk1M1pXSnc",
     price: 47500,
     originalPrice: 85000,
     discountPercent: 44,
@@ -404,25 +414,26 @@ const fruitProducts = ref([
     id: 13,
     name: "Combo chuối Nam Mỹ + sữa uống lên men Yakult...",
     image:
-      "https://images.unsplash.com/photo-1571508601891-ca5e7a713859?auto=format&fit=crop&w=800&q=80",
+      "https://img.onelife.vn/wwtff5ZSiom5ix5WaRLi-63scYcbIOIeAvXe_Y6RwAo/rs:fit:250:250:1/aHR0cHM6Ly9pbWcub25lbGlmZS52bi9UR3dRRDluUFBmeUVEdDh1N2FzME9naUdQbFZpSGtQb0hoSWZNQW92bjZnL3JzOmZpdDoyNTA6MjUwOjEvYUhSMGNITTZMeTl6ZEc5eVlXZGxMbWR2YjJkc1pXRndhWE11WTI5dEwyOXVaV3hwWm1VdGNIVmliR2xqTDA5TU1UYzFPVEk1TXpReU5EVTJOeTFpTWpFdWFuQm4",
+
     price: 40000,
     originalPrice: 59800,
     discountPercent: 33,
     isBestPrice: false,
     isOnlineExclusive: false,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 14,
     name: "Combo sữa Yakult + Chuối Nam Mỹ (1 combo)",
     image:
-      "https://images.unsplash.com/photo-1571508601891-ca5e7a713859?auto=format&fit=crop&w=800&q=80",
+      "https://img.onelife.vn/A0RHHHeLSQVzeu-UeGxMkbGWY4tQ9mhGG9-4bgwNSFk/rs:fit:250:250:1/aHR0cHM6Ly9pbWcub25lbGlmZS52bi80Q3U5aUNIWF9ocWoybHNjTnJ2LUVVam45UDZQR2I3Y0dPYWZYR19TZjQ0L3JzOmZpdDoyNTA6MjUwOjEvYUhSMGNITTZMeTl6ZEc5eVlXZGxMbWR2YjJkc1pXRndhWE11WTI5dEwzTmpYM0JqYlY5d2NtOWtkV04wTDNCeWIyUXZNakF5TlM4eE1DOHlNQzgyTmprMk5ESXRPRGt6TlRFeU9EY3hNREE1TXk1M1pXSnc",
     price: 40000,
     originalPrice: 58800,
     discountPercent: 31,
     isBestPrice: false,
     isOnlineExclusive: true,
-    buttonText: "Mua combo",
+    buttonText: "Mua",
   },
   {
     id: 15,

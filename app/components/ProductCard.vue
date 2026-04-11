@@ -1,10 +1,10 @@
 <template>
   <div
-    class="bg-white rounded border border-gray-100/50 hover:shadow-md transition-shadow duration-300 group flex flex-col h-full overflow-hidden"
+    class="transition-shadow duration-300 group flex flex-col h-full overflow-hidden"
   >
     <!-- Image Box -->
     <div
-      class="relative pt-[100%] overflow-hidden bg-white shrink-0 cursor-pointer"
+      class="relative pt-[100%] overflow-hidden bg-white shrink-0 cursor-pointer rounded-lg"
     >
       <!-- Top Left Tags -->
       <div
@@ -27,7 +27,7 @@
       <img
         :src="product.image"
         :alt="product.name"
-        class="absolute inset-0 w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+        class="absolute inset-0 w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-lg"
         loading="lazy"
       />
 
@@ -44,9 +44,9 @@
     </div>
 
     <!-- Content Box -->
-    <div class="p-3 flex flex-col flex-1 bg-white">
+    <div class="flex flex-col flex-1 bg-white">
       <h3
-        class="text-[13px] font-normal text-gray-800 line-clamp-2 mb-2 group-hover:text-[#f47f20] transition-colors cursor-pointer flex-1"
+        class="text-[13px] font-normal text-gray-800 line-clamp-2 mb-1 mt-1 group-hover:text-[#f47f20] transition-colors cursor-pointer flex-1"
         :title="product.name"
       >
         {{ product.name }}
