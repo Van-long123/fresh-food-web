@@ -8,7 +8,8 @@ import Aura from '@primevue/themes/aura';
     modules: [
       '@primevue/nuxt-module',
       '@nuxt/eslint',
-      '@nuxtjs/google-fonts'
+      '@nuxtjs/google-fonts',
+      '@pinia/nuxt',
     ],
 
     googleFonts: {

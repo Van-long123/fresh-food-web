@@ -51,5 +51,12 @@ export const ROUTES = {
 
   // ── Cart ─────────────────────────────────────────────────────
   CART: '/cart',
+
+  // ── Order ────────────────────────────────────────────────────
+  ORDER: {
+    CART_INFO: '/order/cart-info',
+    CHECKOUT: '/order/checkout',
+    INFO: '/order/info',
+  },
 } as const
 

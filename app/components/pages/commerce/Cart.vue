@@ -292,6 +292,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
 
 type CartRow = {
@@ -548,11 +549,13 @@ const applyVoucher = () => {
   voucherState.value = "error";
 };
 
+const router = useRouter();
+
 const checkoutNow = () => {
   loadingCheckout.value = true;
   setTimeout(() => {
     loadingCheckout.value = false;
-    showToast("Đang xử lý đơn hàng...");
+    router.push(ROUTES.ORDER.CHECKOUT);
   }, 1000);
 };
 
