@@ -1,22 +1,39 @@
 <template>
-  <div class="vct-page">
+  <div class="font-sans text-gray-800 bg-white overflow-x-hidden">
     <!-- ═══════════════════════════════════════
          SECTION 1 — HERO CINEMATIC
          ═══════════════════════════════════════ -->
     <section class="hero" ref="heroRef">
       <!-- SVG Pattern lá cây mờ nhạt -->
-      <div class="hero-pattern" aria-hidden="true"></div>
+      <div
+        class="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
+      ></div>
 
-      <div class="hero-content" :class="{ visible: heroVisible }">
+      <div
+        class="hero-content relative z-[2] text-center"
+        :class="{ visible: heroVisible }"
+      >
         <span class="hero-badge">✦ Thành lập 2026 ✦</span>
         <h1 class="hero-title">Câu Chuyện Của SmartFood</h1>
         <p class="hero-sub">
           Hành trình mang thực phẩm sạch, an toàn đến từng bữa ăn Việt
         </p>
-        <div class="hero-stats">
-          <div class="hero-stat" v-for="s in heroStats" :key="s.label">
-            <span class="hero-stat-num">{{ s.display }}{{ s.suffix }}</span>
-            <span class="hero-stat-label">{{ s.label }}</span>
+        <div
+          class="flex justify-center gap-12 border-t border-white/20 pt-6 mt-2 flex-wrap"
+        >
+          <div
+            class="flex flex-col items-center gap-[0.2rem]"
+            v-for="s in heroStats"
+            :key="s.label"
+          >
+            <span
+              class="text-[1.875rem] font-black text-orange-200 leading-none"
+              >{{ s.display }}{{ s.suffix }}</span
+            >
+            <span class="text-[0.8rem] text-white/75 font-medium">{{
+              s.label
+            }}</span>
           </div>
         </div>
       </div>
@@ -25,15 +42,19 @@
     <!-- ═══════════════════════════════════════
          SECTION 2 — CÂU CHUYỆN THƯƠNG HIỆU
          ═══════════════════════════════════════ -->
-    <section class="story-section">
-      <div class="sw">
+    <section class="py-20 bg-white">
+      <div class="max-w-[1200px] mx-auto px-5">
         <div class="story-grid">
           <!-- Ảnh bên trái -->
-          <div class="story-img-wrap reveal" ref="storyImgRef">
-            <div class="story-img-placeholder">
-              <div class="story-img-overlay" />
-              <div class="story-img-center">
-                <svg viewBox="0 0 120 120" fill="none" class="story-svg">
+          <div class="reveal" ref="storyImgRef">
+            <div
+              class="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl aspect-[4/3] relative overflow-hidden flex items-center justify-center"
+            >
+              <div
+                class="absolute bottom-0 right-0 w-[60%] h-[60%] bg-gradient-to-br from-transparent to-orange-500/50 rounded-[1.5rem_0_1.5rem_0]"
+              ></div>
+              <div class="relative z-[1]">
+                <svg viewBox="0 0 120 120" fill="none" class="w-32 h-32">
                   <circle
                     cx="60"
                     cy="60"
@@ -70,33 +91,49 @@
                   />
                 </svg>
               </div>
-              <span class="organic-badge">🌿 100% Organic</span>
+              <span
+                class="absolute bottom-5 left-5 bg-white text-green-600 text-[0.8rem] font-bold py-[0.375rem] px-[0.875rem] rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+                >🌿 100% Organic</span
+              >
             </div>
           </div>
 
           <!-- Text bên phải -->
           <div class="story-text reveal" ref="storyTextRef">
-            <span class="story-label">VỀ CHÚNG TÔI</span>
-            <h2 class="story-h2">Chúng Tôi Tin Vào<br />Thực Phẩm Sạch</h2>
-            <p class="story-p">
+            <span
+              class="block text-xs font-bold text-orange-500 tracking-[0.12em] uppercase mb-3"
+              >VỀ CHÚNG TÔI</span
+            >
+            <h2
+              class="text-[2rem] font-black text-gray-900 mb-5 leading-[1.25]"
+            >
+              Chúng Tôi Tin Vào<br />Thực Phẩm Sạch
+            </h2>
+            <p class="text-[0.9375rem] text-gray-600 leading-[1.8] mb-4">
               SmartFood ra đời năm 2025 từ một niềm tin đơn giản: mỗi gia đình
               Việt Nam xứng đáng được tiếp cận thực phẩm tươi ngon, an toàn và
               rõ nguồn gốc. Chúng tôi bắt đầu từ một cửa hàng nhỏ tại Đà Nẵng,
               với cam kết kết nối trực tiếp nông trại đến bàn ăn.
             </p>
-            <p class="story-p">
+            <p class="text-[0.9375rem] text-gray-600 leading-[1.8] mb-4">
               Hôm nay, SmartFood phục vụ hơn 500.000 gia đình, hợp tác cùng 50+
               nhà cung cấp được kiểm định nghiêm ngặt, và tiên phong xây dựng hệ
               thống thương mại điện tử thực phẩm sạch hàng đầu miền Trung.
             </p>
-            <ul class="story-bullets">
-              <li v-for="b in storyBullets" :key="b">
-                <span class="bullet-check">✓</span>{{ b }}
+            <ul class="list-none p-0 my-4 mb-7 flex flex-col gap-[0.625rem]">
+              <li
+                v-for="b in storyBullets"
+                :key="b"
+                class="flex items-center gap-[0.625rem] text-[0.9rem] text-gray-700 font-medium"
+              >
+                <span class="text-green-600 font-black text-base shrink-0"
+                  >✓</span
+                >{{ b }}
               </li>
             </ul>
-            <div class="story-btns">
-              <button class="btn-primary">Xem sản phẩm của chúng tôi</button>
-              <button class="btn-outline">Liên hệ</button>
+            <div class="flex gap-4 flex-wrap">
+              <button class="btn-primary-au">Xem sản phẩm của chúng tôi</button>
+              <button class="btn-outline-au">Liên hệ</button>
             </div>
           </div>
         </div>
@@ -106,11 +143,13 @@
     <!-- ═══════════════════════════════════════
          SECTION 3 — SỨ MỆNH & GIÁ TRỊ CỐT LÕI
          ═══════════════════════════════════════ -->
-    <section class="mission-section">
-      <div class="sw">
+    <section class="py-20 bg-orange-50">
+      <div class="max-w-[1200px] mx-auto px-5">
         <div class="section-header reveal" ref="missionHdrRef">
-          <h2 class="section-title">Sứ Mệnh &amp; Giá Trị</h2>
-          <p class="section-sub">
+          <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
+            Sứ Mệnh &amp; Giá Trị
+          </h2>
+          <p class="text-[0.95rem] text-gray-500 text-center mb-10">
             Những nguyên tắc định hướng mọi quyết định của chúng tôi
           </p>
         </div>
@@ -122,17 +161,27 @@
             :style="{ transitionDelay: `${i * 120}ms` }"
             :ref="(el) => observeEl(el)"
           >
-            <div class="mission-icon-wrap" v-html="m.icon" />
-            <h3 class="mission-card-title">{{ m.title }}</h3>
-            <p class="mission-card-text">{{ m.text }}</p>
+            <div class="mb-5" v-html="m.icon" />
+            <h3 class="text-[1.1rem] font-extrabold text-gray-900 mb-3">
+              {{ m.title }}
+            </h3>
+            <p class="text-[0.875rem] text-gray-500 leading-[1.75] m-0">
+              {{ m.text }}
+            </p>
           </div>
         </div>
 
         <!-- 4 giá trị cốt lõi -->
         <div class="core-values reveal" :ref="(el) => observeEl(el)">
-          <div v-for="v in coreValues" :key="v.label" class="core-val">
-            <span class="core-val-icon">{{ v.icon }}</span>
-            <span class="core-val-label">{{ v.label }}</span>
+          <div
+            v-for="v in coreValues"
+            :key="v.label"
+            class="flex flex-col items-center gap-2"
+          >
+            <span class="text-[2rem]">{{ v.icon }}</span>
+            <span class="text-[0.875rem] font-bold text-gray-700">{{
+              v.label
+            }}</span>
           </div>
         </div>
       </div>
@@ -141,11 +190,13 @@
     <!-- ═══════════════════════════════════════
          SECTION 4 — TIMELINE HÀNH TRÌNH
          ═══════════════════════════════════════ -->
-    <section class="timeline-section">
-      <div class="sw">
+    <section class="timeline-section py-20 bg-white">
+      <div class="max-w-[1200px] mx-auto px-5">
         <div class="section-header reveal" :ref="(el) => observeEl(el)">
-          <h2 class="section-title">Hành Trình Phát Triển</h2>
-          <p class="section-sub">
+          <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
+            Hành Trình Phát Triển
+          </h2>
+          <p class="text-[0.95rem] text-gray-500 text-center mb-10">
             Từng bước vững chắc trên con đường mang thực phẩm sạch đến mọi nhà
           </p>
         </div>
@@ -168,9 +219,15 @@
               <span class="tl-inner" />
             </div>
             <div class="tl-card">
-              <span class="tl-year">{{ item.year }}</span>
-              <h4 class="tl-title">{{ item.title }}</h4>
-              <p class="tl-desc">{{ item.desc }}</p>
+              <span class="text-[0.8rem] font-bold text-orange-500">{{
+                item.year
+              }}</span>
+              <h4 class="text-base font-extrabold text-gray-900 my-1 mb-2">
+                {{ item.title }}
+              </h4>
+              <p class="text-[0.8125rem] text-gray-500 leading-[1.65] m-0">
+                {{ item.desc }}
+              </p>
             </div>
           </div>
         </div>
@@ -180,11 +237,13 @@
     <!-- ═══════════════════════════════════════
          SECTION 5 — ĐỘI NGŨ
          ═══════════════════════════════════════ -->
-    <section class="team-section">
-      <div class="sw">
+    <section class="py-20 bg-gray-50">
+      <div class="max-w-[1200px] mx-auto px-5">
         <div class="section-header reveal" :ref="(el) => observeEl(el)">
-          <h2 class="section-title">Đội Ngũ Lãnh Đạo</h2>
-          <p class="section-sub">
+          <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
+            Đội Ngũ Lãnh Đạo
+          </h2>
+          <p class="text-[0.95rem] text-gray-500 text-center mb-10">
             Những con người tâm huyết đứng sau SmartFood
           </p>
         </div>
@@ -202,20 +261,35 @@
             @mouseleave="resetTilt(i)"
           >
             <div class="team-card-inner">
-              <div class="team-avatar" :style="{ background: member.gradient }">
-                <span class="team-initials">{{ member.initials }}</span>
+              <div
+                class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+                :style="{ background: member.gradient }"
+              >
+                <span class="text-2xl font-black text-white">{{
+                  member.initials
+                }}</span>
               </div>
-              <h3 class="team-name">{{ member.name }}</h3>
-              <p class="team-role">{{ member.role }}</p>
-              <p class="team-quote">"{{ member.quote }}"</p>
+              <h3 class="text-base font-extrabold text-gray-900 mb-1 mt-0">
+                {{ member.name }}
+              </h3>
+              <p class="text-[0.78rem] font-semibold text-orange-500 mb-3 mt-0">
+                {{ member.role }}
+              </p>
+              <p class="text-[0.8rem] text-gray-500 italic leading-[1.5] m-0">
+                \"{{ member.quote }}\"
+              </p>
               <!-- Hover overlay bio -->
               <div class="team-bio-overlay">
-                <p class="team-bio">{{ member.bio }}</p>
-                <div class="team-socials">
+                <p
+                  class="text-[0.8125rem] text-white/90 leading-[1.65] text-center m-0"
+                >
+                  {{ member.bio }}
+                </p>
+                <div class="flex gap-2">
                   <span
                     v-for="s in member.socials"
                     :key="s"
-                    class="team-social"
+                    class="text-[0.7rem] font-bold bg-white/20 text-white py-1 px-3 rounded-full border border-white/35"
                     >{{ s }}</span
                   >
                 </div>
@@ -223,8 +297,12 @@
             </div>
           </div>
         </div>
-        <p class="team-footer reveal" :ref="(el) => observeEl(el)">
-          Cùng <strong>+200 nhân viên</strong> tận tâm trên toàn quốc
+        <p
+          class="text-center text-base text-gray-500 reveal"
+          :ref="(el) => observeEl(el)"
+        >
+          Cùng <strong class="text-orange-500">+200 nhân viên</strong> tận tâm
+          trên toàn quốc
         </p>
       </div>
     </section>
@@ -232,11 +310,13 @@
     <!-- ═══════════════════════════════════════
          SECTION 6 — CAM KẾT & CHỨNG NHẬN
          ═══════════════════════════════════════ -->
-    <section class="cert-section">
-      <div class="sw">
+    <section class="py-16 bg-white border-t-2 border-b-2 border-orange-200">
+      <div class="max-w-[1200px] mx-auto px-5">
         <div class="section-header reveal" :ref="(el) => observeEl(el)">
-          <h2 class="section-title">Cam Kết Của Chúng Tôi</h2>
-          <p class="section-sub">
+          <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
+            Cam Kết Của Chúng Tôi
+          </h2>
+          <p class="text-[0.95rem] text-gray-500 text-center mb-10">
             Tiêu chuẩn chất lượng mà chúng tôi không bao giờ thỏa hiệp
           </p>
         </div>
@@ -248,10 +328,16 @@
             :style="{ transitionDelay: `${i * 100}ms` }"
             :ref="(el) => observeEl(el)"
           >
-            <span class="cert-icon">{{ c.icon }}</span>
-            <h3 class="cert-title">{{ c.title }}</h3>
-            <p class="cert-badge-text">{{ c.badge }}</p>
-            <p class="cert-desc">{{ c.desc }}</p>
+            <span class="text-[2.5rem] block mb-3">{{ c.icon }}</span>
+            <h3 class="text-base font-extrabold text-gray-900 mb-1 mt-0">
+              {{ c.title }}
+            </h3>
+            <p class="text-xs font-bold text-orange-500 mb-[0.625rem] mt-0">
+              {{ c.badge }}
+            </p>
+            <p class="text-[0.8rem] text-gray-500 leading-[1.6] m-0">
+              {{ c.desc }}
+            </p>
           </div>
         </div>
       </div>
@@ -260,16 +346,18 @@
     <!-- ═══════════════════════════════════════
          SECTION 7 — LOGO ĐỐI TÁC (MARQUEE)
          ═══════════════════════════════════════ -->
-    <section class="partner-section">
-      <div class="sw">
+    <section class="py-16 bg-white overflow-hidden">
+      <div class="max-w-[1200px] mx-auto px-5">
         <div class="section-header reveal" :ref="(el) => observeEl(el)">
-          <h2 class="section-title">Đối Tác Tin Cậy</h2>
-          <p class="section-sub">
+          <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
+            Đối Tác Tin Cậy
+          </h2>
+          <p class="text-[0.95rem] text-gray-500 text-center mb-10">
             Hệ sinh thái nhà cung cấp được kiểm định nghiêm ngặt
           </p>
         </div>
       </div>
-      <div class="marquee-wrap">
+      <div class="overflow-hidden mt-4">
         <div class="marquee-track">
           <div
             v-for="(p, idx) in [...partners, ...partners]"
@@ -528,13 +616,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.vct-page {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #1f2937;
-  background: white;
-  overflow-x: hidden;
-}
-
 /* ── Scroll reveal ────────────────────────────────────── */
 .reveal {
   opacity: 0;
@@ -546,29 +627,6 @@ onMounted(() => {
 .reveal.visible {
   opacity: 1;
   transform: none;
-}
-
-/* ── Common ───────────────────────────────────────────── */
-.sw {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.25rem;
-}
-.section-title {
-  font-size: 1.875rem;
-  font-weight: 900;
-  color: #111827;
-  text-align: center;
-  margin: 0 0 0.5rem;
-}
-.section-sub {
-  font-size: 0.95rem;
-  color: #6b7280;
-  text-align: center;
-  margin: 0 0 2.5rem;
-}
-.section-header {
-  margin-bottom: 0;
 }
 
 /* ── HERO ──────────────────────────────────────────────── */
@@ -583,16 +641,8 @@ onMounted(() => {
   justify-content: center;
   overflow: hidden;
 }
-.hero-pattern {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
 
 .hero-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
   opacity: 0;
   transform: translateY(30px);
   transition:
@@ -630,37 +680,8 @@ onMounted(() => {
   margin: 0 auto 2rem;
   max-width: 520px;
 }
-.hero-stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 1.5rem;
-  margin-top: 0.5rem;
-}
-.hero-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-}
-.hero-stat-num {
-  font-size: 1.875rem;
-  font-weight: 900;
-  color: #fed7aa;
-  line-height: 1;
-}
-.hero-stat-label {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 500;
-}
 
 /* ── STORY ─────────────────────────────────────────────── */
-.story-section {
-  padding: 5rem 0;
-  background: white;
-}
 .story-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -668,98 +689,8 @@ onMounted(() => {
   align-items: center;
 }
 
-.story-img-placeholder {
-  background: linear-gradient(135deg, #16a34a, #15803d);
-  border-radius: 1.5rem;
-  aspect-ratio: 4/3;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.story-img-overlay {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 60%;
-  height: 60%;
-  background: linear-gradient(135deg, transparent, rgba(249, 115, 22, 0.5));
-  border-radius: 1.5rem 0 1.5rem 0;
-}
-.story-img-center {
-  position: relative;
-  z-index: 1;
-}
-.story-svg {
-  width: 8rem;
-  height: 8rem;
-}
-.organic-badge {
-  position: absolute;
-  bottom: 1.25rem;
-  left: 1.25rem;
-  background: white;
-  color: #16a34a;
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.375rem 0.875rem;
-  border-radius: 9999px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.story-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #f97316;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-}
-.story-h2 {
-  font-size: 2rem;
-  font-weight: 900;
-  color: #111827;
-  margin: 0 0 1.25rem;
-  line-height: 1.25;
-}
-.story-p {
-  font-size: 0.9375rem;
-  color: #4b5563;
-  line-height: 1.8;
-  margin: 0 0 1rem;
-}
-
-.story-bullets {
-  list-style: none;
-  padding: 0;
-  margin: 1rem 0 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-}
-.story-bullets li {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: 0.9rem;
-  color: #374151;
-  font-weight: 500;
-}
-.bullet-check {
-  color: #16a34a;
-  font-weight: 900;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.story-btns {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-.btn-primary {
+/* ── BUTTONS ───────────────────────────────────────────── */
+.btn-primary-au {
   background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
   font-weight: 700;
@@ -773,11 +704,11 @@ onMounted(() => {
     transform 0.2s,
     box-shadow 0.2s;
 }
-.btn-primary:hover {
+.btn-primary-au:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(249, 115, 22, 0.5);
 }
-.btn-outline {
+.btn-outline-au {
   background: white;
   color: #f97316;
   font-weight: 700;
@@ -790,16 +721,12 @@ onMounted(() => {
     background 0.2s,
     color 0.2s;
 }
-.btn-outline:hover {
+.btn-outline-au:hover {
   background: #f97316;
   color: white;
 }
 
 /* ── MISSION ───────────────────────────────────────────── */
-.mission-section {
-  padding: 5rem 0;
-  background: #fff7ed;
-}
 .mission-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -820,24 +747,9 @@ onMounted(() => {
   transform: translateY(-5px);
   box-shadow: 0 16px 40px rgba(249, 115, 22, 0.12);
 }
-.mission-icon-wrap {
-  margin-bottom: 1.25rem;
-}
 :deep(.mc-svg) {
   width: 3rem;
   height: 3rem;
-}
-.mission-card-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 0.75rem;
-}
-.mission-card-text {
-  font-size: 0.875rem;
-  color: #6b7280;
-  line-height: 1.75;
-  margin: 0;
 }
 
 .core-values {
@@ -850,26 +762,8 @@ onMounted(() => {
   gap: 1rem;
   text-align: center;
 }
-.core-val {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-.core-val-icon {
-  font-size: 2rem;
-}
-.core-val-label {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #374151;
-}
 
 /* ── TIMELINE ──────────────────────────────────────────── */
-.timeline-section {
-  padding: 5rem 0;
-  background: white;
-}
 .timeline {
   position: relative;
   max-width: 800px;
@@ -955,29 +849,8 @@ onMounted(() => {
   box-shadow: 0 8px 24px rgba(249, 115, 22, 0.15);
   transform: scale(1.02);
 }
-.tl-year {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #f97316;
-}
-.tl-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #111827;
-  margin: 0.25rem 0 0.5rem;
-}
-.tl-desc {
-  font-size: 0.8125rem;
-  color: #6b7280;
-  line-height: 1.65;
-  margin: 0;
-}
 
 /* ── TEAM ──────────────────────────────────────────────── */
-.team-section {
-  padding: 5rem 0;
-  background: #f9fafb;
-}
 .team-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1005,39 +878,6 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
 }
-.team-avatar {
-  width: 5rem;
-  height: 5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-}
-.team-initials {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: white;
-}
-.team-name {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 0.25rem;
-}
-.team-role {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #f97316;
-  margin: 0 0 0.75rem;
-}
-.team-quote {
-  font-size: 0.8rem;
-  color: #6b7280;
-  font-style: italic;
-  line-height: 1.5;
-  margin: 0;
-}
 
 /* Hover overlay bio */
 .team-bio-overlay {
@@ -1061,42 +901,8 @@ onMounted(() => {
 .team-card-inner:hover .team-bio-overlay {
   opacity: 1;
 }
-.team-bio {
-  font-size: 0.8125rem;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.65;
-  text-align: center;
-  margin: 0;
-}
-.team-socials {
-  display: flex;
-  gap: 0.5rem;
-}
-.team-social {
-  font-size: 0.7rem;
-  font-weight: 700;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-}
-.team-footer {
-  text-align: center;
-  font-size: 1rem;
-  color: #6b7280;
-}
-.team-footer strong {
-  color: #f97316;
-}
 
 /* ── CERTS ─────────────────────────────────────────────── */
-.cert-section {
-  padding: 4rem 0;
-  background: white;
-  border-top: 2px solid #fed7aa;
-  border-bottom: 2px solid #fed7aa;
-}
 .cert-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1119,40 +925,8 @@ onMounted(() => {
   box-shadow: 0 8px 24px rgba(249, 115, 22, 0.12);
   transform: translateY(-4px);
 }
-.cert-icon {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: 0.75rem;
-}
-.cert-title {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 0.25rem;
-}
-.cert-badge-text {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #f97316;
-  margin: 0 0 0.625rem;
-}
-.cert-desc {
-  font-size: 0.8rem;
-  color: #6b7280;
-  line-height: 1.6;
-  margin: 0;
-}
 
 /* ── PARTNER MARQUEE ───────────────────────────────────── */
-.partner-section {
-  padding: 4rem 0;
-  background: white;
-  overflow: hidden;
-}
-.marquee-wrap {
-  overflow: hidden;
-  margin-top: 1rem;
-}
 .marquee-track {
   display: flex;
   gap: 1.5rem;
@@ -1222,10 +996,6 @@ onMounted(() => {
   .hero-sub {
     font-size: 1rem;
   }
-  .hero-stats {
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
   .story-grid {
     grid-template-columns: 1fr;
   }
@@ -1263,7 +1033,7 @@ onMounted(() => {
   .core-values {
     grid-template-columns: repeat(2, 1fr);
   }
-  .hero-stats {
+  .hero-stats-wrap {
     flex-direction: column;
     gap: 1rem;
   }

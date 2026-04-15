@@ -1,7 +1,10 @@
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <!-- <GlobalSkeletonOverlay :visible="isGlobalLoading" /> -->
+
+    <!-- Fullpage loading khi khởi động app lần đầu / route transition -->
+    <!-- <AppLoading v-if="isGlobalLoading" variant="fullpage" /> -->
+
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
@@ -10,8 +13,6 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-
-// import GlobalSkeletonOverlay from "~/components/common/GlobalSkeletonOverlay.vue";
 
 const isGlobalLoading = ref(true);
 const nuxtApp = useNuxtApp();
@@ -27,6 +28,7 @@ const onPageFinish = () => {
 };
 
 onMounted(() => {
+  // Ẩn loading sau khi app khởi tạo xong
   setTimeout(() => {
     isGlobalLoading.value = false;
   }, 260);

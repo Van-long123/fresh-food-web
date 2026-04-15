@@ -115,7 +115,9 @@
 
           <p class="login-link-text">
             Đã có tài khoản?
-            <NuxtLink :to="ROUTES.AUTH.LOGIN" class="login-link">Đăng nhập →</NuxtLink>
+            <NuxtLink :to="ROUTES.AUTH.LOGIN" class="login-link"
+              >Đăng nhập →</NuxtLink
+            >
           </p>
         </div>
       </div>
@@ -161,7 +163,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { ROUTES } from '~/constants/routes';
+import { ROUTES } from "~/constants/routes";
 
 const activeStep = ref(1);
 

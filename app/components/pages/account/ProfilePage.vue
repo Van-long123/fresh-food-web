@@ -37,7 +37,7 @@
                   <span>📞 {{ user.phone }}</span>
                   <span>📧 {{ user.email }}</span>
                   <span>📅 {{ user.birthday }}</span>
-                  <span>🎯 Tích điểm: {{ user.points }} điểm</span>
+                  <!-- <span>🎯 Tích điểm: {{ user.points }} điểm</span> -->
                 </div>
               </div>
             </div>
@@ -84,12 +84,16 @@
                   <span>Họ tên</span>
                   <input v-model="editForm.name" class="input" />
                 </label>
-  
+
                 <label class="field">
                   <span>Ngày sinh</span>
-                  <input v-model="editForm.birthday" type="date" class="input" />
+                  <input
+                    v-model="editForm.birthday"
+                    type="date"
+                    class="input"
+                  />
                 </label>
-  
+
                 <label class="field">
                   <span>Email</span>
                   <div class="relative">
@@ -104,12 +108,12 @@
                     >
                   </div>
                 </label>
-  
+
                 <label class="field">
                   <span>Số điện thoại</span>
                   <input v-model="editForm.phone" class="input" />
                 </label>
-  
+
                 <label class="field">
                   <span>Giới tính</span>
                   <div class="mt-1 flex gap-2">
@@ -129,7 +133,7 @@
                     </button>
                   </div>
                 </label>
-  
+
                 <label class="field">
                   <span>Tỉnh/Thành</span>
                   <select v-model="editForm.city" class="input">
@@ -138,7 +142,7 @@
                     <option>Đà Nẵng</option>
                   </select>
                 </label>
-  
+
                 <div class="md:col-span-2">
                   <button class="save-btn" :disabled="saving">
                     <span
@@ -153,7 +157,7 @@
                 </div>
               </form>
             </section>
-  
+
             <section
               class="rounded-2xl bg-linear-to-r from-[#e8f5e9] to-[#f4fff4] p-5 shadow-sm"
             >
@@ -187,7 +191,7 @@
                   Xem tất cả
                 </button>
               </div>
-  
+
               <article
                 v-for="(order, idx) in orders"
                 :key="order.code"
@@ -252,7 +256,9 @@
           <template v-if="activeMenu === 'voucher'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Mã giảm giá</h2>
-              <div class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500">
+              <div
+                class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500"
+              >
                 <span class="mb-2 text-4xl">🏷️</span>
                 <p>Bạn chưa có mã giảm giá nào.</p>
               </div>
@@ -262,7 +268,9 @@
           <template v-if="activeMenu === 'favorite'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Sản phẩm yêu thích</h2>
-              <div class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500">
+              <div
+                class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500"
+              >
                 <span class="mb-2 text-4xl">⭐</span>
                 <p>Danh sách yêu thích đang trống.</p>
               </div>
@@ -272,7 +280,9 @@
           <template v-if="activeMenu === 'notify'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Thông báo</h2>
-              <div class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500">
+              <div
+                class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500"
+              >
                 <span class="mb-2 text-4xl">🔔</span>
                 <p>Bạn không có thông báo mới.</p>
               </div>
@@ -283,23 +293,40 @@
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Bảo mật tài khoản</h2>
               <div class="mt-4">
-                <p class="text-sm text-gray-600">Quản lý các thông tin đăng nhập và phương thức bảo mật.</p>
+                <p class="text-sm text-gray-600">
+                  Quản lý các thông tin đăng nhập và phương thức bảo mật.
+                </p>
               </div>
             </section>
           </template>
 
           <template v-if="activeMenu === 'changePassword'">
-            <div class="change-password-wrapper overflow-hidden rounded-2xl bg-white shadow-sm p-0">
+            <div
+              class="change-password-wrapper overflow-hidden rounded-2xl bg-white shadow-sm p-0"
+            >
               <ChangePasswordPage />
             </div>
           </template>
 
           <template v-if="activeMenu === 'logout'">
-            <section class="flex flex-col items-center justify-center rounded-2xl bg-white p-5 py-10 shadow-sm">
-              <h2 class="mb-4 text-xl font-bold">Bạn chắc chắn muốn đăng xuất?</h2>
+            <section
+              class="flex flex-col items-center justify-center rounded-2xl bg-white p-5 py-10 shadow-sm"
+            >
+              <h2 class="mb-4 text-xl font-bold">
+                Bạn chắc chắn muốn đăng xuất?
+              </h2>
               <div class="flex gap-4">
-                <button class="px-6 py-2 rounded-full border border-gray-300 font-semibold text-gray-700 hover:bg-gray-50" @click="activeMenu = 'profile'">Hủy</button>
-                <button class="px-6 py-2 rounded-full bg-red-500 font-semibold text-white hover:bg-red-600">Đăng xuất</button>
+                <button
+                  class="px-6 py-2 rounded-full border border-gray-300 font-semibold text-gray-700 hover:bg-gray-50"
+                  @click="activeMenu = 'profile'"
+                >
+                  Hủy
+                </button>
+                <button
+                  class="px-6 py-2 rounded-full bg-red-500 font-semibold text-white hover:bg-red-600"
+                >
+                  Đăng xuất
+                </button>
               </div>
             </section>
           </template>

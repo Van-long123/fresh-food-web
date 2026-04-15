@@ -2,21 +2,28 @@
   <!--
     ╔══════════════════════════════════════════════════════╗
     ║  ServiceTerms.vue — Điều Khoản Dịch Vụ SmartFood    ║
-    ║  Nuxt 3 + PrimeVue 4 + CSS thuần (scoped)           ║
+    ║  Nuxt 3 + PrimeVue 4 + Tailwind CSS                 ║
     ╚══════════════════════════════════════════════════════╝
   -->
-  <div class="st-page" ref="pageRef">
+  <div
+    class="font-sans text-gray-800 bg-white min-h-screen"
+    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;"
+    ref="pageRef"
+  >
     <!-- ══════════════════════════════════════════════════
          READING PROGRESS BAR (fixed top)
          ══════════════════════════════════════════════════ -->
-    <div class="reading-bar" :style="{ width: readingProgress + '%' }" />
+    <div
+      class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-600 z-[9999] transition-[width] duration-150 ease-linear rounded-r-sm"
+      :style="{ width: readingProgress + '%' }"
+    />
 
     <!-- ══════════════════════════════════════════════════
          SECTION 1 — HERO BANNER
          ══════════════════════════════════════════════════ -->
     <section class="hero-banner" :class="{ visible: heroVisible }">
       <!-- SVG dấu check pattern mờ -->
-      <div class="hero-pattern" aria-hidden="true">
+      <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern
@@ -42,8 +49,8 @@
 
       <div class="hero-inner">
         <!-- Trái: Icon + Tiêu đề -->
-        <div class="hero-left">
-          <div class="hero-icon" aria-hidden="true">
+        <div class="flex items-center gap-5">
+          <div class="w-14 h-14 shrink-0" aria-hidden="true">
             <svg
               viewBox="0 0 56 56"
               fill="none"
@@ -83,14 +90,14 @@
               />
             </svg>
           </div>
-          <div class="hero-text">
-            <h1 class="hero-title">Điều Khoản Dịch Vụ</h1>
-            <span class="hero-updated">📅 Cập nhật lần cuối: 01/01/2025</span>
+          <div>
+            <h1 class="text-[1.875rem] font-black text-white mb-[0.375rem] leading-[1.2]">Điều Khoản Dịch Vụ</h1>
+            <span class="inline-block bg-white/[0.18] border border-white/35 text-white/90 text-[0.78rem] font-semibold py-[0.2rem] px-3 rounded-full">📅 Cập nhật lần cuối: 01/01/2025</span>
           </div>
         </div>
 
         <!-- Phải: 3 badge -->
-        <div class="hero-badges">
+        <div class="flex flex-col gap-[0.4rem] items-end">
           <span class="hero-badge">📄 8 Điều khoản</span>
           <span class="hero-badge">🔒 Minh bạch</span>
           <span class="hero-badge">✅ Rõ ràng</span>
@@ -102,14 +109,14 @@
          MOBILE: Dropdown chuyển mục (ẩn ở desktop)
          ══════════════════════════════════════════════════ -->
     <div class="mobile-nav">
-      <label class="mobile-nav-label">Chuyển đến mục:</label>
+      <label class="text-[0.875rem] font-semibold text-gray-700 whitespace-nowrap">Chuyển đến mục:</label>
       <Select
         v-model="mobileSection"
         :options="sections"
         option-label="title"
         option-value="id"
         placeholder="Chọn điều khoản..."
-        class="mobile-nav-select"
+        class="flex-1"
         @change="scrollToSection(mobileSection)"
       />
     </div>
@@ -120,27 +127,27 @@
     <div class="main-layout">
       <!-- ─── SIDEBAR (30%) ──────────────────────────── -->
       <aside class="sidebar">
-        <div class="sidebar-card">
+        <div class="bg-white border-[1.5px] border-gray-200 rounded-[1.25rem] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
           <!-- Sidebar progress bar -->
-          <div class="sidebar-progress-wrap">
+          <div class="h-[3px] bg-gray-100">
             <div
-              class="sidebar-progress-bar"
+              class="h-full bg-gradient-to-r from-orange-500 to-orange-600 transition-[width] duration-150 ease-linear"
               :style="{ width: readingProgress + '%' }"
             />
           </div>
 
-          <div class="sidebar-header">
-            <svg viewBox="0 0 20 20" fill="#F97316" class="sidebar-icon">
+          <div class="flex items-center gap-[0.625rem] px-5 py-4 pb-3 border-b-[1.5px] border-gray-100">
+            <svg viewBox="0 0 20 20" fill="#F97316" class="w-[1.125rem] h-[1.125rem] shrink-0">
               <path
                 fill-rule="evenodd"
                 d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
                 clip-rule="evenodd"
               />
             </svg>
-            <span class="sidebar-title">Mục Lục</span>
+            <span class="text-[0.9375rem] font-extrabold text-gray-900">Mục Lục</span>
           </div>
 
-          <nav class="sidebar-nav">
+          <nav class="py-2 flex flex-col">
             <button
               v-for="sec in sections"
               :key="sec.id"
@@ -148,21 +155,21 @@
               :class="{ active: activeSection === sec.id }"
               @click="scrollToSection(sec.id)"
             >
-              <span class="sidebar-num">{{ sec.num }}</span>
-              <span class="sidebar-link-text">{{ sec.title }}</span>
+              <span class="text-[0.75rem] font-bold text-orange-500 font-mono min-w-[2.25rem]">{{ sec.num }}</span>
+              <span class="text-left">{{ sec.title }}</span>
             </button>
           </nav>
         </div>
 
         <!-- Cần hỗ trợ? -->
-        <div class="support-card">
-          <div class="support-icon-wrap">
+        <div class="bg-orange-50 border-[1.5px] border-orange-200 rounded-[1.25rem] p-5 flex flex-col items-center text-center gap-2">
+          <div class="w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(249,115,22,0.2)]">
             <svg
               viewBox="0 0 24 24"
               fill="none"
               stroke="#F97316"
               stroke-width="2"
-              class="support-svg"
+              class="w-[1.375rem] h-[1.375rem]"
             >
               <path
                 stroke-linecap="round"
@@ -171,25 +178,25 @@
               />
             </svg>
           </div>
-          <div class="support-text">
-            <p class="support-title">Cần hỗ trợ?</p>
-            <p class="support-sub">Đội ngũ SmartFood sẵn sàng giải đáp</p>
+          <div>
+            <p class="text-[0.9rem] font-extrabold text-gray-900 m-0">Cần hỗ trợ?</p>
+            <p class="text-[0.77rem] text-gray-500 m-0">Đội ngũ SmartFood sẵn sàng giải đáp</p>
           </div>
           <button class="btn-support" @click="goToSupport">Liên hệ ngay</button>
         </div>
       </aside>
 
       <!-- ─── NỘI DUNG (70%) ─────────────────────────── -->
-      <main class="content-area">
+      <main class="flex flex-col gap-0">
         <!-- §1 Giới thiệu & Định nghĩa -->
         <section
           id="sec-1"
           class="term-section reveal"
           ref="el => sectionRefs['sec-1'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">1</span>
-            <h2 class="sec-title">Giới Thiệu &amp; Định Nghĩa</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Giới Thiệu &amp; Định Nghĩa</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -225,7 +232,7 @@
               </li>
             </ul>
             <div class="highlight-box">
-              <span class="highlight-icon">⚠️</span>
+              <span class="text-[1.25rem] shrink-0 leading-[1.3]">⚠️</span>
               <div>
                 <p class="highlight-text">
                   <strong>Lưu ý quan trọng:</strong> Điều khoản này có hiệu lực
@@ -245,9 +252,9 @@
           class="term-section reveal"
           ref="el => sectionRefs['sec-2'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">2</span>
-            <h2 class="sec-title">Điều Kiện Sử Dụng Dịch Vụ</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Điều Kiện Sử Dụng Dịch Vụ</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -281,7 +288,7 @@
               </li>
             </ul>
             <div class="highlight-box">
-              <span class="highlight-icon">⚠️</span>
+              <span class="text-[1.25rem] shrink-0 leading-[1.3]">⚠️</span>
               <div>
                 <p class="highlight-text">
                   SmartFood có quyền kiểm tra và xác minh thông tin người dùng
@@ -299,9 +306,9 @@
           class="term-section reveal"
           ref="el => sectionRefs['sec-3'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">3</span>
-            <h2 class="sec-title">Tài Khoản Người Dùng</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Tài Khoản Người Dùng</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -345,9 +352,9 @@
           class="term-section reveal"
           ref="el => sectionRefs['sec-4'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">4</span>
-            <h2 class="sec-title">Quy Định Đặt Hàng &amp; Thanh Toán</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Quy Định Đặt Hàng &amp; Thanh Toán</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -380,7 +387,7 @@
               </li>
             </ul>
             <div class="highlight-box">
-              <span class="highlight-icon">⚠️</span>
+              <span class="text-[1.25rem] shrink-0 leading-[1.3]">⚠️</span>
               <div>
                 <p class="highlight-text">
                   Bạn có thể hủy đơn hàng trong vòng <strong>30 phút</strong> kể
@@ -399,9 +406,9 @@
           class="term-section reveal"
           ref="el => sectionRefs['sec-5'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">5</span>
-            <h2 class="sec-title">Chính Sách Giao Hàng</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Chính Sách Giao Hàng</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -440,9 +447,9 @@
           class="term-section reveal"
           ref="el => sectionRefs['sec-6'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">6</span>
-            <h2 class="sec-title">Đổi Trả &amp; Hoàn Tiền</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Đổi Trả &amp; Hoàn Tiền</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -475,7 +482,7 @@
               </li>
             </ul>
             <div class="highlight-box">
-              <span class="highlight-icon">⚠️</span>
+              <span class="text-[1.25rem] shrink-0 leading-[1.3]">⚠️</span>
               <div>
                 <p class="highlight-text">
                   Các sản phẩm đã qua sử dụng, tươi sống đã mở bao bì không do
@@ -494,9 +501,9 @@
           class="term-section reveal"
           ref="el => sectionRefs['sec-7'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">7</span>
-            <h2 class="sec-title">Quyền Và Nghĩa Vụ Các Bên</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Quyền Và Nghĩa Vụ Các Bên</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -548,9 +555,9 @@
           class="term-section reveal"
           ref="el => sectionRefs['sec-8'] = el"
         >
-          <div class="sec-header">
+          <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">8</span>
-            <h2 class="sec-title">Điều Khoản Chung</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Điều Khoản Chung</h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -584,7 +591,7 @@
               </li>
             </ul>
             <div class="highlight-box">
-              <span class="highlight-icon">⚠️</span>
+              <span class="text-[1.25rem] shrink-0 leading-[1.3]">⚠️</span>
               <div>
                 <p class="highlight-text">
                   Điều Khoản này được cập nhật lần cuối ngày
@@ -600,10 +607,13 @@
         <!-- ══════════════════════════════════════════════════
              CTA SECTION
              ══════════════════════════════════════════════════ -->
-        <div class="cta-box reveal" ref="el => sectionRefs['cta'] = el">
-          <div class="cta-text-wrap">
-            <div class="cta-icon-wrap" aria-hidden="true">
-              <svg viewBox="0 0 40 40" fill="none" class="cta-icon">
+        <div
+          class="bg-orange-50 border-[1.5px] border-orange-200 rounded-3xl p-8 pb-6 mt-6 flex flex-col gap-5 reveal"
+          ref="el => sectionRefs['cta'] = el"
+        >
+          <div class="flex items-start gap-4">
+            <div class="shrink-0">
+              <svg viewBox="0 0 40 40" fill="none" class="w-10 h-10">
                 <circle
                   cx="20"
                   cy="20"
@@ -622,22 +632,22 @@
               </svg>
             </div>
             <div>
-              <p class="cta-main">
+              <p class="text-[0.9375rem] font-semibold text-gray-900 leading-[1.65] mb-1">
                 Bằng việc sử dụng dịch vụ SmartFood, bạn xác nhận đã đọc và đồng
                 ý với toàn bộ các Điều Khoản trên.
               </p>
-              <p class="cta-sub">Điều khoản có hiệu lực từ ngày 15/07/2025</p>
+              <p class="text-[0.8rem] text-gray-500 m-0">Điều khoản có hiệu lực từ ngày 15/07/2025</p>
             </div>
           </div>
-          <div class="cta-actions">
+          <div class="flex gap-[0.875rem] flex-wrap">
             <button class="btn-agree" @click="handleAgree">✓ Tôi đồng ý</button>
             <button class="btn-consult" @click="goToSupport">
               Liên hệ tư vấn
             </button>
           </div>
-          <div class="cta-download">
-            <button class="download-link" @click="handleDownload">
-              <svg viewBox="0 0 16 16" fill="none" class="download-icon">
+          <div class="text-center">
+            <button class="inline-flex items-center gap-[0.375rem] bg-transparent border-0 text-orange-500 text-[0.875rem] font-semibold cursor-pointer p-0 underline underline-offset-[3px] hover:text-orange-600 transition-colors duration-150" @click="handleDownload">
+              <svg viewBox="0 0 16 16" fill="none" class="w-4 h-4">
                 <path
                   d="M8 1v9M4 7l4 4 4-4M2 14h12"
                   stroke="currentColor"
@@ -772,34 +782,20 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* ══════════════════════════════════════════════════════════
-   READING BAR — fixed top
-   ══════════════════════════════════════════════════════════ */
-.reading-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #f97316, #ea580c);
-  z-index: 9999;
-  transition: width 0.15s ease;
-  border-radius: 0 2px 2px 0;
+/* ── Scroll reveal ────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
 }
 
-/* ══════════════════════════════════════════════════════════
-   PAGE WRAPPER
-   ══════════════════════════════════════════════════════════ */
-.st-page {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
-  color: #1f2937;
-  background: #ffffff;
-  min-height: 100vh;
-}
-
-/* ══════════════════════════════════════════════════════════
-   HERO BANNER
-   ══════════════════════════════════════════════════════════ */
+/* ── HERO BANNER ────────────────────────────────────────── */
 .hero-banner {
   position: relative;
   height: 180px;
@@ -817,11 +813,6 @@ onUnmounted(() => {
   opacity: 1;
   transform: none;
 }
-.hero-pattern {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
 .hero-inner {
   position: relative;
   z-index: 1;
@@ -834,39 +825,6 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 1rem;
 }
-.hero-left {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-}
-.hero-icon {
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-}
-.hero-title {
-  font-size: 1.875rem;
-  font-weight: 900;
-  color: white;
-  margin: 0 0 0.375rem;
-  line-height: 1.2;
-}
-.hero-updated {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.2rem 0.75rem;
-  border-radius: 9999px;
-}
-.hero-badges {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  align-items: flex-end;
-}
 .hero-badge {
   background: rgba(255, 255, 255, 0.18);
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -878,9 +836,7 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-/* ══════════════════════════════════════════════════════════
-   MOBILE NAV DROPDOWN (hiện ở mobile, ẩn ở desktop)
-   ══════════════════════════════════════════════════════════ */
+/* ── MOBILE NAV ─────────────────────────────────────────── */
 .mobile-nav {
   display: none;
   align-items: center;
@@ -889,19 +845,8 @@ onUnmounted(() => {
   margin: 1.25rem auto 0;
   padding: 0 1.25rem;
 }
-.mobile-nav-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  white-space: nowrap;
-}
-.mobile-nav-select {
-  flex: 1;
-}
 
-/* ══════════════════════════════════════════════════════════
-   MAIN LAYOUT: 2 CỘT
-   ══════════════════════════════════════════════════════════ */
+/* ── MAIN LAYOUT ────────────────────────────────────────── */
 .main-layout {
   max-width: 1200px;
   margin: 0 auto;
@@ -912,55 +857,13 @@ onUnmounted(() => {
   align-items: start;
 }
 
-/* ── SIDEBAR ───────────────────────────────────────────── */
+/* ── SIDEBAR ─────────────────────────────────────────────── */
 .sidebar {
   position: sticky;
   top: 5.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-.sidebar-card {
-  background: white;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 1.25rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
-}
-
-/* Sidebar progress bar (mỏng phía trên) */
-.sidebar-progress-wrap {
-  height: 3px;
-  background: #f3f4f6;
-}
-.sidebar-progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #f97316, #ea580c);
-  transition: width 0.15s ease;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 1rem 1.25rem 0.75rem;
-  border-bottom: 1.5px solid #f3f4f6;
-}
-.sidebar-icon {
-  width: 1.125rem;
-  height: 1.125rem;
-  flex-shrink: 0;
-}
-.sidebar-title {
-  font-size: 0.9375rem;
-  font-weight: 800;
-  color: #111827;
-}
-
-.sidebar-nav {
-  padding: 0.5rem 0;
-  display: flex;
-  flex-direction: column;
 }
 .sidebar-link {
   display: flex;
@@ -990,54 +893,11 @@ onUnmounted(() => {
   color: #ea580c;
   font-weight: 700;
 }
-.sidebar-num {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #f97316;
-  font-family: monospace;
-  min-width: 2.25rem;
-}
-.sidebar-link.active .sidebar-num {
+.sidebar-link.active span:first-child {
   color: #ea580c;
 }
 
-/* Card hỗ trợ phía dưới sidebar */
-.support-card {
-  background: #fff7ed;
-  border: 1.5px solid #fed7aa;
-  border-radius: 1.25rem;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.5rem;
-}
-.support-icon-wrap {
-  width: 2.75rem;
-  height: 2.75rem;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
-}
-.support-svg {
-  width: 1.375rem;
-  height: 1.375rem;
-}
-.support-title {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #111827;
-  margin: 0;
-}
-.support-sub {
-  font-size: 0.77rem;
-  color: #6b7280;
-  margin: 0;
-}
+/* ── SUPPORT BUTTON ─────────────────────────────────────── */
 .btn-support {
   background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
@@ -1058,27 +918,7 @@ onUnmounted(() => {
   box-shadow: 0 6px 18px rgba(249, 115, 22, 0.45);
 }
 
-/* ── CONTENT AREA ──────────────────────────────────────── */
-.content-area {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-/* Scroll Reveal */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition:
-    opacity 0.55s ease,
-    transform 0.55s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* ── TERM SECTION ──────────────────────────────────────── */
+/* ── TERM SECTION ────────────────────────────────────────── */
 .term-section {
   padding: 2.5rem 0;
   border-bottom: 1px solid #f3f4f6;
@@ -1087,12 +927,6 @@ onUnmounted(() => {
   border-bottom: none;
 }
 
-.sec-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
-}
 .sec-num {
   display: flex;
   align-items: center;
@@ -1107,12 +941,7 @@ onUnmounted(() => {
   border-radius: 50%;
   box-shadow: 0 3px 10px rgba(249, 115, 22, 0.35);
 }
-.sec-title {
-  font-size: 1.3125rem;
-  font-weight: 900;
-  color: #111827;
-  margin: 0;
-}
+
 .sec-divider {
   height: 2px;
   background: linear-gradient(90deg, #fed7aa, transparent);
@@ -1169,11 +998,6 @@ onUnmounted(() => {
   padding: 1rem 1.25rem;
   margin-top: 1.25rem;
 }
-.highlight-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  line-height: 1.3;
-}
 .highlight-text {
   font-size: 0.875rem !important;
   line-height: 1.7 !important;
@@ -1181,46 +1005,7 @@ onUnmounted(() => {
   margin: 0 !important;
 }
 
-/* ── CTA BOX ───────────────────────────────────────────── */
-.cta-box {
-  background: #fff7ed;
-  border: 1.5px solid #fed7aa;
-  border-radius: 1.5rem;
-  padding: 2rem 2rem 1.5rem;
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-.cta-text-wrap {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-.cta-icon-wrap {
-  flex-shrink: 0;
-}
-.cta-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-}
-.cta-main {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #1f2937;
-  line-height: 1.65;
-  margin: 0 0 0.25rem;
-}
-.cta-sub {
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin: 0;
-}
-.cta-actions {
-  display: flex;
-  gap: 0.875rem;
-  flex-wrap: wrap;
-}
+/* ── CTA BUTTONS ─────────────────────────────────────────── */
 .btn-agree {
   background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
@@ -1256,37 +1041,11 @@ onUnmounted(() => {
   background: #f97316;
   color: white;
 }
-.cta-download {
-  text-align: center;
-}
-.download-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  background: none;
-  border: none;
-  color: #f97316;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.15s;
-}
-.download-link:hover {
-  color: #ea580c;
-}
-.download-icon {
-  width: 1rem;
-  height: 1rem;
-}
 
 /* ══════════════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
-  /* Ẩn sidebar, hiển thị mobile dropdown */
   .sidebar {
     display: none;
   }
@@ -1309,16 +1068,13 @@ onUnmounted(() => {
     align-items: flex-start;
     gap: 1rem;
   }
-  .hero-title {
+  .hero-inner > div:first-child h1 {
     font-size: 1.5rem;
   }
-  .hero-badges {
+  .hero-inner > div:last-child {
     align-items: flex-start;
     flex-direction: row;
     flex-wrap: wrap;
-  }
-  .cta-text-wrap {
-    flex-direction: column;
   }
   .term-section {
     padding: 2rem 0;
@@ -1328,9 +1084,6 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .main-layout {
     padding: 1.25rem 1rem 3rem;
-  }
-  .cta-actions {
-    flex-direction: column;
   }
   .btn-agree,
   .btn-consult {

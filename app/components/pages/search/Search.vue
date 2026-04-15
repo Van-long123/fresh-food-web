@@ -50,8 +50,9 @@
         <p class="text-[14px] text-gray-500 mb-4">
           Có
           <strong class="text-gray-800">{{ filteredProducts.length }}</strong>
-          sản phẩm phù hợp với từ khóa
-          "<strong class="text-gray-800">{{ searchQuery || "mận" }}</strong
+          sản phẩm phù hợp với từ khóa "<strong class="text-gray-800">{{
+            searchQuery || "mận"
+          }}</strong
           >"
         </p>
 
@@ -82,13 +83,9 @@
 import { computed, ref, watch } from "vue";
 import Sidebar from "~/components/layout/Sidebar.vue";
 import ProductCard from "~/components/ProductCard.vue";
-import BasePagination from "~/components/BasePagination.vue";
-
 const route = useRoute();
 
-const searchQuery = computed(
-  () => (route.query.q as string) || "mận",
-);
+const searchQuery = computed(() => (route.query.q as string) || "mận");
 
 const selectedCategory = ref("");
 const currentPage = ref(1);

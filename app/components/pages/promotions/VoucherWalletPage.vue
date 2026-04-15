@@ -1,12 +1,27 @@
 <template>
-  <div class="voucher-page">
-    <section class="hero">
-      <div class="hero-confetti" aria-hidden="true">
+  <div
+    class="min-h-screen text-gray-900"
+    style="background: linear-gradient(180deg, #fffdf9 0%, #ffffff 40%)"
+  >
+    <!-- ══════════ HERO ══════════ -->
+    <section
+      class="relative min-h-[260px] overflow-hidden grid place-items-center"
+      style="background: linear-gradient(135deg, #f97316, #ea580c, #dc2626)"
+    >
+      <!-- Confetti -->
+      <div class="absolute inset-0" aria-hidden="true">
         <span
           v-for="shape in confettiShapes"
           :key="shape.id"
-          class="confetti"
-          :class="shape.type"
+          class="absolute opacity-15"
+          :class="[
+            shape.type === 'dot'
+              ? 'w-[10px] h-[10px] rounded-full'
+              : shape.type === 'diamond'
+                ? 'w-[10px] h-[10px] rotate-45'
+                : 'w-3 h-3 star-shape',
+            'animate-floatRotate',
+          ]"
           :style="{
             left: `${shape.left}%`,
             top: `${shape.top}%`,
@@ -17,8 +32,9 @@
         />
       </div>
 
-      <div class="hero-content">
-        <div class="hero-icon mount-0" aria-hidden="true">
+      <!-- Content -->
+      <div class="relative z-[2] text-center text-white">
+        <div class="w-16 mx-auto mb-3 mount-0 animate-swing" aria-hidden="true">
           <svg viewBox="0 0 64 64" role="img">
             <path
               d="M8 20a6 6 0 0 1 6-6h34l8 8v22a6 6 0 0 1-6 6H14a6 6 0 0 1-6-6V20z"
@@ -34,105 +50,204 @@
             />
           </svg>
         </div>
-        <h1 class="mount-1">Kho Mã Giảm Giá</h1>
-        <p class="hero-subtitle mount-2">
+        <h1
+          class="m-0 font-black leading-[1.1] tracking-[-0.03em] mount-1"
+          style="
+            font-size: clamp(2rem, 4vw, 38px);
+            text-shadow: 0 8px 26px rgba(0,0,0,0.26);
+          "
+        >
+          Kho Mã Giảm Giá
+        </h1>
+        <p class="mt-[10px] mb-0 opacity-80 mount-2">
           Săn deal hot - Tiết kiệm mỗi ngày cùng SmartFood
         </p>
 
-        <div class="countdown-wrap mount-3" aria-live="polite">
-          <p class="count-label">Flash Sale hôm nay: {{ flashCompactText }}</p>
-          <div class="deal-progress">
-            <span :style="{ width: `${flashProgress}%` }" />
+        <div class="mt-[14px] mount-3" aria-live="polite">
+          <p class="mb-2 mt-0 font-semibold">
+            Flash Sale hôm nay: {{ flashCompactText }}
+          </p>
+          <!-- Progress bar -->
+          <div
+            class="mx-auto h-2 rounded-full overflow-hidden"
+            style="width: min(440px, 92vw); background: rgba(255,255,255,0.22)"
+          >
+            <span
+              class="block h-full w-0 transition-[width] duration-[400ms] ease-out"
+              style="background: linear-gradient(90deg, #fde047, #facc15, #86efac)"
+              :style="{ width: `${flashProgress}%` }"
+            />
           </div>
-          <div class="deal-stats">
-            <article>
-              <strong>{{ visibleCoupons.length }}</strong>
-              <span>Mã đang hoạt động</span>
+          <!-- Stats -->
+          <div class="mt-[10px] grid grid-cols-3 gap-2">
+            <article
+              class="rounded-[10px] p-2 grid"
+              style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2)"
+            >
+              <strong class="text-[1.1rem]">{{ visibleCoupons.length }}</strong>
+              <span class="text-[0.76rem] opacity-[0.86]">Mã đang hoạt động</span>
             </article>
-            <article>
-              <strong>0đ</strong>
-              <span>Freeship nội thành</span>
+            <article
+              class="rounded-[10px] p-2 grid"
+              style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2)"
+            >
+              <strong class="text-[1.1rem]">0đ</strong>
+              <span class="text-[0.76rem] opacity-[0.86]">Freeship nội thành</span>
             </article>
-            <article>
-              <strong>50%</strong>
-              <span>Mức giảm tối đa</span>
+            <article
+              class="rounded-[10px] p-2 grid"
+              style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2)"
+            >
+              <strong class="text-[1.1rem]">50%</strong>
+              <span class="text-[0.76rem] opacity-[0.86]">Mức giảm tối đa</span>
             </article>
           </div>
-          <p class="update-pill">🔥 Cập nhật mã mới mỗi thứ 2 &amp; thứ 6</p>
+          <p
+            class="mt-[10px] mx-auto w-fit rounded-full px-3 py-[5px] text-[0.8rem] font-bold text-[#9a3412]"
+            style="background: #fde047"
+          >
+            🔥 Cập nhật mã mới mỗi thứ 2 &amp; thứ 6
+          </p>
         </div>
       </div>
     </section>
 
-    <section class="filter-sticky">
-      <div class="container">
-        <div class="filter-row">
-          <label class="search-box" aria-label="Tìm mã giảm giá">
-            <span>🔎</span>
+    <!-- ══════════ FILTER STICKY ══════════ -->
+    <section
+      class="sticky top-16 z-30 border-b border-gray-200 bg-white"
+      style="box-shadow: 0 4px 10px rgba(15,23,42,0.06)"
+    >
+      <div class="w-[min(1120px,92vw)] mx-auto">
+        <div class="flex items-center gap-[14px] py-3 flex-wrap lg:flex-nowrap">
+          <!-- Search -->
+          <label
+            class="flex items-center gap-2 flex-1 border border-gray-200 rounded-full px-[14px] h-11 focus-within:border-orange-500 focus-within:shadow-[0_0_0_3px_rgba(249,115,22,0.16)] transition-shadow"
+            aria-label="Tìm mã giảm giá"
+          >
+            <span class="text-orange-500">🔎</span>
             <input
               v-model="searchText"
               type="text"
               placeholder="Tìm mã giảm giá..."
+              class="border-0 outline-none w-full text-[0.95rem] bg-transparent"
             />
           </label>
 
-          <div class="tabs" role="tablist" aria-label="Lọc mã">
+          <!-- Tabs -->
+          <div
+            class="flex gap-2 order-3 w-full lg:order-none lg:w-auto overflow-x-auto pb-[6px] lg:pb-0"
+            role="tablist"
+            aria-label="Lọc mã"
+          >
             <button
               v-for="tab in filterTabs"
               :key="tab.key"
               type="button"
-              :class="['tab-pill', { active: activeTab === tab.key }]"
+              class="border-0 rounded-full px-[14px] py-[10px] font-bold cursor-pointer whitespace-nowrap transition-colors duration-200"
+              :class="
+                activeTab === tab.key
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-gray-100 text-gray-600'
+              "
               @click="activeTab = tab.key"
             >
               {{ tab.label }}
             </button>
           </div>
 
-          <label class="sort-box" aria-label="Sắp xếp mã giảm giá">
+          <!-- Sort -->
+          <label
+            class="border border-gray-200 rounded-full h-11 flex items-center px-[14px] gap-2 text-[0.92rem] w-full lg:w-auto"
+            aria-label="Sắp xếp mã giảm giá"
+          >
             <span>Sắp xếp:</span>
-            <select v-model="sortKey">
+            <select
+              v-model="sortKey"
+              class="border-0 outline-none font-bold text-gray-900 bg-transparent"
+            >
               <option value="best">Giảm nhiều nhất</option>
               <option value="latest">Mới cập nhật</option>
               <option value="expiring">Sắp hết hạn</option>
             </select>
           </label>
         </div>
-        <p class="result-line">
+        <p class="mb-3 mt-0 text-green-700 text-[0.85rem] font-bold">
           Tìm thấy {{ visibleCoupons.length }} mã khả dụng
         </p>
       </div>
     </section>
 
-    <main class="container main-content">
+    <!-- ══════════ MAIN ══════════ -->
+    <main class="w-[min(1120px,92vw)] mx-auto py-6 pb-14 grid gap-7">
+
+      <!-- Featured -->
       <section>
-        <div class="section-head">
-          <h2>⭐ Mã Nổi Bật Hôm Nay</h2>
-          <span class="hot-badge">HOT</span>
+        <div class="flex items-center gap-[10px] mb-3">
+          <h2 class="m-0 text-[1.4rem]">⭐ Mã Nổi Bật Hôm Nay</h2>
+          <span
+            class="px-[10px] py-[5px] rounded-full bg-red-500 text-white text-[0.8rem] font-extrabold animate-pulse-scale"
+          >HOT</span>
         </div>
 
-        <div class="featured-row">
+        <div
+          class="flex gap-[14px] overflow-x-auto pb-2"
+          style="scroll-snap-type: x mandatory"
+        >
           <article
             v-for="coupon in featuredCoupons"
             :key="coupon.id"
-            class="featured-card"
+            class="relative min-w-[340px] rounded-[18px] overflow-hidden scroll-snap-start"
+            style="
+              background: linear-gradient(135deg, #f97316, #ea580c);
+              box-shadow: 0 16px 30px rgba(234,88,12,0.3);
+            "
           >
-            <span class="featured-ribbon">FEATURED</span>
-            <div class="featured-top">
-              <p class="brand-line">SmartFood Deals</p>
-              <p class="featured-value">{{ coupon.valueLabel }}</p>
-              <p class="featured-condition">{{ coupon.condition }}</p>
+            <!-- Ribbon -->
+            <span
+              class="absolute top-[14px] right-[-34px] rotate-[38deg] font-black text-[0.7rem] px-[34px] py-1 text-red-700"
+              style="background: #fde047"
+              >FEATURED</span
+            >
+            <!-- Top -->
+            <div class="p-[18px] text-white">
+              <p class="m-0 opacity-[0.92]">SmartFood Deals</p>
+              <p class="mt-2 mb-0 text-[2.2rem] leading-none font-black">
+                {{ coupon.valueLabel }}
+              </p>
+              <p class="mt-2 mb-0 opacity-[0.86]">{{ coupon.condition }}</p>
             </div>
+            <!-- Dashed divider with notches -->
             <div class="featured-divider" />
-            <div class="featured-bottom">
-              <div class="code-box">{{ coupon.code }}</div>
-              <span class="expire-tag">⏰ {{ coupon.expireText }}</span>
+            <!-- Bottom -->
+            <div class="p-4 bg-orange-50">
+              <div
+                class="font-mono text-[1.2rem] font-extrabold tracking-[0.1em] text-orange-700 border-2 border-dashed border-orange-400 rounded-[10px] bg-[#fff2df] p-[10px] text-center"
+              >
+                {{ coupon.code }}
+              </div>
+              <span
+                class="inline-block mt-[10px] rounded-full px-[10px] py-1 text-[0.78rem] font-bold bg-red-500 text-white"
+              >⏰ {{ coupon.expireText }}</span>
               <button
                 type="button"
-                class="copy-featured"
+                class="mt-3 w-full border-0 rounded-xl text-white h-11 font-extrabold relative overflow-hidden cursor-pointer transition-colors duration-300"
+                :class="copiedCode === coupon.code ? 'bg-green-600' : 'bg-orange-700'"
                 @click="copyCode(coupon.code)"
               >
-                <span>{{
-                  copiedCode === coupon.code ? "✓ ĐÃ SAO CHÉP" : "SAO CHÉP MÃ"
-                }}</span>
+                <Transition name="copy-slide" mode="out-in">
+                  <span
+                    :key="copiedCode === coupon.code ? 'copied' : 'default'"
+                    class="flex items-center justify-center gap-2"
+                  >
+                    <template v-if="copiedCode === coupon.code">
+                      <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      ĐÃ SAO CHÉP
+                    </template>
+                    <template v-else>SAO CHÉP MÃ</template>
+                  </span>
+                </Transition>
                 <span
                   v-if="burstCode === coupon.code"
                   v-for="n in 6"
@@ -146,42 +261,68 @@
         </div>
       </section>
 
+      <!-- All coupons -->
       <section>
-        <div class="section-head">
-          <h2>🎟️ Tất Cả Mã Giảm Giá</h2>
+        <div class="flex items-center gap-[10px] mb-3">
+          <h2 class="m-0 text-[1.4rem]">🎟️ Tất Cả Mã Giảm Giá</h2>
         </div>
 
-        <div class="coupon-grid">
+        <div
+          class="coupon-grid"
+        >
           <article
             v-for="(coupon, idx) in visibleCoupons"
             :key="coupon.id"
-            class="coupon-card"
+            class="relative overflow-hidden rounded-2xl bg-white grid border border-gray-200 coupon-card hover:-translate-y-[3px] hover:shadow-[0_12px_22px_rgba(15,23,42,0.12)] transition-[transform,box-shadow] duration-[250ms]"
             :class="[
               coupon.status === 'expired' ? 'is-expired' : '',
               coupon.status === 'used' ? 'is-used' : '',
             ]"
+            style="grid-template-columns: 35% 14px 65%"
             :style="{ animationDelay: `${idx * 50}ms` }"
           >
-            <div class="coupon-left" :class="coupon.type">
-              <p class="coupon-value">{{ coupon.valueLabel }}</p>
-              <p class="coupon-icon">{{ coupon.icon }}</p>
-              <p class="coupon-type-name">{{ coupon.typeLabel }}</p>
+            <!-- Left colored column -->
+            <div
+              class="p-[14px] text-white grid content-center justify-items-center text-center"
+              :style="{
+                background:
+                  coupon.type === 'money' || coupon.type === 'percent'
+                    ? 'linear-gradient(140deg, #f97316, #ea580c)'
+                    : 'linear-gradient(140deg, #22c55e, #16a34a)',
+              }"
+            >
+              <p class="m-0 text-2xl font-black">{{ coupon.valueLabel }}</p>
+              <p class="my-1 mx-0">{{ coupon.icon }}</p>
+              <p class="m-0 text-[0.7rem] font-bold tracking-[0.06em]">
+                {{ coupon.typeLabel }}
+              </p>
             </div>
 
-            <div class="vertical-divider coupon-divider" />
+            <!-- Dashed vertical divider with notches -->
+            <div class="coupon-divider vertical-divider" />
 
-            <div class="coupon-right">
-              <div class="coupon-code">{{ coupon.code }}</div>
-              <p class="coupon-condition">{{ coupon.condition }}</p>
-              <p class="coupon-expire">⏰ {{ coupon.expireDate }}</p>
+            <!-- Right info column -->
+            <div class="p-3 px-4 relative">
+              <div
+                class="w-fit rounded-lg px-[10px] py-[6px] border border-dashed border-orange-400 bg-orange-50 font-mono font-extrabold"
+              >
+                {{ coupon.code }}
+              </div>
+              <p class="mt-2 mb-0 text-gray-500 text-[0.82rem]">
+                {{ coupon.condition }}
+              </p>
+              <p class="mt-2 mb-0 text-gray-500 text-[0.82rem]">
+                ⏰ {{ coupon.expireDate }}
+              </p>
 
-              <div class="usage">
-                <p>
+              <div class="mt-2">
+                <p class="m-0 text-gray-500 text-[0.82rem]">
                   Đã dùng {{ coupon.usedCount }}/{{ coupon.totalCount }} lượt
                 </p>
-                <div class="progress-track">
+                <div class="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
                   <span
-                    class="progress-fill"
+                    class="block h-full transition-[width] duration-[800ms] ease-out"
+                    style="background: linear-gradient(90deg, #f97316, #ea580c)"
                     :style="{
                       width: progressVisible
                         ? `${usagePercent(coupon)}%`
@@ -193,23 +334,52 @@
 
               <button
                 type="button"
-                class="copy-standard"
-                :class="{ copied: copiedCode === coupon.code }"
+                class="mt-[10px] rounded-[10px] h-[34px] font-bold w-full cursor-pointer transition-colors duration-300 relative overflow-hidden"
+                :class="
+                  copiedCode === coupon.code
+                    ? 'bg-green-600 border border-green-600 text-white'
+                    : 'border border-orange-500 text-orange-500 bg-transparent'
+                "
                 @click="copyCode(coupon.code)"
               >
-                {{ copiedCode === coupon.code ? "Đã sao chép" : "Sao chép" }}
+                <Transition name="copy-slide" mode="out-in">
+                  <span
+                    :key="copiedCode === coupon.code ? 'copied' : 'default'"
+                    class="flex items-center justify-center gap-1 text-[0.82rem]"
+                  >
+                    <template v-if="copiedCode === coupon.code">
+                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      Đã sao chép!
+                    </template>
+                    <template v-else>Sao chép</template>
+                  </span>
+                </Transition>
               </button>
 
               <span
                 v-if="coupon.totalCount - coupon.usedCount <= 10"
-                class="low-badge"
+                class="mt-2 inline-block rounded-full px-2 py-1 bg-red-500 text-white text-[0.7rem] font-bold animate-pulse-scale"
               >
                 🔥 Còn {{ coupon.totalCount - coupon.usedCount }} lượt
               </span>
             </div>
 
-            <div v-if="coupon.status !== 'active'" class="status-overlay">
-              <span class="status-stamp">{{
+            <!-- Status overlay -->
+            <div
+              v-if="coupon.status !== 'active'"
+              class="absolute inset-0 bg-white/40 grid place-items-center"
+            >
+              <span
+                class="border-[3px] font-black tracking-[0.08em] px-[14px] py-2 bg-white/95 animate-stamp"
+                :class="
+                  coupon.status === 'used'
+                    ? 'border-green-600 text-green-600'
+                    : 'border-red-600 text-red-600'
+                "
+                style="transform: rotate(15deg)"
+              >{{
                 coupon.status === "expired" ? "HẾT HẠN" : "ĐÃ DÙNG"
               }}</span>
             </div>
@@ -217,31 +387,54 @@
         </div>
       </section>
 
-      <section class="guide">
-        <h3>Hướng Dẫn Sử Dụng Mã</h3>
-        <div class="guide-steps">
-          <article v-for="step in guideSteps" :key="step.id" class="guide-step">
-            <div class="step-number">{{ step.id }}</div>
-            <p class="step-icon">{{ step.icon }}</p>
-            <h4>{{ step.title }}</h4>
-            <p>{{ step.desc }}</p>
+      <!-- Guide -->
+      <section class="bg-orange-50 rounded-[18px] p-6">
+        <h3 class="text-center m-0 mb-[18px] text-[1.3rem]">Hướng Dẫn Sử Dụng Mã</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <article
+            v-for="step in guideSteps"
+            :key="step.id"
+            class="bg-white rounded-[14px] p-[14px] text-center relative hover:shadow-[0_0_0_2px_rgba(249,115,22,0.3)] transition-shadow duration-200"
+          >
+            <div
+              class="w-[30px] h-[30px] mx-auto rounded-full grid place-items-center bg-orange-500 text-white font-extrabold"
+            >
+              {{ step.id }}
+            </div>
+            <p class="my-2 mx-0 text-[2rem]">{{ step.icon }}</p>
+            <h4 class="m-0">{{ step.title }}</h4>
+            <p class="mt-[6px] mb-0 text-gray-500 text-[0.85rem]">
+              {{ step.desc }}
+            </p>
           </article>
         </div>
       </section>
 
-      <section class="notes">
-        <h3>Điều Kiện &amp; Lưu Ý</h3>
-        <div class="accordion">
+      <!-- Notes / Accordion -->
+      <section class="rounded-[18px] border border-gray-200 p-5">
+        <h3 class="text-center m-0 mb-[18px] text-[1.3rem]">
+          Điều Kiện &amp; Lưu Ý
+        </h3>
+        <div class="grid gap-2">
           <article
             v-for="(item, idx) in noteItems"
             :key="item.title"
-            class="acc-item"
+            class="border border-gray-200 rounded-xl overflow-hidden"
           >
-            <button type="button" class="acc-head" @click="toggleNote(idx)">
+            <button
+              type="button"
+              class="w-full flex justify-between items-center border-0 bg-white px-[14px] py-3 font-bold cursor-pointer"
+              @click="toggleNote(idx)"
+            >
               <span>{{ item.title }}</span>
               <span>{{ openedNotes.has(idx) ? "−" : "+" }}</span>
             </button>
-            <p v-if="openedNotes.has(idx)" class="acc-body">{{ item.body }}</p>
+            <p
+              v-if="openedNotes.has(idx)"
+              class="m-0 px-[14px] pb-3 text-gray-500 leading-[1.6]"
+            >
+              {{ item.body }}
+            </p>
           </article>
         </div>
       </section>
@@ -311,10 +504,6 @@ const noteItems = [
     title: "Không áp dụng đồng thời 2 mã giảm giá",
     body: "Hệ thống chỉ ghi nhận một mã tối ưu nhất cho mỗi đơn hàng tại cùng thời điểm.",
   },
-  // {
-  //   title: "Mã freeship không áp dụng với đơn COD",
-  //   body: "Để dùng mã freeship, vui lòng chọn phương thức thanh toán online khi đặt đơn.",
-  // },
   {
     title: "Mã có thể hết lượt trước ngày hết hạn",
     body: "Một số mã giới hạn số lượt nên có thể dừng sớm khi đạt ngưỡng phát hành.",
@@ -663,196 +852,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.voucher-page {
-  --primary: #f97316;
-  --primary-dark: #ea580c;
-  --secondary: #16a34a;
-  --orange-soft: #fff7ed;
-  --green-soft: #f0fdf4;
-  --text: #111827;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #fffdf9 0%, #ffffff 40%);
-  color: var(--text);
-}
-
-.container {
-  width: min(1120px, 92vw);
-  margin: 0 auto;
-}
-
-.hero {
-  position: relative;
-  min-height: 260px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #f97316, #ea580c, #dc2626);
-  display: grid;
-  place-items: center;
-}
-
-.hero-confetti {
-  position: absolute;
-  inset: 0;
-}
-
-.confetti {
-  position: absolute;
-  opacity: 0.15;
-  animation: floatRotate linear infinite;
-}
-
-.confetti.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.confetti.diamond {
-  width: 10px;
-  height: 10px;
-  transform: rotate(45deg);
-}
-
-.confetti.star {
-  width: 12px;
-  height: 12px;
-  clip-path: polygon(
-    50% 0,
-    62% 34%,
-    100% 38%,
-    72% 59%,
-    82% 100%,
-    50% 75%,
-    18% 100%,
-    28% 59%,
-    0 38%,
-    38% 34%
-  );
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  color: #fff;
-}
-
-.hero-icon {
-  width: 64px;
-  margin: 0 auto 12px;
-  animation: swing 2s ease-in-out infinite;
-}
-
-h1 {
-  margin: 0;
-  font-size: clamp(2rem, 4vw, 38px);
-  line-height: 1.1;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  text-shadow: 0 8px 26px rgba(0, 0, 0, 0.26);
-}
-
-.hero-subtitle {
-  margin: 10px 0 0;
-  opacity: 0.8;
-}
-
-.countdown-wrap {
-  margin-top: 14px;
-}
-
-.count-label {
-  margin: 0 0 8px;
-  font-weight: 600;
-}
-
-.deal-progress {
-  width: min(440px, 92vw);
-  margin: 0 auto;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  overflow: hidden;
-}
-
-.deal-progress span {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, #fde047, #facc15, #86efac);
-  transition: width 0.4s ease;
-}
-
-.deal-stats {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.deal-stats article {
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 8px;
-  display: grid;
-}
-
-.deal-stats strong {
-  font-size: 1.1rem;
-}
-
-.deal-stats span {
-  font-size: 0.76rem;
-  opacity: 0.86;
-}
-
-.countdown-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 80px));
-  justify-content: center;
-  gap: 8px;
-}
-
-.time-box {
-  border-radius: 12px;
-  padding: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(17, 24, 39, 0.3);
-}
-
-.digit-shell {
-  perspective: 300px;
-}
-
-.digit {
-  display: block;
-  font-size: 1.3rem;
-  font-weight: 800;
-  transform-origin: center top;
-}
-
-.digit.flip {
-  animation: flip 0.6s ease;
-}
-
-.time-box small {
-  font-size: 0.7rem;
-  opacity: 0.8;
-}
-
-.update-pill {
-  margin: 10px auto 0;
-  width: fit-content;
-  border-radius: 999px;
-  padding: 5px 12px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  background: #fde047;
-  color: #9a3412;
-}
-
+/* ── Mount animations ─────────────────────────────── */
 .mount-0,
 .mount-1,
 .mount-2,
@@ -861,195 +861,61 @@ h1 {
   transform: translateY(14px);
   animation: heroMount 0.5s ease forwards;
 }
+.mount-1 { animation-delay: 0.1s; }
+.mount-2 { animation-delay: 0.2s; }
+.mount-3 { animation-delay: 0.3s; }
 
-.mount-1 {
-  animation-delay: 0.1s;
+@keyframes heroMount {
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.mount-2 {
-  animation-delay: 0.2s;
+/* ── Confetti float ───────────────────────────────── */
+@keyframes floatRotate {
+  0%   { transform: translateY(0) rotate(0deg); }
+  50%  { transform: translateY(-12px) rotate(15deg); }
+  100% { transform: translateY(8px) rotate(-12deg); }
+}
+.animate-floatRotate { animation: floatRotate linear infinite; }
+
+/* ── Hero icon swing ──────────────────────────────── */
+@keyframes swing {
+  0%, 100% { transform: rotate(-8deg); }
+  50%       { transform: rotate(8deg); }
+}
+.animate-swing { animation: swing 2s ease-in-out infinite; }
+
+/* ── Star clip-path ───────────────────────────────── */
+.star-shape {
+  clip-path: polygon(
+    50% 0, 62% 34%, 100% 38%, 72% 59%,
+    82% 100%, 50% 75%, 18% 100%, 28% 59%,
+    0 38%, 38% 34%
+  );
 }
 
-.mount-3 {
-  animation-delay: 0.3s;
-}
-
-.filter-sticky {
-  position: sticky;
-  top: 4rem;
-  z-index: 30;
-  border-bottom: 1px solid var(--border);
-  background: #fff;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
-}
-
-.filter-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 0;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0 14px;
-  height: 44px;
-}
-
-.search-box:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16);
-}
-
-.search-box span {
-  color: var(--primary);
-}
-
-.search-box input {
-  border: 0;
-  outline: 0;
-  width: 100%;
-  font-size: 0.95rem;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-}
-
-.tab-pill {
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 14px;
-  background: #f3f4f6;
-  color: #4b5563;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.2s ease;
-}
-
-.tab-pill.active {
-  background: var(--primary);
-  color: #fff;
-}
-
-.sort-box {
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  padding: 0 14px;
-  gap: 8px;
-  font-size: 0.92rem;
-}
-
-.sort-box select {
-  border: 0;
-  outline: 0;
-  font-weight: 700;
-  color: var(--text);
-  background: transparent;
-}
-
-.result-line {
-  margin: 0 0 12px;
-  color: var(--secondary);
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.main-content {
-  padding: 24px 0 56px;
+/* ── Coupon grid ──────────────────────────────────── */
+.coupon-grid {
   display: grid;
-  gap: 28px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.section-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+/* ── Coupon card animation ────────────────────────── */
+.coupon-card {
+  transform: translateY(8px);
+  opacity: 0;
+  animation: cardIn 0.45s ease forwards;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+@keyframes cardIn {
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.section-head h2 {
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.hot-badge {
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: #ef4444;
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 800;
-  animation: pulse 1.2s infinite;
-}
-
-.featured-row {
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 8px;
-}
-
-.featured-card {
-  position: relative;
-  min-width: 340px;
-  border-radius: 18px;
-  overflow: hidden;
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  scroll-snap-align: start;
-  box-shadow: 0 16px 30px rgba(234, 88, 12, 0.3);
-}
-
-.featured-ribbon {
-  position: absolute;
-  top: 14px;
-  right: -34px;
-  transform: rotate(38deg);
-  background: #fde047;
-  color: #b91c1c;
-  font-weight: 900;
-  font-size: 0.7rem;
-  padding: 4px 34px;
-}
-
-.featured-top {
-  padding: 18px;
-  color: #fff;
-}
-
-.brand-line {
-  margin: 0;
-  opacity: 0.92;
-}
-
-.featured-value {
-  margin: 8px 0 0;
-  font-size: 2.2rem;
-  line-height: 1;
-  font-weight: 900;
-}
-
-.featured-condition {
-  margin: 8px 0 0;
-  opacity: 0.86;
-}
-
+/* ── Featured divider with ::before/::after notches ─ */
 .featured-divider {
   position: relative;
   border-top: 1px dashed rgba(255, 255, 255, 0.7);
 }
-
 .featured-divider::before,
 .featured-divider::after {
   content: "";
@@ -1060,57 +926,28 @@ h1 {
   background: #fff;
   top: -9px;
 }
+.featured-divider::before { left: -9px; }
+.featured-divider::after  { right: -9px; }
 
-.featured-divider::before {
+/* ── Coupon card divider notches ─────────────────── */
+.vertical-divider {
+  position: relative;
+  border-left: 2px dashed #cbd5e1;
+}
+.coupon-divider::before,
+.coupon-divider::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
   left: -9px;
 }
+.coupon-divider::before { top: -8px; }
+.coupon-divider::after  { bottom: -8px; }
 
-.featured-divider::after {
-  right: -9px;
-}
-
-.featured-bottom {
-  background: var(--orange-soft);
-  padding: 16px;
-}
-
-.code-box {
-  font-family: "Courier New", monospace;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  color: var(--primary-dark);
-  border: 2px dashed #fb923c;
-  border-radius: 10px;
-  background: #fff2df;
-  padding: 10px;
-  text-align: center;
-}
-
-.expire-tag {
-  display: inline-block;
-  margin-top: 10px;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  background: #ef4444;
-  color: #fff;
-}
-
-.copy-featured {
-  margin-top: 12px;
-  width: 100%;
-  border: 0;
-  border-radius: 12px;
-  background: var(--primary-dark);
-  color: #fff;
-  height: 44px;
-  font-weight: 800;
-  position: relative;
-  overflow: hidden;
-}
-
+/* ── Burst animation (copy button) ───────────────── */
 .burst {
   position: absolute;
   left: 50%;
@@ -1122,320 +959,6 @@ h1 {
   animation: burst 0.5s ease-out forwards;
   transform: rotate(calc(var(--i) * 60deg)) translateY(-4px);
 }
-
-.coupon-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.coupon-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: 16px;
-  background: #fff;
-  display: grid;
-  grid-template-columns: 35% 14px 65%;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-  transform: translateY(8px);
-  opacity: 0;
-  animation: cardIn 0.45s ease forwards;
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.coupon-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12);
-}
-
-.coupon-left {
-  padding: 14px;
-  color: #fff;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  text-align: center;
-}
-
-.coupon-left.money,
-.coupon-left.percent {
-  background: linear-gradient(140deg, #f97316, #ea580c);
-}
-
-.coupon-left.freeship,
-.coupon-left.product {
-  background: linear-gradient(140deg, #22c55e, #16a34a);
-}
-
-.coupon-value {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 900;
-}
-
-.coupon-icon {
-  margin: 4px 0;
-}
-
-.coupon-type-name {
-  margin: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-}
-
-.vertical-divider {
-  position: relative;
-  border-left: 2px dashed #cbd5e1;
-}
-
-.coupon-divider::before,
-.coupon-divider::after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  left: -9px;
-}
-
-.coupon-divider::before {
-  top: -8px;
-}
-
-.coupon-divider::after {
-  bottom: -8px;
-}
-
-.coupon-right {
-  padding: 12px 16px;
-  position: relative;
-}
-
-.coupon-code {
-  width: fit-content;
-  border-radius: 8px;
-  padding: 6px 10px;
-  border: 1px dashed #fb923c;
-  background: #fff7ed;
-  font-family: "Courier New", monospace;
-  font-weight: 800;
-}
-
-.coupon-condition,
-.coupon-expire,
-.usage p {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 0.82rem;
-}
-
-.progress-track {
-  margin-top: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #f3f4f6;
-  overflow: hidden;
-}
-
-.progress-fill {
-  display: block;
-  height: 100%;
-  background: linear-gradient(90deg, #f97316, #ea580c);
-  transition: width 0.8s ease;
-}
-
-.copy-standard {
-  margin-top: 10px;
-  border: 1px solid var(--primary);
-  color: var(--primary);
-  background: transparent;
-  border-radius: 10px;
-  height: 34px;
-  font-weight: 700;
-  width: 100%;
-}
-
-.copy-standard.copied {
-  background: var(--primary);
-  color: #fff;
-}
-
-.low-badge {
-  margin-top: 8px;
-  display: inline-block;
-  border-radius: 999px;
-  padding: 4px 8px;
-  background: #ef4444;
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  animation: pulse 1.2s infinite;
-}
-
-.status-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.4);
-  display: grid;
-  place-items: center;
-}
-
-.status-stamp {
-  border: 3px solid #dc2626;
-  color: #dc2626;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  padding: 8px 14px;
-  transform: rotate(15deg);
-  background: rgba(255, 255, 255, 0.95);
-  animation: stamp 1.2s ease-in-out infinite;
-}
-
-.is-used .status-stamp {
-  border-color: #16a34a;
-  color: #16a34a;
-}
-
-.guide {
-  background: var(--orange-soft);
-  border-radius: 18px;
-  padding: 24px;
-}
-
-.guide h3,
-.notes h3 {
-  text-align: center;
-  margin: 0 0 18px;
-  font-size: 1.3rem;
-}
-
-.guide-steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.guide-step {
-  background: #fff;
-  border-radius: 14px;
-  padding: 14px;
-  text-align: center;
-  position: relative;
-  transition: box-shadow 0.2s ease;
-}
-
-.guide-step:hover {
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
-}
-
-.step-number {
-  width: 30px;
-  height: 30px;
-  margin: 0 auto;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--primary);
-  color: #fff;
-  font-weight: 800;
-}
-
-.step-icon {
-  margin: 8px 0;
-  font-size: 2rem;
-}
-
-.guide-step h4 {
-  margin: 0;
-}
-
-.guide-step p {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
-.notes {
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  padding: 20px;
-}
-
-.accordion {
-  display: grid;
-  gap: 8px;
-}
-
-.acc-item {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.acc-head {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 0;
-  background: #fff;
-  padding: 12px 14px;
-  font-weight: 700;
-}
-
-.acc-body {
-  margin: 0;
-  padding: 0 14px 12px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-@keyframes heroMount {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes floatRotate {
-  0% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-12px) rotate(15deg);
-  }
-  100% {
-    transform: translateY(8px) rotate(-12deg);
-  }
-}
-
-@keyframes swing {
-  0%,
-  100% {
-    transform: rotate(-8deg);
-  }
-  50% {
-    transform: rotate(8deg);
-  }
-}
-
-@keyframes flip {
-  0% {
-    transform: rotateX(0deg);
-  }
-  50% {
-    transform: rotateX(90deg);
-  }
-  100% {
-    transform: rotateX(0deg);
-  }
-}
-
 @keyframes burst {
   from {
     opacity: 1;
@@ -1447,72 +970,54 @@ h1 {
   }
 }
 
-@keyframes cardIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── Pulse (HOT badge & low-badge) ───────────────── */
+@keyframes pulsScale {
+  0%, 100% { transform: scale(1);    opacity: 1;   }
+  50%       { transform: scale(1.08); opacity: 0.8; }
 }
+.animate-pulse-scale { animation: pulsScale 1.2s infinite; }
 
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.08);
-    opacity: 0.8;
-  }
-}
-
+/* ── Stamp (status overlay) ──────────────────────── */
 @keyframes stamp {
-  0%,
-  100% {
-    opacity: 0.85;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.85; }
+  50%       { opacity: 1;    }
+}
+.animate-stamp { animation: stamp 1.2s ease-in-out infinite; }
+
+/* ── Scroll snap for featured row ─────────────────── */
+.scroll-snap-start { scroll-snap-align: start; }
+
+/* ── Copy slide transition (Vue <Transition>) ─────── */
+.copy-slide-enter-active {
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.copy-slide-leave-active {
+  transition: all 0.14s ease-in;
+}
+.copy-slide-enter-from {
+  opacity: 0;
+  transform: translateY(8px) scale(0.92);
+}
+.copy-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.96);
+}
+.copy-slide-enter-to,
+.copy-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
+/* ── Responsive overrides ─────────────────────────── */
 @media (max-width: 1024px) {
-  .filter-row {
-    flex-wrap: wrap;
-  }
-
-  .tabs {
-    order: 3;
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 6px;
-  }
-
   .coupon-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .countdown-grid {
-    grid-template-columns: repeat(2, minmax(0, 92px));
-  }
-
-  .deal-stats {
-    grid-template-columns: 1fr;
-  }
-
   .coupon-grid {
     grid-template-columns: 1fr;
-  }
-
-  .guide-steps {
-    grid-template-columns: 1fr;
-  }
-
-  .sort-box,
-  .search-box {
-    width: 100%;
   }
 }
 </style>

@@ -1,448 +1,626 @@
 <template>
-  <div class="register-page">
-    <Toast position="top-right" />
+  <div>
+    <!-- AppLoading overlay khi submit đăng ký -->
+    <AppLoading
+      v-if="loading"
+      variant="overlay"
+      message="Đang tạo tài khoản..."
+    />
 
-    <!-- Confetti particles -->
-    <Teleport to="body">
-      <div v-if="showConfetti" class="confetti-container" aria-hidden="true">
+    <div class="flex min-h-dvh w-full font-['Inter',sans-serif]">
+      <Toast position="top-right" />
+
+      <!-- Confetti particles -->
+      <Teleport to="body">
         <div
-          v-for="i in 60"
-          :key="i"
-          class="confetti-piece"
-          :style="getConfettiStyle(i)"
+          v-if="showConfetti"
+          class="fixed inset-0 z-[9999] overflow-hidden pointer-events-none"
+          aria-hidden="true"
+        >
+          <div
+            v-for="i in 60"
+            :key="i"
+            class="absolute -top-[10px] rounded-[3px] [animation-name:confettiFall] [animation-timing-function:linear] [animation-fill-mode:forwards]"
+            :style="getConfettiStyle(i)"
+          />
+        </div>
+      </Teleport>
+
+      <!-- ===== LEFT FORM PANEL ===== -->
+      <div
+        class="relative order-1 flex flex-1 items-center justify-center overflow-hidden bg-white px-6 py-10"
+      >
+        <div
+          class="pointer-events-none absolute left-0 top-0 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#fff7ed]"
         />
-      </div>
-    </Teleport>
+        <div
+          class="pointer-events-none absolute bottom-0 right-0 h-48 w-48 translate-x-1/2 translate-y-1/2 rounded-full bg-[#f0fdf4]"
+        />
 
-    <!-- ===== LEFT FORM PANEL ===== -->
-    <div class="form-panel">
-      <div class="form-deco-top-left" />
-      <div class="form-deco-bottom-right" />
-
-      <div class="form-container">
-        <!-- Mobile logo -->
-        <div class="mobile-logo">
-          <div class="mobile-logo-icon">S</div>
-          <span class="mobile-logo-text"
-            >SMART<span class="text-orange">FOOD</span></span
-          >
-        </div>
-
-        <!-- Heading -->
-        <div class="form-heading">
-          <p class="heading-sub">Bắt đầu ngay hôm nay 🌟</p>
-          <h2 class="heading-title">Tạo tài khoản</h2>
-          <p class="heading-desc">Chỉ mất 1 phút để tham gia SmartFood</p>
-        </div>
-
-        <!-- ===== CUSTOM STEPPER ===== -->
-        <div class="stepper" aria-label="Các bước đăng ký">
-          <template v-for="(s, i) in steps" :key="s.label">
-            <!-- Step circle -->
+        <div class="relative z-10 w-full max-w-[500px]">
+          <!-- Mobile logo -->
+          <div class="mb-6 flex items-center gap-2 md:hidden">
             <div
-              class="step-item"
-              :class="{
-                'step-done': currentStep > i + 1,
-                'step-active': currentStep === i + 1,
-              }"
+              class="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-[#f97316] to-[#ea580c] text-lg font-black text-white shadow-[0_4px_10px_rgba(249,115,22,0.3)]"
             >
-              <div class="step-circle">
-                <svg
-                  v-if="currentStep > i + 1"
-                  viewBox="0 0 16 16"
-                  class="step-check"
-                  fill="none"
-                >
-                  <path
-                    d="M3 8l3.5 3.5L13 5"
-                    stroke="white"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                <span v-else>{{ i + 1 }}</span>
-              </div>
-              <span class="step-label">{{ s.label }}</span>
+              S
             </div>
+            <span class="text-lg font-black text-[#111827]"
+              >SMART<span class="text-[#f97316]">FOOD</span></span
+            >
+          </div>
 
-            <!-- Connector line (not after last) -->
-            <div v-if="i < steps.length - 1" class="step-line">
+          <!-- Heading -->
+          <div class="mb-7">
+            <p
+              class="mb-1 text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-[#f97316]"
+            >
+              Bắt đầu ngay hôm nay 🌟
+            </p>
+            <h2 class="m-0 mb-1 text-[1.75rem] font-black text-[#111827]">
+              Tạo tài khoản
+            </h2>
+            <p class="text-sm text-[#9ca3af]">
+              Chỉ mất 1 phút để tham gia SmartFood
+            </p>
+          </div>
+
+          <!-- ===== CUSTOM STEPPER ===== -->
+          <div class="mb-8 flex items-center" aria-label="Các bước đăng ký">
+            <template v-for="(s, i) in steps" :key="s.label">
+              <!-- Step circle -->
               <div
-                class="step-line-fill"
-                :class="{ filled: currentStep > i + 1 }"
-              />
-            </div>
-          </template>
-        </div>
-
-        <!-- ===== STEP CONTENT ===== -->
-        <div class="steps-wrapper" :class="{ shake: isShaking }">
-          <!-- STEP 1: Basic Info -->
-          <Transition :name="transitionName" mode="out-in">
-            <div v-if="currentStep === 1" key="step1" class="step-content">
-              <p class="step-title">📋 Thông tin cơ bản</p>
-
-              <!-- Full Name -->
-              <div class="field-group">
-                <label class="field-label"
-                  >Họ và tên <span class="req">*</span></label
+                class="relative z-[1] flex flex-col items-center gap-[0.4rem]"
+              >
+                <div
+                  class="flex h-10 w-10 items-center justify-center rounded-full border-[2.5px] text-[0.9rem] font-bold transition-all duration-[400ms] ease-in-out"
+                  :class="
+                    currentStep > i + 1
+                      ? 'border-[#f97316] bg-[#f97316] text-white'
+                      : currentStep === i + 1
+                        ? 'border-[#f97316] text-[#f97316] [animation:stepPulse_1.5s_ease-in-out_infinite] shadow-[0_0_0_0_rgba(249,115,22,0.4)]'
+                        : 'border-[#d1d5db] bg-white text-[#9ca3af]'
+                  "
                 >
-                <div class="input-wrap">
-                  <span class="input-icon"><i class="pi pi-user" /></span>
-                  <InputText
-                    v-model="form.name"
-                    placeholder="Nguyễn Văn A"
-                    :invalid="!!step1Errors.name"
-                    class="prime-input"
-                    aria-label="Họ và tên"
-                  />
+                  <svg
+                    v-if="currentStep > i + 1"
+                    viewBox="0 0 16 16"
+                    class="h-4 w-4"
+                    fill="none"
+                  >
+                    <path
+                      d="M3 8l3.5 3.5L13 5"
+                      stroke="white"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span v-else>{{ i + 1 }}</span>
                 </div>
-                <small v-if="step1Errors.name" class="field-error">{{
-                  step1Errors.name
-                }}</small>
+                <span
+                  class="whitespace-nowrap text-[0.7rem] font-semibold transition-colors duration-300"
+                  :class="
+                    currentStep >= i + 1 ? 'text-[#f97316]' : 'text-[#9ca3af]'
+                  "
+                >
+                  {{ s.label }}
+                </span>
               </div>
 
-              <!-- Email -->
-              <div class="field-group">
-                <label class="field-label"
-                  >Email <span class="req">*</span></label
-                >
-                <div class="input-wrap">
-                  <span class="input-icon"><i class="pi pi-envelope" /></span>
-                  <InputText
-                    v-model="form.email"
-                    type="email"
-                    placeholder="your@email.com"
-                    :invalid="!!step1Errors.email"
-                    class="prime-input"
-                    aria-label="Email"
-                  />
-                </div>
-                <small v-if="step1Errors.email" class="field-error">{{
-                  step1Errors.email
-                }}</small>
+              <!-- Connector line (not after last) -->
+              <div
+                v-if="i < steps.length - 1"
+                class="relative mb-[1.4rem] mx-1.5 h-[3px] flex-1 overflow-hidden rounded-full bg-[#e5e7eb]"
+              >
+                <div
+                  class="h-full rounded-full bg-[#f97316] transition-[width] duration-500 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]"
+                  :class="currentStep > i + 1 ? 'w-full' : 'w-0'"
+                />
               </div>
+            </template>
+          </div>
 
-              <!-- Phone -->
-              <div class="field-group">
-                <label class="field-label"
-                  >Số điện thoại <span class="req">*</span></label
-                >
-                <div class="input-wrap phone-wrap">
-                  <div class="phone-prefix">
-                    <span class="flag">🇻🇳</span>
-                    <span>+84</span>
-                  </div>
-                  <InputText
-                    v-model="form.phone"
-                    type="tel"
-                    placeholder="9x xxx xxxx"
-                    :invalid="!!step1Errors.phone"
-                    class="prime-input phone-input"
-                    aria-label="Số điện thoại"
-                  />
-                </div>
-                <small v-if="step1Errors.phone" class="field-error">{{
-                  step1Errors.phone
-                }}</small>
-              </div>
+          <!-- ===== STEP CONTENT ===== -->
+          <div
+            class="relative min-h-[300px] overflow-hidden"
+            :class="
+              isShaking
+                ? '[animation:shakeForm_0.5s_cubic-bezier(0.36,0.07,0.19,0.97)_both]'
+                : ''
+            "
+          >
+            <!-- STEP 1: Basic Info -->
+            <Transition :name="transitionName" mode="out-in">
+              <div v-if="currentStep === 1" key="step1" class="step-pane pb-2">
+                <p class="mb-5 text-[0.9rem] font-bold text-[#374151]">
+                  📋 Thông tin cơ bản
+                </p>
 
-              <button class="btn-primary" @click="goNext(1)">
-                Tiếp theo <i class="pi pi-arrow-right" />
-              </button>
-            </div>
-          </Transition>
-
-          <!-- STEP 2: Security -->
-          <Transition :name="transitionName" mode="out-in">
-            <div v-if="currentStep === 2" key="step2" class="step-content">
-              <p class="step-title">🔐 Bảo mật tài khoản</p>
-
-              <!-- Password -->
-              <div class="field-group">
-                <label class="field-label"
-                  >Mật khẩu <span class="req">*</span></label
-                >
-                <div class="input-wrap">
-                  <span class="input-icon"><i class="pi pi-lock" /></span>
-                  <Password
-                    v-model="form.password"
-                    :feedback="false"
-                    :toggle-mask="true"
-                    placeholder="Ít nhất 8 ký tự"
-                    :invalid="!!step2Errors.password"
-                    input-class="prime-input"
-                    class="w-full"
-                    aria-label="Mật khẩu"
-                    @update:model-value="updateStrength"
-                  />
-                </div>
-
-                <!-- Strength meter -->
-                <div v-if="form.password" class="strength-meter">
-                  <div class="strength-bar-track">
-                    <div
-                      class="strength-bar-fill"
-                      :style="{
-                        width: strengthWidth,
-                        background: strengthColor,
-                      }"
+                <!-- Full Name -->
+                <div class="mb-4">
+                  <label
+                    class="mb-1.5 block text-sm font-semibold text-[#374151]"
+                    >Họ và tên <span class="text-[#ef4444]">*</span></label
+                  >
+                  <div class="relative">
+                    <span
+                      class="pointer-events-none absolute bottom-0 left-3.5 top-0 z-10 flex items-center text-sm text-[#9ca3af]"
+                      ><i class="pi pi-user"
+                    /></span>
+                    <InputText
+                      v-model="form.name"
+                      placeholder="Nguyễn Văn A"
+                      :invalid="!!step1Errors.name"
+                      class="h-[42px] w-full rounded-[12px] border-[#e5e7eb] pl-11 text-sm transition-[border-color,box-shadow] duration-200 focus:border-[#f97316] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] focus:outline-none"
+                      aria-label="Họ và tên"
                     />
                   </div>
-                  <span
-                    class="strength-label"
-                    :style="{ color: strengthColor }"
-                    >{{ strengthLabel }}</span
+                  <small
+                    v-if="step1Errors.name"
+                    class="mt-1 block text-xs text-[#ef4444]"
+                    >{{ step1Errors.name }}</small
                   >
                 </div>
 
-                <small v-if="step2Errors.password" class="field-error">{{
-                  step2Errors.password
-                }}</small>
-              </div>
-
-              <!-- Confirm Password -->
-              <div class="field-group">
-                <label class="field-label"
-                  >Xác nhận mật khẩu <span class="req">*</span></label
-                >
-                <div class="input-wrap">
-                  <span class="input-icon"><i class="pi pi-lock" /></span>
-                  <Password
-                    v-model="form.confirmPassword"
-                    :feedback="false"
-                    :toggle-mask="true"
-                    placeholder="Nhập lại mật khẩu"
-                    :invalid="!!step2Errors.confirmPassword"
-                    input-class="prime-input"
-                    class="w-full"
-                    aria-label="Xác nhận mật khẩu"
-                  />
+                <!-- Email -->
+                <div class="mb-4">
+                  <label
+                    class="mb-1.5 block text-sm font-semibold text-[#374151]"
+                    >Email <span class="text-[#ef4444]">*</span></label
+                  >
+                  <div class="relative">
+                    <span
+                      class="pointer-events-none absolute bottom-0 left-3.5 top-0 z-10 flex items-center text-sm text-[#9ca3af]"
+                      ><i class="pi pi-envelope"
+                    /></span>
+                    <InputText
+                      v-model="form.email"
+                      type="email"
+                      placeholder="your@email.com"
+                      :invalid="!!step1Errors.email"
+                      class="h-[42px] w-full rounded-[12px] border-[#e5e7eb] pl-11 text-sm transition-[border-color,box-shadow] duration-200 focus:border-[#f97316] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] focus:outline-none"
+                      aria-label="Email"
+                    />
+                  </div>
+                  <small
+                    v-if="step1Errors.email"
+                    class="mt-1 block text-xs text-[#ef4444]"
+                    >{{ step1Errors.email }}</small
+                  >
                 </div>
-                <small v-if="step2Errors.confirmPassword" class="field-error">{{
-                  step2Errors.confirmPassword
-                }}</small>
-              </div>
 
-              <!-- Password rules hint -->
-              <div class="rules-box">
-                <div
-                  v-for="rule in passwordRules"
-                  :key="rule.label"
-                  class="rule-item"
-                  :class="{ met: rule.met }"
-                >
-                  <i
-                    :class="rule.met ? 'pi pi-check-circle' : 'pi pi-circle'"
-                  />
-                  {{ rule.label }}
+                <!-- Phone -->
+                <div class="mb-4">
+                  <label
+                    class="mb-1.5 block text-sm font-semibold text-[#374151]"
+                    >Số điện thoại <span class="text-[#ef4444]">*</span></label
+                  >
+                  <div class="flex items-center gap-0">
+                    <div
+                      class="flex h-[42px] shrink-0 items-center whitespace-nowrap rounded-l-[12px] rounded-r-none border border-r-0 border-[#e5e7eb] bg-[#f9fafb] px-3.5 text-sm font-semibold text-[#374151]"
+                    >
+                      <span class="text-base">🇻🇳</span>
+                      <span>+84</span>
+                    </div>
+                    <InputText
+                      v-model="form.phone"
+                      type="tel"
+                      placeholder="9x xxx xxxx"
+                      :invalid="!!step1Errors.phone"
+                      class="h-[42px] w-full rounded-r-[12px] rounded-l-none border-[#e5e7eb] pl-11 text-sm transition-[border-color,box-shadow] duration-200 focus:border-[#f97316] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] focus:outline-none"
+                      aria-label="Số điện thoại"
+                    />
+                  </div>
+                  <small
+                    v-if="step1Errors.phone"
+                    class="mt-1 block text-xs text-[#ef4444]"
+                    >{{ step1Errors.phone }}</small
+                  >
                 </div>
-              </div>
 
-              <div class="btn-row">
-                <button class="btn-outline" @click="goBack">
-                  <i class="pi pi-arrow-left" /> Quay lại
-                </button>
-                <button class="btn-primary flex-1" @click="goNext(2)">
+                <button
+                  class="mt-5 flex w-full items-center justify-center gap-2 rounded-[12px] border-none bg-gradient-to-br from-[#f97316] to-[#ea580c] px-6 py-[0.8rem] text-[0.9rem] font-bold text-white shadow-[0_4px_16px_rgba(249,115,22,0.35)] transition-[transform,box-shadow] duration-200 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(249,115,22,0.5)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-65"
+                  @click="goNext(1)"
+                >
                   Tiếp theo <i class="pi pi-arrow-right" />
                 </button>
               </div>
-            </div>
-          </Transition>
+            </Transition>
 
-          <!-- STEP 3: Confirm -->
-          <Transition :name="transitionName" mode="out-in">
-            <div v-if="currentStep === 3" key="step3" class="step-content">
-              <p class="step-title">✅ Xác nhận thông tin</p>
+            <!-- STEP 2: Security -->
+            <Transition :name="transitionName" mode="out-in">
+              <div v-if="currentStep === 2" key="step2" class="step-pane pb-2">
+                <p class="mb-5 text-[0.9rem] font-bold text-[#374151]">
+                  🔐 Bảo mật tài khoản
+                </p>
 
-              <!-- Info review card -->
-              <div class="review-card">
-                <div class="review-avatar">
-                  {{ form.name.charAt(0).toUpperCase() || "?" }}
-                </div>
-                <div class="review-info">
-                  <div class="review-name">{{ form.name }}</div>
-                  <div class="review-detail">
-                    <i class="pi pi-envelope" /> {{ form.email }}
+                <!-- Password -->
+                <div class="mb-4">
+                  <label
+                    class="mb-1.5 block text-sm font-semibold text-[#374151]"
+                    >Mật khẩu <span class="text-[#ef4444]">*</span></label
+                  >
+                  <div class="relative">
+                    <span
+                      class="pointer-events-none absolute bottom-0 left-3.5 top-0 z-10 flex items-center text-sm text-[#9ca3af]"
+                      ><i class="pi pi-lock"
+                    /></span>
+                    <Password
+                      v-model="form.password"
+                      :feedback="false"
+                      :toggle-mask="true"
+                      placeholder="Ít nhất 8 ký tự"
+                      :invalid="!!step2Errors.password"
+                      input-class="h-[42px] w-full rounded-[12px] border-[#e5e7eb] pl-11 text-sm transition-[border-color,box-shadow] duration-200 focus:border-[#f97316] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] focus:outline-none"
+                      class="w-full"
+                      aria-label="Mật khẩu"
+                      @update:model-value="updateStrength"
+                    />
                   </div>
-                  <div class="review-detail">
-                    <i class="pi pi-phone" /> +84 {{ form.phone }}
+
+                  <!-- Strength meter -->
+                  <div v-if="form.password" class="mt-2.5">
+                    <div
+                      class="mb-1.5 h-[6px] overflow-hidden rounded-full bg-[#e5e7eb]"
+                    >
+                      <div
+                        class="h-full rounded-full transition-[width,background] duration-500"
+                        :style="{
+                          width: strengthWidth,
+                          background: strengthColor,
+                        }"
+                      />
+                    </div>
+                    <span
+                      class="text-xs font-bold"
+                      :style="{ color: strengthColor }"
+                      >{{ strengthLabel }}</span
+                    >
                   </div>
-                </div>
-                <button
-                  class="review-edit"
-                  @click="currentStep = 1"
-                  title="Chỉnh sửa"
-                >
-                  <i class="pi pi-pencil" />
-                </button>
-              </div>
 
-              <!-- Agreements -->
-              <div class="field-group">
-                <div class="checkbox-row">
-                  <Checkbox
-                    v-model="form.agreeTerms"
-                    input-id="terms"
-                    :binary="true"
-                    :invalid="!!step3Errors.agreeTerms"
-                  />
-                  <label for="terms" class="checkbox-label">
-                    Tôi đồng ý với
-                    <NuxtLink :to="ROUTES.TERMS_OF_SERVICE" class="terms-link"
-                      >Điều khoản dịch vụ</NuxtLink
-                    >
-                    và
-                    <NuxtLink :to="ROUTES.PRIVACY_POLICY" class="terms-link"
-                      >Chính sách bảo mật</NuxtLink
-                    >
-                    <span class="req"> *</span>
-                  </label>
-                </div>
-                <small v-if="step3Errors.agreeTerms" class="field-error ml-7">{{
-                  step3Errors.agreeTerms
-                }}</small>
-              </div>
-
-              <div class="field-group">
-                <div class="checkbox-row">
-                  <Checkbox
-                    v-model="form.agreePromo"
-                    input-id="promo"
-                    :binary="true"
-                  />
-                  <label for="promo" class="checkbox-label"
-                    >Nhận thông báo khuyến mãi qua email</label
+                  <small
+                    v-if="step2Errors.password"
+                    class="mt-1 block text-xs text-[#ef4444]"
+                    >{{ step2Errors.password }}</small
                   >
                 </div>
-              </div>
 
-              <div class="btn-row">
-                <button class="btn-outline" @click="goBack">
-                  <i class="pi pi-arrow-left" /> Quay lại
-                </button>
-                <button
-                  class="btn-primary btn-finish flex-1"
-                  :disabled="loading"
-                  @click="handleSubmit"
-                >
-                  <svg
-                    v-if="loading"
-                    class="spinner"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                  <label
+                    class="mb-1.5 block text-sm font-semibold text-[#374151]"
+                    >Xác nhận mật khẩu
+                    <span class="text-[#ef4444]">*</span></label
                   >
-                    <circle
-                      class="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      stroke-width="4"
+                  <div class="relative">
+                    <span
+                      class="pointer-events-none absolute bottom-0 left-3.5 top-0 z-10 flex items-center text-sm text-[#9ca3af]"
+                      ><i class="pi pi-lock"
+                    /></span>
+                    <Password
+                      v-model="form.confirmPassword"
+                      :feedback="false"
+                      :toggle-mask="true"
+                      placeholder="Nhập lại mật khẩu"
+                      :invalid="!!step2Errors.confirmPassword"
+                      input-class="h-[42px] w-full rounded-[12px] border-[#e5e7eb] pl-11 text-sm transition-[border-color,box-shadow] duration-200 focus:border-[#f97316] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] focus:outline-none"
+                      class="w-full"
+                      aria-label="Xác nhận mật khẩu"
                     />
-                    <path
-                      class="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  </div>
+                  <small
+                    v-if="step2Errors.confirmPassword"
+                    class="mt-1 block text-xs text-[#ef4444]"
+                    >{{ step2Errors.confirmPassword }}</small
+                  >
+                </div>
+
+                <!-- Password rules hint -->
+                <div
+                  class="mt-2 grid grid-cols-2 gap-2 rounded-[12px] border border-[#f3f4f6] bg-[#fafafa] p-3.5"
+                >
+                  <div
+                    v-for="rule in passwordRules"
+                    :key="rule.label"
+                    class="flex items-center gap-1.5 text-[0.72rem] transition-colors duration-300"
+                    :class="rule.met ? 'text-[#16a34a]' : 'text-[#9ca3af]'"
+                  >
+                    <i
+                      :class="
+                        rule.met
+                          ? 'pi pi-check-circle text-[#16a34a]'
+                          : 'pi pi-circle text-[0.7rem]'
+                      "
                     />
-                  </svg>
-                  <i v-else class="pi pi-check" />
-                  {{ loading ? "Đang xử lý..." : "Hoàn tất đăng ký" }}
-                </button>
+                    {{ rule.label }}
+                  </div>
+                </div>
+
+                <div class="mt-5 flex gap-3">
+                  <button
+                    class="flex items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-[#e5e7eb] bg-white px-5 py-[0.8rem] text-sm font-semibold text-[#374151] transition-[border-color,background,color] duration-200 hover:border-[#f97316] hover:bg-[#fff7ed] hover:text-[#f97316]"
+                    @click="goBack"
+                  >
+                    <i class="pi pi-arrow-left" /> Quay lại
+                  </button>
+                  <button
+                    class="mt-0 flex flex-1 items-center justify-center gap-2 rounded-[12px] border-none bg-gradient-to-br from-[#f97316] to-[#ea580c] px-6 py-[0.8rem] text-[0.9rem] font-bold text-white shadow-[0_4px_16px_rgba(249,115,22,0.35)] transition-[transform,box-shadow] duration-200 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(249,115,22,0.5)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-65"
+                    @click="goNext(2)"
+                  >
+                    Tiếp theo <i class="pi pi-arrow-right" />
+                  </button>
+                </div>
               </div>
-            </div>
-          </Transition>
+            </Transition>
+
+            <!-- STEP 3: Confirm -->
+            <Transition :name="transitionName" mode="out-in">
+              <div v-if="currentStep === 3" key="step3" class="step-pane pb-2">
+                <p class="mb-5 text-[0.9rem] font-bold text-[#374151]">
+                  ✅ Xác nhận thông tin
+                </p>
+
+                <!-- Info review card -->
+                <div
+                  class="relative mb-5 flex items-center gap-4 rounded-[14px] border-[1.5px] border-[#fed7aa] bg-[linear-gradient(135deg,#fff7ed,#fef9ec)] p-4"
+                >
+                  <div
+                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f97316] to-[#ea580c] text-[1.25rem] font-black text-white"
+                  >
+                    {{ form.name.charAt(0).toUpperCase() || "?" }}
+                  </div>
+                  <div>
+                    <div class="mb-1 text-[0.9rem] font-bold text-[#111827]">
+                      {{ form.name }}
+                    </div>
+                    <div
+                      class="mt-0.5 flex items-center gap-1.5 text-[0.78rem] text-[#6b7280]"
+                    >
+                      <i class="pi pi-envelope text-[0.7rem] text-[#f97316]" />
+                      {{ form.email }}
+                    </div>
+                    <div
+                      class="mt-0.5 flex items-center gap-1.5 text-[0.78rem] text-[#6b7280]"
+                    >
+                      <i class="pi pi-phone text-[0.7rem] text-[#f97316]" />
+                      +84 {{ form.phone }}
+                    </div>
+                  </div>
+                  <button
+                    class="absolute right-3 top-2.5 border-none bg-transparent p-1.5 text-sm text-[#f97316] hover:text-[#ea580c]"
+                    title="Chỉnh sửa"
+                    @click="currentStep = 1"
+                  >
+                    <i class="pi pi-pencil" />
+                  </button>
+                </div>
+
+                <!-- Agreements -->
+                <div class="mb-4">
+                  <div class="flex items-start gap-2.5">
+                    <Checkbox
+                      v-model="form.agreeTerms"
+                      input-id="terms"
+                      :binary="true"
+                      :invalid="!!step3Errors.agreeTerms"
+                    />
+                    <label
+                      for="terms"
+                      class="cursor-pointer text-sm leading-6 text-[#4b5563]"
+                    >
+                      Tôi đồng ý với
+                      <NuxtLink
+                        :to="ROUTES.TERMS_OF_SERVICE"
+                        class="font-semibold text-[#f97316] no-underline hover:underline"
+                        >Điều khoản dịch vụ</NuxtLink
+                      >
+                      và
+                      <NuxtLink
+                        :to="ROUTES.PRIVACY_POLICY"
+                        class="font-semibold text-[#f97316] no-underline hover:underline"
+                        >Chính sách bảo mật</NuxtLink
+                      >
+                      <span class="text-[#ef4444]"> *</span>
+                    </label>
+                  </div>
+                  <small
+                    v-if="step3Errors.agreeTerms"
+                    class="ml-7 mt-1 block text-xs text-[#ef4444]"
+                    >{{ step3Errors.agreeTerms }}</small
+                  >
+                </div>
+
+                <div class="mb-4">
+                  <div class="flex items-start gap-2.5">
+                    <Checkbox
+                      v-model="form.agreePromo"
+                      input-id="promo"
+                      :binary="true"
+                    />
+                    <label
+                      for="promo"
+                      class="cursor-pointer text-sm leading-6 text-[#4b5563]"
+                      >Nhận thông báo khuyến mãi qua email</label
+                    >
+                  </div>
+                </div>
+
+                <div class="mt-5 flex gap-3">
+                  <button
+                    class="flex items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-[#e5e7eb] bg-white px-5 py-[0.8rem] text-sm font-semibold text-[#374151] transition-[border-color,background,color] duration-200 hover:border-[#f97316] hover:bg-[#fff7ed] hover:text-[#f97316]"
+                    @click="goBack"
+                  >
+                    <i class="pi pi-arrow-left" /> Quay lại
+                  </button>
+                  <button
+                    class="mt-0 flex flex-1 items-center justify-center gap-2 rounded-[12px] border-none bg-gradient-to-br from-[#f97316] to-[#ea580c] px-6 py-[0.8rem] text-[0.9rem] font-bold text-white shadow-[0_4px_16px_rgba(249,115,22,0.35)] transition-[transform,box-shadow] duration-200 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(249,115,22,0.5)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-65"
+                    :disabled="loading"
+                    @click="handleSubmit"
+                  >
+                    <svg
+                      v-if="loading"
+                      class="h-4 w-4 shrink-0 animate-[spin_0.8s_linear_infinite]"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      />
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
+                    </svg>
+                    <i v-else class="pi pi-check" />
+                    {{ loading ? "Đang xử lý..." : "Hoàn tất đăng ký" }}
+                  </button>
+                </div>
+              </div>
+            </Transition>
+          </div>
+
+          <!-- Login link -->
+          <p class="mt-5 text-center text-sm text-[#6b7280]">
+            Đã có tài khoản?
+            <NuxtLink
+              :to="ROUTES.AUTH.LOGIN"
+              class="ml-1 font-bold text-[#f97316] no-underline hover:text-[#ea580c] hover:underline"
+              >Đăng nhập →</NuxtLink
+            >
+          </p>
+        </div>
+      </div>
+
+      <!-- ===== RIGHT BRAND PANEL ===== -->
+      <div
+        class="relative order-2 hidden shrink-0 flex-col items-center justify-center overflow-hidden md:flex md:w-[40%]"
+      >
+        <div
+          class="absolute inset-0 bg-[linear-gradient(135deg,#f97316_0%,#ea580c_55%,#c2410c_100%)] [animation:gradientShift_8s_ease_infinite_alternate]"
+        />
+        <div class="absolute inset-0 opacity-[0.08]">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern
+                id="reg-pattern"
+                width="80"
+                height="80"
+                patternUnits="userSpaceOnUse"
+              >
+                <text x="10" y="30" font-size="22">🥗</text>
+                <text x="45" y="65" font-size="20">🍓</text>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#reg-pattern)" />
+          </svg>
         </div>
 
-        <!-- Login link -->
-        <p class="login-link-text">
-          Đã có tài khoản?
-          <NuxtLink :to="ROUTES.AUTH.LOGIN" class="login-link"
-            >Đăng nhập →</NuxtLink
-          >
-        </p>
-      </div>
-    </div>
+        <span
+          class="pointer-events-none absolute left-8 top-14 select-none text-[2.5rem] float-bob"
+          style="animation-delay: 0s; animation-duration: 3.2s"
+        >
+          🍊
+        </span>
 
-    <!-- ===== RIGHT BRAND PANEL ===== -->
-    <div class="brand-panel">
-      <div class="gradient-bg" />
-      <div class="pattern-overlay">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="reg-pattern"
-              width="80"
-              height="80"
-              patternUnits="userSpaceOnUse"
-            >
-              <text x="10" y="30" font-size="22">🥗</text>
-              <text x="45" y="65" font-size="20">🍓</text>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#reg-pattern)" />
-        </svg>
-      </div>
+        <span
+          class="pointer-events-none absolute right-10 top-28 select-none text-[2.2rem] float-bob"
+          style="animation-delay: 0s; animation-duration: 3.2s"
+        >
+          🥑
+        </span>
 
-      <span class="float-el float-1">🍊</span>
-      <span class="float-el float-2">🥑</span>
-      <span class="float-el float-3">🍓</span>
-      <span class="float-el float-4">🌽</span>
-      <span class="float-el float-5">🥝</span>
+        <span
+          class="pointer-events-none absolute bottom-16 right-8 select-none text-[2.5rem] float-bob"
+          style="animation-delay: 0s; animation-duration: 3.2s"
+        >
+          🌽
+        </span>
 
-      <div class="brand-content">
-        <!-- Logo -->
-        <NuxtLink :to="ROUTES.HOME">
-          <div class="logo-wrap">
-            <div class="logo-box">
-              <svg
-                viewBox="0 0 48 48"
-                class="logo-svg"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+        <span
+          class="pointer-events-none absolute left-5 top-[45%] select-none text-[1.8rem] float-bob"
+          style="animation-delay: 0s; animation-duration: 3.2s"
+        >
+          🥝
+        </span>
+
+        <div class="relative z-10 w-full px-8 text-center text-white">
+          <!-- Logo -->
+          <NuxtLink :to="ROUTES.HOME">
+            <div class="mb-7 flex flex-col items-center">
+              <div
+                class="mb-3 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-2xl bg-[rgba(255,255,255,0.2)] backdrop-blur-[8px] shadow-[0_8px_32px_rgba(0,0,0,0.15)]"
               >
-                <path
-                  d="M24 4 C20 4 17 7 18 10 C22 9 28 9 30 10 C31 7 28 4 24 4Z"
-                  fill="#86efac"
-                />
-                <path
-                  d="M22 10 L24 4 L26 10"
-                  stroke="#86efac"
-                  stroke-width="1.5"
+                <svg
+                  viewBox="0 0 48 48"
+                  class="h-11 w-11"
                   fill="none"
-                />
-                <path
-                  d="M30 16 C30 13 27 11 24 11 C21 11 17 12.5 17 16 C17 19 20 20.5 24 21.5 C28 22.5 31 24 31 27.5 C31 31 27.5 33 24 33 C20.5 33 17 31 17 27.5"
-                  stroke="white"
-                  stroke-width="3.5"
-                  stroke-linecap="round"
-                  fill="none"
-                />
-              </svg>
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M24 4 C20 4 17 7 18 10 C22 9 28 9 30 10 C31 7 28 4 24 4Z"
+                    fill="#86efac"
+                  />
+                  <path
+                    d="M22 10 L24 4 L26 10"
+                    stroke="#86efac"
+                    stroke-width="1.5"
+                    fill="none"
+                  />
+                  <path
+                    d="M30 16 C30 13 27 11 24 11 C21 11 17 12.5 17 16 C17 19 20 20.5 24 21.5 C28 22.5 31 24 31 27.5 C31 31 27.5 33 24 33 C20.5 33 17 31 17 27.5"
+                    stroke="white"
+                    stroke-width="3.5"
+                    stroke-linecap="round"
+                    fill="none"
+                  />
+                </svg>
+              </div>
+              <h1 class="m-0 text-[2rem] font-black tracking-[0.15em]">
+                SMARTFOOD
+              </h1>
+              <div
+                class="mt-2.5 h-[3px] w-14 rounded-full bg-[rgba(255,255,255,0.35)]"
+              />
             </div>
-            <h1 class="brand-name">SMARTFOOD</h1>
-            <div class="brand-divider" />
-          </div>
-        </NuxtLink>
+          </NuxtLink>
 
-        <p class="tagline">
-          Tươi ngon mỗi ngày<br /><strong>Đặt hàng siêu tốc</strong>
-        </p>
-
-        <!-- Step progress illustration -->
-        <div class="brand-steps">
-          <div
-            v-for="(s, i) in steps"
-            :key="s.label"
-            class="brand-step"
-            :class="{ active: currentStep > i }"
+          <p
+            class="mb-8 text-[1.05rem] font-semibold leading-[1.7] text-[rgba(255,255,255,0.9)]"
           >
-            <div class="brand-step-icon">{{ s.icon }}</div>
-            <div class="brand-step-text">
-              <div class="brand-step-title">{{ s.brandTitle }}</div>
-              <div class="brand-step-desc">{{ s.brandDesc }}</div>
+            Tươi ngon mỗi ngày<br /><strong class="text-white"
+              >Đặt hàng siêu tốc</strong
+            >
+          </p>
+
+          <!-- Step progress illustration -->
+          <div class="flex flex-col gap-4 text-left">
+            <div
+              v-for="(s, i) in steps"
+              :key="s.label"
+              class="flex items-center gap-3.5 rounded-[14px] border p-[0.875rem_1rem] backdrop-blur-[4px] transition-all duration-[400ms] ease-[ease]"
+              :class="
+                currentStep > i
+                  ? 'scale-[1.02] border-[rgba(255,255,255,0.5)] bg-[rgba(255,255,255,0.25)] opacity-100 shadow-[0_4px_16px_rgba(0,0,0,0.1)]'
+                  : 'border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.1)] opacity-60'
+              "
+            >
+              <div class="shrink-0 text-2xl">{{ s.icon }}</div>
+              <div>
+                <div class="text-sm font-bold text-white">
+                  {{ s.brandTitle }}
+                </div>
+                <div class="mt-0.5 text-xs text-[rgba(255,255,255,0.8)]">
+                  {{ s.brandDesc }}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -452,19 +630,14 @@
 </template>
 
 <script setup lang="ts">
-
-
 import { ref, reactive, computed } from "vue";
 import { useToast } from "primevue/usetoast";
 import { ROUTES } from "~/constants/routes";
 
 useHead({
-  title: 'Đăng ký - SmartFood',
-  meta: [
-    { name: 'description', content: 'Trang Đăng ký của SmartFood' }
-  ]
+  title: "Đăng ký - SmartFood",
+  meta: [{ name: "description", content: "Trang Đăng ký của SmartFood" }],
 });
-
 
 definePageMeta({ layout: false });
 
@@ -683,164 +856,6 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-/* ========================================
-   ROOT
-   ======================================== */
-.register-page {
-  display: flex;
-  min-height: 100dvh;
-  width: 100%;
-  font-family: "Inter", sans-serif;
-}
-
-/* ========================================
-   LEFT FORM PANEL
-   ======================================== */
-.form-panel {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  padding: 2.5rem 1.5rem;
-  position: relative;
-  overflow: hidden;
-  order: 1;
-}
-
-.form-deco-top-left {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 14rem;
-  height: 14rem;
-  background: #fff7ed;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-.form-deco-bottom-right {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 12rem;
-  height: 12rem;
-  background: #f0fdf4;
-  border-radius: 50%;
-  transform: translate(50%, 50%);
-  pointer-events: none;
-}
-
-.form-container {
-  width: 100%;
-  max-width: 500px;
-  position: relative;
-  z-index: 10;
-}
-
-/* Mobile logo */
-.mobile-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-@media (min-width: 768px) {
-  .mobile-logo {
-    display: none;
-  }
-}
-.mobile-logo-icon {
-  width: 2.25rem;
-  height: 2.25rem;
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  border-radius: 0.625rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 900;
-  font-size: 1.125rem;
-  box-shadow: 0 4px 10px rgba(249, 115, 22, 0.3);
-}
-.mobile-logo-text {
-  font-size: 1.125rem;
-  font-weight: 900;
-  color: #111827;
-}
-.text-orange {
-  color: #f97316;
-}
-
-/* Heading */
-.form-heading {
-  margin-bottom: 1.75rem;
-}
-.heading-sub {
-  color: #f97316;
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.25rem;
-}
-.heading-title {
-  font-size: 1.75rem;
-  font-weight: 900;
-  color: #111827;
-  margin: 0 0 0.25rem 0;
-}
-.heading-desc {
-  color: #9ca3af;
-  font-size: 0.875rem;
-}
-
-/* ========================================
-   STEPPER
-   ======================================== */
-.stepper {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  position: relative;
-  z-index: 1;
-}
-
-.step-circle {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.9rem;
-  border: 2.5px solid #d1d5db;
-  background: white;
-  color: #9ca3af;
-  transition: all 0.4s ease;
-}
-
-.step-done .step-circle {
-  border-color: #f97316;
-  background: #f97316;
-  color: white;
-}
-
-.step-active .step-circle {
-  border-color: #f97316;
-  color: #f97316;
-  animation: stepPulse 1.5s ease-in-out infinite;
-  box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
-}
-
 @keyframes stepPulse {
   0% {
     box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
@@ -853,42 +868,7 @@ const handleSubmit = async () => {
   }
 }
 
-.step-check {
-  width: 1rem;
-  height: 1rem;
-}
-
-.step-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #9ca3af;
-  white-space: nowrap;
-  transition: color 0.3s;
-}
-.step-active .step-label,
-.step-done .step-label {
-  color: #f97316;
-}
-
-/* Connector line */
-.step-line {
-  flex: 1;
-  height: 3px;
-  background: #e5e7eb;
-  border-radius: 9999px;
-  margin: 0 0.375rem;
-  margin-bottom: 1.4rem; /* align with circles */
-  overflow: hidden;
-  position: relative;
-}
-.step-line-fill {
-  height: 100%;
-  background: #f97316;
-  border-radius: 9999px;
-  width: 0;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.step-line-fill.filled {
+.step-pane {
   width: 100%;
 }
 
@@ -899,32 +879,35 @@ const handleSubmit = async () => {
 .slide-forward-leave-active,
 .slide-back-enter-active,
 .slide-back-leave-active {
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.32s ease;
+  will-change: transform, opacity;
+}
+
+.slide-forward-leave-active,
+.slide-back-leave-active {
+  position: absolute;
+  inset: 0;
+  width: 100%;
 }
 
 .slide-forward-enter-from {
   opacity: 0;
-  transform: translateX(40px);
+  transform: translate3d(24px, 0, 0);
 }
 .slide-forward-leave-to {
   opacity: 0;
-  transform: translateX(-40px);
+  transform: translate3d(-24px, 0, 0);
 }
 
 .slide-back-enter-from {
   opacity: 0;
-  transform: translateX(-40px);
+  transform: translate3d(-24px, 0, 0);
 }
 .slide-back-leave-to {
   opacity: 0;
-  transform: translateX(40px);
-}
-
-/* ========================================
-   SHAKE ANIMATION
-   ======================================== */
-.shake {
-  animation: shakeForm 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(24px, 0, 0);
 }
 
 @keyframes shakeForm {
@@ -946,93 +929,6 @@ const handleSubmit = async () => {
     transform: translateX(6px);
   }
 }
-
-/* ========================================
-   STEP CONTENT
-   ======================================== */
-.steps-wrapper {
-  min-height: 300px;
-}
-
-.step-content {
-  padding-bottom: 0.5rem;
-}
-.step-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #374151;
-  margin-bottom: 1.25rem;
-}
-
-/* Fields */
-.field-group {
-  margin-bottom: 1rem;
-}
-.field-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.375rem;
-}
-.req {
-  color: #ef4444;
-}
-.field-error {
-  display: block;
-  font-size: 0.75rem;
-  color: #ef4444;
-  margin-top: 0.25rem;
-}
-
-.input-wrap {
-  position: relative;
-}
-.input-icon {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0.875rem;
-  display: flex;
-  align-items: center;
-  color: #9ca3af;
-  font-size: 0.875rem;
-  z-index: 10;
-  pointer-events: none;
-}
-
-/* Phone */
-.phone-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-.phone-prefix {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0 0.875rem;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-right: none;
-  border-radius: 12px 0 0 12px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  height: 42px;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-.flag {
-  font-size: 1rem;
-}
-
-.phone-input {
-  border-radius: 0 12px 12px 0 !important;
-}
-
-/* PrimeVue inputs */
-:deep(.prime-input),
 :deep(.p-inputtext) {
   width: 100%;
   padding-left: 2.75rem !important;
@@ -1050,6 +946,7 @@ const handleSubmit = async () => {
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15) !important;
   outline: none !important;
 }
+
 :deep(.p-password) {
   width: 100%;
 }
@@ -1070,144 +967,6 @@ const handleSubmit = async () => {
   outline: none !important;
 }
 
-/* ========================================
-   PASSWORD STRENGTH
-   ======================================== */
-.strength-meter {
-  margin-top: 0.625rem;
-}
-.strength-bar-track {
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-bottom: 0.375rem;
-}
-.strength-bar-fill {
-  height: 100%;
-  border-radius: 9999px;
-  transition:
-    width 0.5s ease,
-    background 0.4s ease;
-}
-.strength-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-/* Password rules */
-.rules-box {
-  background: #fafafa;
-  border: 1px solid #f3f4f6;
-  border-radius: 12px;
-  padding: 0.875rem;
-  margin-top: 0.5rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
-.rule-item {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-size: 0.72rem;
-  color: #9ca3af;
-  transition: color 0.3s;
-}
-.rule-item i {
-  font-size: 0.7rem;
-}
-.rule-item.met {
-  color: #16a34a;
-}
-.rule-item.met i {
-  color: #16a34a;
-}
-
-/* ========================================
-   REVIEW CARD
-   ======================================== */
-.review-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  background: linear-gradient(135deg, #fff7ed, #fef9ec);
-  border: 1.5px solid #fed7aa;
-  border-radius: 14px;
-  padding: 1rem;
-  margin-bottom: 1.25rem;
-  position: relative;
-}
-.review-avatar {
-  width: 3rem;
-  height: 3rem;
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.25rem;
-  font-weight: 900;
-  flex-shrink: 0;
-}
-.review-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.25rem;
-}
-.review-detail {
-  font-size: 0.78rem;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.125rem;
-}
-.review-detail i {
-  color: #f97316;
-  font-size: 0.7rem;
-}
-.review-edit {
-  position: absolute;
-  top: 0.625rem;
-  right: 0.75rem;
-  background: none;
-  border: none;
-  padding: 0.375rem;
-  color: #f97316;
-  cursor: pointer;
-  font-size: 0.875rem;
-}
-.review-edit:hover {
-  color: #ea580c;
-}
-
-/* Checkboxes */
-.checkbox-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.625rem;
-}
-.checkbox-label {
-  font-size: 0.875rem;
-  color: #4b5563;
-  line-height: 1.5;
-  cursor: pointer;
-}
-.terms-link {
-  color: #f97316;
-  text-decoration: none;
-  font-weight: 600;
-}
-.terms-link:hover {
-  text-decoration: underline;
-}
-.ml-7 {
-  margin-left: 1.75rem;
-}
-
 :deep(.p-checkbox .p-checkbox-box.p-highlight) {
   background: #f97316 !important;
   border-color: #f97316 !important;
@@ -1216,132 +975,10 @@ const handleSubmit = async () => {
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2) !important;
 }
 
-/* ========================================
-   BUTTONS
-   ======================================== */
-.btn-row {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1.25rem;
-}
-.flex-1 {
-  flex: 1;
-}
-
-.btn-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.8rem 1.5rem;
-  margin-top: 1.25rem;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f97316, #ea580c);
-  color: white;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-}
-.btn-row .btn-primary {
-  margin-top: 0;
-}
-.btn-primary:hover:not(:disabled) {
-  transform: scale(1.02);
-  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.5);
-}
-.btn-primary:active:not(:disabled) {
-  transform: scale(0.97);
-}
-.btn-primary:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.btn-outline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.25rem;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 12px;
-  background: white;
-  color: #374151;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition:
-    border-color 0.2s,
-    background 0.2s;
-}
-.btn-outline:hover {
-  border-color: #f97316;
-  color: #f97316;
-  background: #fff7ed;
-}
-
-.spinner {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-  animation: spin 0.8s linear infinite;
-}
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
-}
-
-/* Login link */
-.login-link-text {
-  text-align: center;
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 1.25rem;
-}
-.login-link {
-  font-weight: 700;
-  color: #f97316;
-  text-decoration: none;
-  margin-left: 0.25rem;
-}
-.login-link:hover {
-  text-decoration: underline;
-  color: #ea580c;
-}
-
-/* ========================================
-   RIGHT BRAND PANEL
-   ======================================== */
-.brand-panel {
-  display: none;
-  position: relative;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-  order: 2;
-}
-
-@media (min-width: 768px) {
-  .brand-panel {
-    display: flex;
-    width: 40%;
-  }
-}
-
-.gradient-bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 55%, #c2410c 100%);
-  animation: gradientShift 8s ease infinite alternate;
 }
 
 @keyframes gradientShift {
@@ -1353,54 +990,10 @@ const handleSubmit = async () => {
   }
 }
 
-.pattern-overlay {
-  position: absolute;
-  inset: 0;
-  opacity: 0.08;
-}
-
-.float-el {
-  position: absolute;
-  user-select: none;
-  pointer-events: none;
+/* Floating bob animation */
+.float-bob {
   animation: floatBob 3s ease-in-out infinite;
 }
-.float-1 {
-  top: 3.5rem;
-  left: 2rem;
-  font-size: 2.5rem;
-  animation-delay: 0s;
-  animation-duration: 3.4s;
-}
-.float-2 {
-  top: 7rem;
-  right: 2.5rem;
-  font-size: 2.2rem;
-  animation-delay: 0.6s;
-  animation-duration: 4.1s;
-}
-.float-3 {
-  bottom: 8rem;
-  left: 3.5rem;
-  font-size: 2.2rem;
-  animation-delay: 1.2s;
-  animation-duration: 3.7s;
-}
-.float-4 {
-  bottom: 4rem;
-  right: 2rem;
-  font-size: 2.5rem;
-  animation-delay: 0.3s;
-  animation-duration: 4.3s;
-}
-.float-5 {
-  top: 45%;
-  left: 1.25rem;
-  font-size: 1.8rem;
-  animation-delay: 1.8s;
-  animation-duration: 3.9s;
-}
-
 @keyframes floatBob {
   0%,
   100% {
@@ -1410,121 +1003,6 @@ const handleSubmit = async () => {
     transform: translateY(-14px) rotate(6deg);
   }
 }
-
-.brand-content {
-  position: relative;
-  z-index: 10;
-  text-align: center;
-  color: white;
-  padding: 0 2rem;
-  width: 100%;
-}
-
-.logo-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1.75rem;
-}
-.logo-box {
-  width: 4.5rem;
-  height: 4.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.75rem;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-}
-.logo-svg {
-  width: 2.75rem;
-  height: 2.75rem;
-}
-.brand-name {
-  font-size: 2rem;
-  font-weight: 900;
-  letter-spacing: 0.15em;
-  margin: 0;
-}
-.brand-divider {
-  width: 3.5rem;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.35);
-  border-radius: 9999px;
-  margin-top: 0.625rem;
-}
-
-.tagline {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.7;
-  margin-bottom: 2rem;
-}
-.tagline strong {
-  color: white;
-}
-
-/* Brand steps sidebar */
-.brand-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  text-align: left;
-}
-.brand-step {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 0.875rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: all 0.4s ease;
-  opacity: 0.6;
-}
-.brand-step.active {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
-  opacity: 1;
-  transform: scale(1.02);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-.brand-step-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-.brand-step-title {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: white;
-}
-.brand-step-desc {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-top: 0.125rem;
-}
-
-/* ========================================
-   CONFETTI
-   ======================================== */
-.confetti-container {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  overflow: hidden;
-}
-.confetti-piece {
-  position: absolute;
-  top: -10px;
-  border-radius: 3px;
-  animation: confettiFall linear forwards;
-}
-
 @keyframes confettiFall {
   0% {
     transform: translateY(-10px) rotate(0deg);
@@ -1545,10 +1023,5 @@ const handleSubmit = async () => {
 }
 :deep(.p-divider::before) {
   border-color: #e5e7eb;
-}
-
-/* Utilities */
-.w-full {
-  width: 100%;
 }
 </style>

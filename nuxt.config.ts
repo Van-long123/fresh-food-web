@@ -12,6 +12,11 @@ import Aura from '@primevue/themes/aura';
       '@pinia/nuxt',
     ],
 
+    // Tắt path prefix — components/common/AppLoading.vue → <AppLoading>, không phải <CommonAppLoading>
+    components: [
+      { path: '~/components', pathPrefix: false }
+    ],
+
     googleFonts: {
       families: {
         Inter: [300, 400, 500, 600, 700, 900]
