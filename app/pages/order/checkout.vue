@@ -6,6 +6,17 @@
       variant="overlay"
       message="Đang xử lý đơn hàng..."
     />
+    <AppLoading
+      v-if="isProvincesLoading"
+      variant="overlay"
+      message="Đang tải dữ liệu khu vực..."
+    />
+    <div
+      v-if="provincesErrorMessage"
+      class="mx-auto mt-4 max-w-6xl rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+    >
+      {{ provincesErrorMessage }}
+    </div>
 
     <div class="min-h-screen bg-gray-50 py-8">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -661,13 +672,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useOrderStore } from "~/stores/useOrderStore";
 import { useAuthStore } from "~/stores/useAuthStore";
 import type { OrderProduct, OrderInfo } from "~/stores/useOrderStore";
 import type { Voucher } from "~/stores/useOrderStore";
 import { ROUTES } from "~/constants/routes";
+import { useProvincesQuery } from "~/queries/location/useProvincesQuery";
+import type { Province } from "~/types/location.type";
 
 useHead({
   title: "Thanh toán — SmartFood",
@@ -685,45 +698,39 @@ const authStore = useAuthStore();
 
 // ── Province API ─────────────────────────────────────────────────────────────
 
-interface Ward {
-  code: number;
-  name: string;
-}
-interface District {
-  code: number;
-  name: string;
-  wards: Ward[];
-}
-interface Province {
-  code: number;
-  name: string;
-  districts: District[];
-}
-
 const allProvinces = ref<Province[]>([]);
 const districtOptions = ref<{ label: string; value: number }[]>([]);
 const wardOptions = ref<{ label: string; value: number }[]>([]);
+const provincesQuery = useProvincesQuery();
+const isProvincesLoading = computed(() => provincesQuery.isLoading.value);
+const provincesErrorMessage = computed(() => {
+  if (!provincesQuery.isError.value) return "";
+  return "Không thể tải danh sách tỉnh/thành. Vui lòng thử lại.";
+});
+const isProvincePrefilled = ref(false);
 
 const provinceOptions = computed(() =>
   allProvinces.value.map((p) => ({ label: p.name, value: p.code })),
 );
 
-onMounted(async () => {
-  try {
-    const res = await fetch("https://provinces.open-api.vn/api/?depth=3");
-    allProvinces.value = await res.json();
-  } catch {
-    allProvinces.value = [];
-  }
+watch(
+  () => provincesQuery.data.value,
+  (provinces) => {
+    allProvinces.value = provinces ?? [];
 
-  // Pre-fill from logged-in user
-  if (authStore.user) {
+    if (
+      isProvincePrefilled.value ||
+      !authStore.user ||
+      !allProvinces.value.length
+    ) {
+      return;
+    }
+
     const u = authStore.user;
     form.value.full_name = u.fullname ?? "";
     form.value.phone = u.phone ?? "";
     form.value.address = u.address ?? "";
 
-    // Auto-select Đà Nẵng (code=48) or user province
     const targetCode =
       u.provinceCode ?? (u.province === "Đà Nẵng" ? 48 : undefined);
 
@@ -753,8 +760,11 @@ onMounted(async () => {
         }
       }
     }
-  }
-});
+
+    isProvincePrefilled.value = true;
+  },
+  { immediate: true },
+);
 
 function onProvinceChange() {
   form.value.district_code = null;

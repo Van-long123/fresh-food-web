@@ -1,6 +1,7 @@
 <template>
   <div>
     <NuxtRouteAnnouncer />
+    <Toast position="top-right" />
 
     <!-- Fullpage loading khi khởi động app lần đầu / route transition -->
     <!-- <AppLoading v-if="isGlobalLoading" variant="fullpage" /> -->

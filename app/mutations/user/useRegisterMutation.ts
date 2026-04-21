@@ -1,0 +1,13 @@
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { userService } from '~/services/user.service'
+
+export const useRegisterMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: userService.register,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] })
+    }
+  })
+}

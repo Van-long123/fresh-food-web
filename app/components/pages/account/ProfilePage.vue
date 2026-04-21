@@ -324,8 +324,10 @@
                 </button>
                 <button
                   class="px-6 py-2 rounded-full bg-red-500 font-semibold text-white hover:bg-red-600"
+                  :disabled="loggingOut"
+                  @click="handleLogout"
                 >
-                  Đăng xuất
+                  {{ loggingOut ? "Đang đăng xuất..." : "Đăng xuất" }}
                 </button>
               </div>
             </section>
@@ -422,7 +424,14 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import ChangePasswordPage from "~/pages/auth/change-password.vue";
+import { ROUTES } from "~/constants/routes";
+import { userService } from "~/services/user.service";
+import { useAuthStore } from "~/stores/useAuthStore";
+
+const router = useRouter();
+const authStore = useAuthStore();
 
 const user = {
   name: "Nguyễn Minh Anh",
@@ -466,6 +475,7 @@ const mobileTabs = [
 const activeMenu = ref<MenuKey>("profile");
 const saving = ref(false);
 const saveDone = ref(false);
+const loggingOut = ref(false);
 const rankProgressVisible = ref(false);
 const showAddressModal = ref(false);
 
@@ -562,6 +572,21 @@ const saveProfile = () => {
 const saveAddress = () => {
   defaultAddress.value = `${addressForm.value.detail}, ${addressForm.value.ward}, ${addressForm.value.district}, ${addressForm.value.city}`;
   showAddressModal.value = false;
+};
+
+const handleLogout = async () => {
+  if (loggingOut.value) return;
+
+  loggingOut.value = true;
+  try {
+    await userService.logout();
+  } catch {
+    // Không chặn luồng logout phía client nếu API lỗi.
+  } finally {
+    authStore.logout();
+    await router.replace(ROUTES.AUTH.LOGIN);
+    loggingOut.value = false;
+  }
 };
 
 onMounted(() => {

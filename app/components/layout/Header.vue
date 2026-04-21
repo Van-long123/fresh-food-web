@@ -121,8 +121,9 @@
           <span class="text-white/40 font-light mx-1">|</span>
 
           <button
+            v-if="!authStore.isLoggedIn"
             class="flex items-center gap-2 hover:text-white/80 transition-colors cursor-pointer"
-            @click="() => $router.push(ROUTES.AUTH.LOGIN)"
+            @click="router.push(ROUTES.AUTH.LOGIN)"
           >
             <div class="bg-white/10 p-1.5 rounded-full">
               <svg
@@ -145,6 +146,37 @@
               <span class="text-[11px] font-normal text-white/90"
                 >Tài khoản</span
               >
+            </div>
+          </button>
+
+          <button
+            v-else
+            class="flex items-center gap-2 hover:text-white/80 transition-colors cursor-pointer"
+            @click="router.push(ROUTES.PROFILE)"
+          >
+            <div class="bg-white/10 p-1.5 rounded-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </div>
+            <div class="flex flex-col items-start leading-[1.1]">
+              <span class="text-[11px] font-normal text-white/90"
+                >Xin chào</span
+              >
+              <span class="font-bold line-clamp-1 max-w-28">{{
+                headerDisplayName
+              }}</span>
             </div>
           </button>
 
@@ -471,7 +503,9 @@
           @click="
             () => {
               isMobileMenuOpen = false;
-              $router.push(ROUTES.AUTH.LOGIN);
+              router.push(
+                authStore.isLoggedIn ? ROUTES.PROFILE : ROUTES.AUTH.LOGIN,
+              );
             }
           "
         >
@@ -494,12 +528,14 @@
             </svg>
           </div>
           <div class="flex flex-col">
-            <span class="font-bold text-[#f47f20] text-sm"
-              >Đăng nhập / Đăng ký</span
-            >
-            <span class="text-xs text-gray-500 font-medium"
-              >Quản lý tài khoản</span
-            >
+            <span class="font-bold text-[#f47f20] text-sm">
+              {{ authStore.isLoggedIn ? "Xin chào" : "Đăng nhập / Đăng ký" }}
+            </span>
+            <span class="text-xs text-gray-500 font-medium">
+              {{
+                authStore.isLoggedIn ? headerDisplayName : "Quản lý tài khoản"
+              }}
+            </span>
           </div>
         </div>
 
@@ -601,17 +637,23 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
 import { useCart } from "~/composables/useCart";
+import { useAuthStore } from "~/stores/useAuthStore";
 
 const router = useRouter();
+const authStore = useAuthStore();
 const searchQuery = ref("");
 const isMobileMenuOpen = ref(false);
 const showCartPanel = ref(false);
 const visibleNotice = ref(false);
 const cartPanelRef = ref(null);
+
+const headerDisplayName = computed(() => {
+  return authStore.user?.fullname || authStore.user?.email || "Tài khoản";
+});
 
 const {
   cartItems,

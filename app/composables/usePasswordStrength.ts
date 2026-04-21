@@ -1,4 +1,5 @@
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { getPasswordRuleFlags } from '~/utils/authFormUtils'
 
 export interface PasswordRule {
   label: string
@@ -13,11 +14,13 @@ export interface PasswordStrength {
 }
 
 export function usePasswordStrength(passwordRef: { value: string }) {
+  const flags = computed(() => getPasswordRuleFlags(passwordRef.value))
+
   const rules = computed<PasswordRule[]>(() => [
-    { label: 'Ít nhất 8 ký tự',       met: passwordRef.value.length >= 8 },
-    { label: 'Có chữ hoa (A-Z)',       met: /[A-Z]/.test(passwordRef.value) },
-    { label: 'Có chữ số (0-9)',        met: /[0-9]/.test(passwordRef.value) },
-    { label: 'Ký tự đặc biệt (!@#…)', met: /[^A-Za-z0-9]/.test(passwordRef.value) },
+    { label: 'Ít nhất 8 ký tự', met: flags.value.minLength },
+    { label: 'Có chữ hoa (A-Z)', met: flags.value.hasUppercase },
+    { label: 'Có chữ số (0-9)', met: flags.value.hasNumber },
+    { label: 'Ký tự đặc biệt (!@#…)', met: flags.value.hasSpecial }
   ])
 
   const score = computed(() => rules.value.filter(r => r.met).length)
@@ -28,7 +31,7 @@ export function usePasswordStrength(passwordRef: { value: string }) {
     const widths = ['0%', '25%', '50%', '75%', '100%']
     return {
       score: score.value,
-      label: score.value > 0 ? labels[score.value] : '',
+      label: score.value > 0 ? labels[score.value] ?? '' : '',
       color: colors[score.value] ?? '#ef4444',
       width: widths[score.value] ?? '0%',
     }

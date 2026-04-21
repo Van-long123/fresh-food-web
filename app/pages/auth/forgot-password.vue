@@ -93,7 +93,7 @@
               Nhập email để nhận link đặt lại mật khẩu của bạn.
             </p>
 
-            <form novalidate class="mt-6" @submit.prevent="handleSend">
+            <form novalidate class="mt-6" @submit.prevent="onSend">
               <div
                 class="mb-[1.125rem]"
                 :class="{ 'field-error-state': !!emailError }"
@@ -259,14 +259,14 @@
                 >
               </div>
               <span class="text-[0.8rem] font-semibold text-gray-500">{{
-                countdown > 0 ? `Gửi lại sau ${countdown}s` : "Có thể gửi lại"
+                countdownText
               }}</span>
             </div>
 
             <button
               class="w-full flex items-center justify-center gap-2 py-3.5 border-0 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 text-white font-bold text-[0.9375rem] cursor-pointer mt-4 shadow-[0_4px_18px_rgba(249,115,22,0.35)] transition-[transform,box-shadow,opacity] duration-200 hover:scale-[1.02] hover:shadow-[0_8px_26px_rgba(249,115,22,0.5)] active:scale-[0.97] disabled:from-orange-300 disabled:to-orange-400 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
               :disabled="countdown > 0 || loading"
-              @click="handleResend"
+              @click="onResend"
             >
               <svg
                 v-if="loading"
@@ -377,111 +377,61 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount } from "vue";
+import { onBeforeUnmount } from "vue";
 import { ROUTES } from "~/constants/routes";
 import { useToast } from "primevue/usetoast";
+import { useForgotPassword } from "~/composables/useForgotPassword";
 
 useHead({
   title: "Quên mật khẩu - SmartFood",
   meta: [{ name: "description", content: "Trang Quên mật khẩu của SmartFood" }],
 });
-
-definePageMeta({ layout: false });
+definePageMeta({ layout: false, middleware: "guest" });
 
 const toast = useToast();
-
-type PageState = "input" | "success" | "error";
-
-const state = ref<PageState>("input");
-const email = ref("");
-const emailError = ref("");
-const loading = ref(false);
-
-const TOTAL_SECONDS = 59;
-const countdown = ref(0);
-let countdownTimer: ReturnType<typeof setInterval> | null = null;
-
-const circumference = computed(() => 2 * Math.PI * 27);
-const dashOffset = computed(() => {
-  const fraction = countdown.value / TOTAL_SECONDS;
-  return circumference.value * (1 - fraction);
-});
-
-const startCountdown = () => {
-  countdown.value = TOTAL_SECONDS;
-  countdownTimer = setInterval(() => {
-    countdown.value--;
-    if (countdown.value <= 0) {
-      clearInterval(countdownTimer!);
-      countdownTimer = null;
-    }
-  }, 1000);
-};
+const {
+  state,
+  email,
+  emailError,
+  loading,
+  countdown,
+  circumference,
+  dashOffset,
+  countdownText,
+  handleSend,
+  handleResend,
+  resetState,
+  clearTimer,
+} = useForgotPassword();
 
 onBeforeUnmount(() => {
-  if (countdownTimer) clearInterval(countdownTimer);
+  clearTimer();
 });
 
-const validate = (): boolean => {
-  emailError.value = "";
-  if (!email.value) {
-    emailError.value = "Email là bắt buộc.";
-    return false;
-  }
-  if (!/^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email.value)) {
-    emailError.value = "Email không đúng định dạng.";
-    return false;
-  }
-  return true;
-};
-
-const simulateSend = async (): Promise<boolean> => {
-  return !email.value.toLowerCase().includes("error");
-};
-
-const handleSend = async () => {
-  if (!validate()) return;
-  loading.value = true;
-  await new Promise((r) => setTimeout(r, 1500));
-  const success = await simulateSend();
-  loading.value = false;
-
-  if (success) {
-    state.value = "success";
-    startCountdown();
+const onSend = async () => {
+  const result = await handleSend();
+  if (result?.ok) {
     toast.add({
       severity: "success",
       summary: "Đã gửi",
       detail: "Kiểm tra hộp thư của bạn!",
       life: 4000,
     });
-  } else {
-    state.value = "error";
+    return;
   }
 };
 
-const handleResend = async () => {
-  if (countdown.value > 0) return;
-  loading.value = true;
-  await new Promise((r) => setTimeout(r, 1500));
-  loading.value = false;
-  startCountdown();
-  toast.add({
-    severity: "info",
-    summary: "Đã gửi lại",
-    detail: `Email vừa được gửi đến ${email.value}`,
-    life: 4000,
-  });
-};
-
-const resetState = () => {
-  state.value = "input";
-  emailError.value = "";
-  if (countdownTimer) {
-    clearInterval(countdownTimer);
-    countdownTimer = null;
+const onResend = async () => {
+  const result = await handleResend();
+  if (result?.ok) {
+    toast.add({
+      severity: "info",
+      summary: "Đã gửi lại",
+      detail: `Email vừa được gửi đến ${email.value}`,
+      life: 4000,
+    });
+    return;
   }
-  countdown.value = 0;
 };
 </script>
 

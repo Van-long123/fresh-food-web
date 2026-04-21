@@ -8,10 +8,8 @@
     />
 
     <div class="flex min-h-dvh w-full font-['Inter',sans-serif]">
-      <Toast position="top-right" />
-
       <!-- Confetti particles -->
-      <Teleport to="body">
+      <!-- <Teleport to="body">
         <div
           v-if="showConfetti"
           class="fixed inset-0 z-[9999] overflow-hidden pointer-events-none"
@@ -24,7 +22,7 @@
             :style="getConfettiStyle(i)"
           />
         </div>
-      </Teleport>
+      </Teleport> -->
 
       <!-- ===== LEFT FORM PANEL ===== -->
       <div
@@ -220,7 +218,7 @@
                 </div>
 
                 <button
-                  class="mt-5 flex w-full items-center justify-center gap-2 rounded-[12px] border-none bg-gradient-to-br from-[#f97316] to-[#ea580c] px-6 py-[0.8rem] text-[0.9rem] font-bold text-white shadow-[0_4px_16px_rgba(249,115,22,0.35)] transition-[transform,box-shadow] duration-200 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(249,115,22,0.5)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-65"
+                  class="mt-5 w-full flex items-center justify-center gap-2.5 py-3.5 px-6 border-0 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-600 text-white font-bold text-[0.9375rem] cursor-pointer transition-all duration-200 enabled:hover:shadow-lg enabled:active:scale-[0.97] disabled:opacity-65 disabled:cursor-not-allowed"
                   @click="goNext(1)"
                 >
                   Tiếp theo <i class="pi pi-arrow-right" />
@@ -255,7 +253,6 @@
                       input-class="h-[42px] w-full rounded-[12px] border-[#e5e7eb] pl-11 text-sm transition-[border-color,box-shadow] duration-200 focus:border-[#f97316] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] focus:outline-none"
                       class="w-full"
                       aria-label="Mật khẩu"
-                      @update:model-value="updateStrength"
                     />
                   </div>
 
@@ -345,7 +342,7 @@
                     <i class="pi pi-arrow-left" /> Quay lại
                   </button>
                   <button
-                    class="mt-0 flex flex-1 items-center justify-center gap-2 rounded-[12px] border-none bg-gradient-to-br from-[#f97316] to-[#ea580c] px-6 py-[0.8rem] text-[0.9rem] font-bold text-white shadow-[0_4px_16px_rgba(249,115,22,0.35)] transition-[transform,box-shadow] duration-200 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(249,115,22,0.5)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-65"
+                    class="mt-0 w-full flex flex-1 items-center justify-center gap-2 px-6 py-[0.8rem] border-0 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-600 text-white font-bold text-[0.9375rem] cursor-pointer transition-all duration-200 enabled:hover:shadow-lg enabled:active:scale-[0.97] disabled:opacity-65 disabled:cursor-not-allowed"
                     @click="goNext(2)"
                   >
                     Tiếp theo <i class="pi pi-arrow-right" />
@@ -454,7 +451,7 @@
                     <i class="pi pi-arrow-left" /> Quay lại
                   </button>
                   <button
-                    class="mt-0 flex flex-1 items-center justify-center gap-2 rounded-[12px] border-none bg-gradient-to-br from-[#f97316] to-[#ea580c] px-6 py-[0.8rem] text-[0.9rem] font-bold text-white shadow-[0_4px_16px_rgba(249,115,22,0.35)] transition-[transform,box-shadow] duration-200 hover:scale-[1.02] hover:shadow-[0_8px_24px_rgba(249,115,22,0.5)] active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-65"
+                    class="mt-0 flex-1 flex items-center justify-center gap-2.5 py-3.5 px-6 border-0 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-600 text-white font-bold text-[0.9375rem] cursor-pointer transition-all duration-200 enabled:hover:shadow-lg enabled:active:scale-[0.97] disabled:opacity-65 disabled:cursor-not-allowed"
                     :disabled="loading"
                     @click="handleSubmit"
                   >
@@ -630,229 +627,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
-import { useToast } from "primevue/usetoast";
 import { ROUTES } from "~/constants/routes";
+import { useRegisterForm } from "~/composables/useRegisterForm";
 
 useHead({
   title: "Đăng ký - SmartFood",
   meta: [{ name: "description", content: "Trang Đăng ký của SmartFood" }],
 });
 
-definePageMeta({ layout: false });
+definePageMeta({ layout: false, middleware: "guest" });
 
-const toast = useToast();
-const loading = ref(false);
-const showConfetti = ref(false);
-const currentStep = ref(1);
-const isShaking = ref(false);
-const transitionName = ref("slide-forward");
-
-interface RegisterForm {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-  agreeTerms: boolean;
-  agreePromo: boolean;
-}
-
-const form = reactive<RegisterForm>({
-  name: "",
-  email: "",
-  phone: "",
-  password: "",
-  confirmPassword: "",
-  agreeTerms: false,
-  agreePromo: false,
-});
-
-const step1Errors = reactive({ name: "", email: "", phone: "" });
-const step2Errors = reactive({ password: "", confirmPassword: "" });
-const step3Errors = reactive({ agreeTerms: "" });
-
-const steps = [
-  {
-    label: "Thông tin",
-    icon: "📋",
-    brandTitle: "Thông tin cơ bản",
-    brandDesc: "Tên, email và số điện thoại",
-  },
-  {
-    label: "Bảo mật",
-    icon: "🔐",
-    brandTitle: "Thiết lập bảo mật",
-    brandDesc: "Mật khẩu mạnh, an toàn",
-  },
-  {
-    label: "Xác nhận",
-    icon: "✅",
-    brandTitle: "Xác nhận & Hoàn tất",
-    brandDesc: "Kiểm tra rồi đăng ký",
-  },
-];
-
-// ===== PASSWORD STRENGTH =====
-const strengthScore = ref(0);
-
-const updateStrength = (val: string) => {
-  let score = 0;
-  if (val.length >= 8) score++;
-  if (/[A-Z]/.test(val)) score++;
-  if (/[0-9]/.test(val)) score++;
-  if (/[^A-Za-z0-9]/.test(val)) score++;
-  strengthScore.value = score;
-};
-
-const strengthWidth = computed(
-  () => ["0%", "25%", "50%", "75%", "100%"][strengthScore.value],
-);
-const strengthColor = computed(
-  () =>
-    ["#ef4444", "#ef4444", "#f59e0b", "#22c55e", "#16a34a"][
-      strengthScore.value
-    ],
-);
-const strengthLabel = computed(
-  () => ["", "Yếu", "Trung bình", "Mạnh", "Rất mạnh"][strengthScore.value],
-);
-
-const passwordRules = computed(() => [
-  { label: "Ít nhất 8 ký tự", met: form.password.length >= 8 },
-  { label: "Chứa ít nhất 1 chữ hoa", met: /[A-Z]/.test(form.password) },
-  { label: "Chứa ít nhất 1 số", met: /[0-9]/.test(form.password) },
-  { label: "Ký tự đặc biệt (!@#...)", met: /[^A-Za-z0-9]/.test(form.password) },
-]);
-
-// ===== VALIDATION =====
-const shake = () => {
-  isShaking.value = true;
-  setTimeout(() => {
-    isShaking.value = false;
-  }, 600);
-};
-
-const validateStep1 = (): boolean => {
-  step1Errors.name = step1Errors.email = step1Errors.phone = "";
-  let ok = true;
-  if (!form.name.trim()) {
-    step1Errors.name = "Vui lòng nhập họ và tên.";
-    ok = false;
-  }
-  if (!form.email) {
-    step1Errors.email = "Email là bắt buộc.";
-    ok = false;
-  } else if (!/^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(form.email)) {
-    step1Errors.email = "Email không đúng định dạng.";
-    ok = false;
-  }
-  if (!form.phone.trim()) {
-    step1Errors.phone = "Vui lòng nhập số điện thoại.";
-    ok = false;
-  } else if (!/^[0-9]{8,10}$/.test(form.phone.replace(/\s/g, ""))) {
-    step1Errors.phone = "Số điện thoại không hợp lệ.";
-    ok = false;
-  }
-  return ok;
-};
-
-const validateStep2 = (): boolean => {
-  step2Errors.password = step2Errors.confirmPassword = "";
-  let ok = true;
-  if (!form.password) {
-    step2Errors.password = "Mật khẩu là bắt buộc.";
-    ok = false;
-  } else if (form.password.length < 8) {
-    step2Errors.password = "Mật khẩu phải có ít nhất 8 ký tự.";
-    ok = false;
-  }
-  if (!form.confirmPassword) {
-    step2Errors.confirmPassword = "Vui lòng xác nhận mật khẩu.";
-    ok = false;
-  } else if (form.password !== form.confirmPassword) {
-    step2Errors.confirmPassword = "Mật khẩu không khớp.";
-    ok = false;
-  }
-  return ok;
-};
-
-const validateStep3 = (): boolean => {
-  step3Errors.agreeTerms = "";
-  if (!form.agreeTerms) {
-    step3Errors.agreeTerms = "Bạn phải đồng ý với điều khoản để tiếp tục.";
-    return false;
-  }
-  return true;
-};
-
-// ===== NAVIGATION =====
-const goNext = (step: number) => {
-  const valid = step === 1 ? validateStep1() : validateStep2();
-  if (!valid) {
-    shake();
-    return;
-  }
-  transitionName.value = "slide-forward";
-  currentStep.value++;
-};
-
-const goBack = () => {
-  transitionName.value = "slide-back";
-  currentStep.value--;
-};
-
-// ===== CONFETTI =====
-const confettiColors = [
-  "#f97316",
-  "#ea580c",
-  "#22c55e",
-  "#16a34a",
-  "#fbbf24",
-  "#60a5fa",
-  "#f472b6",
-];
-
-const getConfettiStyle = (i: number): Record<string, string> => {
-  const color = confettiColors[(i - 1) % confettiColors.length];
-  const left = `${Math.random() * 100}%`;
-  const delay = `${Math.random() * 2}s`;
-  const duration = `${2.5 + Math.random() * 2}s`;
-  const size = `${6 + Math.floor(Math.random() * 8)}px`;
-  return {
-    background: color ?? "",
-    left,
-    animationDelay: delay,
-    animationDuration: duration,
-    width: size,
-    height: size,
-  };
-};
-
-const fireConfetti = () => {
-  showConfetti.value = true;
-  setTimeout(() => {
-    showConfetti.value = false;
-  }, 4000);
-};
-
-// ===== SUBMIT =====
-const handleSubmit = async () => {
-  if (!validateStep3()) {
-    shake();
-    return;
-  }
-  loading.value = true;
-  await new Promise((r) => setTimeout(r, 1800));
-  loading.value = false;
-  fireConfetti();
-  toast.add({
-    severity: "success",
-    summary: "Chúc mừng! 🎉",
-    detail: "Tài khoản của bạn đã được tạo thành công!",
-    life: 5000,
-  });
-};
+const {
+  form,
+  loading,
+  // showConfetti,
+  currentStep,
+  isShaking,
+  transitionName,
+  step1Errors,
+  step2Errors,
+  step3Errors,
+  steps,
+  strengthWidth,
+  strengthColor,
+  strengthLabel,
+  passwordRules,
+  goNext,
+  goBack,
+  // getConfettiStyle,
+  handleSubmit,
+} = useRegisterForm();
 </script>
 
 <style scoped>

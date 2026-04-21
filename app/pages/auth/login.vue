@@ -3,8 +3,6 @@
     <AppLoading v-if="loading" variant="overlay" message="Đang đăng nhập..." />
 
     <div class="flex min-h-dvh w-full font-['Inter',sans-serif]">
-      <Toast position="top-right" />
-
       <!-- LEFT BRAND PANEL -->
       <div
         class="hidden md:flex md:w-[40%] relative flex-col items-center justify-center overflow-hidden flex-shrink-0"
@@ -238,7 +236,7 @@
             </div>
 
             <!-- Remember me -->
-            <div
+            <!-- <div
               class="flex items-center gap-2.5 fade-up"
               style="--delay: 300ms"
             >
@@ -252,7 +250,7 @@
                 class="text-sm text-gray-600 cursor-pointer select-none"
                 >Ghi nhớ đăng nhập trong 30 ngày</label
               >
-            </div>
+            </div> -->
 
             <!-- Submit -->
             <div class="mt-5 fade-up" style="--delay: 400ms">
@@ -362,72 +360,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
 import { ROUTES } from "~/constants/routes";
-import { useToast } from "primevue/usetoast";
+import { useLoginForm } from "~/composables/useLoginForm";
 
 useHead({
   title: "Đăng nhập - SmartFood",
   meta: [{ name: "description", content: "Trang Đăng nhập của SmartFood" }],
 });
 
-definePageMeta({ layout: false });
+definePageMeta({ layout: false, middleware: "guest" });
 
-const toast = useToast();
-const loading = ref<boolean>(false);
-
-interface LoginForm {
-  email: string;
-  password: string;
-  remember: boolean;
-}
-interface FormErrors {
-  email: string;
-  password: string;
-}
-
-const form = reactive<LoginForm>({ email: "", password: "", remember: false });
-const errors = reactive<FormErrors>({ email: "", password: "" });
-
-const benefits = [
-  { icon: "🛒", text: "1.000+ sản phẩm tươi ngon mỗi ngày" },
-  { icon: "🚀", text: "Giao hàng tận nhà trong 2 giờ" },
-  { icon: "💳", text: "Thanh toán an toàn, bảo mật tuyệt đối" },
-];
-
-const validate = (): boolean => {
-  errors.email = "";
-  errors.password = "";
-  let valid = true;
-  if (!form.email) {
-    errors.email = "Email là bắt buộc.";
-    valid = false;
-  } else if (!/^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(form.email)) {
-    errors.email = "Email không đúng định dạng.";
-    valid = false;
-  }
-  if (!form.password) {
-    errors.password = "Mật khẩu là bắt buộc.";
-    valid = false;
-  } else if (form.password.length < 6) {
-    errors.password = "Mật khẩu phải có ít nhất 6 ký tự.";
-    valid = false;
-  }
-  return valid;
-};
-
-const handleSubmit = async (): Promise<void> => {
-  if (!validate()) return;
-  loading.value = true;
-  await new Promise((r) => setTimeout(r, 1500));
-  loading.value = false;
-  toast.add({
-    severity: "success",
-    summary: "Thành công",
-    detail: "Đăng nhập thành công!",
-    life: 3000,
-  });
-};
+const { form, errors, benefits, loading, handleSubmit } = useLoginForm();
 </script>
 
 <style scoped>

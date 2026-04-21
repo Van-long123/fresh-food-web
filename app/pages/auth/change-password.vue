@@ -11,7 +11,7 @@
       style="background: linear-gradient(160deg, #f9fafb 0%, #ffffff 100%)"
     >
       <!-- Breadcrumb -->
-      <nav
+      <!-- <nav
         class="flex items-center gap-1.5 w-full max-w-[520px] text-[0.8rem] mb-5"
         aria-label="Breadcrumb"
       >
@@ -24,7 +24,7 @@
         <span class="text-gray-500 font-medium">Bảo mật</span>
         <i class="pi pi-chevron-right text-[0.6rem] text-gray-300" />
         <span class="text-gray-700 font-bold">Đổi mật khẩu</span>
-      </nav>
+      </nav> -->
 
       <!-- Main card -->
       <div
@@ -38,7 +38,7 @@
         :class="{ shake: isShaking }"
       >
         <!-- Success overlay -->
-        <Transition name="overlay-fade">
+        <!-- <Transition name="overlay-fade">
           <div
             v-if="showSuccess"
             class="absolute inset-0 z-20 flex items-center justify-center rounded-3xl"
@@ -94,7 +94,7 @@
               </div>
             </div>
           </div>
-        </Transition>
+        </Transition> -->
 
         <!-- Card header -->
         <div class="flex items-center gap-4 mb-6">
@@ -121,7 +121,7 @@
 
         <form novalidate @submit.prevent="handleSubmit">
           <!-- Current password -->
-          <div class="mb-5">
+          <div v-if="!isResetByEmailLink" class="mb-5">
             <label
               class="block text-[0.875rem] font-semibold text-gray-700 mb-1.5"
             >
@@ -337,96 +337,54 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onBeforeUnmount } from "vue";
-import { useRouter } from "vue-router";
+import { computed, onBeforeUnmount } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useToast } from "primevue/usetoast";
-import { usePasswordStrength } from "~/composables/usePasswordStrength";
-import { ROUTES } from "~/constants/routes";
+// import { ROUTES } from "~/constants/routes";
+import { useChangePassword } from "~/composables/useChangePassword";
 
 useHead({
   title: "Đổi mật khẩu - SmartFood",
   meta: [{ name: "description", content: "Trang Đổi mật khẩu của SmartFood" }],
 });
-definePageMeta({ layout: "default" });
 
-const router = useRouter();
+definePageMeta({ layout: "default", middleware: "guest" });
+
+// const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 
-const form = reactive({ current: "", newPwd: "", confirm: "" });
-const errors = reactive({ current: "", newPwd: "", confirm: "" });
-const loading = ref(false);
-const isShaking = ref(false);
-const showSuccess = ref(false);
-
-const newPwdRef = reactive({
-  get value() {
-    return form.newPwd;
-  },
-});
-const { rules, strength } = usePasswordStrength(newPwdRef);
-
-const isMatched = computed(
-  () => form.confirm.length > 0 && form.newPwd === form.confirm,
-);
-const isMismatched = computed(
-  () => form.confirm.length > 0 && form.newPwd !== form.confirm,
+const emailFromQuery = computed(() => String(route.query.email || ""));
+const tokenFromQuery = computed(() => String(route.query.token || ""));
+const isResetByEmailLink = computed(
+  () => Boolean(emailFromQuery.value) && Boolean(tokenFromQuery.value),
 );
 
-const validate = (): boolean => {
-  errors.current = errors.newPwd = errors.confirm = "";
-  let ok = true;
-  if (!form.current) {
-    errors.current = "Vui lòng nhập mật khẩu hiện tại.";
-    ok = false;
-  }
-  if (!form.newPwd) {
-    errors.newPwd = "Vui lòng nhập mật khẩu mới.";
-    ok = false;
-  } else if (form.newPwd.length < 8) {
-    errors.newPwd = "Mật khẩu mới phải có ít nhất 8 ký tự.";
-    ok = false;
-  } else if (form.newPwd === form.current) {
-    errors.newPwd = "Mật khẩu mới phải khác mật khẩu hiện tại.";
-    ok = false;
-  }
-  if (!form.confirm) {
-    errors.confirm = "Vui lòng xác nhận mật khẩu mới.";
-    ok = false;
-  } else if (form.newPwd !== form.confirm) {
-    errors.confirm = "Xác nhận mật khẩu không khớp.";
-    ok = false;
-  }
-  return ok;
-};
-
-const shake = () => {
-  isShaking.value = true;
-  setTimeout(() => {
-    isShaking.value = false;
-  }, 600);
-};
-
-const REDIRECT_SECONDS = 3;
-const redirectCountdown = ref(REDIRECT_SECONDS);
-const redirectProgress = computed(
-  () => `${(redirectCountdown.value / REDIRECT_SECONDS) * 100}%`,
+const {
+  form,
+  errors,
+  loading,
+  isShaking,
+  showSuccess,
+  rules,
+  strength,
+  isMatched,
+  isMismatched,
+  // redirectCountdown,
+  // redirectProgress,
+  validate,
+  shake,
+  resetForm,
+  // startRedirect,
+  clearRedirectTimer,
+  submitAuthenticatedChange,
+  submitResetByToken,
+} = useChangePassword(
+  isResetByEmailLink.value ? "reset-link" : "authenticated",
 );
-let redirectTimer: ReturnType<typeof setInterval> | null = null;
-
-const startRedirect = () => {
-  redirectCountdown.value = REDIRECT_SECONDS;
-  redirectTimer = setInterval(() => {
-    redirectCountdown.value--;
-    if (redirectCountdown.value <= 0) {
-      clearInterval(redirectTimer!);
-      redirectTimer = null;
-      router.push(ROUTES.HOME);
-    }
-  }, 1000);
-};
 
 onBeforeUnmount(() => {
-  if (redirectTimer) clearInterval(redirectTimer);
+  clearRedirectTimer();
 });
 
 const handleSubmit = async () => {
@@ -434,22 +392,24 @@ const handleSubmit = async () => {
     shake();
     return;
   }
-  loading.value = true;
-  await new Promise((r) => setTimeout(r, 1800));
-  loading.value = false;
-  showSuccess.value = true;
-  toast.add({
-    severity: "success",
-    summary: "Thành công!",
-    detail: "Mật khẩu của bạn đã được thay đổi.",
-    life: 5000,
-  });
-  startRedirect();
-};
 
-const resetForm = () => {
-  form.current = form.newPwd = form.confirm = "";
-  errors.current = errors.newPwd = errors.confirm = "";
+  try {
+    if (isResetByEmailLink.value) {
+      await submitResetByToken(emailFromQuery.value, tokenFromQuery.value);
+    } else {
+      await submitAuthenticatedChange();
+    }
+
+    showSuccess.value = true;
+    toast.add({
+      severity: "success",
+      summary: "Thành công!",
+      detail: "Mật khẩu của bạn đã được thay đổi.",
+      life: 5000,
+    });
+  } catch {
+    // Toast lỗi được xử lý tập trung ở authorizedAxios interceptor.
+  }
 };
 </script>
 

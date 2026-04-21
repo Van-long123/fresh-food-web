@@ -10,6 +10,7 @@ import Aura from '@primevue/themes/aura';
       '@nuxt/eslint',
       '@nuxtjs/google-fonts',
       '@pinia/nuxt',
+      'pinia-plugin-persistedstate/nuxt',
     ],
 
     // Tắt path prefix — components/common/AppLoading.vue → <AppLoading>, không phải <CommonAppLoading>
@@ -28,6 +29,12 @@ import Aura from '@primevue/themes/aura';
       theme: {
         preset: Aura
       }
+    }
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8017'
     }
   },
 
