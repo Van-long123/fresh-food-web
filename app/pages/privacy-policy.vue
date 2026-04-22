@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import PrivacyPolicy from "~/components/PrivacyPolicy.vue";
+import PrivacyPolicy from "~/components/pages/policies/PrivacyPolicy.vue";
 
 useHead({
   title: 'Chính sách bảo mật - SmartFood',

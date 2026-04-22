@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import Sidebar from "~/components/layout/Sidebar.vue";
-import ProductCard from "~/components/ProductCard.vue";
+import ProductCard from "~/components/features/home/ProductCard.vue";
 const route = useRoute();
 
 const searchQuery = computed(() => (route.query.q as string) || "mận");

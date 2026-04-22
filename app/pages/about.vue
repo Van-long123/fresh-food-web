@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import AboutUs from '~/components/AboutUs.vue'
+import AboutUs from '~/components/pages/company/AboutUs.vue'
 
 useHead({
   title: 'Về chúng tôi - SmartFood',

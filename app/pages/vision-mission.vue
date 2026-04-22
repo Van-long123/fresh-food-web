@@ -5,7 +5,7 @@
 <script setup lang="ts">
 
 
-import VisionMission from "~/components/VisionMission.vue";
+import VisionMission from "~/components/pages/company/VisionMission.vue";
 
 useHead({
   title: 'Tầm nhìn & Sứ mệnh - SmartFood',

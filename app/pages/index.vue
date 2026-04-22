@@ -443,10 +443,10 @@
 import { ref, computed, onMounted } from "vue";
 import { ROUTES } from "~/constants/routes";
 import Sidebar from "~/components/layout/Sidebar.vue";
-import ProductCard from "~/components/ProductCard.vue";
-import HeroBanner from "~/components/HeroBanner.vue";
-import BlogSection from "~/components/BlogSection.vue";
-import BackToTop from "~/components/BackToTop.vue";
+import ProductCard from "~/components/features/home/ProductCard.vue";
+import HeroBanner from "~/components/features/home/HeroBanner.vue";
+import BlogSection from "~/components/features/home/BlogSection.vue";
+import BackToTop from "~/components/features/home/BackToTop.vue";
 import SkHomePage from "~/components/skeletons/SkHomePage.vue";
 
 useHead({

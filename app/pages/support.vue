@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import CustomerSupport from '~/components/CustomerSupport.vue'
+import CustomerSupport from '~/components/pages/support/CustomerSupport.vue'
 
 useHead({
   title: 'Hỗ trợ khách hàng - SmartFood',

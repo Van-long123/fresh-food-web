@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import ServiceTerms from '~/components/ServiceTerms.vue'
+import ServiceTerms from '~/components/pages/policies/ServiceTerms.vue'
 
 useHead({
   title: 'Điều khoản dịch vụ - SmartFood',
