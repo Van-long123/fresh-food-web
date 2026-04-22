@@ -222,6 +222,213 @@
           </NuxtLink>
         </div>
 
+        <!-- The gioi rau cu section banner -->
+        <div
+          class="rounded-xl overflow-hidden mb-5 bg-gray-50 h-[100px] relative shadow-sm"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&q=80&w=2000"
+            alt="Thế giới rau củ"
+            class="w-full h-full object-cover"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-emerald-900/90 to-transparent px-8 flex flex-col justify-center"
+          >
+            <div class="flex items-center gap-4">
+              <h2 class="text-3xl font-black text-[#eaffc4] drop-shadow-md">
+                Thế giới rau củ
+              </h2>
+              <span
+                class="bg-gradient-to-r from-emerald-700 to-emerald-600 border border-emerald-500 text-white text-[11px] font-bold px-3 py-1 rounded shadow-lg uppercase tracking-wider hidden sm:inline-block"
+                >Tươi mới mỗi ngày</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="relative group/slider mb-8">
+          <button
+            @click="scrollVeg('left')"
+            class="absolute left-[-16px] top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#414141] text-white flex items-center justify-center hover:bg-[#6c6c6c] shadow-lg z-20 opacity-0 group-hover/slider:opacity-100 transition-opacity"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
+            @click="scrollVeg('right')"
+            class="absolute right-[-16px] top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#414141] text-white flex items-center justify-center hover:bg-[#6c6c6c] shadow-lg z-20 opacity-0 group-hover/slider:opacity-100 transition-opacity"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+
+          <div ref="vegScrollRef" class="carousel-grid-2 py-1">
+            <ProductCard
+              v-for="veg in vegDisplay"
+              :key="veg.uniqueId"
+              :product="veg"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-center mb-10 pb-6 border-b border-gray-200">
+          <NuxtLink
+            :to="ROUTES.CATEGORY('the-gioi-rau-cu')"
+            class="text-[#006ee6] text-[13px] font-bold hover:underline flex items-center gap-1 group/link"
+          >
+            Xem tất cả
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3 w-3 group-hover/link:translate-x-1 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </NuxtLink>
+        </div>
+
+        <section
+          v-for="section in extraSections"
+          :key="section.slug"
+          class="mb-10"
+        >
+          <div
+            class="rounded-xl overflow-hidden mb-5 bg-gray-50 h-[100px] relative shadow-sm"
+          >
+            <img
+              :src="section.bannerImage"
+              :alt="section.title"
+              class="w-full h-full object-cover"
+            />
+            <div
+              class="absolute inset-0 px-8 flex flex-col justify-center"
+              :class="section.overlayClass"
+            >
+              <div class="flex items-center gap-4">
+                <h2
+                  class="text-3xl font-black drop-shadow-md"
+                  :class="section.titleClass"
+                >
+                  {{ section.title }}
+                </h2>
+                <span
+                  class="text-[11px] font-bold px-3 py-1 rounded shadow-lg uppercase tracking-wider hidden sm:inline-block"
+                  :class="section.badgeClass"
+                  >{{ section.badge }}</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="relative group/slider mb-8">
+            <button
+              @click="scrollExtra(section.slug, 'left')"
+              class="absolute left-[-16px] top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#414141] text-white flex items-center justify-center hover:bg-[#6c6c6c] shadow-lg z-20 opacity-0 group-hover/slider:opacity-100 transition-opacity"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <button
+              @click="scrollExtra(section.slug, 'right')"
+              class="absolute right-[-16px] top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-[#414141] text-white flex items-center justify-center hover:bg-[#6c6c6c] shadow-lg z-20 opacity-0 group-hover/slider:opacity-100 transition-opacity"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            <div
+              :ref="(el) => setExtraScrollRef(section.slug, el)"
+              class="carousel-grid-2 py-1"
+            >
+              <ProductCard
+                v-for="item in extraDisplayMap[section.slug]"
+                :key="item.uniqueId"
+                :product="item"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-center pb-6 border-b border-gray-200">
+            <NuxtLink
+              :to="ROUTES.CATEGORY(section.slug)"
+              class="text-[#006ee6] text-[13px] font-bold hover:underline flex items-center gap-1 group/link"
+            >
+              Xem tất cả
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-3 w-3 group-hover/link:translate-x-1 transition-transform"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </NuxtLink>
+          </div>
+        </section>
+
         <!-- Blog Section component -->
         <BlogSection />
       </main>
@@ -449,6 +656,69 @@ const fruitProducts = ref([
   },
 ]);
 
+const vegProducts = ref([
+  {
+    id: 21,
+    name: "Cà rốt Đà Lạt (500g)",
+    image:
+      "https://images.unsplash.com/photo-1447175008436-054170c2e979?auto=format&fit=crop&w=800&q=80",
+    price: 32000,
+    originalPrice: 45000,
+    discountPercent: 29,
+    isBestPrice: true,
+    isOnlineExclusive: false,
+    buttonText: "Mua",
+  },
+  {
+    id: 22,
+    name: "Bông cải xanh hữu cơ (300g)",
+    image:
+      "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?auto=format&fit=crop&w=800&q=80",
+    price: 39000,
+    originalPrice: 52000,
+    discountPercent: 25,
+    isBestPrice: false,
+    isOnlineExclusive: true,
+    buttonText: "Mua",
+  },
+  {
+    id: 23,
+    name: "Combo rau salad tổng hợp (1 khay)",
+    image:
+      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+    price: 58000,
+    originalPrice: 76000,
+    discountPercent: 24,
+    isBestPrice: true,
+    isOnlineExclusive: true,
+    buttonText: "Mua",
+  },
+  {
+    id: 24,
+    name: "Khoai tây vàng nhập khẩu (1kg)",
+    image:
+      "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80",
+    price: 47000,
+    originalPrice: 64000,
+    discountPercent: 27,
+    isBestPrice: false,
+    isOnlineExclusive: false,
+    buttonText: "Mua",
+  },
+  {
+    id: 25,
+    name: "Cải bó xôi baby (250g)",
+    image:
+      "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80",
+    price: 36000,
+    originalPrice: 49000,
+    discountPercent: 27,
+    isBestPrice: true,
+    isOnlineExclusive: false,
+    buttonText: "Mua",
+  },
+]);
+
 // Categories state
 const activeCategory = ref("khuyen_mai_hot");
 const categoriesMenu = ref([
@@ -519,10 +789,164 @@ const fruitDisplay = computed(() => {
   ].map((item, index) => ({ ...item, uniqueId: "f" + index }));
 });
 
+const vegDisplay = computed(() => {
+  return [...vegProducts.value, ...vegProducts.value, ...vegProducts.value].map(
+    (item, index) => ({ ...item, uniqueId: "v" + index }),
+  );
+});
+
+const extraSections = ref([
+  {
+    slug: "thit-ca-hai-san",
+    title: "Thịt, cá, hải sản",
+    badge: "Tươi mỗi ngày",
+    bannerImage:
+      "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-rose-900/90 to-transparent",
+    titleClass: "text-[#ffe3e3]",
+    badgeClass: "bg-rose-700 border border-rose-500 text-white",
+  },
+  {
+    slug: "dau-an-nuoc-cham-gia-vi",
+    title: "Dầu ăn, nước chấm, gia vị",
+    badge: "Đậm đà chuẩn vị",
+    bannerImage:
+      "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-amber-900/90 to-transparent",
+    titleClass: "text-[#ffe9c3]",
+    badgeClass: "bg-amber-700 border border-amber-500 text-white",
+  },
+  {
+    slug: "thuc-pham-dong-lanh",
+    title: "Thực phẩm đông lạnh",
+    badge: "Giữ trọn độ tươi",
+    bannerImage:
+      "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-cyan-900/90 to-transparent",
+    titleClass: "text-[#d9fbff]",
+    badgeClass: "bg-cyan-700 border border-cyan-500 text-white",
+  },
+  {
+    slug: "sua-bo-pho-mai",
+    title: "Sữa, bơ & phô mai",
+    badge: "Nhập khẩu chọn lọc",
+    bannerImage:
+      "https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-orange-900/90 to-transparent",
+    titleClass: "text-[#ffefcf]",
+    badgeClass: "bg-orange-700 border border-orange-500 text-white",
+  },
+  {
+    slug: "kem-sua-chua",
+    title: "Kem & sữa chua",
+    badge: "Mát lạnh tức thì",
+    bannerImage:
+      "https://images.unsplash.com/photo-1488900128323-21503983a07e?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-fuchsia-900/90 to-transparent",
+    titleClass: "text-[#ffe3ff]",
+    badgeClass: "bg-fuchsia-700 border border-fuchsia-500 text-white",
+  },
+  {
+    slug: "thuc-pham-dong-hop",
+    title: "Thực phẩm đóng hộp",
+    badge: "Tiện lợi dự trữ",
+    bannerImage:
+      "https://images.unsplash.com/photo-1584263347416-85a696b4eda7?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-slate-900/90 to-transparent",
+    titleClass: "text-[#f0f6ff]",
+    badgeClass: "bg-slate-700 border border-slate-500 text-white",
+  },
+  {
+    slug: "do-che-bien-san",
+    title: "Đồ chế biến sẵn",
+    badge: "Nhanh gọn ngon miệng",
+    bannerImage:
+      "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-red-900/90 to-transparent",
+    titleClass: "text-[#ffe6dc]",
+    badgeClass: "bg-red-700 border border-red-500 text-white",
+  },
+  {
+    slug: "banh-keo-an-vat",
+    title: "Bánh kẹo & ăn vặt",
+    badge: "Khuyến mãi mỗi tuần",
+    bannerImage:
+      "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-pink-900/90 to-transparent",
+    titleClass: "text-[#ffe3f4]",
+    badgeClass: "bg-pink-700 border border-pink-500 text-white",
+  },
+  {
+    slug: "gao-dau-bot-do-kho",
+    title: "Gạo, đậu, bột & đồ khô",
+    badge: "Thiết yếu mỗi bữa",
+    bannerImage:
+      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-lime-900/90 to-transparent",
+    titleClass: "text-[#f2ffd4]",
+    badgeClass: "bg-lime-700 border border-lime-500 text-white",
+  },
+  {
+    slug: "do-uong",
+    title: "Đồ uống",
+    badge: "Đủ trà, cà phê, bia rượu",
+    bannerImage:
+      "https://images.unsplash.com/photo-1497534446932-c925b458314e?auto=format&fit=crop&q=80&w=2000",
+    overlayClass: "bg-gradient-to-r from-indigo-900/90 to-transparent",
+    titleClass: "text-[#e2e6ff]",
+    badgeClass: "bg-indigo-700 border border-indigo-500 text-white",
+  },
+]);
+
+const sectionProductsBase = computed(() => [
+  ...hotProducts.value,
+  ...fruitProducts.value,
+  ...vegProducts.value,
+]);
+
+const extraDisplayMap = computed(() => {
+  const productSource = sectionProductsBase.value;
+  const result = {};
+
+  extraSections.value.forEach((section, idx) => {
+    const shift = (idx * 3) % productSource.length;
+    const rotated = productSource
+      .slice(shift)
+      .concat(productSource.slice(0, shift))
+      .slice(0, 10);
+
+    result[section.slug] = [...rotated, ...rotated, ...rotated].map(
+      (item, itemIndex) => ({
+        ...item,
+        uniqueId: `${section.slug}-${itemIndex}`,
+      }),
+    );
+  });
+
+  return result;
+});
+
+const extraScrollRefs = ref({});
+const setExtraScrollRef = (slug, element) => {
+  if (element) {
+    extraScrollRefs.value[slug] = element;
+  }
+};
+
 // Hight-performance smooth scroll function using requestAnimationFrame
+const runningAnimations = new WeakMap();
+
 const smoothScroll = (element, targetPos, duration = 600) => {
+  const previousFrame = runningAnimations.get(element);
+  if (previousFrame) cancelAnimationFrame(previousFrame);
+
   const startPos = element.scrollLeft;
-  const distance = targetPos - startPos;
+  const maxScroll = Math.max(0, element.scrollWidth - element.clientWidth);
+  const clampedTarget = Math.min(Math.max(0, targetPos), maxScroll);
+  const distance = clampedTarget - startPos;
+
+  if (Math.abs(distance) < 1) return;
+
   let startTime = null;
 
   const animation = (currentTime) => {
@@ -536,33 +960,75 @@ const smoothScroll = (element, targetPos, duration = 600) => {
     element.scrollLeft = startPos + distance * ease;
 
     if (timeElapsed < duration) {
-      requestAnimationFrame(animation);
+      const frameId = requestAnimationFrame(animation);
+      runningAnimations.set(element, frameId);
+    } else {
+      element.scrollLeft = clampedTarget;
+      runningAnimations.delete(element);
     }
   };
-  requestAnimationFrame(animation);
+
+  const frameId = requestAnimationFrame(animation);
+  runningAnimations.set(element, frameId);
+};
+
+const getVisibleColumns = () => {
+  if (window.matchMedia("(min-width: 1280px)").matches) return 5;
+  if (window.matchMedia("(min-width: 1024px)").matches) return 4;
+  if (window.matchMedia("(min-width: 640px)").matches) return 3;
+  return 2;
+};
+
+const getScrollStep = (element) => {
+  const styles = window.getComputedStyle(element);
+  const gap = Number.parseFloat(styles.columnGap || styles.gap || "12") || 12;
+  const visibleColumns = getVisibleColumns();
+  const colWidth =
+    (element.clientWidth - gap * (visibleColumns - 1)) / visibleColumns;
+  const stepColumns = Math.max(1, visibleColumns - 2);
+  return (colWidth + gap) * stepColumns;
+};
+
+const scrollByStep = (elementRef, direction) => {
+  const element = elementRef.value;
+  if (!element) return;
+
+  const step = getScrollStep(element);
+  const target =
+    direction === "left"
+      ? element.scrollLeft - step
+      : element.scrollLeft + step;
+
+  smoothScroll(element, target, 700);
+};
+
+const scrollExtra = (slug, direction) => {
+  const element = extraScrollRefs.value[slug];
+  if (!element) return;
+
+  const step = getScrollStep(element);
+  const target =
+    direction === "left"
+      ? element.scrollLeft - step
+      : element.scrollLeft + step;
+
+  smoothScroll(element, target, 700);
 };
 
 // Slider Scroll logic
 const hotScrollRef = ref(null);
 const scrollHot = (direction) => {
-  if (hotScrollRef.value) {
-    const scrollAmount = hotScrollRef.value.clientWidth * 0.95; // 95% of container width
-    const target =
-      hotScrollRef.value.scrollLeft +
-      (direction === "left" ? -scrollAmount : scrollAmount);
-    smoothScroll(hotScrollRef.value, target, 700);
-  }
+  scrollByStep(hotScrollRef, direction);
 };
 
 const fruitScrollRef = ref(null);
 const scrollFruit = (direction) => {
-  if (fruitScrollRef.value) {
-    const scrollAmount = fruitScrollRef.value.clientWidth * 0.95;
-    const target =
-      fruitScrollRef.value.scrollLeft +
-      (direction === "left" ? -scrollAmount : scrollAmount);
-    smoothScroll(fruitScrollRef.value, target, 700);
-  }
+  scrollByStep(fruitScrollRef, direction);
+};
+
+const vegScrollRef = ref(null);
+const scrollVeg = (direction) => {
+  scrollByStep(vegScrollRef, direction);
 };
 </script>
 
@@ -572,9 +1038,11 @@ const scrollFruit = (direction) => {
 .carousel-grid-1 {
   display: grid;
   grid-auto-flow: column;
+  align-items: start;
   gap: 12px;
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
+  scroll-behavior: auto;
 }
 
 /* Hide scrollbar for Chrome/Safari */
