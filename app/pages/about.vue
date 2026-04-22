@@ -5,15 +5,10 @@
 </template>
 
 <script setup lang="ts">
-import AboutUs from '~/components/pages/company/AboutUs.vue'
+import AboutUs from "~/components/pages/company/AboutUs.vue";
 
 useHead({
-  title: 'Về chúng tôi - SmartFood',
-  meta: [
-    { name: 'description', content: 'Trang Về chúng tôi của SmartFood' }
-  ]
+  title: "Về chúng tôi - SmartFood",
+  meta: [{ name: "description", content: "Trang Về chúng tôi của SmartFood" }],
 });
-
-
-
 </script>

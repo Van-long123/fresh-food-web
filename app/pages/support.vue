@@ -5,15 +5,12 @@
 </template>
 
 <script setup lang="ts">
-import CustomerSupport from '~/components/pages/support/CustomerSupport.vue'
+import CustomerSupport from "~/components/pages/support/CustomerSupport.vue";
 
 useHead({
-  title: 'Hỗ trợ khách hàng - SmartFood',
+  title: "Hỗ trợ khách hàng - SmartFood",
   meta: [
-    { name: 'description', content: 'Trang Hỗ trợ khách hàng của SmartFood' }
-  ]
+    { name: "description", content: "Trang Hỗ trợ khách hàng của SmartFood" },
+  ],
 });
-
-
-
 </script>

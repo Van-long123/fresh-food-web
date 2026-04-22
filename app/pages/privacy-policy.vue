@@ -9,14 +9,11 @@
 import PrivacyPolicy from "~/components/pages/policies/PrivacyPolicy.vue";
 
 useHead({
-  title: 'Chính sách bảo mật - SmartFood',
+  title: "Chính sách bảo mật - SmartFood",
   meta: [
-    { name: 'description', content: 'Trang Chính sách bảo mật của SmartFood' }
-  ]
+    { name: "description", content: "Trang Chính sách bảo mật của SmartFood" },
+  ],
 });
-
-
-
 </script>
 
 <style scoped>
