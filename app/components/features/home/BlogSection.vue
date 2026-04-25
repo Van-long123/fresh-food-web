@@ -31,8 +31,23 @@
       </NuxtLink>
     </div>
 
+    <div v-if="isLoading" class="px-5 py-8 text-center text-sm text-gray-500">
+      Đang tải bài viết...
+    </div>
+
+    <div v-else-if="isError" class="px-5 py-8 text-center text-sm text-red-500">
+      {{ errorMessage }}
+    </div>
+
+    <div
+      v-else-if="isEmpty"
+      class="px-5 py-8 text-center text-sm text-gray-500"
+    >
+      Chưa có bài viết nổi bật.
+    </div>
+
     <!-- ── Body: 2 cột ── -->
-    <div class="flex flex-col lg:flex-row gap-0">
+    <div v-else class="flex flex-col lg:flex-row gap-0">
       <!-- LEFT: Ảnh lớn + info -->
       <article
         class="w-full lg:w-[48%] p-4 lg:p-5 flex flex-col group cursor-pointer border-b lg:border-b-0 lg:border-r border-gray-100"
@@ -42,19 +57,21 @@
           <img
             :src="primaryPost.image"
             :alt="primaryPost.title"
-            class="w-full aspect-[4/3] object-cover group-hover:scale-[1.02] transition-transform duration-500"
+            class="w-full aspect-4/3 object-cover group-hover:scale-[1.02] transition-transform duration-500"
             loading="lazy"
           />
         </div>
         <!-- Title -->
-        <h3
-          class="text-[17px] font-semibold text-[#222] leading-snug mb-1.5 line-clamp-2 group-hover:text-[#4caf50] transition-colors"
-        >
-          {{ primaryPost.title }}
-        </h3>
+        <NuxtLink :to="ROUTES.NEWS_DETAIL(primaryPost.slug)">
+          <h3
+            class="text-[17px] font-semibold text-[#222] leading-snug mb-1.5 line-clamp-2 group-hover:text-[#4caf50] transition-colors"
+          >
+            {{ primaryPost.title }}
+          </h3>
+        </NuxtLink>
         <!-- Date -->
         <p class="text-[11px] text-gray-400 font-medium mb-2">
-          {{ primaryPost.date }}
+          {{ primaryPost.publishedLabel }}
         </p>
         <!-- Description -->
         <p class="text-[13px] text-gray-600 leading-relaxed line-clamp-3">
@@ -68,7 +85,7 @@
 
       <!-- RIGHT: Danh sách bài nhỏ có scroll -->
       <div
-        class="w-full lg:w-[52%] overflow-y-auto max-h-[520px] lg:max-h-[560px] scrollbar-green"
+        class="w-full lg:w-[52%] overflow-y-auto max-h-130 lg:max-h-140 scrollbar-green"
       >
         <article
           v-for="(post, index) in secondaryPosts"
@@ -80,7 +97,7 @@
         >
           <!-- Thumbnail -->
           <div
-            class="w-[100px] sm:w-[120px] h-[70px] sm:h-[82px] flex-shrink-0 overflow-hidden rounded bg-gray-100"
+            class="w-25 sm:w-30 h-17.5 sm:h-20.5 shrink-0 overflow-hidden rounded bg-gray-100"
           >
             <img
               :src="post.image"
@@ -92,13 +109,15 @@
 
           <!-- Text -->
           <div class="flex flex-col flex-1 min-w-0 py-0.5">
-            <h4
-              class="text-[14px] sm:text-[15px] font-semibold text-[#222] leading-snug mb-1 line-clamp-2 group-hover:text-[#4caf50] transition-colors"
-            >
-              {{ post.title }}
-            </h4>
+            <NuxtLink :to="ROUTES.NEWS_DETAIL(post.slug)">
+              <h4
+                class="text-[14px] sm:text-[15px] font-semibold text-[#222] leading-snug mb-1 line-clamp-2 group-hover:text-[#4caf50] transition-colors"
+              >
+                {{ post.title }}
+              </h4>
+            </NuxtLink>
             <p class="text-[11px] text-gray-400 font-medium mb-1.5">
-              {{ post.date }}
+              {{ post.publishedLabel }}
             </p>
             <p
               class="text-[12.5px] text-gray-500 leading-relaxed line-clamp-2 hidden sm:block"
@@ -115,80 +134,48 @@
   </section>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { ROUTES } from '~/constants/routes'
+<script setup lang="ts">
+import { computed } from "vue";
+import { ROUTES } from "~/constants/routes";
+import type { HomeBlogPost } from "~/types/home.type";
 
-const primaryPost = ref({
-  id: 1,
-  title:
-    "Ưu Đãi Tuần Này Tại Organic Food – Mua Ngay Thực Phẩm Organic Giá Tốt",
-  date: "Th 3 17/03/2026",
-  description:
-    "Ưu Đãi Tuần Này Tại Organic Food Có Gì Hấp Dẫn? Nếu các mom đang tìm một chương trình khuyến mãi thực phẩm organic để mua sắm...",
-  image:
-    "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800",
+const props = withDefaults(
+  defineProps<{
+    primaryPost: HomeBlogPost | null;
+    secondaryPosts: HomeBlogPost[];
+    isLoading?: boolean;
+    isError?: boolean;
+    isEmpty?: boolean;
+    errorMessage?: string;
+  }>(),
+  {
+    isLoading: false,
+    isError: false,
+    isEmpty: false,
+    errorMessage: "Khong the tai danh sach bai viet.",
+  },
+);
+
+const primaryPost = computed<HomeBlogPost>(() => {
+  if (props.primaryPost) return props.primaryPost;
+
+  return {
+    id: "blog-fallback",
+    slug: "news",
+    title: "Tin tuc dang cap nhat",
+    description: "Noi dung dang duoc cap nhat.",
+    image:
+      "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&q=80&w=1200",
+    publishedAt: new Date().toISOString(),
+    publishedLabel: "--/--/----",
+  };
 });
 
-const secondaryPosts = ref([
-  {
-    id: 2,
-    title:
-      "Ưu Đãi Tuần Này Tại Organic Food – Mua Ngay Thực Phẩm Organic Giá Tốt",
-    date: "Th 3 17/03/2026",
-    description:
-      "Ưu Đãi Tuần Này Tại Organic Food Có Gì Hấp Dẫn? Nếu các mom đang tìm một chương trình khuyến mãi thực phẩm organic để mua sắm...",
-    image:
-      "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 3,
-    title:
-      "Khuyến Mãi Chà Bông Thịt Heo Chỉ 119.000đ/Hũ Từ 13/03 Đến 15/03/2026",
-    date: "Th 6 13/03/2026",
-    description:
-      "Khuyến Mãi Chà Bông Thịt Heo Chỉ 119.000đ/Hũ Từ 13/03 Đến 15/03/2026. Nếu bạn đang tìm kiếm một sản phẩm tiện lợi, thơm ngon và phù hợp...",
-    image:
-      "https://images.unsplash.com/photo-1556910110-a5a63dfd393c?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 4,
-    title: "Sale Promotion 2026",
-    date: "Th 6 13/03/2026",
-    description:
-      "Khuyến Mãi Bí Đỏ Hạt Đậu Hữu Cơ Chỉ 79.000đ/kg Từ 13/03 Đến 15/03/2026. Nếu bạn đang tìm kiếm một loại rau củ hữu cơ thơm...",
-    image:
-      "https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 5,
-    title:
-      "Mua 1 Yến mạch hữu cơ Bob's Red Mill tặng 2 sữa đậu nành Kikkoman 200ml",
-    date: "Th 4 11/03/2026",
-    description:
-      "Quà tặng hấp dẫn từ Bob's Red Mill: Mua 1 tặng 2 tại Organicfood.vn. Nếu bạn đang tìm một chương trình ưu đãi vừa tiết kiệm...",
-    image:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 6,
-    title: "CHÀO HÈ SẢNG KHOÁI – DEAL TẶNG BẠN",
-    date: "Th 6 06/03/2026",
-    description:
-      "Mua 5 Tặng 1 áp dụng cho các sản phẩm thương hiệu Altavie tại Organicfood.vn. Mùa hè này, lên kệ ngay những món ăn vặt và...",
-    image:
-      "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&q=80&w=400",
-  },
-  {
-    id: 7,
-    title: "Vì sao Cô Kim Xuân chọn thực phẩm Organic?",
-    date: "Th 5 05/03/2026",
-    description:
-      'Nhiều người thường thắc mắc: "Thực phẩm organic không dùng hóa chất thì đáng ra phải rẻ hơn chứ?" Nhưng thực tế, thực phẩm hữu cơ...',
-    image:
-      "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&q=80&w=400",
-  },
-]);
+const secondaryPosts = computed(() => props.secondaryPosts);
+const isLoading = computed(() => props.isLoading);
+const isError = computed(() => props.isError);
+const isEmpty = computed(() => props.isEmpty);
+const errorMessage = computed(() => props.errorMessage);
 </script>
 
 <style scoped>

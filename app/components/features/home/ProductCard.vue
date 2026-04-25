@@ -8,16 +8,16 @@
     >
       <!-- Top Left Tags -->
       <div
-        v-if="product.discountPercent"
+        v-if="product?.discountPercent"
         class="absolute top-0 left-0 z-10 flex items-start"
       >
         <div
           class="bg-[#fced44] text-black text-xs font-bold px-1.5 py-0.5 whitespace-nowrap"
         >
-          -{{ product.discountPercent }}%
+          -{{ product?.discountPercent }}%
         </div>
         <div
-          v-if="product.isOnlineExclusive"
+          v-if="product?.isOnlineExclusive"
           class="bg-linear-to-r from-[#fc5c22] to-[#fd4d2d] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg transform origin-top-left flex items-center shadow-sm ml-px border-l-2 border-white"
         >
           ĐỘC QUYỀN ONLINE
@@ -103,35 +103,37 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { useCart } from "~/composables/useCart";
+import type { HomeProduct } from "~/types/home.type";
 
-const props = defineProps({
-  product: {
-    type: Object,
-    required: true,
-  },
-});
+interface ProductCardModel extends HomeProduct {
+  uniqueId?: string;
+}
+
+const props = defineProps<{
+  product: ProductCardModel;
+}>();
 
 const { addToCart } = useCart();
 const addedState = ref(false);
 
-const formatPrice = (price) => {
+const formatPrice = (price: number): string => {
   return price.toLocaleString("vi-VN");
 };
 
-const calculateSaving = (original, current) => {
+const calculateSaving = (original: number, current: number): string => {
   const saving = original - current;
   if (saving >= 1000) {
-    return saving / 1000 + "K";
+    return `${saving / 1000}K`;
   }
-  return formatPrice(saving) + "đ";
+  return `${formatPrice(saving)}đ`;
 };
 
 const handleBuy = () => {
   addToCart({
-    id: props.product.id,
+    id: props.product.id ? Number(props.product.id) : undefined,
     name: props.product.name,
     price: props.product.price,
     image: props.product.image,

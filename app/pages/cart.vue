@@ -1,28 +1,815 @@
 <template>
   <SkCartPage v-if="isLoading" />
-  <Cart v-else />
+  <div
+    v-else
+    class="bg-[#f8fafc] min-h-screen text-[#111827] pb-[90px]"
+    style="--primary: #f97316; --secondary: #16a34a"
+  >
+    <div class="w-[min(1200px,92vw)] mx-auto pt-6">
+      <!-- BREADCRUMB -->
+      <nav class="flex gap-2 text-[#6b7280] text-[13px]">
+        <NuxtLink :to="ROUTES.HOME" class="text-[#4b5563]">Trang chủ</NuxtLink>
+        <span>›</span>
+        <span>Giỏ hàng</span>
+      </nav>
+
+      <!-- HEAD ROW -->
+      <div class="mt-2.5 head-mount">
+        <h1 class="m-0 text-[28px] font-extrabold flex items-center gap-2.5">
+          🛒 Giỏ Hàng Của Bạn
+          <span
+            class="text-[13px] rounded-full px-2.5 py-1 bg-[#f97316] text-white"
+            >{{ selectedCount }} sản phẩm</span
+          >
+        </h1>
+      </div>
+
+      <template v-if="items.length">
+        <!-- MAIN LAYOUT -->
+        <section
+          class="mt-5 grid grid-cols-1 lg:grid-cols-[63%_37%] gap-6 items-start"
+        >
+          <div>
+            <!-- TOOLS ROW -->
+            <div
+              class="flex items-center gap-3 justify-between mb-2.5 text-sm flex-wrap"
+            >
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :checked="allSelected"
+                  @change="toggleAll"
+                />
+                Chọn tất cả ({{ items.length }})
+              </label>
+              <button
+                type="button"
+                class="border-0 bg-transparent text-[#ef4444] text-[13px]"
+                @click="removeSelected"
+              >
+                Xóa đã chọn
+              </button>
+              <div class="text-[#6b7280] text-[13px]">
+                Sắp xếp theo: Mới thêm ▾
+              </div>
+            </div>
+
+            <TransitionGroup name="slide-list" tag="div" class="grid gap-3">
+              <article
+                v-for="item in items"
+                :key="item.id"
+                class="grid gap-3.5 rounded-2xl border border-[#e5e7eb] bg-white p-4 relative"
+                :class="item.checked ? 'border-[#fdba74]' : ''"
+                style="grid-template-columns: 26px 80px 1fr auto 40px"
+              >
+                <!-- Checkbox -->
+                <label class="grid place-items-center">
+                  <input
+                    v-model="item.checked"
+                    type="checkbox"
+                    class="hidden"
+                  />
+                  <span
+                    class="w-[18px] h-[18px] rounded-md border border-[#d1d5db] block"
+                    :class="
+                      item.checked
+                        ? 'bg-[#f97316] border-[#f97316] shadow-[inset_0_0_0_3px_#fff]'
+                        : ''
+                    "
+                  />
+                </label>
+
+                <!-- Thumb -->
+                <div
+                  class="w-20 h-20 rounded-xl relative"
+                  :style="{ background: item.gradient }"
+                ></div>
+
+                <!-- Info -->
+                <div class="item-info">
+                  <h3 class="m-0 text-base hover:text-[#ea580c]">
+                    {{ item.name }}
+                  </h3>
+                  <p class="mt-1 mb-0 text-[#6b7280] text-[12px] uppercase">
+                    {{ item.brand }}
+                  </p>
+                  <p class="mt-1 mb-0 text-[#6b7280] text-[12px] uppercase">
+                    Loại: {{ item.variant }} · Mã: {{ item.sku }}
+                  </p>
+                  <div class="mt-2 flex gap-1.5 flex-wrap">
+                    <span
+                      class="rounded-full text-[11px] px-2 py-0.5 bg-[#f0fdf4] text-[#166534]"
+                      >🌿 Organic</span
+                    >
+                    <span
+                      class="rounded-full text-[11px] px-2 py-0.5 bg-[#eff6ff] text-[#1d4ed8]"
+                      >❄️ Bảo quản lạnh</span
+                    >
+                  </div>
+                  <p
+                    v-if="item.lowStock"
+                    class="mt-2 mb-0 text-[#ef4444] text-[12px]"
+                  >
+                    ⚠️ Chỉ còn {{ item.lowStock }} sản phẩm
+                  </p>
+                  <div class="mt-2.5 flex items-center gap-2.5">
+                    <button
+                      type="button"
+                      :disabled="item.qty <= 1"
+                      @click="changeQty(item.id, -1)"
+                      class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:enabled:bg-[#f97316] hover:enabled:border-[#f97316] hover:enabled:text-white"
+                    >
+                      -
+                    </button>
+                    <strong
+                      class="min-w-[40px] text-center"
+                      :class="{ 'qty-bump': qtyBumpId === item.id }"
+                      >{{ item.qty }}</strong
+                    >
+                    <button
+                      type="button"
+                      @click="changeQty(item.id, 1)"
+                      class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:bg-[#f97316] hover:border-[#f97316] hover:text-white"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Price -->
+                <div class="text-right">
+                  <p
+                    v-if="item.originalPrice"
+                    class="m-0 text-[#6b7280] line-through text-[13px]"
+                  >
+                    {{ format(item.originalPrice) }}đ
+                  </p>
+                  <p
+                    class="mt-1 mb-0 text-[#ea580c] text-[22px] font-extrabold"
+                  >
+                    {{ format(item.price) }}đ
+                  </p>
+                  <small class="text-[#6b7280]"
+                    >= {{ format(item.price * item.qty) }}đ</small
+                  >
+                </div>
+
+                <!-- Remove -->
+                <div class="relative">
+                  <button
+                    type="button"
+                    @click="toggleRemoveAsk(item.id)"
+                    class="w-[30px] h-[30px] border-0 rounded-lg bg-transparent text-[#9ca3af] hover:text-[#ef4444] hover:bg-[#fef2f2]"
+                  >
+                    🗑
+                  </button>
+                  <div
+                    v-if="removeAskId === item.id"
+                    class="absolute right-0 top-[34px] w-[130px] rounded-[10px] border border-[#e5e7eb] bg-white shadow-[0_12px_20px_rgba(15,23,42,0.12)] p-2 z-[5]"
+                  >
+                    <p class="m-0 text-[13px] text-[#6b7280]">Xóa?</p>
+                    <div class="mt-1.5 flex gap-1.5">
+                      <button
+                        type="button"
+                        @click="removeAskId = null"
+                        class="border border-[#d1d5db] rounded-lg bg-white px-2 py-1 text-[12px]"
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        type="button"
+                        @click="removeItem(item.id)"
+                        class="border border-[#ef4444] rounded-lg bg-white px-2 py-1 text-[12px] text-[#ef4444]"
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </TransitionGroup>
+          </div>
+
+          <!-- SUMMARY CARD -->
+          <aside
+            class="lg:sticky lg:top-24 border border-[#e5e7eb] rounded-2xl bg-white p-5 shadow-[0_6px_16px_rgba(15,23,42,0.06)]"
+          >
+            <h3 class="m-0 mb-3">Tóm Tắt Đơn Hàng</h3>
+
+            <div class="flex justify-between my-2 text-[#374151]">
+              <span>Tạm tính:</span><strong>{{ format(subtotal) }}đ</strong>
+            </div>
+            <div class="flex justify-between my-2 text-[#374151]">
+              <span>Phí giao hàng:</span>
+              <strong :class="shippingFee === 0 ? 'text-[#16a34a]' : ''">{{
+                shippingFee === 0 ? "🎉 Miễn phí" : `${format(shippingFee)}đ`
+              }}</strong>
+            </div>
+            <div class="flex justify-between my-2 text-[#374151]">
+              <span>Giảm giá voucher:</span>
+              <strong class="text-[#16a34a]"
+                >-{{ format(voucherDiscount) }}đ</strong
+              >
+            </div>
+            <div
+              class="flex justify-between my-2 text-[#374151] border-t border-[#f3f4f6] pt-2.5 text-[20px] font-black text-[#ea580c]"
+              :class="{ 'total-pulse': totalPulse }"
+            >
+              <span>TỔNG CỘNG:</span><strong>{{ format(grandTotal) }}đ</strong>
+            </div>
+
+            <!-- Free ship bar -->
+            <div class="mt-3">
+              <p class="m-0 text-[13px] text-[#4b5563]">
+                <template v-if="shippingFee > 0"
+                  >Mua thêm
+                  {{ format(Math.max(0, freeShipTarget - subtotal)) }}đ để miễn
+                  phí vận chuyển! 🚚</template
+                >
+                <template v-else>🎉 Bạn được miễn phí vận chuyển!</template>
+              </p>
+              <div
+                class="mt-2 h-1.5 rounded-full bg-[#e5e7eb] overflow-hidden relative"
+              >
+                <span
+                  class="block h-full bg-[#f97316] transition-[width] duration-500"
+                  :style="{ width: `${freeShipPercent}%` }"
+                />
+                <template v-if="shippingFee === 0">
+                  <i
+                    v-for="n in 4"
+                    :key="n"
+                    class="confetti-dot"
+                    :style="{ '--i': `${n}` }"
+                  />
+                </template>
+              </div>
+            </div>
+
+            <!-- Voucher -->
+            <div class="mt-3.5">
+              <label class="text-[13px] font-bold">Mã giảm giá / Voucher</label>
+              <div class="mt-[7px] grid grid-cols-[1fr_auto] gap-2">
+                <input
+                  v-model="voucherInput"
+                  type="text"
+                  placeholder="Nhập mã voucher"
+                  class="border rounded-[10px] p-2.5"
+                  :class="
+                    voucherState === 'ok'
+                      ? 'border-[#16a34a]'
+                      : voucherState === 'error'
+                        ? 'border-[#ef4444] voucher-shake'
+                        : 'border-[#e5e7eb]'
+                  "
+                />
+                <button
+                  type="button"
+                  @click="applyVoucher"
+                  class="border-0 rounded-[10px] bg-[#f97316] text-white px-3 font-bold"
+                >
+                  Áp dụng
+                </button>
+              </div>
+              <small v-if="voucherState === 'ok'" class="text-[#16a34a]"
+                >✓ Giảm 30.000đ</small
+              >
+              <small
+                v-if="voucherState === 'error'"
+                class="mt-1 block text-[#ef4444]"
+                >Mã không hợp lệ</small
+              >
+              <NuxtLink
+                :to="ROUTES.VOUCHERS"
+                class="inline-block mt-1.5 text-[#f97316] text-[13px]"
+                >Xem mã của tôi</NuxtLink
+              >
+            </div>
+
+            <!-- ETA -->
+            <div
+              class="mt-3 border border-[#bbf7d0] bg-[#f0fdf4] text-[#166534] rounded-[10px] p-2.5 text-[13px]"
+            >
+              🚴 Dự kiến giao: Hôm nay 14:00 - 18:00
+            </div>
+
+            <!-- Checkout button -->
+            <button
+              type="button"
+              :disabled="loadingCheckout"
+              @click="checkoutNow"
+              class="w-full mt-3.5 h-[52px] border-0 rounded-xl text-white text-base font-extrabold bg-gradient-to-r from-[#f97316] to-[#ea580c] flex justify-center items-center gap-2 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_12px_22px_rgba(249,115,22,0.32)] active:scale-[0.98]"
+            >
+              <span v-if="loadingCheckout" class="checkout-spin" />
+              Đặt hàng ngay →
+            </button>
+
+            <!-- Trust row -->
+            <div class="mt-2.5 grid gap-1 text-[#6b7280] text-[12px]">
+              <span>🔒 Thanh toán an toàn SSL</span>
+              <span>🔄 Đổi trả dễ dàng 24h</span>
+              <span>🚚 Giao hàng nhanh 2h</span>
+            </div>
+
+            <!-- Pay icons -->
+            <div class="mt-2.5 flex gap-1.5 flex-wrap">
+              <span
+                v-for="p in [
+                  'VISA',
+                  'Master',
+                  'Momo',
+                  'VNPay',
+                  'ZaloPay',
+                  'COD',
+                ]"
+                :key="p"
+                class="border border-[#e5e7eb] rounded-lg px-2 py-[5px] text-[11px] text-[#9ca3af] hover:text-[#374151]"
+                >{{ p }}</span
+              >
+            </div>
+          </aside>
+        </section>
+
+        <!-- SUGGESTIONS -->
+        <section class="mt-6">
+          <h3 class="m-0 mb-2.5">🔥 Thường Được Mua Cùng</h3>
+          <div class="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory">
+            <article
+              v-for="item in suggestItems"
+              :key="item.id"
+              class="min-w-[180px] border border-[#e5e7eb] rounded-xl bg-white p-2.5 snap-start"
+            >
+              <div
+                class="w-full aspect-square rounded-[10px] relative"
+                :style="{ background: item.gradient }"
+              ></div>
+              <h4 class="mt-2 mb-0 min-h-[40px] text-sm">{{ item.name }}</h4>
+              <p class="mt-1.5 mb-0">
+                <strong class="text-[#ea580c]"
+                  >{{ format(item.price) }}đ</strong
+                >
+                <span class="text-[#9ca3af] line-through ml-1 text-[13px]"
+                  >{{ format(item.originalPrice) }}đ</span
+                >
+              </p>
+              <button
+                type="button"
+                @click="quickAdd(item)"
+                class="mt-2 w-[30px] h-[30px] border-0 rounded-full bg-[#f97316] text-white text-lg"
+              >
+                +
+              </button>
+            </article>
+          </div>
+        </section>
+      </template>
+
+      <!-- EMPTY STATE -->
+      <section v-else class="min-h-[60vh] grid place-items-center text-center">
+        <div>
+          <svg viewBox="0 0 120 120" class="w-[120px] cart-sway">
+            <path
+              d="M20 26h18l8 48h44l10-34H40"
+              fill="none"
+              stroke="#F97316"
+              stroke-width="8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle cx="52" cy="90" r="8" fill="#F97316" />
+            <circle cx="84" cy="90" r="8" fill="#F97316" />
+          </svg>
+          <h2 class="m-0">Giỏ hàng trống trơn...</h2>
+          <p class="mt-1.5 mb-0 text-[#6b7280]">
+            Hãy khám phá ngay kho thực phẩm tươi ngon!
+          </p>
+          <NuxtLink
+            :to="ROUTES.HOME"
+            class="inline-block mt-2.5 rounded-full bg-[#f97316] text-white px-[18px] py-2.5 font-bold"
+            >🛒 Mua sắm ngay</NuxtLink
+          >
+        </div>
+      </section>
+    </div>
+
+    <!-- MOBILE FLOAT -->
+    <Transition name="float-bar">
+      <div
+        v-if="showMobileFloat && items.length"
+        class="fixed left-0 right-0 bottom-0 z-[35] bg-white border-t border-[#e5e7eb] shadow-[0_-8px_22px_rgba(15,23,42,0.12)] px-4 py-3 hidden max-[768px]:flex justify-between items-center"
+      >
+        <div>
+          <strong
+            >{{ selectedCount }} sản phẩm · {{ format(grandTotal) }}đ</strong
+          >
+        </div>
+        <button
+          type="button"
+          @click="checkoutNow"
+          class="border-0 rounded-full bg-[#f97316] text-white font-bold px-[18px] py-2.5"
+        >
+          Đặt hàng
+        </button>
+      </div>
+    </Transition>
+
+    <!-- TOAST -->
+    <Transition name="toast">
+      <div
+        v-if="toastText"
+        class="fixed right-5 bottom-[90px] z-[45] rounded-[10px] bg-[#111827] text-white px-3.5 py-2.5"
+      >
+        {{ toastText }}
+      </div>
+    </Transition>
+  </div>
 </template>
 
 <script setup lang="ts">
-
-
-import { ref, onMounted } from "vue";
-import Cart from "~/components/pages/commerce/Cart.vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
+import { ROUTES } from "~/constants/routes";
 import SkCartPage from "~/components/skeletons/SkCartPage.vue";
 
 useHead({
-  title: 'Giỏ hàng - SmartFood',
-  meta: [
-    { name: 'description', content: 'Trang Giỏ hàng của SmartFood' }
-  ]
+  title: "Giỏ hàng - SmartFood",
+  meta: [{ name: "description", content: "Trang Giỏ hàng của SmartFood" }],
 });
 
+const isLoading = ref(false);
 
-const isLoading = ref(true);
+type CartRow = {
+  id: number;
+  checked: boolean;
+  name: string;
+  brand: string;
+  variant: string;
+  sku: string;
+  qty: number;
+  price: number;
+  originalPrice?: number;
+  gradient: string;
+  sale?: boolean;
+  lowStock?: number;
+};
 
-onMounted(() => {
+const items = ref<CartRow[]>([
+  {
+    id: 1,
+    checked: true,
+    name: "Cà chua bi hữu cơ Đà Lạt",
+    brand: "SMARTFARM",
+    variant: "500g",
+    sku: "SKU001",
+    qty: 2,
+    price: 45000,
+    originalPrice: 52000,
+    gradient: "linear-gradient(135deg,#fee2e2,#fecaca)",
+    sale: true,
+    lowStock: 3,
+  },
+  {
+    id: 2,
+    checked: true,
+    name: "Rau cải bó xôi baby",
+    brand: "GREEN LIFE",
+    variant: "300g",
+    sku: "SKU002",
+    qty: 1,
+    price: 39000,
+    gradient: "linear-gradient(135deg,#dcfce7,#bbf7d0)",
+  },
+  {
+    id: 3,
+    checked: true,
+    name: "Ức gà tươi fillet",
+    brand: "FRESH 365",
+    variant: "500g",
+    sku: "SKU003",
+    qty: 1,
+    price: 89000,
+    originalPrice: 99000,
+    gradient: "linear-gradient(135deg,#fef3c7,#fde68a)",
+    sale: true,
+  },
+  {
+    id: 4,
+    checked: false,
+    name: "Táo Fuji nhập khẩu",
+    brand: "KING FRUIT",
+    variant: "1kg",
+    sku: "SKU004",
+    qty: 1,
+    price: 125000,
+    gradient: "linear-gradient(135deg,#fee2e2,#ffedd5)",
+  },
+  {
+    id: 5,
+    checked: false,
+    name: "Sữa chua Hy Lạp không đường",
+    brand: "DAIRY PRO",
+    variant: "4 hũ",
+    sku: "SKU005",
+    qty: 2,
+    price: 58000,
+    gradient: "linear-gradient(135deg,#dbeafe,#bfdbfe)",
+  },
+]);
+
+const suggestItems = [
+  {
+    id: 11,
+    name: "Xà lách lolo",
+    price: 28000,
+    originalPrice: 35000,
+    gradient: "linear-gradient(135deg,#dcfce7,#bbf7d0)",
+    sale: true,
+  },
+  {
+    id: 12,
+    name: "Cam vàng Mỹ",
+    price: 118000,
+    originalPrice: 145000,
+    gradient: "linear-gradient(135deg,#fef3c7,#fcd34d)",
+    sale: true,
+  },
+  {
+    id: 13,
+    name: "Cá hồi phi lê",
+    price: 179000,
+    originalPrice: 199000,
+    gradient: "linear-gradient(135deg,#fee2e2,#fecaca)",
+    sale: true,
+  },
+  {
+    id: 14,
+    name: "Bơ booth",
+    price: 69000,
+    originalPrice: 79000,
+    gradient: "linear-gradient(135deg,#d9f99d,#bef264)",
+    sale: false,
+  },
+  {
+    id: 15,
+    name: "Nấm đùi gà",
+    price: 39000,
+    originalPrice: 45000,
+    gradient: "linear-gradient(135deg,#f3f4f6,#e5e7eb)",
+    sale: true,
+  },
+  {
+    id: 16,
+    name: "Sữa hạnh nhân",
+    price: 52000,
+    originalPrice: 62000,
+    gradient: "linear-gradient(135deg,#ede9fe,#ddd6fe)",
+    sale: true,
+  },
+];
+
+const voucherInput = ref("");
+const voucherState = ref<"idle" | "ok" | "error">("idle");
+const removeAskId = ref<number | null>(null);
+const qtyBumpId = ref<number | null>(null);
+const loadingCheckout = ref(false);
+const toastText = ref("");
+const totalPulse = ref(false);
+const showMobileFloat = ref(false);
+const freeShipTarget = 150000;
+
+const selectedItems = computed(() => items.value.filter((i) => i.checked));
+const selectedCount = computed(() =>
+  selectedItems.value.reduce((s, i) => s + i.qty, 0),
+);
+const allSelected = computed(
+  () => items.value.length > 0 && items.value.every((i) => i.checked),
+);
+const subtotal = computed(() =>
+  selectedItems.value.reduce((s, i) => s + i.price * i.qty, 0),
+);
+const shippingFee = computed(() =>
+  subtotal.value >= freeShipTarget ? 0 : 25000,
+);
+const voucherDiscount = computed(() =>
+  voucherState.value === "ok" ? 30000 : 0,
+);
+const grandTotal = computed(() =>
+  Math.max(0, subtotal.value + shippingFee.value - voucherDiscount.value),
+);
+const freeShipPercent = computed(() =>
+  Math.min(100, Math.round((subtotal.value / freeShipTarget) * 100)),
+);
+const format = (n: number) => n.toLocaleString("vi-VN");
+
+const showToast = (text: string) => {
+  toastText.value = text;
   setTimeout(() => {
-    isLoading.value = false;
-  }, 700);
+    toastText.value = "";
+  }, 1400);
+};
+const toggleAll = (e: Event) => {
+  const t = e.target as HTMLInputElement;
+  items.value = items.value.map((i) => ({ ...i, checked: t.checked }));
+};
+const removeSelected = () => {
+  items.value = items.value.filter((i) => !i.checked);
+  showToast("Đã xóa các sản phẩm đã chọn");
+};
+const toggleRemoveAsk = (id: number) => {
+  removeAskId.value = removeAskId.value === id ? null : id;
+};
+const removeItem = (id: number) => {
+  items.value = items.value.filter((i) => i.id !== id);
+  removeAskId.value = null;
+  showToast("Đã xóa sản phẩm khỏi giỏ");
+};
+const changeQty = (id: number, delta: number) => {
+  const item = items.value.find((it) => it.id === id);
+  if (!item) return;
+  const next = item.qty + delta;
+  if (next < 1) return;
+  item.qty = next;
+  qtyBumpId.value = id;
+  setTimeout(() => {
+    qtyBumpId.value = null;
+  }, 250);
+};
+const applyVoucher = () => {
+  const code = voucherInput.value.trim().toUpperCase();
+  voucherState.value = ["SMART30", "SALE30"].includes(code) ? "ok" : "error";
+};
+const router = useRouter();
+const checkoutNow = () => {
+  loadingCheckout.value = true;
+  setTimeout(() => {
+    loadingCheckout.value = false;
+    router.push(ROUTES.ORDER.CHECKOUT);
+  }, 1000);
+};
+const quickAdd = (item: (typeof suggestItems)[number]) => {
+  items.value.push({
+    id: Date.now(),
+    checked: true,
+    name: item.name,
+    brand: "SMARTFOOD",
+    variant: "500g",
+    sku: "SKU-ADD",
+    qty: 1,
+    price: item.price,
+    originalPrice: item.originalPrice,
+    gradient: item.gradient,
+    sale: item.sale,
+  });
+  showToast(`Đã thêm ${item.name}`);
+};
+const onScroll = () => {
+  showMobileFloat.value = window.scrollY > 260;
+};
+watch(grandTotal, () => {
+  totalPulse.value = true;
+  setTimeout(() => {
+    totalPulse.value = false;
+  }, 320);
+});
+onMounted(() => {
+  window.addEventListener("scroll", onScroll, { passive: true });
+});
+onUnmounted(() => {
+  window.removeEventListener("scroll", onScroll);
 });
 </script>
+
+<style scoped>
+/* Animations */
+.head-mount {
+  opacity: 0;
+  transform: translateY(-8px);
+  animation: headIn 0.4s ease forwards;
+}
+@keyframes headIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.qty-bump {
+  animation: qtyPop 0.3s ease;
+}
+@keyframes qtyPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.total-pulse {
+  animation: totalPulse 0.3s ease;
+}
+@keyframes totalPulse {
+  50% {
+    transform: scale(1.03);
+    color: #f97316;
+  }
+}
+
+.voucher-shake {
+  animation: shake 0.25s ease;
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
+.confetti-dot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  top: -3px;
+  left: calc(var(--i) * 22%);
+  background: #22c55e;
+  animation: confetti 0.6s ease-out infinite;
+}
+@keyframes confetti {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+}
+
+.cart-sway {
+  animation: sway 3s infinite ease-in-out;
+}
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.checkout-spin {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* List transitions */
+.slide-list-enter-active,
+.slide-list-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-list-enter-from,
+.slide-list-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+/* Float bar & toast transitions */
+.float-bar-enter-active,
+.float-bar-leave-active,
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.2s ease;
+}
+.float-bar-enter-from,
+.float-bar-leave-to,
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* Mobile cart item layout */
+@media (max-width: 768px) {
+  article.cart-item-mobile {
+    grid-template-columns: 24px 64px 1fr !important;
+    padding: 12px !important;
+  }
+}
+</style>

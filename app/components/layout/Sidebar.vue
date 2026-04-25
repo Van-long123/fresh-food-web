@@ -5,22 +5,23 @@
     <ul>
       <li v-for="(item, index) in categories" :key="index">
         <NuxtLink
-          :to="item.link"
+          :to="ROUTES.CATEGORY(item.slug)"
           class="flex items-center py-2.5 px-3 hover:bg-gray-50 group cursor-pointer border-b border-transparent hover:border-gray-50 transition-colors"
         >
           <div
             class="w-8 h-8 rounded-full overflow-hidden border border-gray-100 mr-3 flex-shrink-0 bg-white flex items-center justify-center p-0.5 group-hover:shadow-sm"
           >
             <img
-              :src="item.icon"
-              :alt="item.name"
+              v-if="item.thumbnail"
+              :src="item.thumbnail"
+              :alt="item.title"
               class="w-full h-full object-contain rounded-full"
             />
           </div>
           <span
             class="text-[13px] text-gray-700 font-medium leading-snug flex-1 group-hover:text-[#f47f20]"
           >
-            {{ item.name }}
+            {{ item.title }}
           </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -42,97 +43,17 @@
   </aside>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
 import { ROUTES } from "~/constants/routes";
+import type { SidebarCategory } from "~/types/home.type";
 
-const categories = ref([
-  {
-    name: "Khuyến mãi HOT",
-    link: ROUTES.CATEGORY("khuyen-mai-hot"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3594/3594165.png",
-  },
-  {
-    name: "Thế giới trái cây",
-    link: ROUTES.CATEGORY("the-gioi-trai-cay"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3137/3137286.png",
-  },
-  {
-    name: "Rau củ quả",
-    link: ROUTES.CATEGORY("rau-cu-qua"),
-    icon: "https://cdn-icons-png.flaticon.com/512/2153/2153788.png",
-  },
-  {
-    name: "Thịt, cá, trứng, thủy, hải sản",
-    link: ROUTES.CATEGORY("thit-ca-trung-thuy-hai-san"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3143/3143645.png",
-  },
-  {
-    name: "Kem, sữa chua",
-    link: ROUTES.CATEGORY("kem-sua-chua"),
-    icon: "https://cdn-icons-png.flaticon.com/512/2619/2619472.png",
-  },
-  {
-    name: "Sữa, bơ, phô mai",
-    link: ROUTES.CATEGORY("sua-bo-pho-mai"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3014/3014526.png",
-  },
-  {
-    name: "Mì gói, xúc xích, đồ hộp",
-    link: ROUTES.CATEGORY("mi-goi-xuc-xich-do-hop"),
-    icon: "https://cdn-icons-png.flaticon.com/512/2857/2857448.png",
-  },
-  {
-    name: "Thực phẩm đông mát",
-    link: ROUTES.CATEGORY("thuc-pham-dong-mat"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3081/3081977.png",
-  },
-  {
-    name: "Bánh kẹo, ăn vặt",
-    link: ROUTES.CATEGORY("banh-keo-an-vat"),
-    icon: "https://cdn-icons-png.flaticon.com/512/2553/2553642.png",
-  },
-  {
-    name: "Bánh tươi, ngũ cốc, ăn sáng",
-    link: ROUTES.CATEGORY("banh-tuoi-ngu-coc-an-sang"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3014/3014526.png",
-  },
-  {
-    name: "Thẻ quà tặng",
-    link: ROUTES.CATEGORY("the-qua-tang"),
-    icon: "https://cdn-icons-png.flaticon.com/512/2953/2953283.png",
-  },
-  {
-    name: "Gạo, đậu, bột, đồ khô",
-    link: ROUTES.CATEGORY("gao-dau-bot-do-kho"),
-    icon: "https://cdn-icons-png.flaticon.com/512/2857/2857448.png",
-  },
-  {
-    name: "Dầu ăn, nước chấm, gia vị",
-    link: ROUTES.CATEGORY("dau-an-nuoc-cham-gia-vi"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3081/3081977.png",
-  },
-  {
-    name: "Bia, rượu, đồ uống có cồn",
-    link: ROUTES.CATEGORY("bia-ruou-do-uong-co-con"),
-    icon: "https://cdn-icons-png.flaticon.com/512/3050/3050114.png",
-  },
-  {
-    name: "Trà, cà phê, nước giải khát",
-    link: ROUTES.CATEGORY("tra-ca-phe-nuoc-giai-khat"),
-    icon: "https://cdn-icons-png.flaticon.com/512/1036/1036034.png",
-  },
-  {
-    name: "Đồ dùng gia đình",
-    link: ROUTES.CATEGORY("do-dung-gia-dinh"),
-    icon: "https://cdn-icons-png.flaticon.com/512/1036/1036034.png",
-  },
-  {
-    name: "Chăm sóc cá nhân",
-    link: ROUTES.CATEGORY("cham-soc-ca-nhan"),
-    icon: "https://cdn-icons-png.flaticon.com/512/2953/2953283.png",
-  },
-]);
+interface Props {
+  categories?: SidebarCategory[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  categories: () => [],
+});
 </script>
 
 <style scoped>
