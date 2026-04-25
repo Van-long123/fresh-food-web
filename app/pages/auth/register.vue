@@ -628,7 +628,7 @@
 
 <script setup lang="ts">
 import { ROUTES } from "~/constants/routes";
-import { useRegisterForm } from "~/composables/useRegisterForm";
+import { useRegisterForm } from "~/composables/auth/useRegisterForm";
 
 useHead({
   title: "Đăng ký - SmartFood",

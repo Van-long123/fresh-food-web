@@ -640,7 +640,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
-import { useCart } from "~/composables/useCart";
+import { useCart } from "~/composables/cart/useCart";
 import { useAuthStore } from "~/stores/useAuthStore";
 
 const router = useRouter();

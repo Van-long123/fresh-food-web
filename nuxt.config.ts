@@ -13,6 +13,10 @@ import Aura from '@primevue/themes/aura';
       'pinia-plugin-persistedstate/nuxt',
     ],
 
+    imports: {
+      dirs: ['composables/**', 'composables']
+    },
+
     // Tắt path prefix — components/common/AppLoading.vue → <AppLoading>, không phải <CommonAppLoading>
     components: [
       { path: '~/components', pathPrefix: false }

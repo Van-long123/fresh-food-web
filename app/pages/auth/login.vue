@@ -361,7 +361,7 @@
 
 <script setup lang="ts">
 import { ROUTES } from "~/constants/routes";
-import { useLoginForm } from "~/composables/useLoginForm";
+import { useLoginForm } from "~/composables/auth/useLoginForm";
 
 useHead({
   title: "Đăng nhập - SmartFood",

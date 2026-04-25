@@ -279,7 +279,7 @@ import BlogSection from "~/components/features/home/BlogSection.vue";
 import BackToTop from "~/components/features/home/BackToTop.vue";
 import SkHomePage from "~/components/skeletons/SkHomePage.vue";
 import { ROUTES } from "~/constants/routes";
-import { useHomePage } from "~/composables/useHomePage";
+import { useHomePage } from "~/composables/home/useHomePage";
 
 useHead({
   title: "SmartFood - Nguon Thuc Pham Sach",

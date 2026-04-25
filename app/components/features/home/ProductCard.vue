@@ -105,7 +105,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useCart } from "~/composables/useCart";
+import { useCart } from "~/composables/cart/useCart";
 import type { HomeProduct } from "~/types/home.type";
 
 interface ProductCardModel extends HomeProduct {

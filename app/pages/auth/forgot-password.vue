@@ -380,7 +380,7 @@
 import { onBeforeUnmount } from "vue";
 import { ROUTES } from "~/constants/routes";
 import { useToast } from "primevue/usetoast";
-import { useForgotPassword } from "~/composables/useForgotPassword";
+import { useForgotPassword } from "~/composables/auth/useForgotPassword";
 
 useHead({
   title: "Quên mật khẩu - SmartFood",
