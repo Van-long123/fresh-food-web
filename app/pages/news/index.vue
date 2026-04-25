@@ -1,7 +1,7 @@
 <template>
   <div>
     <SkNewsListPage v-if="isLoading" />
-    <div else>
+    <div v-else>
       <div class="min-h-screen bg-slate-50 text-slate-800">
         <section
           class="relative overflow-hidden bg-linear-to-br from-emerald-600 via-teal-600 to-cyan-600 px-4 pb-12 pt-16 text-white"
@@ -31,7 +31,7 @@
             >
               <i class="pi pi-search text-sm text-emerald-100" />
               <input
-                v-model="keyword"
+                v-model="searchInput"
                 type="text"
                 placeholder="Tìm kiếm chủ đề, nguyên liệu hoặc tiêu đề bài viết..."
                 class="w-full bg-transparent text-sm text-white placeholder:text-emerald-100 focus:outline-none"
@@ -84,7 +84,7 @@
           class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_320px]"
         >
           <div class="space-y-10">
-            <section v-if="activeCategory === 'Tất cả'">
+            <section v-if="activeCategory === 'Tất cả' && !keyword">
               <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-2xl font-black text-slate-900">
                   Bài Viết Nổi Bật
@@ -192,11 +192,10 @@
                 class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
               >
                 <NuxtLink
-                  v-for="(article, index) in pagedArticles"
+                  v-for="article in pagedArticles"
                   :key="article.id"
                   :to="ROUTES.NEWS_DETAIL(article.slug)"
                   class="news-card group overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
-                  :data-index="index + (currentPage - 1) * pageSize"
                 >
                   <img
                     :src="article.cover"
@@ -389,6 +388,7 @@ useHead({
 
 const {
   keyword,
+  searchInput,
   sortBy,
   activeCategory,
   currentPage,
