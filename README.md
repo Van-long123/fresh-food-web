@@ -258,9 +258,6 @@ food-ecommerce/
 | Hạng mục      | Minh họa                                                 |
 | ------------- | -------------------------------------------------------- |
 | Logo chính    | ![Logo](app/assets/images/logo.png)                      |
-| Logo phụ      | ![Logo 2](app/assets/images/logo2.png)                   |
-| Hero banner 1 | ![Hero 1](app/assets/images/hero-banner/WPVzLAblob.webp) |
-| Hero banner 2 | ![Hero 2](app/assets/images/hero-banner/FWFWMQblob.webp) |
 | Chứng nhận    | ![BCT](app/assets/images/BCT.jpg)                        |
 
 ### 2) Video demo giao diện
