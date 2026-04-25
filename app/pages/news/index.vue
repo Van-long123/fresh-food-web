@@ -84,14 +84,14 @@
           class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_320px]"
         >
           <div class="space-y-10">
-            <section>
+            <section v-if="activeCategory === 'Tất cả'">
               <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-2xl font-black text-slate-900">
                   Bài Viết Nổi Bật
                 </h2>
                 <span
                   class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
-                  >Biên Tập Viên Chọn</span
+                  >Được Chọn Lọc</span
                 >
               </div>
 
@@ -165,9 +165,9 @@
                 <h2 class="text-2xl font-black text-slate-900">
                   Bài Viết Mới Nhất
                 </h2>
-                <span class="text-sm font-semibold text-slate-500"
-                  >{{ filteredArticles.length }} bài viết</span
-                >
+                <span class="text-sm font-semibold text-slate-500">
+                  {{ filteredArticles.length }} bài viết
+                </span>
               </div>
 
               <div
@@ -241,36 +241,39 @@
               </div>
 
               <div
-                v-if="!loading && totalPages > 1"
-                class="mt-6 flex flex-wrap items-center justify-center gap-2"
+                v-if="!loading && pagedArticles.length === 0"
+                class="flex flex-col items-center justify-center py-20 text-center"
               >
-                <Button
-                  label="Trước"
-                  severity="secondary"
-                  outlined
-                  :disabled="currentPage === 1"
-                  @click="currentPage -= 1"
-                />
-
-                <Button
-                  v-for="page in pageButtons"
-                  :key="String(page)"
-                  :label="String(page)"
-                  :severity="page === currentPage ? 'success' : 'secondary'"
-                  :outlined="page !== currentPage"
-                  :disabled="page === '...'"
-                  class="min-w-10!"
-                  @click="typeof page === 'number' && (currentPage = page)"
-                />
-
-                <Button
-                  label="Sau"
-                  severity="secondary"
-                  outlined
-                  :disabled="currentPage === totalPages"
-                  @click="currentPage += 1"
-                />
+                <div
+                  class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 text-slate-300"
+                >
+                  <i class="pi pi-inbox text-4xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900">
+                  Chưa có bài viết nào
+                </h3>
+                <p class="mt-1 text-sm text-slate-500">
+                  Rất tiếc, chưa có bài viết nào trong mục
+                  <span class="font-bold text-emerald-600">{{
+                    activeCategory
+                  }}</span
+                  >.
+                </p>
+                <button
+                  v-if="activeCategory !== 'Tất cả'"
+                  class="mt-6 text-sm font-bold text-emerald-600 hover:underline"
+                  @click="activeCategory = 'Tất cả'"
+                >
+                  Xem tất cả bài viết
+                </button>
               </div>
+
+              <BasePagination
+                v-if="!loading && totalPages > 1"
+                v-model="currentPage"
+                :total="filteredArticles.length"
+                :per-page="pageSize"
+              />
             </section>
           </div>
 
@@ -298,7 +301,7 @@
               </div>
             </section>
 
-            <section
+            <!-- <section
               class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
             >
               <h3 class="text-base font-black text-slate-900">
@@ -324,7 +327,7 @@
                   }}</span>
                 </div>
               </div>
-            </section>
+            </section> -->
 
             <section
               class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
@@ -337,21 +340,27 @@
               </p>
               <div class="mt-4 grid grid-cols-3 gap-2 text-center">
                 <div class="rounded-xl bg-emerald-50 px-2 py-3">
-                  <p class="text-lg font-black text-emerald-600">120+</p>
+                  <p class="text-lg font-black text-emerald-600">
+                    {{ articlesData?.pagination.total || 0 }}+
+                  </p>
                   <p class="text-[11px] font-semibold text-slate-500">
                     Bài viết
                   </p>
                 </div>
                 <div class="rounded-xl bg-emerald-50 px-2 py-3">
-                  <p class="text-lg font-black text-emerald-600">8</p>
+                  <p class="text-lg font-black text-emerald-600">
+                    {{ articlesData?.stats.totalAuthors || 0 }}
+                  </p>
                   <p class="text-[11px] font-semibold text-slate-500">
-                    Chuyên gia
+                    Tác giả
                   </p>
                 </div>
                 <div class="rounded-xl bg-emerald-50 px-2 py-3">
-                  <p class="text-lg font-black text-emerald-600">4k+</p>
+                  <p class="text-lg font-black text-emerald-600">
+                    {{ formatCount(articlesData?.stats.totalViews) }}
+                  </p>
                   <p class="text-[11px] font-semibold text-slate-500">
-                    Độc giả
+                    Lượt đọc
                   </p>
                 </div>
               </div>
@@ -367,6 +376,9 @@
 import SkNewsListPage from "~/components/skeletons/SkNewsListPage.vue";
 import { ROUTES } from "~/constants/routes";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import BasePagination from "~/components/common/BasePagination.vue";
+import { useArticleListQuery } from "~/queries/article/useArticleListQuery";
+import { useArticleCategoriesQuery } from "~/queries/article/useArticleCategoriesQuery";
 
 useHead({
   title: "Tin tức & Khuyến mãi - SmartFood",
@@ -378,203 +390,131 @@ useHead({
   ],
 });
 
-const isLoading = ref(false);
-
-type Article = {
-  id: number;
-  slug: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  author: string;
-  authorInitial: string;
-  date: string;
-  readTime: number;
-  cover: string;
-  views: number;
-};
-
 const keyword = ref("");
 const sortBy = ref<"latest" | "popular" | "readTime">("latest");
 const activeCategory = ref("Tất cả");
-const loading = ref(true);
 const currentPage = ref(1);
 const pageSize = 6;
 
-const articles = ref<Article[]>([
-  {
-    id: 1,
-    slug: "immune-foods-everyday",
-    title: "5 Thực Phẩm Tự Nhiên Tăng Cường Miễn Dịch",
-    excerpt:
-      "Khám phá các nguyên liệu hỗ trợ hệ miễn dịch, tiêu hóa và cân bằng năng lượng hàng ngày.",
-    category: "Dinh dưỡng",
-    author: "Lena Nguyen",
-    authorInitial: "L",
-    date: "03 Th04, 2026",
-    readTime: 6,
-    cover:
-      "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
-    views: 2180,
-  },
-  {
-    id: 2,
-    slug: "smart-grocery-budget",
-    title: "Cách Cắt Giảm Chi Phí Mua Sắm Không Ảnh Hưởng Dinh Dưỡng",
-    excerpt:
-      "Nguyên tắc mua sắm thông minh, tránh lãng phí và giữ được chi phí hợp lý.",
-    category: "Mẹo mua sắm",
-    author: "Mina Tran",
-    authorInitial: "M",
-    date: "02 Th04, 2026",
-    readTime: 5,
-    cover:
-      "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80",
-    views: 1850,
-  },
-  {
-    id: 3,
-    slug: "quick-healthy-lunches",
-    title: "7 Ý Tưởng Bữa Trưa Nhanh Chóng Cho Ngày Bận Rộn",
-    excerpt:
-      "Bữa ăn sáng tạo chỉ tốn chưa đầy 20 phút mà vẫn đảm bảo độ tươi ngon.",
-    category: "Công thức",
-    author: "Quynh Le",
-    authorInitial: "Q",
-    date: "01 Th04, 2026",
-    readTime: 4,
-    cover:
-      "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=80",
-    views: 1390,
-  },
-  {
-    id: 4,
-    slug: "fiber-and-gut-health",
-    title: "Tại Sao Chất Xơ Là Thiết Yếu Cho Tiêu Hóa Khỏe Mạnh",
-    excerpt:
-      "Tìm hiểu cách thực phẩm giàu chất xơ hỗ trợ hệ vi sinh đường ruột và cải thiện độ no.",
-    category: "Dinh dưỡng",
-    author: "Lena Nguyen",
-    authorInitial: "L",
-    date: "30 Th03, 2026",
-    readTime: 7,
-    cover:
-      "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?auto=format&fit=crop&w=1200&q=80",
-    views: 1675,
-  },
-  {
-    id: 5,
-    slug: "meal-prep-for-families",
-    title: "Chuẩn Bị Bữa Ăn Cho Gia Đình: Hệ Thống Đơn Giản Hàng Tuần",
-    excerpt: "Lập thói quen chuẩn bị nhanh chóng cho các bữa tối tuyệt đỉnh.",
-    category: "Lối sống",
-    author: "Hao Vo",
-    authorInitial: "H",
-    date: "29 Th03, 2026",
-    readTime: 8,
-    cover:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
-    views: 1240,
-  },
-  {
-    id: 6,
-    slug: "seasonal-fruits-guide",
-    title: "Hướng Dẫn Trái Cây Theo Mùa: Nên Mua Gì Tháng Nay",
-    excerpt:
-      "Sử dụng bảng theo mùa này để mua trái cây đúng mùa, tươi ngon và nhiều hương vị hơn.",
-    category: "Mẹo mua sắm",
-    author: "Mina Tran",
-    authorInitial: "M",
-    date: "28 Th03, 2026",
-    readTime: 5,
-    cover:
-      "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=1200&q=80",
-    views: 990,
-  },
-]);
+const { data: categoriesData } = useArticleCategoriesQuery();
 
 const categories = computed(() => [
   "Tất cả",
-  ...new Set(articles.value.map((item) => item.category)),
+  ...(categoriesData.value?.data.map((c) => c.title) || []),
 ]);
 
-const filteredArticles = computed(() => {
-  const query = keyword.value.trim().toLowerCase();
-  const byCategory = articles.value.filter((article) =>
-    activeCategory.value === "Tất cả"
-      ? true
-      : article.category === activeCategory.value,
-  );
-
-  const byKeyword = byCategory.filter((article) => {
-    if (!query) return true;
-    return (
-      article.title.toLowerCase().includes(query) ||
-      article.excerpt.toLowerCase().includes(query) ||
-      article.category.toLowerCase().includes(query)
-    );
-  });
-
-  if (sortBy.value === "popular") {
-    return [...byKeyword].sort((a, b) => b.views - a.views);
-  }
-  if (sortBy.value === "readTime") {
-    return [...byKeyword].sort((a, b) => a.readTime - b.readTime);
-  }
-  return [...byKeyword].sort((a, b) => b.id - a.id);
+const activeCategoryId = computed(() => {
+  if (activeCategory.value === "Tất cả") return undefined;
+  return categoriesData.value?.data.find(
+    (c) => c.title === activeCategory.value,
+  )?._id;
 });
 
-const featured = computed(() => filteredArticles.value.slice(0, 3));
-const totalPages = computed(() =>
-  Math.max(1, Math.ceil(filteredArticles.value.length / pageSize)),
+const listParams = computed(() => {
+  return {
+    page: 1,
+    limit: 1000,
+    keyword: keyword.value,
+    sortField:
+      sortBy.value === "popular"
+        ? "views"
+        : sortBy.value === "readTime"
+          ? "readTime"
+          : "publishedAt",
+    sortOrder: "desc",
+  };
+});
+
+const featuredParams = computed(() => {
+  return {
+    page: 1,
+    limit: 3,
+    featured: true,
+  };
+});
+
+const popularParams = computed(() => {
+  return {
+    page: 1,
+    limit: 5,
+    sortField: "views",
+    sortOrder: "desc" as const,
+  };
+});
+
+const { data: articlesData, isPending: loadingArticles } = useArticleListQuery(
+  () => listParams.value,
 );
+const { data: featuredData, isPending: loadingFeatured } = useArticleListQuery(
+  () => featuredParams.value,
+);
+const { data: popularData } = useArticleListQuery(() => popularParams.value);
+
+const isLoading = computed(
+  () => loadingArticles.value && loadingFeatured.value,
+);
+const loading = computed(() => loadingArticles.value);
+
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const mapArticle = (a: any) => ({
+  id: a._id,
+  slug: a.slug,
+  title: a.title,
+  excerpt: a.shortDescription || "",
+  category:
+    categoriesData.value?.data.find((c: any) => c._id === a.article_category_id)
+      ?.title || "Chưa phân loại",
+  author: a.authorName || "Ẩn danh",
+  authorInitial: a.authorName ? a.authorName.charAt(0).toUpperCase() : "A",
+  date: formatDate(a.publishedAt),
+  readTime: a.readTime || 0,
+  cover: a.thumbnail || "",
+  views: a.views || 0,
+});
+
+const allArticles = computed(() => articlesData.value?.data || []);
+
+const allMappedArticles = computed(() =>
+  allArticles.value.map((a: any) => mapArticle(a)),
+);
+
+const filteredArticles = computed(() => {
+  if (activeCategory.value === "Tất cả") return allMappedArticles.value;
+  return allMappedArticles.value.filter(
+    (a: any) => a.category === activeCategory.value,
+  );
+});
 
 const pagedArticles = computed(() => {
   const start = (currentPage.value - 1) * pageSize;
   return filteredArticles.value.slice(start, start + pageSize);
 });
 
-const pageButtons = computed<(number | "...")[]>(() => {
-  if (totalPages.value <= 6) {
-    return Array.from({ length: totalPages.value }, (_, idx) => idx + 1);
-  }
-
-  if (currentPage.value <= 3) {
-    return [1, 2, 3, "...", totalPages.value - 1, totalPages.value];
-  }
-
-  if (currentPage.value >= totalPages.value - 2) {
-    return [
-      1,
-      2,
-      "...",
-      totalPages.value - 2,
-      totalPages.value - 1,
-      totalPages.value,
-    ];
-  }
-
-  return [
-    1,
-    "...",
-    currentPage.value - 1,
-    currentPage.value,
-    currentPage.value + 1,
-    "...",
-    totalPages.value,
-  ];
-});
-const popularPosts = computed(() =>
-  [...articles.value].sort((a, b) => b.views - a.views).slice(0, 5),
+const featured = computed(() =>
+  (featuredData.value?.data || []).map(mapArticle),
 );
-const hotTags = [
-  "an-sach",
-  "giau-protein",
-  "chuan-bi-bua-an",
-  "theo-mua",
-  "suc-khoe-tieu-hoa",
-  "mua-sam-thong-minh",
-];
+const popularPosts = computed(() =>
+  (popularData.value?.data || []).map(mapArticle),
+);
+
+const totalPages = computed(
+  () => Math.ceil(filteredArticles.value.length / pageSize) || 1,
+);
+
+const formatCount = (num: number | undefined) => {
+  if (num === undefined) return "0";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "k+";
+  return num.toString();
+};
 
 let observer: IntersectionObserver | null = null;
 
@@ -590,7 +530,8 @@ const bindCardObserver = async () => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const index = Number((entry.target as HTMLElement).dataset.index || 0);
-        (entry.target as HTMLElement).style.animationDelay = `${index * 90}ms`;
+        (entry.target as HTMLElement).style.animationDelay =
+          `${(index % pageSize) * 90}ms`;
         entry.target.classList.add("in-view");
       });
     },
@@ -600,13 +541,6 @@ const bindCardObserver = async () => {
   cards.forEach((card) => observer?.observe(card));
 };
 
-onMounted(() => {
-  setTimeout(() => {
-    loading.value = false;
-    bindCardObserver();
-  }, 700);
-});
-
 watch([keyword, activeCategory, sortBy], () => {
   currentPage.value = 1;
 });
@@ -614,6 +548,12 @@ watch([keyword, activeCategory, sortBy], () => {
 watch([pagedArticles, loading], () => {
   if (loading.value) return;
   bindCardObserver();
+});
+
+onMounted(() => {
+  if (!loading.value) {
+    bindCardObserver();
+  }
 });
 
 onUnmounted(() => {

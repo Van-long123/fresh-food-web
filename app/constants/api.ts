@@ -13,5 +13,13 @@ export const API_ENDPOINTS = {
     AGGREGATE: '/v1/client/home/aggregate',
     // CATEGORY_PRODUCTS: '/v1/client/home/category-products',
     // BLOGS: '/v1/client/home/blogs'
+  },
+  ARTICLE: {
+    LIST: '/v1/client/articles',
+    DETAIL: (slug: string) => `/v1/client/articles/${slug}`
+  },
+  CATEGORY: {
+    LIST: '/v1/client/categories',
+    DETAIL: (slug: string) => `/v1/client/categories/${slug}`
   }
 } as const
