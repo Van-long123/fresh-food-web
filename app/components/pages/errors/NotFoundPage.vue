@@ -57,8 +57,18 @@
             />
             <circle cx="224" cy="212" r="20" fill="#f97316" />
             <circle cx="340" cy="212" r="20" fill="#f97316" />
-            <circle cx="224" cy="212" r="8" fill="#fff" opacity="0.85" />
-            <circle cx="340" cy="212" r="8" fill="#fff" opacity="0.85" />
+            <circle
+cx="224"
+cy="212"
+r="8"
+fill="#fff"
+opacity="0.85" />
+            <circle
+cx="340"
+cy="212"
+r="8"
+fill="#fff"
+opacity="0.85" />
           </g>
 
           <g class="question-flow q1">
@@ -114,7 +124,9 @@
       </section>
 
       <section class="actions">
-        <NuxtLink :to="ROUTES.HOME" class="btn btn-primary"
+        <NuxtLink
+:to="ROUTES.HOME"
+class="btn btn-primary"
           >🏠 Về Trang Chủ</NuxtLink
         >
         <NuxtLink

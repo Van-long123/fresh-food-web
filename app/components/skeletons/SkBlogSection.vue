@@ -18,7 +18,7 @@
       >
         <!-- Image 4:3 aspect -->
         <div class="w-full overflow-hidden rounded mb-3">
-          <Skeleton width="100%" height="0" class="!pb-[75%]" borderRadius="4px" />
+          <Skeleton width="100%" height="0" class="!pb-[75%]" border-radius="4px" />
         </div>
         <!-- Title -->
         <div class="mb-1.5 space-y-1.5">
@@ -45,7 +45,7 @@
         >
           <!-- Thumbnail -->
           <div class="w-[100px] sm:w-[120px] h-[70px] sm:h-[82px] flex-shrink-0">
-            <Skeleton width="100%" height="100%" borderRadius="4px" />
+            <Skeleton width="100%" height="100%" border-radius="4px" />
           </div>
 
           <!-- Text content -->

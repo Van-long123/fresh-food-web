@@ -28,7 +28,7 @@
           class="animate-item badge-enter border border-white/60 rounded-full px-5 py-1.5 text-xs sm:text-sm tracking-wide"
           data-delay="300"
         >
-          ✦ Thành lập 2025 · Đà Nẵng ✦
+          ✦ Thành lập 2026 · Đà Nẵng ✦
         </div>
         <h1 class="animate-item hero-title mt-4" data-delay="0">
           Tầm Nhìn &amp; Sứ Mệnh
@@ -315,9 +315,9 @@ const commitments = [
 const statsSection = ref<HTMLElement | null>(null);
 const hasCounted = ref(false);
 const stats = ref([
-  { label: "Khách hàng tin tưởng", target: 500000, current: 0, suffix: "+" },
-  { label: "Sản phẩm chất lượng", target: 1000, current: 0, suffix: "+" },
-  { label: "Nhà cung cấp uy tín", target: 50, current: 0, suffix: "+" },
+  { label: "Khách hàng tin tưởng", target: 300, current: 0, suffix: "+" },
+  { label: "Sản phẩm chất lượng", target: 500, current: 0, suffix: "+" },
+  { label: "Nhà cung cấp uy tín", target: 20, current: 0, suffix: "+" },
   { label: "Khách hàng hài lòng", target: 98, current: 0, suffix: "%" },
 ]);
 

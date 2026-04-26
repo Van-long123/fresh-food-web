@@ -54,7 +54,7 @@
           class="m-0 font-black leading-[1.1] tracking-[-0.03em] mount-1"
           style="
             font-size: clamp(2rem, 4vw, 38px);
-            text-shadow: 0 8px 26px rgba(0,0,0,0.26);
+            text-shadow: 0 8px 26px rgba(0, 0, 0, 0.26);
           "
         >
           Kho Mã Giảm Giá
@@ -70,11 +70,16 @@
           <!-- Progress bar -->
           <div
             class="mx-auto h-2 rounded-full overflow-hidden"
-            style="width: min(440px, 92vw); background: rgba(255,255,255,0.22)"
+            style="
+              width: min(440px, 92vw);
+              background: rgba(255, 255, 255, 0.22);
+            "
           >
             <span
               class="block h-full w-0 transition-[width] duration-[400ms] ease-out"
-              style="background: linear-gradient(90deg, #fde047, #facc15, #86efac)"
+              style="
+                background: linear-gradient(90deg, #fde047, #facc15, #86efac);
+              "
               :style="{ width: `${flashProgress}%` }"
             />
           </div>
@@ -82,21 +87,34 @@
           <div class="mt-[10px] grid grid-cols-3 gap-2">
             <article
               class="rounded-[10px] p-2 grid"
-              style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2)"
+              style="
+                background: rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              "
             >
               <strong class="text-[1.1rem]">{{ visibleCoupons.length }}</strong>
-              <span class="text-[0.76rem] opacity-[0.86]">Mã đang hoạt động</span>
+              <span class="text-[0.76rem] opacity-[0.86]"
+                >Mã đang hoạt động</span
+              >
             </article>
             <article
               class="rounded-[10px] p-2 grid"
-              style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2)"
+              style="
+                background: rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              "
             >
               <strong class="text-[1.1rem]">0đ</strong>
-              <span class="text-[0.76rem] opacity-[0.86]">Freeship nội thành</span>
+              <span class="text-[0.76rem] opacity-[0.86]"
+                >Freeship nội thành</span
+              >
             </article>
             <article
               class="rounded-[10px] p-2 grid"
-              style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2)"
+              style="
+                background: rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              "
             >
               <strong class="text-[1.1rem]">50%</strong>
               <span class="text-[0.76rem] opacity-[0.86]">Mức giảm tối đa</span>
@@ -115,7 +133,7 @@
     <!-- ══════════ FILTER STICKY ══════════ -->
     <section
       class="sticky top-16 z-30 border-b border-gray-200 bg-white"
-      style="box-shadow: 0 4px 10px rgba(15,23,42,0.06)"
+      style="box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06)"
     >
       <div class="w-[min(1120px,92vw)] mx-auto">
         <div class="flex items-center gap-[14px] py-3 flex-wrap lg:flex-nowrap">
@@ -179,14 +197,14 @@
 
     <!-- ══════════ MAIN ══════════ -->
     <main class="w-[min(1120px,92vw)] mx-auto py-6 pb-14 grid gap-7">
-
       <!-- Featured -->
       <section>
         <div class="flex items-center gap-[10px] mb-3">
           <h2 class="m-0 text-[1.4rem]">⭐ Mã Nổi Bật Hôm Nay</h2>
           <span
             class="px-[10px] py-[5px] rounded-full bg-red-500 text-white text-[0.8rem] font-extrabold animate-pulse-scale"
-          >HOT</span>
+            >HOT</span
+          >
         </div>
 
         <div
@@ -199,7 +217,7 @@
             class="relative min-w-[340px] rounded-[18px] overflow-hidden scroll-snap-start"
             style="
               background: linear-gradient(135deg, #f97316, #ea580c);
-              box-shadow: 0 16px 30px rgba(234,88,12,0.3);
+              box-shadow: 0 16px 30px rgba(234, 88, 12, 0.3);
             "
           >
             <!-- Ribbon -->
@@ -227,11 +245,14 @@
               </div>
               <span
                 class="inline-block mt-[10px] rounded-full px-[10px] py-1 text-[0.78rem] font-bold bg-red-500 text-white"
-              >⏰ {{ coupon.expireText }}</span>
+                >⏰ {{ coupon.expireText }}</span
+              >
               <button
                 type="button"
                 class="mt-3 w-full border-0 rounded-xl text-white h-11 font-extrabold relative overflow-hidden cursor-pointer transition-colors duration-300"
-                :class="copiedCode === coupon.code ? 'bg-green-600' : 'bg-orange-700'"
+                :class="
+                  copiedCode === coupon.code ? 'bg-green-600' : 'bg-orange-700'
+                "
                 @click="copyCode(coupon.code)"
               >
                 <Transition name="copy-slide" mode="out-in">
@@ -240,21 +261,30 @@
                     class="flex items-center justify-center gap-2"
                   >
                     <template v-if="copiedCode === coupon.code">
-                      <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      <svg
+                        class="w-[18px] h-[18px] shrink-0"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd"
+                        />
                       </svg>
                       ĐÃ SAO CHÉP
                     </template>
                     <template v-else>SAO CHÉP MÃ</template>
                   </span>
                 </Transition>
-                <span
-                  v-if="burstCode === coupon.code"
-                  v-for="n in 6"
-                  :key="`${coupon.code}-${n}`"
-                  class="burst"
-                  :style="{ '--i': `${n}` }"
-                />
+                <template v-if="burstCode === coupon.code">
+                  <span
+                    v-for="n in 6"
+                    :key="`${coupon.code}-${n}`"
+                    class="burst"
+                    :style="{ '--i': `${n}` }"
+                  />
+                </template>
               </button>
             </div>
           </article>
@@ -267,9 +297,7 @@
           <h2 class="m-0 text-[1.4rem]">🎟️ Tất Cả Mã Giảm Giá</h2>
         </div>
 
-        <div
-          class="coupon-grid"
-        >
+        <div class="coupon-grid">
           <article
             v-for="(coupon, idx) in visibleCoupons"
             :key="coupon.id"
@@ -348,8 +376,16 @@
                     class="flex items-center justify-center gap-1 text-[0.82rem]"
                   >
                     <template v-if="copiedCode === coupon.code">
-                      <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      <svg
+                        class="w-4 h-4 shrink-0"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd"
+                        />
                       </svg>
                       Đã sao chép!
                     </template>
@@ -379,9 +415,8 @@
                     : 'border-red-600 text-red-600'
                 "
                 style="transform: rotate(15deg)"
-              >{{
-                coupon.status === "expired" ? "HẾT HẠN" : "ĐÃ DÙNG"
-              }}</span>
+                >{{ coupon.status === "expired" ? "HẾT HẠN" : "ĐÃ DÙNG" }}</span
+              >
             </div>
           </article>
         </div>
@@ -389,7 +424,9 @@
 
       <!-- Guide -->
       <section class="bg-orange-50 rounded-[18px] p-6">
-        <h3 class="text-center m-0 mb-[18px] text-[1.3rem]">Hướng Dẫn Sử Dụng Mã</h3>
+        <h3 class="text-center m-0 mb-[18px] text-[1.3rem]">
+          Hướng Dẫn Sử Dụng Mã
+        </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <article
             v-for="step in guideSteps"
@@ -861,35 +898,66 @@ onUnmounted(() => {
   transform: translateY(14px);
   animation: heroMount 0.5s ease forwards;
 }
-.mount-1 { animation-delay: 0.1s; }
-.mount-2 { animation-delay: 0.2s; }
-.mount-3 { animation-delay: 0.3s; }
+.mount-1 {
+  animation-delay: 0.1s;
+}
+.mount-2 {
+  animation-delay: 0.2s;
+}
+.mount-3 {
+  animation-delay: 0.3s;
+}
 
 @keyframes heroMount {
-  to { opacity: 1; transform: translateY(0); }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Confetti float ───────────────────────────────── */
 @keyframes floatRotate {
-  0%   { transform: translateY(0) rotate(0deg); }
-  50%  { transform: translateY(-12px) rotate(15deg); }
-  100% { transform: translateY(8px) rotate(-12deg); }
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(15deg);
+  }
+  100% {
+    transform: translateY(8px) rotate(-12deg);
+  }
 }
-.animate-floatRotate { animation: floatRotate linear infinite; }
+.animate-floatRotate {
+  animation: floatRotate linear infinite;
+}
 
 /* ── Hero icon swing ──────────────────────────────── */
 @keyframes swing {
-  0%, 100% { transform: rotate(-8deg); }
-  50%       { transform: rotate(8deg); }
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
 }
-.animate-swing { animation: swing 2s ease-in-out infinite; }
+.animate-swing {
+  animation: swing 2s ease-in-out infinite;
+}
 
 /* ── Star clip-path ───────────────────────────────── */
 .star-shape {
   clip-path: polygon(
-    50% 0, 62% 34%, 100% 38%, 72% 59%,
-    82% 100%, 50% 75%, 18% 100%, 28% 59%,
-    0 38%, 38% 34%
+    50% 0,
+    62% 34%,
+    100% 38%,
+    72% 59%,
+    82% 100%,
+    50% 75%,
+    18% 100%,
+    28% 59%,
+    0 38%,
+    38% 34%
   );
 }
 
@@ -908,7 +976,10 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 @keyframes cardIn {
-  to { opacity: 1; transform: translateY(0); }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Featured divider with ::before/::after notches ─ */
@@ -926,8 +997,12 @@ onUnmounted(() => {
   background: #fff;
   top: -9px;
 }
-.featured-divider::before { left: -9px; }
-.featured-divider::after  { right: -9px; }
+.featured-divider::before {
+  left: -9px;
+}
+.featured-divider::after {
+  right: -9px;
+}
 
 /* ── Coupon card divider notches ─────────────────── */
 .vertical-divider {
@@ -944,8 +1019,12 @@ onUnmounted(() => {
   background: #fff;
   left: -9px;
 }
-.coupon-divider::before { top: -8px; }
-.coupon-divider::after  { bottom: -8px; }
+.coupon-divider::before {
+  top: -8px;
+}
+.coupon-divider::after {
+  bottom: -8px;
+}
 
 /* ── Burst animation (copy button) ───────────────── */
 .burst {
@@ -972,20 +1051,38 @@ onUnmounted(() => {
 
 /* ── Pulse (HOT badge & low-badge) ───────────────── */
 @keyframes pulsScale {
-  0%, 100% { transform: scale(1);    opacity: 1;   }
-  50%       { transform: scale(1.08); opacity: 0.8; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.8;
+  }
 }
-.animate-pulse-scale { animation: pulsScale 1.2s infinite; }
+.animate-pulse-scale {
+  animation: pulsScale 1.2s infinite;
+}
 
 /* ── Stamp (status overlay) ──────────────────────── */
 @keyframes stamp {
-  0%, 100% { opacity: 0.85; }
-  50%       { opacity: 1;    }
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
 }
-.animate-stamp { animation: stamp 1.2s ease-in-out infinite; }
+.animate-stamp {
+  animation: stamp 1.2s ease-in-out infinite;
+}
 
 /* ── Scroll snap for featured row ─────────────────── */
-.scroll-snap-start { scroll-snap-align: start; }
+.scroll-snap-start {
+  scroll-snap-align: start;
+}
 
 /* ── Copy slide transition (Vue <Transition>) ─────── */
 .copy-slide-enter-active {

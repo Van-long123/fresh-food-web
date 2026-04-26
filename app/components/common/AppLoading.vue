@@ -116,7 +116,7 @@
     </div>
 
     <!-- Layer 4: Loading message -->
-    <p class="loading-message" :key="displayMessage">
+    <p :key="displayMessage" class="loading-message">
       {{ displayMessage }}
     </p>
 

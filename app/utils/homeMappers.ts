@@ -127,12 +127,14 @@ const mapCampaignBadge = (campaign: HomeCampaignApi, index: number): HomeCampaig
   const fallbackById = HOME_CAMPAIGN_BADGE_FALLBACKS.find((fb) => fb.id === id)
   const fallback = fallbackById || HOME_CAMPAIGN_BADGE_FALLBACKS[index % HOME_CAMPAIGN_BADGE_FALLBACKS.length]
 
+  const name = title || fallback?.name || ''
+
   return {
     id,
-    slug: toSlug(campaign.slug ?? campaign.id ?? title, fallback.slug),
-    name: (title || fallback.name).replace(/\n/g, '<br/>'),
-    color: normalizeText(campaign.color, fallback.color),
-    textColor: normalizeText(campaign.textColor, fallback.textColor)
+    slug: toSlug(campaign.slug ?? campaign.id ?? title, fallback?.slug || ''),
+    name: name.replace(/\n/g, '<br/>'),
+    color: normalizeText(campaign.color, fallback?.color || ''),
+    textColor: normalizeText(campaign.textColor, fallback?.textColor || '')
   }
 }
 
@@ -165,9 +167,9 @@ const mapCategorySection = (category: HomeCategoryApi, index: number): HomeCateg
     badgeText: normalizeText(category.badgeText ?? category.badge, 'Uu dai moi ngay'),
     bannerImage: normalizeText(category.bannerImage ?? category.image, FALLBACK_BANNER),
     products: products.slice(0, HOME_DEFAULTS.categoryProductLimit),
-    overlayClass: style.overlayClass,
-    titleClass: style.titleClass,
-    badgeClass: style.badgeClass
+    overlayClass: style?.overlayClass || '',
+    titleClass: style?.titleClass || '',
+    badgeClass: style?.badgeClass || ''
   }
 }
 

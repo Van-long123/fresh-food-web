@@ -338,7 +338,7 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import { useToast } from "primevue/usetoast";
 // import { ROUTES } from "~/constants/routes";
 import { useChangePassword } from "~/composables/auth/useChangePassword";

@@ -79,7 +79,9 @@ Trace ID: SF-500-{{ nowToken }}</pre
             <button type="button" class="reload-btn" @click="reloadNow">
               Tải lại ngay
             </button>
-            <NuxtLink :to="ROUTES.HOME" class="home-link"
+            <NuxtLink
+:to="ROUTES.HOME"
+class="home-link"
               >Hoặc về trang chủ</NuxtLink
             >
           </div>

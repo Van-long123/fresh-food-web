@@ -1,9 +1,6 @@
 <template>
   <div class="font-sans text-gray-800 bg-white">
-    <!-- ========================================================
-         SECTION 1 — HERO BANNER
-         ======================================================== -->
-    <section class="hero-banner reveal" ref="heroRef">
+    <section ref="heroRef" class="hero-banner reveal">
       <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -13,7 +10,12 @@
               height="40"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="20" cy="20" r="3" fill="white" fill-opacity="0.10" />
+              <circle
+cx="20"
+cy="20"
+r="3"
+fill="white"
+fill-opacity="0.10" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#dots)" />
@@ -71,9 +73,6 @@
       </div>
     </section>
 
-    <!-- ========================================================
-         SECTION 2 — KÊNH LIÊN HỆ NHANH
-         ======================================================== -->
     <section class="py-12 bg-gray-50">
       <div class="max-w-[1200px] mx-auto px-5">
         <h2 class="text-[1.75rem] font-black text-gray-900 text-center mb-2">
@@ -83,9 +82,9 @@
           <div
             v-for="(channel, i) in channels"
             :key="channel.id"
+            :ref="(el) => setRef(el, `card${i}`)"
             class="contact-card reveal"
             :style="{ transitionDelay: `${i * 100}ms` }"
-            :ref="(el) => setRef(el, `card${i}`)"
           >
             <div
               class="w-16 h-16 rounded-2xl flex items-center justify-center mb-1"
@@ -117,7 +116,7 @@
          ======================================================== -->
     <section class="py-12 bg-white">
       <div class="max-w-[1200px] mx-auto px-5">
-        <div class="mb-6 reveal" ref="faqHeaderRef">
+        <div ref="faqHeaderRef" class="mb-6 reveal">
           <h2 class="text-[1.75rem] font-black text-gray-900 text-center mb-2">
             Câu Hỏi Thường Gặp
           </h2>
@@ -126,8 +125,13 @@
           </p>
         </div>
 
-        <TabView class="faq-tabs" v-model:activeIndex="activeTab">
-          <TabPanel v-for="tab in faqTabs" :key="tab.label" :header="tab.label">
+        <TabView v-model:active-index="activeTab" class="faq-tabs">
+          <TabPanel
+            v-for="tab in faqTabs"
+            :key="tab.label"
+            :header="tab.label"
+            :value="tab.label"
+          >
             <Accordion :multiple="true" class="faq-accordion">
               <AccordionPanel
                 v-for="(item, idx) in tab.items"
@@ -157,7 +161,7 @@
       <div class="max-w-[1200px] mx-auto px-5">
         <div class="form-grid">
           <!-- LEFT: Form -->
-          <div class="reveal" ref="formRef">
+          <div ref="formRef" class="reveal">
             <h2 class="text-[1.75rem] font-black text-gray-900 text-left mb-1">
               Gửi Yêu Cầu Hỗ Trợ
             </h2>
@@ -207,8 +211,8 @@
             <form
               v-if="!submitSuccess"
               novalidate
-              @submit.prevent="handleSubmit"
               class="flex flex-col gap-4"
+              @submit.prevent="handleSubmit"
             >
               <div class="flex flex-col gap-[0.375rem]">
                 <label class="text-[0.875rem] font-semibold text-gray-700"
@@ -356,8 +360,8 @@
                     📎 {{ f.name }}
                     <button
                       type="button"
-                      @click="removeFile(f.name)"
                       class="bg-transparent border-0 cursor-pointer text-orange-600 text-base leading-none p-0"
+                      @click="removeFile(f.name)"
                     >
                       ×
                     </button>
@@ -397,7 +401,7 @@
           </div>
 
           <!-- RIGHT: Info box -->
-          <div class="reveal" ref="infoRef">
+          <div ref="infoRef" class="reveal">
             <div
               class="bg-orange-50 border-[1.5px] border-orange-200 rounded-[1.25rem] p-7"
             >
@@ -446,7 +450,7 @@
                       class="text-[0.875rem] m-0 font-medium"
                       style="color: #f97316; font-weight: 700"
                     >
-                      1800.5858
+                      {{ CONTACT_INFO.HOTLINE }}
                     </p>
                   </div>
                 </li>
@@ -457,7 +461,7 @@
                   <div>
                     <p class="text-xs font-semibold text-gray-400 m-0">Email</p>
                     <p class="text-[0.875rem] text-gray-700 m-0 font-medium">
-                      hotro@smartfood.vn
+                      {{ CONTACT_INFO.EMAIL }}
                     </p>
                   </div>
                 </li>
@@ -509,7 +513,7 @@
     <!-- ========================================================
          SECTION 5 — THỐNG KÊ TIN TƯỞNG
          ======================================================== -->
-    <section class="py-12 bg-orange-50" ref="statsRef">
+    <section ref="statsRef" class="py-12 bg-orange-50">
       <div class="max-w-[1200px] mx-auto px-5">
         <div class="stats-grid">
           <div
@@ -534,6 +538,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
+import { CONTACT_INFO } from "~/constants/contact";
 
 // ===== TYPES =====
 interface FormData {
@@ -688,10 +693,11 @@ const observeEl = (el: Element) => {
 
 // ===== CONTACT CHANNELS =====
 const channelActions: Record<string, () => void> = {
-  hotline: () => window.open("tel:18005858"),
-  chat: () => {},
-  email: () => window.open("mailto:hotro@smartfood.vn"),
-  zalo: () => {},
+  hotline: () => window.open(`tel:${CONTACT_INFO.HOTLINE}`),
+  "facebook-chat": () =>
+    window.open("https://www.facebook.com/pham.long.118027"),
+  email: () => window.open(`mailto:${CONTACT_INFO.EMAIL}`),
+  zalo: () => window.open(`https://zalo.me/${CONTACT_INFO.HOTLINE}`),
 };
 const handleChannelAction = (id: string) => channelActions[id]?.();
 
@@ -701,19 +707,22 @@ const channels = [
     name: "Hotline",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>`,
     iconBg: "#FFF7ED",
-    detail: "1800.5858",
-    meta: "Miễn phí • 8h–22h hàng ngày",
+    detail: CONTACT_INFO.HOTLINE,
+    meta: " 8h–22h hàng ngày",
     btnLabel: "Gọi ngay",
     btnStyle: "btn-primary",
   },
   {
-    id: "chat",
-    name: "Live Chat",
-    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>`,
-    iconBg: "#FFF7ED",
-    detail: "Chat trực tiếp",
-    meta: "Phản hồi trong 2 phút",
-    btnLabel: "Chat ngay",
+    id: "facebook-chat",
+    name: "Facebook Chat",
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#1877F2" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round"
+      d="M7 10v4h3v8h4v-8h3l1-4h-4V8c0-1 .2-2 2-2h2V2h-3c-3 0-5 2-5 5v3H7z"/>
+  </svg>`,
+    iconBg: "#EFF6FF",
+    detail: "Chat qua Facebook Messenger",
+    meta: "Phản hồi nhanh qua Messenger",
+    btnLabel: "Nhắn tin Facebook",
     btnStyle: "btn-outline",
   },
   {
@@ -721,7 +730,7 @@ const channels = [
     name: "Email",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
     iconBg: "#FFF7ED",
-    detail: "hotro@smartfood.vn",
+    detail: CONTACT_INFO.EMAIL,
     meta: "Phản hồi trong 2–4 giờ",
     btnLabel: "Gửi email",
     btnStyle: "btn-outline",
@@ -731,7 +740,7 @@ const channels = [
     name: "Zalo OA",
     icon: `<svg viewBox="0 0 48 48" fill="#0068FF" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#0068FF"/><text x="50%" y="58%" text-anchor="middle" fill="white" font-size="20" font-weight="bold" font-family="Arial">Z</text></svg>`,
     iconBg: "#EFF6FF",
-    detail: "SmartFood Official",
+    detail: CONTACT_INFO.HOTLINE,
     meta: "Nhắn tin qua Zalo",
     btnLabel: "Kết nối Zalo",
     btnStyle: "btn-zalo",
@@ -749,7 +758,7 @@ const faqTabs: FaqTab[] = [
       },
       {
         q: "Tôi có thể đặt hàng số lượng lớn không?",
-        a: "Có! Đối với đơn hàng số lượng lớn (từ 50kg trở lên), vui lòng liên hệ hotline 1800.5858 để được hỗ trợ và nhận báo giá ưu đãi.",
+        a: `Có! Đối với đơn hàng số lượng lớn (từ 50kg trở lên), vui lòng liên hệ hotline ${CONTACT_INFO.HOTLINE} để được hỗ trợ và nhận báo giá ưu đãi.`,
       },
       {
         q: "Có thể đặt hàng trước không?",
@@ -782,7 +791,7 @@ const faqTabs: FaqTab[] = [
       // },
       {
         q: "Shipper không giao đúng giờ phải làm sao?",
-        a: "Vui lòng liên hệ hotline 1800.5858 ngay khi giao trễ quá 30 phút. Chúng tôi sẽ xử lý và bồi thường nếu lỗi từ phía chúng tôi.",
+        a: `Vui lòng liên hệ hotline ${CONTACT_INFO.HOTLINE} ngay khi giao trễ quá 30 phút. Chúng tôi sẽ xử lý và bồi thường nếu lỗi từ phía chúng tôi.`,
       },
       {
         q: "Giao hàng vào cuối tuần và ngày lễ không?",
@@ -893,7 +902,7 @@ onMounted(() => {
   // IntersectionObserver for stats countUp
   const obs = new IntersectionObserver(
     (entries) => {
-      if (entries[0].isIntersecting && !statsStarted.value) {
+      if (entries[0]?.isIntersecting && !statsStarted.value) {
         statsStarted.value = true;
         stats.forEach((s) => countUp(s));
       }

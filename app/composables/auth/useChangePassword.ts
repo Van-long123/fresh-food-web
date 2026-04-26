@@ -1,5 +1,5 @@
 import { computed, reactive, ref } from 'vue'
-import { usePasswordStrength } from '~/composables/usePasswordStrength'
+import { usePasswordStrength } from '~/composables/auth/usePasswordStrength'
 import { useResetPasswordMutation } from '~/mutations/user/useResetPasswordMutation'
 import { useUpdateProfileMutation } from '~/mutations/user/useUpdateProfileMutation'
 import { PASSWORD_RULE_MESSAGE, isValidPassword } from '~/utils/authFormUtils'

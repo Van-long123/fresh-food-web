@@ -2,7 +2,7 @@ export const HOME_DEFAULTS = {
   campaignProductLimit: 20,
   categorySectionLimit: 100,
   categoryProductLimit: 20,
-  blogLimit: 4
+  blogLimit: 9
 } as const
 
 export const HOME_QUERY_KEYS = {
@@ -14,21 +14,29 @@ export const HOME_QUERY_KEYS = {
 export const HOME_CAMPAIGN_BADGE_FALLBACKS = [
   {
     id: 'khuyen_mai_hot',
+    name: 'Khuyến mãi hot',
+    slug: 'khuyen-mai-hot',
     color: 'bg-[#e84142]',
     textColor: 'text-white'
   },
   {
     id: 'ban_chay',
+    name: 'Bán chạy',
+    slug: 'ban-chay',
     color: 'bg-orange-500',
     textColor: 'text-white'
   },
   {
     id: 'doc_quyen_online',
+    name: 'Độc quyền online',
+    slug: 'doc-quyen-online',
     color: 'bg-gradient-to-br from-[#2563eb] via-[#0ea5e9] to-[#06b6d4]',
     textColor: 'text-white'
   },
   {
     id: 'goi_y',
+    name: 'Gợi ý cho bạn',
+    slug: 'goi-y',
     color: 'bg-[#0bb5d8]',
     textColor: 'text-white'
   }

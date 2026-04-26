@@ -9,8 +9,8 @@
       v-if="loading"
       class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8"
     >
-      <Skeleton height="24px" width="220px" borderRadius="0.5rem" />
-      <Skeleton class="mt-4" height="360px" borderRadius="1.5rem" />
+      <Skeleton height="24px" width="220px" border-radius="0.5rem" />
+      <Skeleton class="mt-4" height="360px" border-radius="1.5rem" />
       <div
         class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"
       >
@@ -21,8 +21,8 @@
           <Skeleton height="18px" width="95%" />
         </div>
         <div class="space-y-3">
-          <Skeleton height="180px" borderRadius="1rem" />
-          <Skeleton height="180px" borderRadius="1rem" />
+          <Skeleton height="180px" border-radius="1rem" />
+          <Skeleton height="180px" border-radius="1rem" />
         </div>
       </div>
     </main>
@@ -34,11 +34,15 @@
             aria-label="Breadcrumb"
             class="mb-4 flex items-center gap-2 text-sm text-slate-500"
           >
-            <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600"
+            <NuxtLink
+:to="ROUTES.HOME"
+class="hover:text-orange-600"
               >Trang chu</NuxtLink
             >
             <i class="pi pi-angle-right text-xs" />
-            <NuxtLink :to="ROUTES.NEWS" class="hover:text-orange-600"
+            <NuxtLink
+:to="ROUTES.NEWS"
+class="hover:text-orange-600"
               >Tin tuc</NuxtLink
             >
             <i class="pi pi-angle-right text-xs" />

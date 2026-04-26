@@ -115,7 +115,7 @@
               <span class="text-xl">📞</span>
               <span class="font-semibold">Liên hệ nhanh</span>
             </div>
-            <p class="mt-2 text-2xl font-extrabold text-[#F97316]">1800.xxxx</p>
+            <p class="mt-2 text-2xl font-extrabold text-[#F97316]">{{ CONTACT_INFO.HOTLINE }}</p>
             <button
               class="mt-3 w-full rounded-lg bg-[#F97316] py-2 font-semibold text-white transition hover:bg-[#EA580C]"
             >
@@ -268,13 +268,13 @@
           <h2 class="text-xl font-bold">§6 - Liên hệ hỗ trợ đổi trả</h2>
           <div class="mt-3 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
             <p class="rounded-lg border border-[#DCFCE7] bg-white p-3">
-              Hotline: <strong>1800.xxxx</strong>
+              Hotline: <strong>{{ CONTACT_INFO.HOTLINE }}</strong>
             </p>
             <p class="rounded-lg border border-[#DCFCE7] bg-white p-3">
               Zalo: <strong>SmartFood Support</strong>
             </p>
             <p class="rounded-lg border border-[#DCFCE7] bg-white p-3">
-              Email: <strong>hotro@smartfood.vn</strong>
+              Email: <strong>{{ CONTACT_INFO.EMAIL }}</strong>
             </p>
           </div>
 
@@ -321,6 +321,7 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import { CONTACT_INFO } from "~/constants/contact";
 
 const quickSummary = [
   "Đổi trả trong 24h kể từ khi nhận hàng",
@@ -328,7 +329,7 @@ const quickSummary = [
   "Hoàn tiền 100% nếu không tìm được hàng thay thế",
   "Không đổi trả thực phẩm đã mở seal/bóc gói",
   "Cần giữ hóa đơn và ảnh chụp sản phẩm lỗi",
-  "Hotline hỗ trợ đổi trả: 1800.xxxx (miễn phí)",
+  `Hotline hỗ trợ đổi trả: ${CONTACT_INFO.HOTLINE} (miễn phí)`,
 ];
 
 const sections = [

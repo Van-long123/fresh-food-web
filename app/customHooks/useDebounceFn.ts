@@ -1,5 +1,6 @@
 import { debounce } from 'lodash'
-export const useDebounceFn = (fnToDebounce: Function, delay: number = 500) => {
+
+export const useDebounceFn = (fnToDebounce: (...args: any[]) => any, delay: number = 500) => {
   // Trả lỗi luôn nếu delay nhận vào không phải number
   if (isNaN(delay)) {
     throw new Error('Delay value should be a number.')

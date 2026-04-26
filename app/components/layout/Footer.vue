@@ -30,40 +30,104 @@
           </p>
         </div>
 
-        <!-- Newsletter Side -->
-        <div class="flex flex-col justify-center items-center lg:items-end">
-          <h3
-            class="text-white text-[15px] font-bold mb-4 uppercase tracking-wider flex items-center gap-2"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 text-[#f47f20]"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+        <!-- Info Side -->
+        <div
+          class="flex flex-col justify-center items-center lg:items-end gap-6"
+        >
+          <!-- Giờ hoạt động -->
+          <div class="text-center lg:text-right">
+            <h3
+              class="text-white text-[15px] font-bold mb-4 uppercase tracking-wider flex items-center justify-center lg:justify-end gap-2"
             >
-              <path
-                d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-              />
-              <path
-                d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-              />
-            </svg>
-            Nhận Thông Báo Ưu Đãi
-          </h3>
-          <div
-            class="flex w-full max-w-md items-stretch overflow-hidden rounded-full border border-gray-200 bg-white shadow-md transition focus-within:ring-2 focus-within:ring-orange-500"
-          >
-            <input
-              type="email"
-              placeholder="Nhập email của bạn..."
-              class="flex-1 h-12 px-5 text-sm text-gray-700 placeholder-gray-400 outline-none bg-transparent"
-            />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-[#f47f20]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6v6l4 2"
+                />
+              </svg>
+              Giờ Hoạt Động
+            </h3>
+            <ul class="space-y-1 text-[13px] text-gray-400">
+              <li>
+                Thứ Hai – Thứ Sáu:
+                <span class="text-white font-semibold">7:00 – 21:00</span>
+              </li>
+              <li>
+                Thứ Bảy – Chủ Nhật:
+                <span class="text-white font-semibold">8:00 – 20:00</span>
+              </li>
+              <li>
+                Lễ, Tết:
+                <span class="text-white font-semibold">8:00 – 18:00</span>
+              </li>
+            </ul>
+          </div>
 
-            <button
-              class="h-12 px-6 bg-linear-to-r from-orange-500 to-orange-600 text-white text-sm cursor-pointer font-semibold tracking-wide transition-all duration-300 hover:from-orange-600 hover:to-orange-700 active:scale-95"
+          <!-- Cam kết -->
+          <div class="flex flex-wrap justify-center lg:justify-end gap-3">
+            <div
+              class="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2 text-[12px] text-gray-300 border border-white/10"
             >
-              ĐĂNG KÝ
-            </button>
+              <svg
+                class="h-4 w-4 text-[#f47f20] shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Hàng tươi mỗi ngày
+            </div>
+            <div
+              class="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2 text-[12px] text-gray-300 border border-white/10"
+            >
+              <svg
+                class="h-4 w-4 text-[#f47f20] shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              An toàn vệ sinh
+            </div>
+            <div
+              class="flex items-center gap-2 bg-white/5 rounded-xl px-4 py-2 text-[12px] text-gray-300 border border-white/10"
+            >
+              <svg
+                class="h-4 w-4 text-[#f47f20] shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              Giao hàng nhanh
+            </div>
           </div>
         </div>
       </div>
@@ -141,7 +205,9 @@
               </svg>
               <span
                 >Tổng đài miễn phí:
-                <strong class="text-[#3b82f6] text-[15px]">1800 6804</strong>
+                <strong class="text-[#3b82f6] text-[15px]">{{
+                  CONTACT_INFO.HOTLINE
+                }}</strong>
                 (7:00 - 21:00)</span
               >
             </li>
@@ -162,9 +228,9 @@
               <span
                 >Email:
                 <a
-                  href="mailto:hotro@SmartFood.com"
+                  :href="`mailto:${CONTACT_INFO.EMAIL}`"
                   class="hover:text-white transition-colors"
-                  >hotro@SmartFood.com</a
+                  >{{ CONTACT_INFO.EMAIL }}</a
                 ></span
               >
             </li>
@@ -308,9 +374,9 @@
         <!-- Trust Badges -->
         <div class="flex items-center gap-4">
           <img
-            src="@/assets/images/BCT.jpg"
+            src="@/assets/images/footer_logobct_img.png"
             alt="Bộ Công Thương"
-            class="h-12 w-25 object-cover filter drop-shadow-md"
+            class="h-14 w-37 object-cover drop-shadow-md"
           />
           <div class="text-xs text-gray-500 font-medium">
             Bản quyền © 2026<br />SmartFood. All Rights Reserved.
@@ -323,4 +389,5 @@
 
 <script setup>
 import { ROUTES } from "~/constants/routes";
+import { CONTACT_INFO } from "~/constants/contact";
 </script>

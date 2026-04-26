@@ -3,7 +3,7 @@
   <div
     class="rounded-xl overflow-hidden mb-5 bg-gray-100 h-[100px] relative shadow-sm"
   >
-    <Skeleton width="100%" height="100%" borderRadius="12px" />
+    <Skeleton width="100%" height="100%" border-radius="12px" />
   </div>
 
   <!-- Fruit products slider skeleton -->

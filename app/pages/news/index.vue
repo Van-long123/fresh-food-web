@@ -97,11 +97,11 @@
 
               <div v-if="loading" class="grid grid-cols-1 gap-4 md:grid-cols-5">
                 <article class="md:col-span-3">
-                  <Skeleton height="300px" borderRadius="1rem" />
+                  <Skeleton height="300px" border-radius="1rem" />
                 </article>
                 <div class="grid gap-4 md:col-span-2">
-                  <Skeleton height="142px" borderRadius="1rem" />
-                  <Skeleton height="142px" borderRadius="1rem" />
+                  <Skeleton height="142px" border-radius="1rem" />
+                  <Skeleton height="142px" border-radius="1rem" />
                 </div>
               </div>
 
@@ -179,7 +179,7 @@
                   :key="n"
                   class="space-y-3 rounded-2xl border border-slate-200 bg-white p-4"
                 >
-                  <Skeleton height="150px" borderRadius="0.85rem" />
+                  <Skeleton height="150px" border-radius="0.85rem" />
                   <Skeleton width="45%" height="12px" />
                   <Skeleton width="100%" height="16px" />
                   <Skeleton width="82%" height="14px" />

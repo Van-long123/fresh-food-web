@@ -12,14 +12,21 @@
       </div>
         <NuxtLink :to="ROUTES.CATEGORY('khuyen-mai-hot')" class="text-sm font-semibold text-green-600 hover:text-green-700 flex items-center gap-1 group">
           Xem tất cả
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg
+xmlns="http://www.w3.org/2000/svg"
+class="h-4 w-4 group-hover:translate-x-1 transition-transform"
+fill="none"
+viewBox="0 0 24 24"
+stroke="currentColor"
+stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </NuxtLink>
     </div>
 
     <!-- Layout Horizontal Scroll for Mobile, Grid for Desktop -->
-    <div :class="[
+    <div
+:class="[
       'flex overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-5 gap-4 lg:gap-6 lg:overflow-visible hide-scrollbar',
     ]">
       <div v-for="product in products" :key="product.id" class="w-[200px] sm:w-[240px] lg:w-auto flex-shrink-0 lg:flex-shrink">

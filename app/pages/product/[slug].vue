@@ -4,7 +4,9 @@
   <div v-else class="min-h-screen bg-[#f5f5f5] pb-12 text-[#222]">
     <div class="mx-auto max-w-7xl px-4 pt-4 md:px-6">
       <nav class="text-xs text-[#666]">
-        <NuxtLink :to="ROUTES.HOME" class="hover:underline hover:text-[#4caf50]"
+        <NuxtLink
+:to="ROUTES.HOME"
+class="hover:underline hover:text-[#4caf50]"
           >Trang chủ</NuxtLink
         >
         <span class="mx-1 text-[#ccc]">›</span>
@@ -116,8 +118,8 @@
           </div>
 
           <div
-            class="mt-4 rounded-2xl bg-linear-to-r from-[#fc5c22] to-[#ef4444] p-4 text-white"
             v-if="remainingSeconds > 0"
+            class="mt-4 rounded-2xl bg-linear-to-r from-[#fc5c22] to-[#ef4444] p-4 text-white"
           >
             <p class="text-sm font-semibold">Flash Sale kết thúc sau</p>
             <div class="mt-2 flex gap-2 font-mono text-xl font-black">

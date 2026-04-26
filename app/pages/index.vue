@@ -44,7 +44,7 @@
                 "
               >
                 <div
-                  class="w-full h-full rounded-full flex items-center justify-center text-center font-black leading-tight shadow-md border-2 border-white/80"
+                  class="w-full h-full rounded-full flex items-center justify-center text-center font-black leading-tight shadow-md border-2 border-white/80 whitespace-pre-line"
                   :class="[
                     badge.color,
                     badge.textColor,
@@ -52,8 +52,9 @@
                       ? 'text-[13px]'
                       : 'text-[11px]',
                   ]"
-                  v-html="badge.name"
-                />
+                >
+                  {{ badge.name }}
+                </div>
               </div>
             </div>
           </div>

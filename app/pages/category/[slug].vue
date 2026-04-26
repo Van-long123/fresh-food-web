@@ -205,7 +205,7 @@
             </button>
           </div>
 
-          <div class="flex justify-center py-6" v-if="showLoadSpinner">
+          <div v-if="showLoadSpinner" class="flex justify-center py-6">
             <div
               class="h-6 w-6 animate-spin rounded-full border-2 border-[#f47f20] border-t-transparent"
             />
@@ -256,6 +256,7 @@ const allProducts = Array.from({ length: 32 }).map((_, idx) => {
   return {
     id: idx + 1,
     name: `Sản phẩm rau củ số ${idx + 1}`,
+    slug: `san-pham-${idx + 1}`,
     image: `https://picsum.photos/seed/food-cat-${idx + 1}/400/400`,
     price,
     originalPrice: discount ? Math.round(price * 1.2) : null,
@@ -290,11 +291,8 @@ let observer: IntersectionObserver | null = null;
 const parallaxOffset = ref(0);
 
 const filteredProducts = computed(() => {
-  if (minPrice.value > maxPrice.value) {
-    const temp = minPrice.value;
-    minPrice.value = maxPrice.value;
-    maxPrice.value = temp;
-  }
+  const currentMin = Math.min(minPrice.value, maxPrice.value);
+  const currentMax = Math.max(minPrice.value, maxPrice.value);
 
   return allProducts
     .filter((item) => {
@@ -303,9 +301,7 @@ const filteredProducts = computed(() => {
       if (activeFilter.value === "new") return item.isNew;
       return true;
     })
-    .filter(
-      (item) => item.price >= minPrice.value && item.price <= maxPrice.value,
-    )
+    .filter((item) => item.price >= currentMin && item.price <= currentMax)
     .filter(
       (item) =>
         !selectedBrands.value.length ||

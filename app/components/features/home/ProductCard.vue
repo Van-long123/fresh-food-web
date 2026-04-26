@@ -63,8 +63,8 @@
           >
         </div>
         <div
-          class="flex items-center gap-1.5 mb-3"
           v-if="product.originalPrice"
+          class="flex items-center gap-1.5 mb-3"
         >
           <span class="text-[11px] text-gray-400 line-through"
             >{{ formatPrice(product.originalPrice) }} đ</span
@@ -74,7 +74,7 @@
             {{ calculateSaving(product.originalPrice, product.price) }}</span
           >
         </div>
-        <div class="h-4 mb-3" v-if="!product.originalPrice" />
+        <div v-if="!product.originalPrice" class="h-4 mb-3" />
         <!-- Spacer for alignment if no original price -->
 
         <!-- Action Button -->

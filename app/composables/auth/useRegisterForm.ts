@@ -1,7 +1,7 @@
 import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ROUTES } from '~/constants/routes'
-import { usePasswordStrength } from '~/composables/usePasswordStrength'
+import { usePasswordStrength } from '~/composables/auth/usePasswordStrength'
 import { useRegisterMutation } from '~/mutations/user/useRegisterMutation'
 import {
   EMAIL_FORMAT_MESSAGE,

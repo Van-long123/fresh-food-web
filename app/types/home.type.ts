@@ -85,8 +85,8 @@ export interface HomeCampaignApi {
   slug?: string
   name?: string
   title?: string
-  // color?: string
-  // textColor?: string
+  color?: string
+  textColor?: string
   products?: unknown[]
 }
 

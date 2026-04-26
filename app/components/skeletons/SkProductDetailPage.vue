@@ -16,7 +16,7 @@
         <div class="h-fit lg:sticky lg:top-20">
           <div class="rounded-2xl bg-white p-3 shadow-sm">
             <!-- Main image -->
-            <Skeleton width="100%" height="0" class="!pb-[100%]" borderRadius="12px" />
+            <Skeleton width="100%" height="0" class="!pb-[100%]" border-radius="12px" />
             <!-- Thumbnails -->
             <div class="mt-3 flex gap-2">
               <Skeleton
@@ -24,7 +24,7 @@
                 :key="n"
                 width="72px"
                 height="72px"
-                borderRadius="12px"
+                border-radius="12px"
               />
             </div>
           </div>
@@ -48,14 +48,19 @@
           <div class="mt-4 flex flex-wrap items-end gap-3">
             <Skeleton width="140px" height="32px" />
             <Skeleton width="90px" height="18px" />
-            <Skeleton width="100px" height="26px" borderRadius="9999px" />
+            <Skeleton width="100px" height="26px" border-radius="9999px" />
           </div>
 
           <!-- Flash sale timer -->
           <div class="mt-4 rounded-2xl bg-gray-200 p-4">
             <Skeleton width="170px" height="16px" />
             <div class="mt-2 flex gap-2">
-              <Skeleton v-for="n in 3" :key="n" width="56px" height="36px" borderRadius="6px" />
+              <Skeleton
+v-for="n in 3"
+:key="n"
+width="56px"
+height="36px"
+border-radius="6px" />
             </div>
           </div>
 
@@ -68,7 +73,7 @@
                 :key="n"
                 :width="`${60 + n * 20}px`"
                 height="38px"
-                borderRadius="9999px"
+                border-radius="9999px"
               />
             </div>
           </div>
@@ -77,14 +82,14 @@
           <div class="mt-5">
             <Skeleton width="60px" height="16px" />
             <div class="mt-2">
-              <Skeleton width="160px" height="44px" borderRadius="9999px" />
+              <Skeleton width="160px" height="44px" border-radius="9999px" />
             </div>
           </div>
 
           <!-- CTA buttons -->
           <div class="mt-6 grid gap-3 sm:grid-cols-2">
-            <Skeleton width="100%" height="48px" borderRadius="9999px" />
-            <Skeleton width="100%" height="48px" borderRadius="9999px" />
+            <Skeleton width="100%" height="48px" border-radius="9999px" />
+            <Skeleton width="100%" height="48px" border-radius="9999px" />
           </div>
 
           <!-- Trust badges -->

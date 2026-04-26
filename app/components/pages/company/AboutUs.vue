@@ -3,7 +3,7 @@
     <!-- ═══════════════════════════════════════
          SECTION 1 — HERO CINEMATIC
          ═══════════════════════════════════════ -->
-    <section class="hero" ref="heroRef">
+    <section ref="heroRef" class="hero">
       <!-- SVG Pattern lá cây mờ nhạt -->
       <div
         class="absolute inset-0 pointer-events-none"
@@ -23,9 +23,9 @@
           class="flex justify-center gap-12 border-t border-white/20 pt-6 mt-2 flex-wrap"
         >
           <div
-            class="flex flex-col items-center gap-[0.2rem]"
             v-for="s in heroStats"
             :key="s.label"
+            class="flex flex-col items-center gap-[0.2rem]"
           >
             <span
               class="text-[1.875rem] font-black text-orange-200 leading-none"
@@ -46,7 +46,7 @@
       <div class="max-w-[1200px] mx-auto px-5">
         <div class="story-grid">
           <!-- Ảnh bên trái -->
-          <div class="reveal" ref="storyImgRef">
+          <div ref="storyImgRef" class="reveal">
             <div
               class="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl aspect-[4/3] relative overflow-hidden flex items-center justify-center"
             >
@@ -99,7 +99,7 @@
           </div>
 
           <!-- Text bên phải -->
-          <div class="story-text reveal" ref="storyTextRef">
+          <div ref="storyTextRef" class="story-text reveal">
             <span
               class="block text-xs font-bold text-orange-500 tracking-[0.12em] uppercase mb-3"
               >VỀ CHÚNG TÔI</span
@@ -110,14 +110,14 @@
               Chúng Tôi Tin Vào<br />Thực Phẩm Sạch
             </h2>
             <p class="text-[0.9375rem] text-gray-600 leading-[1.8] mb-4">
-              SmartFood ra đời năm 2025 từ một niềm tin đơn giản: mỗi gia đình
+              SmartFood ra đời năm 2026 từ một niềm tin đơn giản: mỗi gia đình
               Việt Nam xứng đáng được tiếp cận thực phẩm tươi ngon, an toàn và
               rõ nguồn gốc. Chúng tôi bắt đầu từ một cửa hàng nhỏ tại Đà Nẵng,
               với cam kết kết nối trực tiếp nông trại đến bàn ăn.
             </p>
             <p class="text-[0.9375rem] text-gray-600 leading-[1.8] mb-4">
-              Hôm nay, SmartFood phục vụ hơn 500.000 gia đình, hợp tác cùng 50+
-              nhà cung cấp được kiểm định nghiêm ngặt, và tiên phong xây dựng hệ
+              Hôm nay, SmartFood phục vụ hơn 300 gia đình, hợp tác cùng 20+ nhà
+              cung cấp được kiểm định nghiêm ngặt, và tiên phong xây dựng hệ
               thống thương mại điện tử thực phẩm sạch hàng đầu miền Trung.
             </p>
             <ul class="list-none p-0 my-4 mb-7 flex flex-col gap-[0.625rem]">
@@ -145,7 +145,7 @@
          ═══════════════════════════════════════ -->
     <section class="py-20 bg-orange-50">
       <div class="max-w-[1200px] mx-auto px-5">
-        <div class="section-header reveal" ref="missionHdrRef">
+        <div ref="missionHdrRef" class="section-header reveal">
           <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
             Sứ Mệnh &amp; Giá Trị
           </h2>
@@ -157,9 +157,9 @@
           <div
             v-for="(m, i) in missionCards"
             :key="m.title"
+            :ref="(el) => observeEl(el)"
             class="mission-card reveal"
             :style="{ transitionDelay: `${i * 120}ms` }"
-            :ref="(el) => observeEl(el)"
           >
             <div class="mb-5" v-html="m.icon" />
             <h3 class="text-[1.1rem] font-extrabold text-gray-900 mb-3">
@@ -172,7 +172,7 @@
         </div>
 
         <!-- 4 giá trị cốt lõi -->
-        <div class="core-values reveal" :ref="(el) => observeEl(el)">
+        <div :ref="(el) => observeEl(el)" class="core-values reveal">
           <div
             v-for="v in coreValues"
             :key="v.label"
@@ -192,7 +192,7 @@
          ═══════════════════════════════════════ -->
     <section class="timeline-section py-20 bg-white">
       <div class="max-w-[1200px] mx-auto px-5">
-        <div class="section-header reveal" :ref="(el) => observeEl(el)">
+        <div :ref="(el) => observeEl(el)" class="section-header reveal">
           <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
             Hành Trình Phát Triển
           </h2>
@@ -202,17 +202,17 @@
         </div>
         <div class="timeline">
           <div
-            class="timeline-line"
             ref="timelineLineRef"
+            class="timeline-line"
             :style="{ height: timelineHeight }"
           />
           <div
             v-for="(item, i) in timeline"
             :key="item.year"
+            :ref="(el) => observeEl(el)"
             class="tl-item reveal"
             :class="{ 'tl-right': i % 2 === 0, 'tl-left': i % 2 !== 0 }"
             :style="{ transitionDelay: `${i * 150}ms` }"
-            :ref="(el) => observeEl(el)"
           >
             <div class="tl-dot">
               <span class="tl-pulse" />
@@ -239,7 +239,7 @@
          ═══════════════════════════════════════ -->
     <section class="py-20 bg-gray-50">
       <div class="max-w-[1200px] mx-auto px-5">
-        <div class="section-header reveal" :ref="(el) => observeEl(el)">
+        <div :ref="(el) => observeEl(el)" class="section-header reveal">
           <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
             Đội Ngũ Lãnh Đạo
           </h2>
@@ -251,12 +251,12 @@
           <div
             v-for="(member, i) in team"
             :key="member.name"
+            :ref="(el) => observeEl(el)"
             class="team-card reveal"
             :style="[
               { transitionDelay: `${i * 120}ms` },
               tiltStyles[i] ? { transform: tiltStyles[i] } : {},
             ]"
-            :ref="(el) => observeEl(el)"
             @mousemove="handleTilt($event, i)"
             @mouseleave="resetTilt(i)"
           >
@@ -276,7 +276,7 @@
                 {{ member.role }}
               </p>
               <p class="text-[0.8rem] text-gray-500 italic leading-[1.5] m-0">
-                \"{{ member.quote }}\"
+                "{{ member.quote }}"
               </p>
               <!-- Hover overlay bio -->
               <div class="team-bio-overlay">
@@ -298,11 +298,10 @@
           </div>
         </div>
         <p
-          class="text-center text-base text-gray-500 reveal"
           :ref="(el) => observeEl(el)"
+          class="text-center text-base text-gray-500 reveal"
         >
-          Cùng <strong class="text-orange-500">+200 nhân viên</strong> tận tâm
-          trên toàn quốc
+          Cùng <strong class="text-orange-500">+20 nhân viên</strong> tận tâm
         </p>
       </div>
     </section>
@@ -312,7 +311,7 @@
          ═══════════════════════════════════════ -->
     <section class="py-16 bg-white border-t-2 border-b-2 border-orange-200">
       <div class="max-w-[1200px] mx-auto px-5">
-        <div class="section-header reveal" :ref="(el) => observeEl(el)">
+        <div :ref="(el) => observeEl(el)" class="section-header reveal">
           <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
             Cam Kết Của Chúng Tôi
           </h2>
@@ -324,9 +323,9 @@
           <div
             v-for="(c, i) in certs"
             :key="c.title"
+            :ref="(el) => observeEl(el)"
             class="cert-item reveal"
             :style="{ transitionDelay: `${i * 100}ms` }"
-            :ref="(el) => observeEl(el)"
           >
             <span class="text-[2.5rem] block mb-3">{{ c.icon }}</span>
             <h3 class="text-base font-extrabold text-gray-900 mb-1 mt-0">
@@ -348,7 +347,7 @@
          ═══════════════════════════════════════ -->
     <section class="py-16 bg-white overflow-hidden">
       <div class="max-w-[1200px] mx-auto px-5">
-        <div class="section-header reveal" :ref="(el) => observeEl(el)">
+        <div :ref="(el) => observeEl(el)" class="section-header reveal">
           <h2 class="text-[1.875rem] font-black text-gray-900 text-center mb-2">
             Đối Tác Tin Cậy
           </h2>
@@ -389,9 +388,9 @@ interface HeroStat {
   suffix: string;
 }
 const heroStats = reactive<HeroStat[]>([
-  { label: "Năm kinh nghiệm", target: 6, display: "0", suffix: "+" },
-  { label: "Khách hàng", target: 500000, display: "0", suffix: "+" },
-  { label: "Nhà cung cấp", target: 50, display: "0", suffix: "+" },
+  { label: "Năm kinh nghiệm", target: 1, display: "0", suffix: "+" },
+  { label: "Khách hàng", target: 300, display: "0", suffix: "+" },
+  { label: "Nhà cung cấp", target: 20, display: "0", suffix: "+" },
 ]);
 
 // ═══ CÂU CHUYỆN ══════════════════════════════════════════
@@ -435,17 +434,17 @@ const timeline = [
     desc: "Thành lập tại Đà Nẵng, cam kết 100% thực phẩm sạch từ nông trại địa phương.",
   },
   {
-    year: "2025",
+    year: "2026",
     title: "Mở rộng danh mục",
     desc: "Ra mắt hơn 200 sản phẩm từ rau củ, trái cây đến thịt cá hữu cơ.",
   },
   {
-    year: "2025",
+    year: "2026",
     title: "Nền tảng online ra đời",
     desc: "Ứng dụng SmartFood ra mắt, mang đến trải nghiệm mua sắm thực phẩm sạch 24/7 ngay trên điện thoại.",
   },
   {
-    year: "2025",
+    year: "2026",
     title: "Hệ sinh thái 10+ đối tác",
     desc: "Hợp tác 10+ nhà cung cấp toàn quốc, đạt chứng nhận VSATTP, triển khai chuỗi lạnh tiêu chuẩn quốc tế.",
   },
@@ -522,14 +521,13 @@ const certs = [
 
 // ═══ ĐỐI TÁC ═════════════════════════════════════════════
 const partners = [
-  "Trang Trại Đà Lạt Xanh",
-  "Nông Nghiệp Hòa Bình",
-  "VinEco Organic",
-  "Thanh Long Bình Thuận",
-  "Rau Sạch Mộc Châu",
-  "Hải Sản Hội An",
-  "Bò Một Nắng Phú Yên",
-  "Nấm Tươi Lâm Đồng",
+  "Nông Sản Sạch Đà Nẵng",
+  "Hợp Tác Xã Nông Nghiệp Hòa Vang",
+  "Rau Sạch Điện Bàn",
+  "Trang Trại Hội An Organic",
+  "Nông Sản Duy Xuyên",
+  "Hải Sản Cửa Đại",
+  "Nông Trại Tam Kỳ Xanh",
 ];
 
 // ═══ TILT EFFECT ════════════════════════════════════════

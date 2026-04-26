@@ -12,7 +12,7 @@
 
       <!-- Banner -->
       <div class="mt-3 rounded-2xl overflow-hidden" style="min-height: 120px">
-        <Skeleton width="100%" height="140px" borderRadius="16px" />
+        <Skeleton width="100%" height="140px" border-radius="16px" />
       </div>
 
       <!-- Filter chips bar -->
@@ -24,12 +24,12 @@
               :key="n"
               :width="`${50 + n * 12}px`"
               height="30px"
-              borderRadius="9999px"
+              border-radius="9999px"
             />
           </div>
           <div class="flex items-center gap-2">
-            <Skeleton width="120px" height="36px" borderRadius="8px" class="hidden md:block" />
-            <Skeleton width="36px" height="36px" borderRadius="8px" />
+            <Skeleton width="120px" height="36px" border-radius="8px" class="hidden md:block" />
+            <Skeleton width="36px" height="36px" border-radius="8px" />
           </div>
         </div>
       </div>
@@ -49,13 +49,13 @@
           <div class="mt-5">
             <Skeleton width="60px" height="16px" class="mb-2" />
             <Skeleton width="100%" height="14px" class="mb-3" />
-            <Skeleton width="100%" height="8px" borderRadius="4px" />
+            <Skeleton width="100%" height="8px" border-radius="4px" />
           </div>
 
           <div class="mt-5">
             <Skeleton width="80px" height="16px" class="mb-2" />
             <div v-for="n in 4" :key="n" class="mt-2 flex items-center gap-2">
-              <Skeleton width="16px" height="16px" borderRadius="3px" />
+              <Skeleton width="16px" height="16px" border-radius="3px" />
               <Skeleton :width="`${40 + n * 10}%`" height="14px" />
             </div>
           </div>

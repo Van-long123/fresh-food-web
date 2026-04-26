@@ -5,7 +5,7 @@
     <!-- Image Box — same pt-[100%] aspect ratio -->
     <div class="relative pt-[100%] overflow-hidden bg-white shrink-0">
       <div class="absolute inset-0 p-2">
-        <Skeleton width="100%" height="100%" borderRadius="4px" />
+        <Skeleton width="100%" height="100%" border-radius="4px" />
       </div>
     </div>
 
@@ -30,7 +30,7 @@
         </div>
 
         <!-- Buy button -->
-        <Skeleton width="100%" height="32px" borderRadius="9999px" />
+        <Skeleton width="100%" height="32px" border-radius="9999px" />
       </div>
     </div>
   </div>

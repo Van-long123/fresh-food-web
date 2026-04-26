@@ -14,7 +14,7 @@
             <Skeleton :width="randomWidth(n)" height="14px" />
           </div>
           <!-- Arrow -->
-          <Skeleton width="14px" height="14px" borderRadius="2px" />
+          <Skeleton width="14px" height="14px" border-radius="2px" />
         </div>
       </li>
     </ul>

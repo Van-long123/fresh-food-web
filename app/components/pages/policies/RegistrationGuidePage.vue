@@ -69,9 +69,9 @@
                 <div class="review-info">
                   <div class="review-name">{{ currentGuide.highlight }}</div>
                   <div
-                    class="review-detail"
                     v-for="line in currentGuide.details"
                     :key="line"
+                    class="review-detail"
                   >
                     <i class="pi pi-check-circle" /> {{ line }}
                   </div>
@@ -115,7 +115,9 @@
 
           <p class="login-link-text">
             Đã có tài khoản?
-            <NuxtLink :to="ROUTES.AUTH.LOGIN" class="login-link"
+            <NuxtLink
+:to="ROUTES.AUTH.LOGIN"
+class="login-link"
               >Đăng nhập →</NuxtLink
             >
           </p>

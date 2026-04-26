@@ -46,9 +46,9 @@
             <input
               v-model="searchQuery"
               type="text"
-              @keyup.enter="handleSearch"
               placeholder="Tìm sản phẩm trong Smartfood..."
               class="w-full h-full outline-none text-[13px] text-gray-800 placeholder-gray-400 bg-transparent font-medium"
+              @keyup.enter="handleSearch"
             />
           </div>
         </div>
@@ -307,8 +307,8 @@
             class="mx-3.5 mb-3 h-0.5 overflow-hidden rounded-full bg-gray-100"
           >
             <div
-              class="h-full rounded-full bg-emerald-400 transition-none"
               :key="noticeKey"
+              class="h-full rounded-full bg-emerald-400 transition-none"
               style="animation: toastProgress 2s linear forwards"
             />
           </div>
@@ -329,8 +329,8 @@
         v-if="showCartPanel"
         ref="cartPanelRef"
         class="fixed right-4 top-[72px] z-60 w-[min(400px,92vw)] rounded-2xl border border-[#e5e7eb]/80 bg-white text-[#0f172a] shadow-[0_20px_50px_rgba(15,23,42,0.15)]"
-        @click.stop
         aria-label="Mini cart"
+        @click.stop
       >
         <!-- Header -->
         <div
@@ -347,8 +347,8 @@
           </div>
           <button
             class="grid h-7 w-7 place-items-center rounded-lg text-[#94a3b8] transition hover:bg-[#fff1f2] hover:text-[#e11d48]"
-            @click="showCartPanel = false"
             aria-label="Close mini cart"
+            @click="showCartPanel = false"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -396,8 +396,8 @@
                   </p>
                   <button
                     class="shrink-0 grid h-6 w-6 place-items-center rounded-md text-[#cbd5e1] transition hover:bg-[#fef2f2] hover:text-[#ef4444]"
-                    @click="removeItem(item.id)"
                     :aria-label="`Remove ${item.name} from cart`"
+                    @click="removeItem(item.id)"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -421,8 +421,8 @@
                     <button
                       class="qty-btn"
                       :disabled="item.qty <= 1"
-                      @click="decreaseQty(item.id)"
                       :aria-label="`Decrease quantity for ${item.name}`"
+                      @click="decreaseQty(item.id)"
                     >
                       −
                     </button>
@@ -432,8 +432,8 @@
                     >
                     <button
                       class="qty-btn"
-                      @click="increaseQty(item.id)"
                       :aria-label="`Increase quantity for ${item.name}`"
+                      @click="increaseQty(item.id)"
                     >
                       +
                     </button>
@@ -470,8 +470,8 @@
             </NuxtLink>
             <button
               class="h-10 rounded-lg bg-linear-to-r from-[#f97316] to-[#ef4444] text-[13px] font-bold text-white transition hover:shadow-md hover:shadow-orange-200/50"
-              @click="showCartPanel = false"
               aria-label="Proceed to checkout"
+              @click="showCartPanel = false"
             >
               Thanh toán
             </button>

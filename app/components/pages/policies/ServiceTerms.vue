@@ -1,26 +1,9 @@
 <template>
-  <!--
-    ╔══════════════════════════════════════════════════════╗
-    ║  ServiceTerms.vue — Điều Khoản Dịch Vụ SmartFood    ║
-    ║  Nuxt 3 + PrimeVue 4 + Tailwind CSS                 ║
-    ╚══════════════════════════════════════════════════════╝
-  -->
-  <div
-    class="font-sans text-gray-800 bg-white min-h-screen"
-    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;"
-    ref="pageRef"
-  >
-    <!-- ══════════════════════════════════════════════════
-         READING PROGRESS BAR (fixed top)
-         ══════════════════════════════════════════════════ -->
+  <div ref="pageRef" class="font-sans text-gray-800 bg-white min-h-screen">
     <div
       class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-600 z-[9999] transition-[width] duration-150 ease-linear rounded-r-sm"
       :style="{ width: readingProgress + '%' }"
     />
-
-    <!-- ══════════════════════════════════════════════════
-         SECTION 1 — HERO BANNER
-         ══════════════════════════════════════════════════ -->
     <section class="hero-banner" :class="{ visible: heroVisible }">
       <!-- SVG dấu check pattern mờ -->
       <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -91,8 +74,15 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-[1.875rem] font-black text-white mb-[0.375rem] leading-[1.2]">Điều Khoản Dịch Vụ</h1>
-            <span class="inline-block bg-white/[0.18] border border-white/35 text-white/90 text-[0.78rem] font-semibold py-[0.2rem] px-3 rounded-full">📅 Cập nhật lần cuối: 01/01/2025</span>
+            <h1
+              class="text-[1.875rem] font-black text-white mb-[0.375rem] leading-[1.2]"
+            >
+              Điều Khoản Dịch Vụ
+            </h1>
+            <span
+              class="inline-block bg-white/[0.18] border border-white/35 text-white/90 text-[0.78rem] font-semibold py-[0.2rem] px-3 rounded-full"
+              >📅 Cập nhật lần cuối: 01/01/2025</span
+            >
           </div>
         </div>
 
@@ -109,7 +99,10 @@
          MOBILE: Dropdown chuyển mục (ẩn ở desktop)
          ══════════════════════════════════════════════════ -->
     <div class="mobile-nav">
-      <label class="text-[0.875rem] font-semibold text-gray-700 whitespace-nowrap">Chuyển đến mục:</label>
+      <label
+        class="text-[0.875rem] font-semibold text-gray-700 whitespace-nowrap"
+        >Chuyển đến mục:</label
+      >
       <Select
         v-model="mobileSection"
         :options="sections"
@@ -127,7 +120,9 @@
     <div class="main-layout">
       <!-- ─── SIDEBAR (30%) ──────────────────────────── -->
       <aside class="sidebar">
-        <div class="bg-white border-[1.5px] border-gray-200 rounded-[1.25rem] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+        <div
+          class="bg-white border-[1.5px] border-gray-200 rounded-[1.25rem] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden"
+        >
           <!-- Sidebar progress bar -->
           <div class="h-[3px] bg-gray-100">
             <div
@@ -136,15 +131,23 @@
             />
           </div>
 
-          <div class="flex items-center gap-[0.625rem] px-5 py-4 pb-3 border-b-[1.5px] border-gray-100">
-            <svg viewBox="0 0 20 20" fill="#F97316" class="w-[1.125rem] h-[1.125rem] shrink-0">
+          <div
+            class="flex items-center gap-[0.625rem] px-5 py-4 pb-3 border-b-[1.5px] border-gray-100"
+          >
+            <svg
+              viewBox="0 0 20 20"
+              fill="#F97316"
+              class="w-[1.125rem] h-[1.125rem] shrink-0"
+            >
               <path
                 fill-rule="evenodd"
                 d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
                 clip-rule="evenodd"
               />
             </svg>
-            <span class="text-[0.9375rem] font-extrabold text-gray-900">Mục Lục</span>
+            <span class="text-[0.9375rem] font-extrabold text-gray-900"
+              >Mục Lục</span
+            >
           </div>
 
           <nav class="py-2 flex flex-col">
@@ -155,15 +158,22 @@
               :class="{ active: activeSection === sec.id }"
               @click="scrollToSection(sec.id)"
             >
-              <span class="text-[0.75rem] font-bold text-orange-500 font-mono min-w-[2.25rem]">{{ sec.num }}</span>
+              <span
+                class="text-[0.75rem] font-bold text-orange-500 font-mono min-w-[2.25rem]"
+                >{{ sec.num }}</span
+              >
               <span class="text-left">{{ sec.title }}</span>
             </button>
           </nav>
         </div>
 
         <!-- Cần hỗ trợ? -->
-        <div class="bg-orange-50 border-[1.5px] border-orange-200 rounded-[1.25rem] p-5 flex flex-col items-center text-center gap-2">
-          <div class="w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(249,115,22,0.2)]">
+        <div
+          class="bg-orange-50 border-[1.5px] border-orange-200 rounded-[1.25rem] p-5 flex flex-col items-center text-center gap-2"
+        >
+          <div
+            class="w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(249,115,22,0.2)]"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -179,8 +189,12 @@
             </svg>
           </div>
           <div>
-            <p class="text-[0.9rem] font-extrabold text-gray-900 m-0">Cần hỗ trợ?</p>
-            <p class="text-[0.77rem] text-gray-500 m-0">Đội ngũ SmartFood sẵn sàng giải đáp</p>
+            <p class="text-[0.9rem] font-extrabold text-gray-900 m-0">
+              Cần hỗ trợ?
+            </p>
+            <p class="text-[0.77rem] text-gray-500 m-0">
+              Đội ngũ SmartFood sẵn sàng giải đáp
+            </p>
           </div>
           <button class="btn-support" @click="goToSupport">Liên hệ ngay</button>
         </div>
@@ -191,12 +205,14 @@
         <!-- §1 Giới thiệu & Định nghĩa -->
         <section
           id="sec-1"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-1'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">1</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Giới Thiệu &amp; Định Nghĩa</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Giới Thiệu &amp; Định Nghĩa
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -249,12 +265,14 @@
         <!-- §2 Điều kiện sử dụng -->
         <section
           id="sec-2"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-2'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">2</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Điều Kiện Sử Dụng Dịch Vụ</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Điều Kiện Sử Dụng Dịch Vụ
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -303,12 +321,14 @@
         <!-- §3 Tài khoản người dùng -->
         <section
           id="sec-3"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-3'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">3</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Tài Khoản Người Dùng</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Tài Khoản Người Dùng
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -335,7 +355,7 @@
               <li>
                 <strong>Bảo vệ thông tin:</strong> Nếu phát hiện dấu hiệu xâm
                 nhập trái phép, hãy đặt lại mật khẩu ngay và liên hệ SmartFood
-                qua hotline 1800.5858.
+                qua hotline {{ CONTACT_INFO.HOTLINE }}.
               </li>
             </ul>
             <p>
@@ -349,12 +369,14 @@
         <!-- §4 Đặt hàng & Thanh toán -->
         <section
           id="sec-4"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-4'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">4</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Quy Định Đặt Hàng &amp; Thanh Toán</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Quy Định Đặt Hàng &amp; Thanh Toán
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -403,12 +425,14 @@
         <!-- §5 Chính sách giao hàng -->
         <section
           id="sec-5"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-5'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">5</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Chính Sách Giao Hàng</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Chính Sách Giao Hàng
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -444,12 +468,14 @@
         <!-- §6 Đổi trả & Hoàn tiền -->
         <section
           id="sec-6"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-6'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">6</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Đổi Trả &amp; Hoàn Tiền</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Đổi Trả &amp; Hoàn Tiền
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -498,12 +524,14 @@
         <!-- §7 Quyền & Nghĩa vụ -->
         <section
           id="sec-7"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-7'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">7</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Quyền Và Nghĩa Vụ Các Bên</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Quyền Và Nghĩa Vụ Các Bên
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -552,12 +580,14 @@
         <!-- §8 Điều khoản chung -->
         <section
           id="sec-8"
-          class="term-section reveal"
           ref="el => sectionRefs['sec-8'] = el"
+          class="term-section reveal"
         >
           <div class="flex items-center gap-4 mb-3">
             <span class="sec-num">8</span>
-            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">Điều Khoản Chung</h2>
+            <h2 class="text-[1.3125rem] font-black text-gray-900 m-0">
+              Điều Khoản Chung
+            </h2>
           </div>
           <div class="sec-divider" />
           <div class="sec-body">
@@ -576,7 +606,7 @@
               <li>
                 <strong>Liên hệ pháp lý:</strong> Mọi thông báo pháp lý gửi về:
                 Công ty TNHH SmartFood Việt Nam, 123 Nguyễn Văn Linh, Hải Châu,
-                Đà Nẵng. Email: legal@smartfood.vn.
+                Đà Nẵng. Email: {{ CONTACT_INFO.EMAIL }}.
               </li>
               <li>
                 <strong>Hiệu lực điều khoản:</strong> Nếu bất kỳ điều khoản nào
@@ -603,13 +633,9 @@
             </div>
           </div>
         </section>
-
-        <!-- ══════════════════════════════════════════════════
-             CTA SECTION
-             ══════════════════════════════════════════════════ -->
         <div
-          class="bg-orange-50 border-[1.5px] border-orange-200 rounded-3xl p-8 pb-6 mt-6 flex flex-col gap-5 reveal"
           ref="el => sectionRefs['cta'] = el"
+          class="bg-orange-50 border-[1.5px] border-orange-200 rounded-3xl p-8 pb-6 mt-6 flex flex-col gap-5 reveal"
         >
           <div class="flex items-start gap-4">
             <div class="shrink-0">
@@ -632,11 +658,15 @@
               </svg>
             </div>
             <div>
-              <p class="text-[0.9375rem] font-semibold text-gray-900 leading-[1.65] mb-1">
+              <p
+                class="text-[0.9375rem] font-semibold text-gray-900 leading-[1.65] mb-1"
+              >
                 Bằng việc sử dụng dịch vụ SmartFood, bạn xác nhận đã đọc và đồng
                 ý với toàn bộ các Điều Khoản trên.
               </p>
-              <p class="text-[0.8rem] text-gray-500 m-0">Điều khoản có hiệu lực từ ngày 15/07/2025</p>
+              <p class="text-[0.8rem] text-gray-500 m-0">
+                Điều khoản có hiệu lực từ ngày 15/07/2025
+              </p>
             </div>
           </div>
           <div class="flex gap-[0.875rem] flex-wrap">
@@ -646,7 +676,10 @@
             </button>
           </div>
           <div class="text-center">
-            <button class="inline-flex items-center gap-[0.375rem] bg-transparent border-0 text-orange-500 text-[0.875rem] font-semibold cursor-pointer p-0 underline underline-offset-[3px] hover:text-orange-600 transition-colors duration-150" @click="handleDownload">
+            <button
+              class="inline-flex items-center gap-[0.375rem] bg-transparent border-0 text-orange-500 text-[0.875rem] font-semibold cursor-pointer p-0 underline underline-offset-[3px] hover:text-orange-600 transition-colors duration-150"
+              @click="handleDownload"
+            >
               <svg viewBox="0 0 16 16" fill="none" class="w-4 h-4">
                 <path
                   d="M8 1v9M4 7l4 4 4-4M2 14h12"
@@ -669,12 +702,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
+import { CONTACT_INFO } from "~/constants/contact";
 
 const router = useRouter();
 
-// ══════════════════════════════════════════════════════════
-// DANH SÁCH CÁC SECTION
-// ══════════════════════════════════════════════════════════
 const sections = [
   { id: "sec-1", num: "§1", title: "Giới thiệu & Định nghĩa" },
   { id: "sec-2", num: "§2", title: "Điều kiện sử dụng dịch vụ" },
@@ -686,17 +717,13 @@ const sections = [
   { id: "sec-8", num: "§8", title: "Điều khoản chung" },
 ];
 
-// ══════════════════════════════════════════════════════════
 // TRẠNG THÁI
-// ══════════════════════════════════════════════════════════
 const heroVisible = ref(false);
 const readingProgress = ref(0);
 const activeSection = ref("sec-1");
 const mobileSection = ref("sec-1");
 
-// ══════════════════════════════════════════════════════════
 // SCROLL PROGRESS + SCROLL SPY
-// ══════════════════════════════════════════════════════════
 const handleScroll = () => {
   // Reading progress (0 → 100%)
   const scrollTop = window.scrollY;
@@ -719,9 +746,7 @@ const handleScroll = () => {
   mobileSection.value = currentId;
 };
 
-// ══════════════════════════════════════════════════════════
 // SMOOTH SCROLL ĐẾN SECTION
-// ══════════════════════════════════════════════════════════
 const scrollToSection = (id: string) => {
   const el = document.getElementById(id);
   if (el) {
@@ -731,9 +756,7 @@ const scrollToSection = (id: string) => {
   }
 };
 
-// ══════════════════════════════════════════════════════════
 // SCROLL REVEAL (IntersectionObserver)
-// ══════════════════════════════════════════════════════════
 const observeEl = (el: Element) => {
   const obs = new IntersectionObserver(
     (entries) => {
@@ -749,9 +772,7 @@ const observeEl = (el: Element) => {
   obs.observe(el);
 };
 
-// ══════════════════════════════════════════════════════════
 // ACTIONS
-// ══════════════════════════════════════════════════════════
 const goToSupport = () => router.push(ROUTES.SUPPORT);
 const handleAgree = () => router.push(ROUTES.HOME);
 const handleDownload = () => {
@@ -759,9 +780,7 @@ const handleDownload = () => {
   alert("Chức năng tải PDF sẽ sớm ra mắt!");
 };
 
-// ══════════════════════════════════════════════════════════
 // LIFECYCLE
-// ══════════════════════════════════════════════════════════
 onMounted(() => {
   // Hero animation
   setTimeout(() => {

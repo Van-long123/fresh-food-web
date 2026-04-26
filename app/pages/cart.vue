@@ -116,8 +116,8 @@
                     <button
                       type="button"
                       :disabled="item.qty <= 1"
-                      @click="changeQty(item.id, -1)"
                       class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:enabled:bg-[#f97316] hover:enabled:border-[#f97316] hover:enabled:text-white"
+                      @click="changeQty(item.id, -1)"
                     >
                       -
                     </button>
@@ -128,8 +128,8 @@
                     >
                     <button
                       type="button"
-                      @click="changeQty(item.id, 1)"
                       class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:bg-[#f97316] hover:border-[#f97316] hover:text-white"
+                      @click="changeQty(item.id, 1)"
                     >
                       +
                     </button>
@@ -158,8 +158,8 @@
                 <div class="relative">
                   <button
                     type="button"
-                    @click="toggleRemoveAsk(item.id)"
                     class="w-[30px] h-[30px] border-0 rounded-lg bg-transparent text-[#9ca3af] hover:text-[#ef4444] hover:bg-[#fef2f2]"
+                    @click="toggleRemoveAsk(item.id)"
                   >
                     🗑
                   </button>
@@ -171,15 +171,15 @@
                     <div class="mt-1.5 flex gap-1.5">
                       <button
                         type="button"
-                        @click="removeAskId = null"
                         class="border border-[#d1d5db] rounded-lg bg-white px-2 py-1 text-[12px]"
+                        @click="removeAskId = null"
                       >
                         Hủy
                       </button>
                       <button
                         type="button"
-                        @click="removeItem(item.id)"
                         class="border border-[#ef4444] rounded-lg bg-white px-2 py-1 text-[12px] text-[#ef4444]"
+                        @click="removeItem(item.id)"
                       >
                         Xóa
                       </button>
@@ -265,13 +265,15 @@
                 />
                 <button
                   type="button"
-                  @click="applyVoucher"
                   class="border-0 rounded-[10px] bg-[#f97316] text-white px-3 font-bold"
+                  @click="applyVoucher"
                 >
                   Áp dụng
                 </button>
               </div>
-              <small v-if="voucherState === 'ok'" class="text-[#16a34a]"
+              <small
+v-if="voucherState === 'ok'"
+class="text-[#16a34a]"
                 >✓ Giảm 30.000đ</small
               >
               <small
@@ -297,8 +299,8 @@
             <button
               type="button"
               :disabled="loadingCheckout"
-              @click="checkoutNow"
               class="w-full mt-3.5 h-[52px] border-0 rounded-xl text-white text-base font-extrabold bg-gradient-to-r from-[#f97316] to-[#ea580c] flex justify-center items-center gap-2 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_12px_22px_rgba(249,115,22,0.32)] active:scale-[0.98]"
+              @click="checkoutNow"
             >
               <span v-if="loadingCheckout" class="checkout-spin" />
               Đặt hàng ngay →
@@ -354,8 +356,8 @@
               </p>
               <button
                 type="button"
-                @click="quickAdd(item)"
                 class="mt-2 w-[30px] h-[30px] border-0 rounded-full bg-[#f97316] text-white text-lg"
+                @click="quickAdd(item)"
               >
                 +
               </button>
@@ -405,8 +407,8 @@
         </div>
         <button
           type="button"
-          @click="checkoutNow"
           class="border-0 rounded-full bg-[#f97316] text-white font-bold px-[18px] py-2.5"
+          @click="checkoutNow"
         >
           Đặt hàng
         </button>

@@ -35,15 +35,15 @@
 
         <!-- Pagination skeleton -->
         <div class="flex items-center justify-center gap-2 pt-6">
-          <Skeleton width="80px" height="36px" borderRadius="8px" />
+          <Skeleton width="80px" height="36px" border-radius="8px" />
           <Skeleton
             v-for="n in 3"
             :key="n"
             width="36px"
             height="36px"
-            borderRadius="8px"
+            border-radius="8px"
           />
-          <Skeleton width="80px" height="36px" borderRadius="8px" />
+          <Skeleton width="80px" height="36px" border-radius="8px" />
         </div>
         <div class="flex justify-center mt-2">
           <Skeleton width="240px" height="12px" />
