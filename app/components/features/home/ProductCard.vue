@@ -24,12 +24,14 @@
         </div>
       </div>
 
-      <img
-        :src="product.image"
-        :alt="product.name"
-        class="absolute inset-0 w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-lg"
-        loading="lazy"
-      />
+      <NuxtLink :to="productDetailRoute" class="absolute inset-0 block">
+        <img
+          :src="product.image"
+          :alt="product.name"
+          class="absolute inset-0 w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 rounded-lg"
+          loading="lazy"
+        />
+      </NuxtLink>
 
       <!-- BEST PRICE banner at the bottom of the image -->
       <div
@@ -45,12 +47,14 @@
 
     <!-- Content Box -->
     <div class="flex flex-col flex-1 bg-white">
-      <h3
-        class="text-[13px] font-normal text-gray-800 line-clamp-2 mb-1 mt-1 group-hover:text-[#f47f20] transition-colors cursor-pointer flex-1"
-        :title="product.name"
-      >
-        {{ product.name }}
-      </h3>
+      <NuxtLink :to="productDetailRoute" class="block">
+        <h3
+          class="text-[13px] font-normal text-gray-800 line-clamp-2 mb-1 mt-1 group-hover:text-[#f47f20] transition-colors cursor-pointer flex-1"
+          :title="product.name"
+        >
+          {{ product.name }}
+        </h3>
+      </NuxtLink>
 
       <div class="mt-auto">
         <div class="flex items-baseline gap-1.5 mb-0.5">
@@ -104,8 +108,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useCart } from "~/composables/cart/useCart";
+import { ROUTES } from "~/constants/routes";
 import type { HomeProduct } from "~/types/home.type";
 
 interface ProductCardModel extends HomeProduct {
@@ -118,6 +123,9 @@ const props = defineProps<{
 
 const { addToCart } = useCart();
 const addedState = ref(false);
+const productDetailRoute = computed(() =>
+  ROUTES.PRODUCT_DETAIL(props.product.slug || ""),
+);
 
 const formatPrice = (price: number): string => {
   return price.toLocaleString("vi-VN");

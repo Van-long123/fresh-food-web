@@ -1,17 +1,28 @@
 <template>
   <SkProductDetailPage v-if="isLoading" />
 
+  <div
+    v-else-if="!detail"
+    class="min-h-screen bg-[#f5f5f5] px-4 py-12 text-center text-[#222]"
+  >
+    <p class="text-xl font-bold">Không tìm thấy sản phẩm.</p>
+    <NuxtLink
+      :to="ROUTES.HOME"
+      class="mt-4 inline-block text-sm font-semibold text-[#4caf50] hover:underline"
+    >
+      Quay về trang chủ
+    </NuxtLink>
+  </div>
+
   <div v-else class="min-h-screen bg-[#f5f5f5] pb-12 text-[#222]">
     <div class="mx-auto max-w-7xl px-4 pt-4 md:px-6">
       <nav class="text-xs text-[#666]">
-        <NuxtLink
-:to="ROUTES.HOME"
-class="hover:underline hover:text-[#4caf50]"
+        <NuxtLink :to="ROUTES.HOME" class="hover:underline hover:text-[#4caf50]"
           >Trang chủ</NuxtLink
         >
         <span class="mx-1 text-[#ccc]">›</span>
         <NuxtLink
-          :to="ROUTES.CATEGORY('rau-cu')"
+          :to="categorySlug ? ROUTES.CATEGORY(categorySlug) : ROUTES.HOME"
           class="hover:underline hover:text-[#4caf50]"
           >{{ categoryName }}</NuxtLink
         >
@@ -93,7 +104,9 @@ class="hover:underline hover:text-[#4caf50]"
                 :key="i"
                 viewBox="0 0 20 20"
                 class="h-4 w-4"
-                :class="i <= 4 ? 'text-[#f59e0b]' : 'text-gray-300'"
+                :class="
+                  i <= roundedAverage ? 'text-[#f59e0b]' : 'text-gray-300'
+                "
                 fill="currentColor"
               >
                 <path
@@ -101,38 +114,26 @@ class="hover:underline hover:text-[#4caf50]"
                 />
               </svg>
             </div>
-            <span class="text-xs text-[#666]">(128 đánh giá)</span>
+            <span class="text-xs text-[#666]"
+              >({{ ratingSummary.totalReviews }} đánh giá)</span
+            >
           </button>
 
           <div class="mt-4 flex flex-wrap items-end gap-3">
             <p class="text-[28px] font-black text-[#f47f20]">
               {{ formatVnd(product.price) }}đ
             </p>
-            <p class="text-base text-gray-400 line-through">
+            <p
+              v-if="product.originalPrice > product.price"
+              class="text-base text-gray-400 line-through"
+            >
               {{ formatVnd(product.originalPrice) }}đ
             </p>
             <span
+              v-if="product.originalPrice > product.price"
               class="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700"
               >Tiết kiệm {{ savingText }}</span
             >
-          </div>
-
-          <div
-            v-if="remainingSeconds > 0"
-            class="mt-4 rounded-2xl bg-linear-to-r from-[#fc5c22] to-[#ef4444] p-4 text-white"
-          >
-            <p class="text-sm font-semibold">Flash Sale kết thúc sau</p>
-            <div class="mt-2 flex gap-2 font-mono text-xl font-black">
-              <span class="rounded bg-white/95 px-3 py-1 text-[#f47f20]">{{
-                countdown.hh
-              }}</span>
-              <span class="rounded bg-white/95 px-3 py-1 text-[#f47f20]">{{
-                countdown.mm
-              }}</span>
-              <span class="rounded bg-white/95 px-3 py-1 text-[#f47f20]">{{
-                countdown.ss
-              }}</span>
-            </div>
           </div>
 
           <div class="mt-5">
@@ -206,7 +207,7 @@ class="hover:underline hover:text-[#4caf50]"
               class="prose max-w-none text-gray-700"
               :class="{ 'max-h-75 overflow-hidden': !expandDescription }"
             >
-              <p>{{ longDescription }}</p>
+              <p>{{ descriptionText }}</p>
             </div>
             <button
               class="mt-3 text-sm font-semibold text-[#f47f20]"
@@ -216,31 +217,12 @@ class="hover:underline hover:text-[#4caf50]"
             </button>
           </div>
 
-          <div v-else-if="activeTab === 'nutrition'" class="overflow-x-auto">
-            <table class="w-full min-w-125 border-collapse text-sm">
-              <thead>
-                <tr class="bg-[#fff3e8] text-orange-700">
-                  <th class="px-3 py-2 text-left">Thành phần</th>
-                  <th class="px-3 py-2 text-left">Giá trị / 100g</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(row, idx) in nutritionRows"
-                  :key="row.label"
-                  :class="idx % 2 ? 'bg-gray-50' : ''"
-                >
-                  <td class="px-3 py-2">{{ row.label }}</td>
-                  <td class="px-3 py-2">{{ row.value }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
           <div v-else id="review-tab">
             <div class="grid gap-4 md:grid-cols-[220px_1fr]">
               <div class="rounded-xl bg-[#fff7ed] p-4 text-center">
-                <p class="text-4xl font-black text-[#f47f20]">4.8</p>
+                <p class="text-4xl font-black text-[#f47f20]">
+                  {{ averageRatingText }}
+                </p>
                 <p class="text-xs text-gray-500">trên 5 sao</p>
               </div>
               <div class="space-y-2">
@@ -253,7 +235,7 @@ class="hover:underline hover:text-[#4caf50]"
                   <div class="h-2 flex-1 rounded-full bg-gray-200">
                     <div
                       class="h-full rounded-full bg-[#f47f20]"
-                      :style="{ width: `${score * 18}%` }"
+                      :style="{ width: `${getRatingPercent(score)}%` }"
                     />
                   </div>
                 </div>
@@ -266,14 +248,26 @@ class="hover:underline hover:text-[#4caf50]"
               class="mt-4 rounded-xl border border-gray-100 p-4"
             >
               <div class="flex items-start gap-3">
-                <img
-                  :src="review.avatar"
-                  alt="avatar"
-                  class="h-10 w-10 rounded-full object-cover"
-                />
+                <div class="h-10 w-10 shrink-0">
+                  <img
+                    v-if="review.avatar"
+                    :src="review.avatar"
+                    alt="avatar"
+                    class="h-full w-full rounded-full object-cover"
+                  />
+                  <div
+                    v-else
+                    class="flex h-full w-full items-center justify-center rounded-full border border-gray-300 bg-gray-50 text-xs font-bold text-gray-400"
+                  >
+                    {{ review.name.charAt(0).toUpperCase() }}
+                  </div>
+                </div>
                 <div class="flex-1">
                   <p class="font-semibold">{{ review.name }}</p>
                   <p class="text-sm text-gray-600">{{ review.content }}</p>
+                  <p class="mt-1 text-xs text-gray-500">
+                    {{ review.createdAt }}
+                  </p>
                   <div class="mt-2 flex gap-2">
                     <img
                       v-for="(img, idx) in review.images"
@@ -291,19 +285,22 @@ class="hover:underline hover:text-[#4caf50]"
       </section>
 
       <section class="mt-8">
-        <h2 class="text-xl font-bold">Có thể bạn cũng thích</h2>
-        <div
-          class="mt-4 grid grid-flow-col auto-cols-[65%] gap-3 overflow-x-auto pb-2 md:auto-cols-[31%] lg:grid-flow-row lg:grid-cols-5 lg:overflow-visible"
+        <h2 class="text-xl font-bold mb-4">Có thể bạn cũng thích</h2>
+        <Carousel
+          :value="suggestions"
+          :numVisible="5"
+          :numScroll="1"
+          :responsiveOptions="responsiveOptions"
+          circular
+          :autoplayInterval="4000"
+          :showIndicators="false"
         >
-          <div
-            v-for="(item, idx) in suggestions"
-            :key="item.id"
-            class="suggestion-card"
-            :style="{ animationDelay: `${idx * 90}ms` }"
-          >
-            <ProductCard :product="item" />
-          </div>
-        </div>
+          <template #item="slotProps">
+            <div class="px-2">
+              <ProductCard :product="slotProps.data" />
+            </div>
+          </template>
+        </Carousel>
       </section>
     </div>
 
@@ -331,13 +328,19 @@ class="hover:underline hover:text-[#4caf50]"
         </div>
       </Transition>
     </Teleport>
+
+    >
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, ref, watch } from "vue";
+import { useProductDetailQuery } from "~/queries/product/useProductDetailQuery";
+import { useCart } from "~/composables/cart/useCart";
 import SkProductDetailPage from "~/components/skeletons/SkProductDetailPage.vue";
 import { ROUTES } from "~/constants/routes";
+import type { HomeProduct } from "~/types/home.type";
+
 useHead({
   title: "Chi tiết sản phẩm - SmartFood",
   meta: [
@@ -345,26 +348,47 @@ useHead({
   ],
 });
 
-const isLoading = ref(false);
+const route = useRoute();
+const slug = computed(() => String(route.params.slug || ""));
 
-const categoryName = "Rau củ";
-const product = {
-  name: "Bông cải xanh hữu cơ Đà Lạt loại tuyển chọn tươi mới mỗi ngày",
-  price: 89000,
-  originalPrice: 119000,
-  discountPercent: 25,
-  isOnlineExclusive: true,
-};
+const { data: detail, isLoading } = useProductDetailQuery(slug);
 
-const images = [
-  "https://picsum.photos/seed/food-detail-1/800/800",
-  "https://picsum.photos/seed/food-detail-2/800/800",
-  "https://picsum.photos/seed/food-detail-3/800/800",
-  "https://picsum.photos/seed/food-detail-4/800/800",
-];
+const categoryName = computed(
+  () => detail.value?.primary_category?.title || "Danh mục",
+);
+const categorySlug = computed(() => detail.value?.primary_category?.slug || "");
 
-const activeImage = ref(images[0] || "");
+const product = computed(() => ({
+  id: String(detail.value?._id || ""),
+  name: detail.value?.title || "",
+  price: Number(detail.value?.price || 0),
+  originalPrice: Number(
+    detail.value?.originalPrice || detail.value?.price || 0,
+  ),
+  discountPercent: Number(detail.value?.discountPercentage || 0),
+  isOnlineExclusive: Boolean(detail.value?.isOnlineExclusive),
+  image: detail.value?.thumbnail || "",
+}));
+
+const images = computed(() => {
+  const rawImages = Array.isArray(detail.value?.images)
+    ? detail.value?.images.filter((item) => typeof item === "string")
+    : [];
+  if (rawImages.length > 0) return rawImages;
+  if (detail.value?.thumbnail) return [detail.value.thumbnail];
+  return [];
+});
+
+const activeImage = ref("");
 const showLightbox = ref(false);
+
+watch(
+  images,
+  (newImages) => {
+    activeImage.value = newImages[0] || "";
+  },
+  { immediate: true },
+);
 
 const shareItems = [
   { key: "facebook", icon: "f", label: "Facebook" },
@@ -372,73 +396,158 @@ const shareItems = [
   { key: "copy", icon: "⧉", label: "Copy link" },
 ];
 
-const units = ["500g", "1kg", "Thùng 12 chai"];
-const selectedUnit = ref(units[0] || "500g");
+const units = computed(() => [detail.value?.unit || "kg"]);
+
+const selectedUnit = ref("");
+watch(
+  units,
+  (newUnits) => {
+    selectedUnit.value = newUnits[0] || "kg";
+  },
+  { immediate: true },
+);
+
 const quantity = ref(1);
 
-const tabs = [
-  { key: "description", label: "Mô tả" },
-  // { key: "nutrition", label: "Thông tin dinh dưỡng" },
-  { key: "reviews", label: "Đánh giá (12)" },
-] as const;
+const ratingSummary = computed(() => {
+  const defaultTotalRating = Number(detail.value?.ratings?.totalRating || 0);
+  const defaultNumberOfRatings = Number(
+    detail.value?.ratings?.numberOfRatings || 0,
+  );
+  const fallbackDistribution = [1, 2, 3, 4, 5].map((star) => ({
+    star,
+    count: 0,
+  }));
 
-const activeTab = ref<(typeof tabs)[number]["key"]>("description");
+  if (detail.value?.ratingSummary) {
+    return {
+      totalReviews: Number(detail.value.ratingSummary.totalReviews || 0),
+      averageRating: Number(detail.value.ratingSummary.averageRating || 0),
+      distribution: Array.isArray(detail.value.ratingSummary.distribution)
+        ? detail.value.ratingSummary.distribution
+        : fallbackDistribution,
+    };
+  }
+
+  return {
+    totalReviews: defaultNumberOfRatings,
+    averageRating:
+      defaultNumberOfRatings > 0
+        ? Number((defaultTotalRating / defaultNumberOfRatings).toFixed(1))
+        : 0,
+    distribution: fallbackDistribution,
+  };
+});
+
+const tabs = computed(() => {
+  const baseTabs = [
+    { key: "description", label: "Mô tả" },
+    {
+      key: "reviews",
+      label: `Đánh giá (${ratingSummary.value.totalReviews})`,
+    },
+  ];
+  return baseTabs;
+});
+
+const activeTab = ref("");
 const expandDescription = ref(false);
 const showToast = ref(false);
 
-const longDescription =
-  "Bông cải xanh hữu cơ được trồng theo quy chuẩn VietGAP, thu hoạch trong ngày và đóng gói lạnh để giữ độ tươi. Sản phẩm phù hợp cho salad, luộc, hấp hoặc xào nhanh. Hương vị thanh nhẹ, giòn ngọt tự nhiên và giàu vitamin C, K, chất xơ. Nguồn gốc minh bạch, truy xuất được lô hàng.";
-
-const nutritionRows = [
-  { label: "Năng lượng", value: "34 kcal" },
-  { label: "Chất xơ", value: "2.6 g" },
-  { label: "Vitamin C", value: "89.2 mg" },
-  { label: "Canxi", value: "47 mg" },
-  { label: "Protein", value: "2.8 g" },
-];
-
-const reviews = [
+const responsiveOptions = ref([
   {
-    id: 1,
-    name: "Ngọc H.",
-    avatar: "https://i.pravatar.cc/80?img=11",
-    content: "Rau tươi, đóng gói sạch. Luộc lên vẫn giòn và ngọt.",
-    images: ["https://picsum.photos/seed/review-a/120/120"],
+    breakpoint: "1399px",
+    numVisible: 4,
+    numScroll: 1,
   },
   {
-    id: 2,
-    name: "Phú L.",
-    avatar: "https://i.pravatar.cc/80?img=14",
-    content: "Giao nhanh trong 2h như cam kết, sẽ mua lại.",
-    images: [
-      "https://picsum.photos/seed/review-b/120/120",
-      "https://picsum.photos/seed/review-c/120/120",
-    ],
+    breakpoint: "1199px",
+    numVisible: 3,
+    numScroll: 1,
   },
-];
+  {
+    breakpoint: "767px",
+    numVisible: 2,
+    numScroll: 1,
+  },
+  {
+    breakpoint: "575px",
+    numVisible: 1,
+    numScroll: 1,
+  },
+]);
 
-const suggestions = Array.from({ length: 8 }).map((_, idx) => ({
-  id: idx + 1,
-  name: `Gợi ý sản phẩm ${idx + 1}`,
-  image: `https://picsum.photos/seed/suggest-food-${idx + 1}/400/400`,
-  price: 45000 + idx * 5000,
-  originalPrice: 58000 + idx * 5000,
-  discountPercent: 12 + (idx % 3) * 4,
-  isOnlineExclusive: idx % 2 === 0,
-  isBestPrice: idx % 4 === 0,
-  buttonText: "Mua",
-}));
+const descriptionText = computed(() => detail.value?.description || "");
+
+const reviews = computed(() => {
+  const rawReviews = Array.isArray(detail.value?.reviews)
+    ? detail.value.reviews
+    : [];
+  return rawReviews.map((review) => ({
+    id: String(review._id || ""),
+    name: review.user?.displayName || "Khách hàng",
+    avatar: review.user?.avatar || "",
+    content: review.comment || "",
+    images: Array.isArray(review.images) ? review.images : [],
+    createdAt: review.createdAt
+      ? new Date(review.createdAt).toLocaleDateString("vi-VN")
+      : "",
+  }));
+});
+
+const suggestions = computed<HomeProduct[]>(() => {
+  const rawSuggestions = Array.isArray(detail.value?.suggestions)
+    ? detail.value.suggestions
+    : [];
+
+  return rawSuggestions.map((item) => ({
+    id: String(item._id || ""),
+    slug: item.slug || "",
+    name: item.title || "",
+    image: item.thumbnail || "",
+    price: Number(item.price || 0),
+    originalPrice: Number(item.originalPrice || 0),
+    discountPercent: Number(item.discountPercentage || 0),
+    isBestPrice: Boolean(item.isBestPrice),
+    isOnlineExclusive: Boolean(item.isOnlineExclusive),
+    buttonText: "Mua",
+  }));
+});
 
 const shortName = computed(() =>
-  product.name.length > 30 ? `${product.name.slice(0, 30)}...` : product.name,
+  product.value.name.length > 30
+    ? `${product.value.name.slice(0, 30)}...`
+    : product.value.name,
 );
 
 const savingText = computed(() => {
-  const diff = product.originalPrice - product.price;
+  const diff = product.value.originalPrice - product.value.price;
   return `${Math.round(diff / 1000)}K`;
 });
 
+const averageRatingText = computed(() =>
+  ratingSummary.value.averageRating.toFixed(1),
+);
+const roundedAverage = computed(() =>
+  Math.round(ratingSummary.value.averageRating),
+);
+
+const getRatingCount = (score: number) => {
+  const found = ratingSummary.value.distribution.find(
+    (item) => item.star === score,
+  );
+  return found?.count || 0;
+};
+
+const getRatingPercent = (score: number) => {
+  const totalReviews = ratingSummary.value.totalReviews;
+  if (!totalReviews) return 0;
+  return Math.round((getRatingCount(score) / totalReviews) * 100);
+};
+
 const formatVnd = (value: number) => value.toLocaleString("vi-VN");
+
+const { addToCart: pushToCart } = useCart();
 
 const decreaseQty = () => {
   if (quantity.value > 1) quantity.value -= 1;
@@ -449,6 +558,7 @@ const increaseQty = () => {
 };
 
 const buyNow = () => {
+  addToCart();
   showToast.value = true;
   setTimeout(() => {
     showToast.value = false;
@@ -456,6 +566,12 @@ const buyNow = () => {
 };
 
 const addToCart = () => {
+  pushToCart({
+    id: Number(product.value.id) || undefined,
+    name: product.value.name,
+    price: product.value.price,
+    image: product.value.image,
+  });
   showToast.value = true;
   setTimeout(() => {
     showToast.value = false;
@@ -478,26 +594,18 @@ const scrollToReviews = () => {
     ?.scrollIntoView({ behavior: "smooth", block: "start" });
 };
 
-const remainingSeconds = ref(7 * 60 * 60 + 15 * 60 + 32);
-let timer: ReturnType<typeof setInterval> | null = null;
-
-const countdown = computed(() => {
-  const total = Math.max(remainingSeconds.value, 0);
-  const hh = String(Math.floor(total / 3600)).padStart(2, "0");
-  const mm = String(Math.floor((total % 3600) / 60)).padStart(2, "0");
-  const ss = String(total % 60).padStart(2, "0");
-  return { hh, mm, ss };
-});
-
-onMounted(() => {
-  timer = setInterval(() => {
-    if (remainingSeconds.value > 0) remainingSeconds.value -= 1;
-  }, 1000);
-});
-
-onBeforeUnmount(() => {
-  if (timer) clearInterval(timer);
-});
+watch(
+  tabs,
+  (newTabs) => {
+    const hasActiveTab = newTabs.some((tab) => tab.key === activeTab.value);
+    if (!hasActiveTab && newTabs.length > 0) {
+      activeTab.value = newTabs[0]?.key || "description";
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <style scoped>

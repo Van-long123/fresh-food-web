@@ -21,5 +21,10 @@ export const API_ENDPOINTS = {
   CATEGORY: {
     LIST: '/v1/client/categories',
     DETAIL: (slug: string) => `/v1/client/categories/${slug}`
+  },
+  PRODUCT: {
+    LIST: '/v1/client/products',
+    DETAIL: (slug: string) => `/v1/client/products/${slug}/details`,
+    CREATE_REVIEW: (slug: string) => `/v1/client/products/${slug}/reviews`
   }
 } as const
