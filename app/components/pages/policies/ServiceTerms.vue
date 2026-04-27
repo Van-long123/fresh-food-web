@@ -398,15 +398,15 @@
                 dụng.
               </li>
               <li>
-                <strong>Phương thức thanh toán:</strong> Tiền mặt khi nhận hàng
-                (COD), thẻ ATM nội địa, VISA/Mastercard, ví điện tử MoMo,
-                ZaloPay, VNPay, chuyển khoản ngân hàng.
+                <strong>Phương thức thanh toán:</strong> Thẻ VISA/Mastercard
+                quốc tế, thẻ American Express, thẻ JCB, Apple Pay, Google Pay,
+                chuyển khoản ngân hàng quốc tế (SEPA/ACH tùy khu vực).
               </li>
-              <li>
+              <!-- <li>
                 <strong>Hóa đơn điện tử:</strong> Được gửi qua email trong vòng
                 24 giờ sau khi giao hàng thành công. Yêu cầu hóa đơn VAT doanh
                 nghiệp vui lòng cung cấp thông tin trước khi đặt hàng.
-              </li>
+              </li> -->
             </ul>
             <div class="highlight-box">
               <span class="text-[1.25rem] shrink-0 leading-[1.3]">⚠️</span>
@@ -453,7 +453,7 @@
               </li>
               <li>
                 <strong>Phí giao hàng:</strong> Miễn phí với đơn từ 200.000đ
-                (nội thành). Đơn dưới 200.000đ phí 15.000đ.
+                (nội thành).
               </li>
               <li>
                 <strong>Giao hàng thất bại:</strong> Nếu shipper không thể liên
@@ -676,7 +676,7 @@
             </button>
           </div>
           <div class="text-center">
-            <button
+            <!-- <button
               class="inline-flex items-center gap-[0.375rem] bg-transparent border-0 text-orange-500 text-[0.875rem] font-semibold cursor-pointer p-0 underline underline-offset-[3px] hover:text-orange-600 transition-colors duration-150"
               @click="handleDownload"
             >
@@ -690,7 +690,7 @@
                 />
               </svg>
               Tải xuống PDF
-            </button>
+            </button> -->
           </div>
         </div>
       </main>

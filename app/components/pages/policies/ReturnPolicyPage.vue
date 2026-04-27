@@ -115,12 +115,14 @@
               <span class="text-xl">📞</span>
               <span class="font-semibold">Liên hệ nhanh</span>
             </div>
-            <p class="mt-2 text-2xl font-extrabold text-[#F97316]">{{ CONTACT_INFO.HOTLINE }}</p>
-            <button
+            <p class="mt-2 text-2xl font-extrabold text-[#F97316]">
+              {{ CONTACT_INFO.HOTLINE }}
+            </p>
+            <!-- <button
               class="mt-3 w-full rounded-lg bg-[#F97316] py-2 font-semibold text-white transition hover:bg-[#EA580C]"
             >
               Yêu cầu đổi trả
-            </button>
+            </button> -->
           </div>
         </div>
       </aside>
@@ -278,7 +280,7 @@
             </p>
           </div>
 
-          <form
+          <!-- <form
             class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto]"
             @submit.prevent="handleSubmit"
           >
@@ -312,7 +314,7 @@
                     : "Gửi yêu cầu"
               }}
             </button>
-          </form>
+          </form> -->
         </section>
       </div>
     </section>
@@ -363,7 +365,7 @@ const timelines = [
 
 const processSteps = [
   { title: "📸 Bước 1", desc: "Chụp ảnh sản phẩm lỗi + giữ hóa đơn" },
-  { title: "📞 Bước 2", desc: "Liên hệ hotline hoặc chat trên app" },
+  { title: "📞 Bước 2", desc: "Liên hệ hotline hoặc gửi yêu cầu hỗ trợ" },
   { title: "🚚 Bước 3", desc: "Shipper đến thu hồi hoặc giao hàng mới" },
   { title: "✅ Bước 4", desc: "Hoàn tất - Hoàn tiền hoặc đổi hàng mới" },
 ];

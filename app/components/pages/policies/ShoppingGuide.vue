@@ -95,11 +95,12 @@
           </ul>
           <div class="mt-4 rounded-xl border border-[#FDBA74] bg-[#FFF7ED] p-3">
             <p class="font-semibold">Cần hỗ trợ?</p>
-            <button
-              class="mt-2 w-full h-10 rounded-lg bg-[#F97316] text-white font-semibold"
+            <NuxtLink
+              to="/support"
+              class="mt-2 w-full h-10 rounded-lg bg-[#F97316] text-white font-semibold block flex items-center justify-center"
             >
               Liên hệ ngay
-            </button>
+            </NuxtLink>
           </div>
         </aside>
 
@@ -311,8 +312,8 @@
             <ul class="mt-4 text-sm space-y-1 text-[#374151]">
               <li>☑ Kiểm tra số lượng đúng chưa</li>
               <li>☑ Áp mã khuyến mãi nếu có</li>
-              <li>☑ Chọn địa chỉ giao hàng chính xác</li>
-              <li>☑ Chọn khung giờ giao phù hợp</li>
+              <!-- <li>☑ Chọn địa chỉ giao hàng chính xác</li>
+              <li>☑ Chọn khung giờ giao phù hợp</li> -->
             </ul>
           </section>
 
@@ -540,30 +541,29 @@ const detailSteps = [
 const payments = [
   {
     icon: "💳",
-    title: "Thẻ ATM/VISA/Master",
-    badge: "Phổ biến",
-    desc: "Xử lý nhanh, tiện lợi cho đơn giá trị cao.",
+    title: "Visa / Mastercard",
+    badge: "Phổ biến nhất",
+    desc: "Thẻ tín dụng/ghi nợ quốc tế từ mọi ngân hàng Việt Nam có chip Visa hoặc Mastercard.",
+  },
+  {
+    icon: "🇺🇸",
+    title: "American Express",
+    badge: "Cao cấp",
+    desc: "Dành cho chủ thẻ Amex, thường áp dụng cho khách hàng quốc tế hoặc doanh nghiệp.",
+  },
+  {
+    icon: "🌐",
+    title: "JCB / Discover / Diners Club",
+    badge: "Quốc tế",
+    desc: "Hỗ trợ thêm các mạng thẻ quốc tế khác, phổ biến với khách từ Nhật Bản và châu Á.",
   },
   {
     icon: "📱",
-    title: "Ví MoMo / ZaloPay / VNPay",
+    title: "Apple Pay / Google Pay",
     badge: "Nhanh nhất",
-    desc: "Hoàn tất chỉ trong vài giây.",
-  },
-  {
-    icon: "🏦",
-    title: "Chuyển khoản ngân hàng",
-    badge: "An toàn",
-    desc: "Phù hợp doanh nghiệp và đơn đặt trước.",
-  },
-  {
-    icon: "💵",
-    title: "Tiền mặt khi nhận hàng",
-    badge: "Tiện lợi",
-    desc: "Thanh toán trực tiếp khi shipper giao hàng.",
+    desc: "Thanh toán không tiếp xúc qua ví số, bảo mật bằng Face ID hoặc vân tay.",
   },
 ];
-
 const deliveryTimeline = [
   "📧 Xác nhận qua email (ngay lập tức)",
   "🏪 Xử lý đơn & đóng gói (1-2h)",
@@ -576,11 +576,6 @@ const shippingMethods = [
     icon: "⚡",
     title: "Giao nhanh.",
     desc: "Trong nội thành Đà Nẵng.",
-  },
-  {
-    icon: "📅",
-    title: "Giao theo lịch",
-    desc: "Chọn khung giờ phù hợp lịch trình.",
   },
   {
     icon: "🏪",

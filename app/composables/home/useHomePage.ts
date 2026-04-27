@@ -79,7 +79,7 @@ export const useHomePage = () => {
 
       const hasCurrent = badges.some((badge) => badge.id === activeCampaignId.value)
       if (!hasCurrent) {
-        activeCampaignId.value = badges[0].id
+        activeCampaignId.value = badges[0]?.id || ''
       }
     },
     { immediate: true }

@@ -52,9 +52,8 @@
                       ? 'text-[13px]'
                       : 'text-[11px]',
                   ]"
-                >
-                  {{ badge.name }}
-                </div>
+                  v-html="badge.name"
+                ></div>
               </div>
             </div>
           </div>
