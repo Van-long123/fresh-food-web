@@ -84,7 +84,8 @@ const createAuthorizedAxios = (baseURL: string) => {
             .get(`${baseURL}${API_ENDPOINTS.AUTH.REFRESH_TOKEN}`, { withCredentials: true })
             .then((response) => response.data?.accessToken as string | undefined)
             .catch(async (refreshError) => {
-              await performLogout(baseURL)
+                console.log("🚀 ~ createAuthorizedAxios ~ refreshError:", 'refreshError')
+                await performLogout(baseURL)
               return Promise.reject(refreshError)
             })
             .finally(() => {

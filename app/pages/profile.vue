@@ -1,3 +1,149 @@
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import ChangePasswordPage from "~/pages/auth/change-password.vue";
+import { ROUTES } from "~/constants/routes";
+import { userService } from "~/services/user.service";
+import { useAuthStore } from "~/stores/useAuthStore";
+import { useProfile } from "~/composables/useProfile";
+import SkProfilePage from "~/components/skeletons/SkProfilePage.vue";
+
+definePageMeta({ middleware: "auth" });
+
+useHead({
+  title: "Hồ sơ cá nhân - SmartFood",
+  meta: [{ name: "description", content: "Trang Hồ sơ cá nhân của SmartFood" }],
+});
+
+const router = useRouter();
+const authStore = useAuthStore();
+const {
+  user,
+  isLoading,
+  saving,
+  saveDone,
+  editForm,
+  minDate,
+  maxDate,
+  formattedBirthday,
+  avatarPreview,
+  userInitial,
+  onAvatarChange,
+  saveProfile,
+  selectGender,
+  GENDER_OPTIONS,
+} = useProfile();
+
+const menuItems = [
+  { key: "profile", icon: "👤", label: "Hồ sơ cá nhân" },
+  { key: "orders", icon: "📋", label: "Đơn hàng của tôi" },
+  { key: "address", icon: "📍", label: "Địa chỉ" },
+  { key: "notify", icon: "🔔", label: "Thông báo" },
+  { key: "changePassword", icon: "🔑", label: "Đổi mật khẩu" },
+  { key: "logout", icon: "🚪", label: "Đăng xuất" },
+] as const;
+
+type MenuKey = (typeof menuItems)[number]["key"];
+
+const mobileTabs = [
+  { key: "profile", icon: "👤", label: "Hồ sơ" },
+  { key: "orders", icon: "📋", label: "Đơn hàng" },
+  { key: "changePassword", icon: "🔑", label: "Mật khẩu" },
+  { key: "address", icon: "📍", label: "Địa chỉ" },
+] as const satisfies ReadonlyArray<{
+  key: MenuKey;
+  icon: string;
+  label: string;
+}>;
+
+const activeMenu = ref<MenuKey>("profile");
+const loggingOut = ref(false);
+const rankProgressVisible = ref(false);
+const showAddressModal = ref(false);
+
+const orders = [
+  {
+    code: "DH240115",
+    date: "15/01/2026",
+    status: "Đang giao",
+    total: 324000,
+    images: [
+      "https://picsum.photos/seed/o-1/80/80",
+      "https://picsum.photos/seed/o-2/80/80",
+      "https://picsum.photos/seed/o-3/80/80",
+    ],
+  },
+  {
+    code: "DH240102",
+    date: "02/01/2026",
+    status: "Thành công",
+    total: 518000,
+    images: [
+      "https://picsum.photos/seed/o-4/80/80",
+      "https://picsum.photos/seed/o-5/80/80",
+      "https://picsum.photos/seed/o-6/80/80",
+    ],
+  },
+  {
+    code: "DH231228",
+    date: "28/12/2025",
+    status: "Đã hủy",
+    total: 189000,
+    images: [
+      "https://picsum.photos/seed/o-7/80/80",
+      "https://picsum.photos/seed/o-8/80/80",
+      "https://picsum.photos/seed/o-9/80/80",
+    ],
+  },
+];
+
+const defaultAddress = ref("25 Nguyễn Trãi, P.Bến Thành, Q.1, TP.HCM");
+
+const addressForm = ref({
+  name: "",
+  phone: "",
+  detail: "",
+  city: "TP.HCM",
+  district: "Quận 1",
+  ward: "Phường 1",
+  default: true,
+});
+
+const statusClass = (status: string) => {
+  if (status === "Đang giao") return "bg-blue-100 text-blue-700";
+  if (status === "Thành công") return "bg-green-100 text-green-700";
+  return "bg-red-100 text-red-700";
+};
+
+const formatVnd = (v: number) => v.toLocaleString("vi-VN");
+
+const saveAddress = () => {
+  defaultAddress.value = `${addressForm.value.detail}, ${addressForm.value.ward}, ${addressForm.value.district}, ${addressForm.value.city}`;
+  showAddressModal.value = false;
+};
+
+const handleLogout = async () => {
+  if (loggingOut.value) return;
+
+  loggingOut.value = true;
+  try {
+    await userService.logout();
+  } catch {
+    // Không chặn luồng logout phía client nếu API lỗi.
+  } finally {
+    authStore.logout();
+    await router.replace(ROUTES.AUTH.LOGIN);
+    loggingOut.value = false;
+  }
+};
+
+onMounted(() => {
+  requestAnimationFrame(() => {
+    rankProgressVisible.value = true;
+  });
+});
+</script>
+
 <template>
   <SkProfilePage v-if="isLoading" />
   <div v-else class="min-h-screen bg-[#f5f5f5] pb-24 text-[#111827]">
@@ -19,15 +165,23 @@
             <div class="flex items-end gap-4">
               <label class="avatar-wrap">
                 <img
+                  v-if="avatarPreview"
                   :src="avatarPreview"
                   alt="Avatar"
                   class="h-22 w-22 rounded-full object-cover"
                 />
+                <div
+                  v-else
+                  class="h-22 w-22 rounded-full bg-orange-100 flex items-center justify-center"
+                >
+                  <span class="text-2xl font-black text-orange-500">{{
+                    userInitial
+                  }}</span>
+                </div>
                 <div class="avatar-overlay">
                   <span>📷 Đổi ảnh</span>
                 </div>
                 <input
-                  ref="avatarInput"
                   type="file"
                   accept="image/*"
                   class="hidden"
@@ -37,18 +191,19 @@
 
               <div>
                 <div class="flex items-center gap-2">
-                  <h1 class="text-xl font-bold">{{ user.name }}</h1>
+                  <h1 class="text-xl font-bold">{{ user?.fullname }}</h1>
                   <span
-                    v-if="user.verified"
+                    v-if="user?.verified"
                     class="inline-flex items-center gap-1 rounded-full bg-[#e8f5e9] px-2 py-1 text-xs font-semibold text-[#4caf50]"
                     >✓ Đã xác minh</span
                   >
                 </div>
                 <div class="mt-2 flex flex-wrap gap-3 text-sm text-gray-600">
-                  <span>📞 {{ user.phone }}</span>
-                  <span>📧 {{ user.email }}</span>
-                  <span>📅 {{ user.birthday }}</span>
-                  <!-- <span>🎯 Tích điểm: {{ user.points }} điểm</span> -->
+                  <span>📞 {{ user?.phone }}</span>
+                  <span>📧 {{ user?.email }}</span>
+                  <span v-if="formattedBirthday"
+                    >📅 {{ formattedBirthday }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -93,15 +248,24 @@
               >
                 <label class="field">
                   <span>Họ tên</span>
-                  <input v-model="editForm.name" class="input" />
+                  <input
+                    v-model="editForm.name"
+                    class="input"
+                    placeholder="Nhập họ tên"
+                  />
                 </label>
 
                 <label class="field">
                   <span>Ngày sinh</span>
-                  <input
+                  <DatePicker
                     v-model="editForm.birthday"
-                    type="date"
-                    class="input"
+                    dateFormat="dd/mm/yy"
+                    show-icon
+                    icon-display="input"
+                    :min-date="minDate"
+                    :max-date="maxDate"
+                    fluid
+                    input-class="input !h-[44px]"
                   />
                 </label>
 
@@ -122,36 +286,37 @@
 
                 <label class="field">
                   <span>Số điện thoại</span>
-                  <input v-model="editForm.phone" class="input" />
+                  <input
+                    v-model="editForm.phone"
+                    class="input"
+                    placeholder="Nhập số điện thoại"
+                  />
                 </label>
 
                 <label class="field">
                   <span>Giới tính</span>
                   <div class="mt-1 flex gap-2">
-                    <button
-                      v-for="g in ['Nam', 'Nữ', 'Khác']"
-                      :key="g"
-                      type="button"
-                      class="rounded-full border px-3 py-1 text-sm"
-                      :class="
-                        editForm.gender === g
-                          ? 'border-[#f47f20] bg-[#f47f20] text-white'
-                          : 'border-gray-200'
-                      "
-                      @click="editForm.gender = g"
+                    <div
+                      v-for="g in GENDER_OPTIONS"
+                      :key="g.value"
+                      class="relative"
                     >
-                      {{ g }}
-                    </button>
+                      <input
+                        type="radio"
+                        :id="'gender-' + g.value"
+                        name="gender"
+                        :value="g.value"
+                        v-model="editForm.gender"
+                        class="peer sr-only"
+                      />
+                      <label
+                        :for="'gender-' + g.value"
+                        class="inline-block cursor-pointer rounded-full border px-4 py-2 text-sm transition-all peer-checked:border-[#f47f20] peer-checked:bg-[#f47f20] peer-checked:text-white peer-checked:shadow-md hover:border-gray-300 bg-white text-gray-600 border-gray-200"
+                      >
+                        {{ g.label }}
+                      </label>
+                    </div>
                   </div>
-                </label>
-
-                <label class="field">
-                  <span>Tỉnh/Thành</span>
-                  <select v-model="editForm.city" class="input">
-                    <option>Hồ Chí Minh</option>
-                    <option>Hà Nội</option>
-                    <option>Đà Nẵng</option>
-                  </select>
                 </label>
 
                 <div class="md:col-span-2">
@@ -168,30 +333,6 @@
                 </div>
               </form>
             </section>
-
-            <!-- <section
-              class="rounded-2xl bg-linear-to-r from-[#e8f5e9] to-[#f4fff4] p-5 shadow-sm"
-            >
-              <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold">Điểm thưởng & Hạng thành viên</h2>
-                <span class="text-2xl">⭐</span>
-              </div>
-              <p class="mt-2 text-4xl font-black text-[#4caf50]">
-                {{ user.points }}
-              </p>
-              <p class="text-sm">
-                Hạng hiện tại: <strong>{{ user.rank }}</strong>
-              </p>
-              <div class="mt-4 h-3 overflow-hidden rounded-full bg-white/70">
-                <div
-                  class="h-full bg-[#4caf50] transition-all duration-700"
-                  :style="{ width: rankProgressVisible ? '72%' : '0%' }"
-                />
-              </div>
-              <p class="mt-1 text-sm text-gray-600">
-                Còn 280 điểm để lên hạng Vàng
-              </p>
-            </section> -->
           </template>
 
           <template v-if="activeMenu === 'orders'">
@@ -264,30 +405,6 @@
             </section>
           </template>
 
-          <!-- <template v-if="activeMenu === 'voucher'">
-            <section class="rounded-2xl bg-white p-5 shadow-sm">
-              <h2 class="text-lg font-bold">Mã giảm giá</h2>
-              <div
-                class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500"
-              >
-                <span class="mb-2 text-4xl">🏷️</span>
-                <p>Bạn chưa có mã giảm giá nào.</p>
-              </div>
-            </section>
-          </template> -->
-
-          <!-- <template v-if="activeMenu === 'favorite'">
-            <section class="rounded-2xl bg-white p-5 shadow-sm">
-              <h2 class="text-lg font-bold">Sản phẩm yêu thích</h2>
-              <div
-                class="mt-8 flex flex-col items-center justify-center pb-8 text-gray-500"
-              >
-                <span class="mb-2 text-4xl">⭐</span>
-                <p>Danh sách yêu thích đang trống.</p>
-              </div>
-            </section>
-          </template> -->
-
           <template v-if="activeMenu === 'notify'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Thông báo</h2>
@@ -299,17 +416,6 @@
               </div>
             </section>
           </template>
-
-          <!-- <template v-if="activeMenu === 'security'">
-            <section class="rounded-2xl bg-white p-5 shadow-sm">
-              <h2 class="text-lg font-bold">Bảo mật tài khoản</h2>
-              <div class="mt-4">
-                <p class="text-sm text-gray-600">
-                  Quản lý các thông tin đăng nhập và phương thức bảo mật.
-                </p>
-              </div>
-            </section>
-          </template> -->
 
           <template v-if="activeMenu === 'changePassword'">
             <div
@@ -372,57 +478,89 @@
           @click.self="showAddressModal = false"
         >
           <div class="w-full max-w-lg rounded-2xl bg-white p-5">
-            <h3 class="text-lg font-bold">Chỉnh sửa địa chỉ</h3>
-            <form class="mt-4 space-y-3" @submit.prevent="saveAddress">
-              <input
-                v-model="addressForm.name"
-                class="input"
-                placeholder="Tên người nhận"
-              />
-              <input
-                v-model="addressForm.phone"
-                class="input"
-                placeholder="Số điện thoại"
-              />
-              <input
-                v-model="addressForm.detail"
-                class="input"
-                placeholder="Địa chỉ chi tiết"
-              />
-              <div class="grid gap-2 sm:grid-cols-3">
-                <select v-model="addressForm.city" class="input">
-                  <option>TP.HCM</option>
-                  <option>Hà Nội</option>
-                </select>
-                <select v-model="addressForm.district" class="input">
-                  <option>Quận 1</option>
-                  <option>Quận 7</option>
-                </select>
-                <select v-model="addressForm.ward" class="input">
-                  <option>Phường 1</option>
-                  <option>Phường 2</option>
-                </select>
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="text-lg font-bold">Chỉnh sửa địa chỉ</h3>
+              <button
+                class="text-gray-400 hover:text-gray-600"
+                @click="showAddressModal = false"
+              >
+                <i class="pi pi-times" />
+              </button>
+            </div>
+            <form class="space-y-4" @submit.prevent="saveAddress">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <label class="field">
+                  <span>Tên người nhận</span>
+                  <input
+                    v-model="addressForm.name"
+                    class="input"
+                    placeholder="VD: Nguyễn Văn A"
+                  />
+                </label>
+                <label class="field">
+                  <span>Số điện thoại</span>
+                  <input
+                    v-model="addressForm.phone"
+                    class="input"
+                    placeholder="VD: 0912..."
+                  />
+                </label>
               </div>
+
+              <label class="field">
+                <span>Địa chỉ chi tiết</span>
+                <input
+                  v-model="addressForm.detail"
+                  class="input"
+                  placeholder="Số nhà, tên đường..."
+                />
+              </label>
+
+              <div class="grid gap-3 sm:grid-cols-3">
+                <label class="field">
+                  <span>Tỉnh/Thành</span>
+                  <select v-model="addressForm.city" class="input">
+                    <option>TP.HCM</option>
+                    <option>Hà Nội</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Quận/Huyện</span>
+                  <select v-model="addressForm.district" class="input">
+                    <option>Quận 1</option>
+                    <option>Quận 7</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Phường/Xã</span>
+                  <select v-model="addressForm.ward" class="input">
+                    <option>Phường 1</option>
+                    <option>Phường 2</option>
+                  </select>
+                </label>
+              </div>
+
               <label class="flex items-center gap-2 text-sm">
                 <input
                   v-model="addressForm.default"
                   type="checkbox"
-                  class="accent-[#f47f20]"
+                  class="h-4 w-4 accent-[#f47f20]"
                 />
-                Đặt làm địa chỉ mặc định
+                <span class="text-gray-600">Đặt làm địa chỉ mặc định</span>
               </label>
-              <div class="flex justify-end gap-2 pt-2">
+
+              <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
                 <button
                   type="button"
-                  class="rounded-lg border border-gray-300 px-4 py-2"
+                  class="rounded-full border border-gray-300 px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
                   @click="showAddressModal = false"
                 >
                   Hủy
                 </button>
                 <button
-                  class="rounded-lg bg-[#f47f20] px-4 py-2 font-semibold text-white"
+                  class="rounded-full bg-[#f47f20] px-8 py-2 text-sm font-semibold text-white transition hover:bg-[#e06d10]"
                 >
-                  Lưu
+                  Lưu địa chỉ
                 </button>
               </div>
             </form>
@@ -432,191 +570,6 @@
     </Teleport>
   </div>
 </template>
-
-<script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
-import ChangePasswordPage from "~/pages/auth/change-password.vue";
-import { ROUTES } from "~/constants/routes";
-import { userService } from "~/services/user.service";
-import { useAuthStore } from "~/stores/useAuthStore";
-
-import SkProfilePage from "~/components/skeletons/SkProfilePage.vue";
-
-definePageMeta({ middleware: "auth" });
-
-useHead({
-  title: "Hồ sơ cá nhân - SmartFood",
-  meta: [{ name: "description", content: "Trang Hồ sơ cá nhân của SmartFood" }],
-});
-
-const isLoading = ref(false);
-
-const router = useRouter();
-const authStore = useAuthStore();
-
-const user = {
-  name: "Nguyễn Minh Anh",
-  phone: "0908 123 456",
-  email: "minhanh@gmail.com",
-  birthday: "1998-04-08",
-  points: 1720,
-  rank: "Bạc",
-  verified: true,
-};
-
-const avatarPreview = ref("https://i.pravatar.cc/180?img=47");
-const avatarInput = ref<HTMLInputElement | null>(null);
-
-const menuItems = [
-  { key: "profile", icon: "👤", label: "Hồ sơ cá nhân" },
-  { key: "orders", icon: "📋", label: "Đơn hàng của tôi" },
-  // { key: "voucher", icon: "🏷️", label: "Mã giảm giá" },
-  // { key: "favorite", icon: "⭐", label: "Sản phẩm yêu thích" },
-  { key: "address", icon: "📍", label: "Địa chỉ" },
-  { key: "notify", icon: "🔔", label: "Thông báo" },
-  // { key: "security", icon: "🔐", label: "Bảo mật" },
-  { key: "changePassword", icon: "🔑", label: "Đổi mật khẩu" },
-  { key: "logout", icon: "🚪", label: "Đăng xuất" },
-] as const;
-
-type MenuKey = (typeof menuItems)[number]["key"];
-
-const mobileTabs = [
-  { key: "profile", icon: "👤", label: "Hồ sơ" },
-  { key: "orders", icon: "📋", label: "Đơn hàng" },
-  // { key: "favorite", icon: "⭐", label: "Yêu thích" },
-  { key: "changePassword", icon: "🔑", label: "Mật khẩu" },
-  { key: "address", icon: "📍", label: "Địa chỉ" },
-] as const satisfies ReadonlyArray<{
-  key: MenuKey;
-  icon: string;
-  label: string;
-}>;
-
-const activeMenu = ref<MenuKey>("profile");
-const saving = ref(false);
-const saveDone = ref(false);
-const loggingOut = ref(false);
-const rankProgressVisible = ref(false);
-const showAddressModal = ref(false);
-
-const editForm = ref({
-  name: user.name,
-  birthday: "1998-04-08",
-  email: user.email,
-  phone: user.phone,
-  gender: "Nam",
-  city: "Hồ Chí Minh",
-});
-
-const orders = [
-  {
-    code: "DH240115",
-    date: "15/01/2026",
-    status: "Đang giao",
-    total: 324000,
-    images: [
-      "https://picsum.photos/seed/o-1/80/80",
-      "https://picsum.photos/seed/o-2/80/80",
-      "https://picsum.photos/seed/o-3/80/80",
-    ],
-  },
-  {
-    code: "DH240102",
-    date: "02/01/2026",
-    status: "Thành công",
-    total: 518000,
-    images: [
-      "https://picsum.photos/seed/o-4/80/80",
-      "https://picsum.photos/seed/o-5/80/80",
-      "https://picsum.photos/seed/o-6/80/80",
-    ],
-  },
-  {
-    code: "DH231228",
-    date: "28/12/2025",
-    status: "Đã hủy",
-    total: 189000,
-    images: [
-      "https://picsum.photos/seed/o-7/80/80",
-      "https://picsum.photos/seed/o-8/80/80",
-      "https://picsum.photos/seed/o-9/80/80",
-    ],
-  },
-];
-
-const defaultAddress = ref("25 Nguyễn Trãi, P.Bến Thành, Q.1, TP.HCM");
-
-const addressForm = ref({
-  name: "",
-  phone: "",
-  detail: "",
-  city: "TP.HCM",
-  district: "Quận 1",
-  ward: "Phường 1",
-  default: true,
-});
-
-const statusClass = (status: string) => {
-  if (status === "Đang giao") return "bg-blue-100 text-blue-700";
-  if (status === "Thành công") return "bg-green-100 text-green-700";
-  return "bg-red-100 text-red-700";
-};
-
-const formatVnd = (v: number) => v.toLocaleString("vi-VN");
-
-const onAvatarChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    avatarPreview.value =
-      typeof reader.result === "string" ? reader.result : avatarPreview.value;
-  };
-  reader.readAsDataURL(file);
-};
-
-const saveProfile = () => {
-  saving.value = true;
-  saveDone.value = false;
-  setTimeout(() => {
-    saving.value = false;
-    saveDone.value = true;
-    setTimeout(() => {
-      saveDone.value = false;
-    }, 1200);
-  }, 900);
-};
-
-const saveAddress = () => {
-  defaultAddress.value = `${addressForm.value.detail}, ${addressForm.value.ward}, ${addressForm.value.district}, ${addressForm.value.city}`;
-  showAddressModal.value = false;
-};
-
-const handleLogout = async () => {
-  if (loggingOut.value) return;
-
-  loggingOut.value = true;
-  try {
-    await userService.logout();
-  } catch {
-    // Không chặn luồng logout phía client nếu API lỗi.
-  } finally {
-    authStore.logout();
-    await router.replace(ROUTES.AUTH.LOGIN);
-    loggingOut.value = false;
-  }
-};
-
-onMounted(() => {
-  requestAnimationFrame(() => {
-    rankProgressVisible.value = true;
-  });
-});
-</script>
 
 <style scoped>
 .avatar-wrap {
@@ -657,6 +610,7 @@ onMounted(() => {
   width: 100%;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
+  background-color: #fff;
   padding: 0 12px;
   outline: none;
   transition:
@@ -716,5 +670,34 @@ onMounted(() => {
   padding: 1.5rem;
   border-radius: 0;
   animation: none;
+}
+
+:deep(.p-datepicker) {
+  font-family: inherit;
+}
+
+:deep(.p-datepicker-input) {
+  border-radius: 10px !important;
+  border: 1px solid #e5e7eb !important;
+  height: 44px !important;
+  padding: 0 12px !important;
+  font-size: 14px !important;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease !important;
+}
+
+:deep(.p-datepicker-input:focus) {
+  border-color: #f47f20 !important;
+  box-shadow: 0 0 0 3px rgba(244, 127, 32, 0.2) !important;
+  outline: none !important;
+}
+
+:deep(.p-datepicker-input:hover) {
+  border-color: #f47f20 !important;
+}
+
+:deep(.p-datepicker .p-inputtext) {
+  border-color: #e5e7eb;
 }
 </style>

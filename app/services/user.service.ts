@@ -15,7 +15,7 @@ import type {
   ResetPasswordPayload,
   UpdateProfilePayload,
   VerifyAccountPayload
-} from '~/constants/auth'
+} from '~/types/user.type'
 
 export const userService = {
   register: (payload: RegisterPayload) => registerRequest(payload),
@@ -23,7 +23,7 @@ export const userService = {
   login: (payload: LoginPayload) => loginRequest(payload),
   logout: () => logoutRequest(),
   refreshToken: () => refreshTokenRequest(),
-  updateProfile: (payload: UpdateProfilePayload) => updateProfileRequest(payload),
+  updateProfile: (payload: UpdateProfilePayload | FormData) => updateProfileRequest(payload),
   forgotPassword: (payload: ForgotPasswordPayload) => forgotPasswordRequest(payload),
   resetPassword: (payload: ResetPasswordPayload) => resetPasswordRequest(payload)
 }

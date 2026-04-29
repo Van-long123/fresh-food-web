@@ -1,36 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Voucher } from './useOrderStore'
-
-export interface AuthUser {
-  id: string
-  fullname: string
-  phone: string
-  email?: string
-  address?: string
-  ward?: string
-  wardCode?: number
-  district?: string
-  districtCode?: number
-  province?: string
-  provinceCode?: number
-  avatar?: string
-}
-
-export interface ApiAuthUser {
-  _id: string
-  displayName: string
-  phone: string
-  email?: string
-  address?: string
-  ward?: string
-  ward_code?: number
-  district?: string
-  district_code?: number
-  province?: string
-  province_code?: number
-  avatar?: string
-}
+import type { AuthUser, ApiAuthUser } from '~/types/user.type'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<AuthUser | null>(null)
@@ -54,7 +25,10 @@ export const useAuthStore = defineStore('auth', () => {
       districtCode: u.district_code,
       province: u.province,
       provinceCode: u.province_code,
-      avatar: u.avatar
+      avatar: u.avatar,
+      birthday: u.birthday,
+      gender: u.gender,
+      verified: u.verified
     })
   }
 

@@ -6,7 +6,7 @@ import type {
   ResetPasswordPayload,
   UpdateProfilePayload,
   VerifyAccountPayload
-} from '~/constants/auth'
+} from '~/types/user.type'
 import { getAuthorizedAxios } from '~/utils/authorizedAxios'
 
 export const registerRequest = async (payload: RegisterPayload) => {
@@ -35,8 +35,10 @@ export const refreshTokenRequest = async () => {
   return response.data
 }
 
-export const updateProfileRequest = async (payload: UpdateProfilePayload) => {
-  const response = await getAuthorizedAxios().put(API_ENDPOINTS.AUTH.UPDATE_PROFILE, payload)
+export const updateProfileRequest = async (payload: UpdateProfilePayload | FormData) => {
+  const response = await getAuthorizedAxios().put(API_ENDPOINTS.AUTH.UPDATE_PROFILE, payload, {
+    headers: payload instanceof FormData ? { 'Content-Type': 'multipart/form-data' } : {}
+  })
   return response.data
 }
 

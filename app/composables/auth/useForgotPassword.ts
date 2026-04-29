@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue'
-import type { ForgotPasswordPageState } from '~/constants/auth'
+import type { ForgotPasswordPageState } from '~/types/user.type'
 import { useForgotPasswordMutation } from '~/mutations/user/useForgotPasswordMutation'
 import { validateForgotPasswordEmail } from '~/utils/authFormUtils'
 
