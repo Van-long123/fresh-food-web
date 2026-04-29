@@ -24,6 +24,7 @@ export const loginRequest = async (payload: LoginPayload) => {
   return response.data
 }
 
+
 export const logoutRequest = async () => {
   const response = await getAuthorizedAxios().delete(API_ENDPOINTS.AUTH.LOGOUT)
   return response.data

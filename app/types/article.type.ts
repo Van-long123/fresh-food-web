@@ -74,3 +74,51 @@ export interface CategoryListQueryParams {
   type?: string
   featured?: boolean
 }
+
+export interface ArticleDetailComment {
+  _id?: string
+  name?: string
+  avatar?: string
+  content: string
+  createdAt?: string | null
+}
+
+export interface ArticleDetailRelatedItem {
+  _id: string
+  slug: string
+  title: string
+  shortDescription?: string
+  thumbnail?: string
+  publishedAt?: string | null
+  readTime?: number
+  views?: number
+}
+
+export interface ArticleDetailPopularItem {
+  _id: string
+  slug: string
+  title: string
+  views?: number
+}
+
+export interface ArticleDetailResponse extends Article {
+  comments?: ArticleDetailComment[]
+  primary_category?: {
+    _id: string
+    title: string
+    slug: string
+    type?: string
+    thumbnail?: string
+  } | null
+  relatedArticles?: ArticleDetailRelatedItem[]
+  popularArticles?: ArticleDetailPopularItem[]
+}
+
+export interface CreateArticleCommentPayload {
+  content: string
+}
+
+export interface CreateArticleCommentResponse {
+  message: string
+  comment: ArticleDetailComment
+}

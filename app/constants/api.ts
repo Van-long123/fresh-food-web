@@ -16,7 +16,8 @@ export const API_ENDPOINTS = {
   },
   ARTICLE: {
     LIST: '/v1/client/articles',
-    DETAIL: (slug: string) => `/v1/client/articles/${slug}`
+    DETAIL: (slug: string) => `/v1/client/articles/${slug}`,
+    CREATE_COMMENT: (slug: string) => `/v1/client/articles/${slug}/comments`
   },
   CATEGORY: {
     LIST: '/v1/client/categories',

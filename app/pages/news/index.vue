@@ -4,11 +4,21 @@
     <div v-else>
       <div class="min-h-screen bg-slate-50 text-slate-800">
         <section
-          class="relative overflow-hidden bg-linear-to-br from-emerald-600 via-teal-600 to-cyan-600 px-4 pb-12 pt-16 text-white"
+          class="relative overflow-hidden bg-linear-to-br from-emerald-600 via-teal-600 to-cyan-600 px-4 pb-12 pt-8 text-white"
         >
           <div class="hero-orb hero-orb-a" />
           <div class="hero-orb hero-orb-b" />
           <div class="mx-auto w-full max-w-6xl">
+            <nav
+              aria-label="Breadcrumb"
+              class="mb-6 flex items-center gap-2 text-sm text-emerald-100/80"
+            >
+              <NuxtLink :to="ROUTES.HOME" class="hover:text-white"
+                >Trang chủ</NuxtLink
+              >
+              <i class="pi pi-angle-right text-xs" />
+              <span class="line-clamp-1 text-white">Tin tức</span>
+            </nav>
             <p
               class="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-emerald-100"
             >

@@ -11,6 +11,16 @@
 
       <!-- Right Content -->
       <main class="flex-1 min-w-0 px-4 sm:px-6 lg:px-0 py-6 pb-16">
+        <nav
+          aria-label="Breadcrumb"
+          class="mb-4 flex items-center gap-2 text-sm text-slate-500"
+        >
+          <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600"
+            >Trang chủ</NuxtLink
+          >
+          <i class="pi pi-angle-right text-xs" />
+          <span class="text-slate-700 font-bold">Tìm kiếm</span>
+        </nav>
         <!-- Category badges scroll strip -->
         <div
           class="flex items-center gap-4 sm:gap-6 mb-6 overflow-x-auto pb-2 hide-scrollbar px-1 pt-1"
@@ -83,6 +93,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { ROUTES } from "~/constants/routes";
 import Sidebar from "~/components/layout/Sidebar.vue";
 import ProductCard from "~/components/features/home/ProductCard.vue";
 import SkSearchPage from "~/components/skeletons/SkSearchPage.vue";

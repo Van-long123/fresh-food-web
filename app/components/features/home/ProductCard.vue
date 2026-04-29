@@ -4,7 +4,8 @@
   >
     <!-- Image Box -->
     <div
-      class="relative pt-[100%] overflow-hidden bg-white shrink-0 cursor-pointer rounded-lg"
+      class="relative pt-[100%] overflow-hidden shrink-0 cursor-pointer rounded-lg"
+      :style="{ backgroundColor: bg }"
     >
       <!-- Top Left Tags -->
       <div
@@ -46,7 +47,7 @@
     </div>
 
     <!-- Content Box -->
-    <div class="flex flex-col flex-1 bg-white">
+    <div class="flex flex-col flex-1" :style="{ backgroundColor: bg }">
       <NuxtLink :to="productDetailRoute" class="block">
         <h3
           class="text-[13px] font-normal text-gray-800 line-clamp-2 mb-1 mt-1 group-hover:text-[#f47f20] transition-colors cursor-pointer flex-1"
@@ -117,9 +118,15 @@ interface ProductCardModel extends HomeProduct {
   uniqueId?: string;
 }
 
-const props = defineProps<{
-  product: ProductCardModel;
-}>();
+const props = withDefaults(
+  defineProps<{
+    product: ProductCardModel;
+    bg?: string;
+  }>(),
+  {
+    bg: "#fff",
+  },
+);
 
 const { addToCart } = useCart();
 const addedState = ref(false);

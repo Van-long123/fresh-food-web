@@ -16,18 +16,21 @@
 
   <div v-else class="min-h-screen bg-[#f5f5f5] pb-12 text-[#222]">
     <div class="mx-auto max-w-7xl px-4 pt-4 md:px-6">
-      <nav class="text-xs text-[#666]">
-        <NuxtLink :to="ROUTES.HOME" class="hover:underline hover:text-[#4caf50]"
+      <nav
+        aria-label="Breadcrumb"
+        class="mb-4 flex items-center gap-2 text-sm text-slate-500"
+      >
+        <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600"
           >Trang chủ</NuxtLink
         >
-        <span class="mx-1 text-[#ccc]">›</span>
+        <i class="pi pi-angle-right text-xs" />
         <NuxtLink
           :to="categorySlug ? ROUTES.CATEGORY(categorySlug) : ROUTES.HOME"
-          class="hover:underline hover:text-[#4caf50]"
+          class="hover:text-orange-600"
           >{{ categoryName }}</NuxtLink
         >
-        <span class="mx-1 text-[#ccc]">›</span>
-        <span>{{ shortName }}</span>
+        <i class="pi pi-angle-right text-xs" />
+        <span class="line-clamp-1 text-slate-700">{{ shortName }}</span>
       </nav>
 
       <section class="mt-4 grid gap-6 lg:grid-cols-[45%_55%]">
@@ -297,7 +300,7 @@
         >
           <template #item="slotProps">
             <div class="px-2">
-              <ProductCard :product="slotProps.data" />
+              <ProductCard :product="slotProps.data" bg="#f5f5f5" />
             </div>
           </template>
         </Carousel>
@@ -316,17 +319,6 @@
           class="lightbox-image max-h-[85vh] w-auto max-w-[90vw] rounded-xl"
         />
       </div>
-    </Teleport>
-
-    <Teleport to="body">
-      <Transition name="toast">
-        <div
-          v-if="showToast"
-          class="fixed right-4 top-4 z-80 rounded-xl bg-green-500 px-4 py-3 text-sm font-semibold text-white shadow-lg"
-        >
-          Đã thêm sản phẩm vào giỏ hàng.
-        </div>
-      </Transition>
     </Teleport>
 
     >
@@ -452,7 +444,6 @@ const tabs = computed(() => {
 
 const activeTab = ref("");
 const expandDescription = ref(false);
-const showToast = ref(false);
 
 const responsiveOptions = ref([
   {
@@ -559,10 +550,6 @@ const increaseQty = () => {
 
 const buyNow = () => {
   addToCart();
-  showToast.value = true;
-  setTimeout(() => {
-    showToast.value = false;
-  }, 2500);
 };
 
 const addToCart = () => {
@@ -572,10 +559,6 @@ const addToCart = () => {
     price: product.value.price,
     image: product.value.image,
   });
-  showToast.value = true;
-  setTimeout(() => {
-    showToast.value = false;
-  }, 2500);
 };
 
 const copyOrShare = async (key: string) => {

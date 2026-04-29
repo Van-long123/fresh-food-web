@@ -5,7 +5,7 @@
   >
     <!-- ══════════ HERO ══════════ -->
     <section
-      class="relative min-h-[260px] overflow-hidden grid place-items-center"
+      class="relative min-h-[300px] overflow-hidden grid place-items-center pt-8 pb-10"
       style="background: linear-gradient(135deg, #f97316, #ea580c, #dc2626)"
     >
       <!-- Confetti -->
@@ -481,6 +481,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
+import { ROUTES } from "~/constants/routes";
 
 type CouponType = "freeship" | "percent" | "money" | "product";
 type CouponStatus = "active" | "expired" | "used";

@@ -96,7 +96,7 @@
           <div class="mt-4 rounded-xl border border-[#FDBA74] bg-[#FFF7ED] p-3">
             <p class="font-semibold">Cần hỗ trợ?</p>
             <NuxtLink
-              to="/support"
+              :to="ROUTES.SUPPORT"
               class="mt-2 w-full h-10 rounded-lg bg-[#F97316] text-white font-semibold block flex items-center justify-center"
             >
               Liên hệ ngay
@@ -491,6 +491,7 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref } from "vue";
+import { ROUTES } from "~/constants/routes";
 
 const readingProgress = ref(0);
 const highlightedFlow = ref(0);

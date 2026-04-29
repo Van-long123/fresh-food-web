@@ -1,13 +1,3 @@
-/**
- * @file constants/routes.ts
- * @description Centralized route definitions for SmartFood.
- * Import ROUTES in any component instead of hardcoding URLs.
- *
- * Usage:
- *   import { ROUTES } from '~/constants/routes'
- *   <NuxtLink :to="ROUTES.AUTH.LOGIN">Đăng nhập</NuxtLink>
- */
-
 export const ROUTES = {
   HOME: '/',
 
@@ -58,5 +48,19 @@ export const ROUTES = {
     CHECKOUT: '/order/checkout',
     INFO: '/order/info',
   },
+
+  // ── Admin ───────────────────────────────────────────────────
+  ADMIN: {
+    DASHBOARD: '/admin',
+    PRODUCTS: '/admin/products',
+    CATEGORIES: '/admin/categories',
+    USERS: '/admin/users',
+    SETTINGS: '/admin/settings',
+    PRICING: '/admin/pricing',
+    MAINTENANCE: '/admin/maintenance',
+  },
+
+  // ── Others ───────────────────────────────────────────────────
+  ERROR_404: '/404',
 } as const
 

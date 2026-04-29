@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { ROUTES } from '~/constants/routes';
 
 const openDropdowns = ref<Record<string, boolean>>({
   crud: false,
@@ -19,7 +20,7 @@ const toggleDropdown = (key: string) => {
         <div class="flex-1 px-3 space-y-1 bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
           <ul class="pb-2 space-y-2">
             <li>
-              <NuxtLink to="/admin" class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">
+              <NuxtLink :to="ROUTES.ADMIN.DASHBOARD" class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">
                 <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
                 <span class="ml-3">Dashboard</span>
               </NuxtLink>
@@ -40,23 +41,23 @@ xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1
               </button>
               <ul v-show="openDropdowns.crud" class="py-2 space-y-2">
                 <li>
-                  <NuxtLink to="/admin/products" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">Products</NuxtLink>
+                  <NuxtLink :to="ROUTES.ADMIN.PRODUCTS" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">Products</NuxtLink>
                 </li>
                 <li>
-                  <NuxtLink to="/admin/categories" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">Categories</NuxtLink>
+                  <NuxtLink :to="ROUTES.ADMIN.CATEGORIES" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">Categories</NuxtLink>
                 </li>
               </ul>
             </li>
 
             <li>
-              <NuxtLink to="/admin/users" class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">
+              <NuxtLink :to="ROUTES.ADMIN.USERS" class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">
                 <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                 <span class="ml-3">Users</span>
               </NuxtLink>
             </li>
 
             <li>
-              <NuxtLink to="/admin/settings" class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">
+              <NuxtLink :to="ROUTES.ADMIN.SETTINGS" class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700" active-class="bg-gray-100 dark:bg-gray-700">
                 <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
                 <span class="ml-3">Settings</span>
               </NuxtLink>
@@ -75,13 +76,13 @@ xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1
               </button>
               <ul v-show="openDropdowns.pages" class="py-2 space-y-2">
                 <li>
-                  <NuxtLink to="/admin/pricing" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Pricing</NuxtLink>
+                  <NuxtLink :to="ROUTES.ADMIN.PRICING" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Pricing</NuxtLink>
                 </li>
                 <li>
-                  <NuxtLink to="/admin/maintenance" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Maintenance</NuxtLink>
+                  <NuxtLink :to="ROUTES.ADMIN.MAINTENANCE" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Maintenance</NuxtLink>
                 </li>
                 <li>
-                  <NuxtLink to="/404" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">404 Page</NuxtLink>
+                  <NuxtLink :to="ROUTES.ERROR_404" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">404 Page</NuxtLink>
                 </li>
               </ul>
             </li>

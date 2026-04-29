@@ -1,15 +1,18 @@
 <template>
   <SkCategoryProductsPage v-if="isLoadingPage" />
-  <div v-else class="min-h-screen bg-[#f5f5f5] pb-14 text-[#111827]">
+  <div v-else class="min-h-screen bg-[#fff] pb-14 text-[#111827]">
     <div class="mx-auto max-w-7xl px-4 pt-4 md:px-6">
-      <nav class="text-xs text-[#666]">
-        <NuxtLink :to="ROUTES.HOME" class="hover:text-[#4caf50]"
+      <nav
+        aria-label="Breadcrumb"
+        class="mb-4 flex items-center gap-2 text-sm text-slate-500"
+      >
+        <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600"
           >Trang chủ</NuxtLink
         >
-        <span class="mx-1 text-[#ccc]">›</span>
-        <span>Danh mục</span>
-        <span class="mx-1 text-[#ccc]">›</span>
-        <span class="font-semibold">{{ categoryName }}</span>
+        <i class="pi pi-angle-right text-xs" />
+        <span class="text-slate-400">Danh mục</span>
+        <i class="pi pi-angle-right text-xs" />
+        <span class="line-clamp-1 text-slate-700">{{ categoryName }}</span>
       </nav>
 
       <div

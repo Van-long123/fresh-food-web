@@ -365,7 +365,11 @@ const timelines = [
 
 const processSteps = [
   { title: "📸 Bước 1", desc: "Chụp ảnh sản phẩm lỗi + giữ hóa đơn" },
-  { title: "📞 Bước 2", desc: "Liên hệ hotline hoặc gửi yêu cầu hỗ trợ" },
+  {
+    title: "📞 Bước 2",
+    desc: "Liên hệ hotline hoặc gửi yêu cầu hỗ trợ qua zalo",
+  },
+  // { title: "📞 Bước 2", desc: "Liên hệ hotline hoặc gửi yêu cầu hỗ trợ" },
   { title: "🚚 Bước 3", desc: "Shipper đến thu hồi hoặc giao hàng mới" },
   { title: "✅ Bước 4", desc: "Hoàn tất - Hoàn tiền hoặc đổi hàng mới" },
 ];

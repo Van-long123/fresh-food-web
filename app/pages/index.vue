@@ -121,7 +121,7 @@
                 :to="ROUTES.CATEGORY(selectedCampaignLink)"
                 class="text-[#006ee6] text-[13px] font-bold hover:underline flex items-center gap-1 group/link"
               >
-                Xem tat ca
+                Xem tất cả
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-3 w-3 group-hover/link:translate-x-1 transition-transform"
@@ -232,7 +232,7 @@
                 :to="ROUTES.CATEGORY(section.slug)"
                 class="text-[#006ee6] text-[13px] font-bold hover:underline flex items-center gap-1 group/link"
               >
-                Xem tat ca
+                Xem tất cả
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-3 w-3 group-hover/link:translate-x-1 transition-transform"

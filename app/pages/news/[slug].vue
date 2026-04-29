@@ -27,23 +27,19 @@
       </div>
     </main>
 
-    <template v-else>
+    <template v-else-if="hasArticle && article">
       <section class="hero-wrap px-4 pb-8 pt-4 sm:px-6 lg:px-8">
         <div class="mx-auto w-full max-w-6xl">
           <nav
             aria-label="Breadcrumb"
             class="mb-4 flex items-center gap-2 text-sm text-slate-500"
           >
-            <NuxtLink
-:to="ROUTES.HOME"
-class="hover:text-orange-600"
-              >Trang chu</NuxtLink
+            <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600"
+              >Trang chủ</NuxtLink
             >
             <i class="pi pi-angle-right text-xs" />
-            <NuxtLink
-:to="ROUTES.NEWS"
-class="hover:text-orange-600"
-              >Tin tuc</NuxtLink
+            <NuxtLink :to="ROUTES.NEWS" class="hover:text-orange-600"
+              >Tin tức</NuxtLink
             >
             <i class="pi pi-angle-right text-xs" />
             <span class="line-clamp-1 text-slate-700">{{ article.title }}</span>
@@ -54,33 +50,33 @@ class="hover:text-orange-600"
             <div class="hero-overlay" />
             <button
               type="button"
-              aria-label="Mo menu chia se"
+              aria-label="Mở menu chia sẻ"
               class="share-toggle"
               @click="showShareMenu = !showShareMenu"
             >
               <i class="pi pi-share-alt" />
             </button>
             <div v-if="showShareMenu" class="share-popover">
-              <button
+              <!-- <button
                 type="button"
                 class="share-row"
                 @click="shareArticle('facebook')"
               >
                 <i class="pi pi-facebook text-blue-600" /> Facebook
-              </button>
-              <button
+              </button> -->
+              <!-- <button
                 type="button"
                 class="share-row"
                 @click="shareArticle('zalo')"
               >
                 <i class="pi pi-comments text-green-600" /> Zalo
-              </button>
+              </button> -->
               <button
                 type="button"
                 class="share-row"
                 @click="shareArticle('copy')"
               >
-                <i class="pi pi-link text-orange-600" /> Sao chep lien ket
+                <i class="pi pi-link text-orange-600" /> Sao chép liên kết
               </button>
             </div>
 
@@ -99,7 +95,7 @@ class="hover:text-orange-600"
                 <span>•</span>
                 <span>{{ article.date }}</span>
                 <span>•</span>
-                <span>{{ article.readTime }} phut doc</span>
+                <span>{{ article.readTime }} phút đọc</span>
               </div>
             </div>
           </header>
@@ -116,7 +112,7 @@ class="hover:text-orange-600"
             class="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:hidden"
           >
             <summary class="cursor-pointer text-sm font-bold text-slate-900">
-              Muc luc bai viet
+              Mục lục bài viết
             </summary>
             <div class="mt-3 space-y-1">
               <button
@@ -135,66 +131,12 @@ class="hover:text-orange-600"
             {{ article.intro }}
           </p>
 
-          <section
-            v-for="(section, index) in sections"
-            :id="section.id"
-            :key="section.id"
-            class="reveal mt-10 scroll-mt-28"
-          >
-            <h2 class="section-title">{{ index + 1 }}. {{ section.title }}</h2>
-            <p class="mt-4 text-base leading-8 text-slate-700">
-              {{ section.p1 }}
-            </p>
-            <p class="mt-4 text-base leading-8 text-slate-700">
-              {{ section.p2 }}
-            </p>
+          <div
+            class="reveal article-content mt-8"
+            v-html="article.contentHtml"
+          />
 
-            <div
-              v-if="section.highlight"
-              class="mt-5 rounded-2xl border border-orange-100 bg-orange-50 p-4 text-sm italic text-orange-900"
-            >
-              {{ section.highlight }}
-            </div>
-
-            <figure
-              v-if="section.image"
-              class="mt-6 overflow-hidden rounded-2xl border border-slate-200"
-            >
-              <img
-                :src="section.image"
-                :alt="section.title"
-                class="h-64 w-full object-cover sm:h-80"
-              />
-              <figcaption class="bg-white px-4 py-3 text-sm text-slate-500">
-                Minh hoa noi dung thuc hanh dinh duong trong doi song hang ngay.
-              </figcaption>
-            </figure>
-
-            <ol v-if="section.steps?.length" class="mt-5 space-y-2">
-              <li
-                v-for="(step, stepIndex) in section.steps"
-                :key="step"
-                class="step-row"
-              >
-                <span>{{ stepIndex + 1 }}</span>
-                <p>{{ step }}</p>
-              </li>
-            </ol>
-
-            <blockquote
-              v-if="section.quote"
-              class="mt-6 rounded-2xl border-l-4 border-orange-500 bg-slate-50 px-5 py-4 text-slate-700"
-            >
-              <p class="text-lg italic leading-8">"{{ section.quote }}"</p>
-              <cite class="mt-2 block text-sm text-slate-500"
-                >- Chuyen gia dinh duong SmartFood</cite
-              >
-            </blockquote>
-
-            <Divider class="my-8!" />
-          </section>
-
-          <section class="reveal">
+          <section class="reveal mt-4">
             <div class="flex flex-wrap gap-2">
               <button
                 v-for="tag in tags"
@@ -207,30 +149,9 @@ class="hover:text-orange-600"
             </div>
           </section>
 
-          <section
-            class="reveal mt-8 flex flex-wrap items-center justify-center gap-3"
-          >
-            <button
-              type="button"
-              class="reaction orange"
-              :class="{ active: liked }"
-              @click="toggleLike"
-            >
-              Thich ({{ likeCount }})
-            </button>
-            <button
-              type="button"
-              class="reaction green"
-              :class="{ active: saved }"
-              @click="saved = !saved"
-            >
-              Luu bai viet
-            </button>
-          </section>
-
           <section class="reveal mt-10" aria-labelledby="comment-title">
             <h2 id="comment-title" class="text-2xl font-black text-slate-900">
-              Binh luan ({{ comments.length }})
+              Bình luận ({{ comments.length }})
             </h2>
 
             <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
@@ -240,23 +161,25 @@ class="hover:text-orange-600"
                   shape="circle"
                   class="bg-orange-100! text-orange-700!"
                 />
-                <div class="w-full">
+                <form class="w-full" @submit.prevent="submitComment">
                   <textarea
                     v-model="newComment"
                     :rows="commentFocused ? 4 : 2"
-                    placeholder="Chia se goc nhin cua ban..."
+                    placeholder="Chia sẻ góc nhìn của bạn..."
                     class="comment-box"
                     @focus="commentFocused = true"
                     @blur="commentFocused = false"
                   />
                   <div class="mt-3 flex justify-end">
                     <Button
-                      label="Gui binh luan"
-                      :disabled="!newComment.trim()"
-                      @click="submitComment"
+                      type="submit"
+                      label="Gửi bình luận"
+                      :loading="isCreatingComment"
+                      :disabled="!newComment.trim() || isCreatingComment"
+                      @mousedown.prevent
                     />
                   </div>
-                </div>
+                </form>
               </div>
             </div>
 
@@ -289,7 +212,7 @@ class="hover:text-orange-600"
 
         <aside class="sidebar" :class="{ elevated: sidebarElevated }">
           <section class="panel">
-            <h3 class="text-base font-black text-slate-900">Muc luc</h3>
+            <h3 class="text-base font-black text-slate-900">Mục lục</h3>
             <button
               v-for="item in sections"
               :key="item.id"
@@ -311,27 +234,27 @@ class="hover:text-orange-600"
             <p class="mt-3 text-lg font-black text-slate-900">
               {{ article.author }}
             </p>
-            <p class="text-sm text-green-700">Chuyen gia dinh duong</p>
+            <p class="text-sm text-green-700">Chuyên gia dinh dưỡng</p>
             <p class="mt-2 text-sm leading-6 text-slate-600">
-              Dong hanh cung SmartFood trong cac chu de an sach, song khoe va
-              toi uu thuc don.
+              Đồng hành cùng SmartFood trong các chủ đề ăn sạch, sống khỏe và
+              tối ưu thực đơn.
             </p>
           </section>
 
           <section class="panel">
             <h3 class="text-base font-black text-slate-900">
-              Bai viet pho bien
+              Bài viết phổ biến
             </h3>
             <NuxtLink
-              v-for="(item, idx) in popularArticles"
+              v-for="item in popularArticles"
               :key="item.id"
               :to="ROUTES.NEWS_DETAIL(item.slug)"
               class="popular-row"
             >
-              <span>{{ String(idx + 1).padStart(2, "0") }}</span>
+              <span>{{ item.rank }}</span>
               <div>
                 <p>{{ item.title }}</p>
-                <small>{{ item.views }} luot xem</small>
+                <small>{{ item.viewsLabel }} lượt xem</small>
               </div>
             </NuxtLink>
           </section>
@@ -339,7 +262,7 @@ class="hover:text-orange-600"
       </main>
 
       <section class="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-black text-slate-900">Co the ban quan tam</h2>
+        <h2 class="text-2xl font-black text-slate-900">Có thể bạn quan tâm</h2>
         <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <NuxtLink
             v-for="item in relatedArticles"
@@ -352,11 +275,6 @@ class="hover:text-orange-600"
               :alt="item.title"
               class="h-40 w-full rounded-xl object-cover"
             />
-            <p
-              class="mt-3 text-xs font-bold uppercase tracking-wide text-orange-600"
-            >
-              {{ item.category }}
-            </p>
             <h3 class="mt-1 line-clamp-2 text-lg font-black text-slate-900">
               {{ item.title }}
             </h3>
@@ -367,13 +285,31 @@ class="hover:text-orange-600"
         </div>
       </section>
     </template>
+
+    <section
+      v-else
+      class="mx-auto flex min-h-[55vh] w-full max-w-6xl items-center justify-center px-4 py-10 text-center"
+    >
+      <div>
+        <h2 class="text-2xl font-black text-slate-900">
+          Không tìm thấy bài viết
+        </h2>
+        <NuxtLink
+          :to="ROUTES.NEWS"
+          class="mt-3 inline-block text-sm font-semibold text-orange-600 hover:underline"
+        >
+          Quay lại trang tin tức
+        </NuxtLink>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ROUTES } from "~/constants/routes";
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { useCreateArticleCommentMutation } from "~/mutations/article/useCreateArticleCommentMutation";
+import { useAuthStore } from "~/stores/useAuthStore";
+import { useNewsDetail } from "~/composables/news/useNewsDetail";
 
 useHead({
   title: "Chi tiết tin tức - SmartFood",
@@ -382,191 +318,57 @@ useHead({
   ],
 });
 
-type Section = {
+type NewsComment = {
   id: string;
-  title: string;
-  p1: string;
-  p2: string;
-  highlight?: string;
-  image?: string;
-  quote?: string;
-  steps?: string[];
-};
-
-type Article = {
-  slug: string;
-  title: string;
-  category: string;
-  author: string;
-  authorInitial: string;
-  date: string;
-  readTime: number;
-  cover: string;
-  intro: string;
-  sections: Section[];
-};
-
-type CommentItem = {
-  id: number;
+  avatar: string;
   initial: string;
   name: string;
   time: string;
   content: string;
 };
 
-const loading = ref(true);
-const route = useRoute();
-const slug = computed(() =>
-  String(route.params.slug || "immune-foods-everyday"),
-);
+const {
+  loading,
+  hasArticle,
+  article,
+  sections,
+  tags,
+  comments: articleComments,
+  relatedArticles,
+  popularArticles,
+  ROUTES,
+} = useNewsDetail();
 
-const articleDB: Article[] = [
-  {
-    slug: "immune-foods-everyday",
-    title: "5 Thuc pham giup tang suc de khang ban nen an moi ngay",
-    category: "Dinh duong",
-    author: "Lena Nguyen",
-    authorInitial: "L",
-    date: "03/04/2026",
-    readTime: 7,
-    cover:
-      "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1400&q=80",
-    intro:
-      "Suc de khang khong chi den tu vien bo sung, ma con tu cach ban an, nghi ngoi va quan ly nhịp sinh hoat. Bai viet nay goi y mot khung thuc hanh de ban bat dau de dang va duy tri ben vung.",
-    sections: [
-      {
-        id: "tong-quan",
-        title: "Tai sao dinh duong quyet dinh suc de khang",
-        p1: "Khi co the duoc cung cap chat xơ, vitamin va khoang chat can thiet, he mien dich co du nguyen lieu de phan ung nhanh hon truoc tac nhan gay benh. Dieu quan trong la su deu dan, khong phai nhung dot no luc ngan han.",
-        p2: "Nhip song nhanh de dan den bo bua, an toi muon hoac phu thuoc thuc pham che bien. Cac thoi quen nay lam roi nhip duong huyet va anh huong truc tiep den nang luong, giac ngu va kha nang phuc hoi.",
-        highlight:
-          "Bat dau tu thay doi nho: moi bua trua them mot phan rau mau dam.",
-        image:
-          "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80",
-      },
-      {
-        id: "nhom-thuc-pham",
-        title: "5 nhom thuc pham nen co trong tuan",
-        p1: "Rau la xanh, trai cay giau vitamin C, dam chat luong cao, thuc pham len men va chat beo tot la nhom nen duoc luan phien thuong xuyen. Su ket hop nay tao ra bo nen can bang cho he mien dich va he tieu hoa.",
-        p2: "Ban khong can an phuc tap. Uu tien cach che bien gon, it dau mo, it duong va han che vi man. Thoi quen nho lap lai moi ngay se hieu qua hon mot ke hoach qua tham vong.",
-        quote: "An lanh manh la mot he thong, khong phai mot bai test y chi.",
-        steps: [
-          "Moi bua co rau va dam",
-          "Chon trai cay nguyen qua thay do uong nuoc ngot",
-          "Them 3 bua len men moi tuan",
-          "Uong nuoc deu trong ngay",
-        ],
-      },
-      {
-        id: "ung-dung",
-        title: "Ung dung cho lich lam viec ban ron",
-        p1: "Hay chia nho cong viec theo block vao cuoi tuan: so che rau, chuan bi dam nen, va chia khau phan co ban. Trong tuan ban chi can ghep nhanh la co bua an can bang.",
-        p2: "Ket hop them ngu som va van dong nhe 20-30 phut moi ngay, ban se thay doi ro chat luong nang luong va muc tap trung. Dinh duong hieu qua can di cung giac ngu va quan ly stress.",
-        highlight:
-          "Muc tieu 1 phan tram moi ngay de tao buoc nhay lon trong 30 ngay.",
-        image:
-          "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=80",
-      },
-    ],
-  },
-];
+const authStore = useAuthStore();
+const { mutateAsync: createArticleComment, isPending: isCreatingComment } =
+  useCreateArticleCommentMutation();
 
-const article = computed(
-  () => articleDB.find((item) => item.slug === slug.value) || articleDB[0]!,
-);
-const sections = computed(() => article.value.sections);
-
-const tags = ["dinh-duong", "an-sach", "song-khoe", "smartfood"];
-
-const relatedArticles = [
-  {
-    id: 1,
-    slug: "smart-grocery-budget",
-    title: "How To Cut Grocery Costs Without Compromising Nutrition",
-    category: "Shopping Tips",
-    excerpt:
-      "Len ngan sach thong minh de tiet kiem ma van giu chat luong bua an.",
-    cover:
-      "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 2,
-    slug: "quick-healthy-lunches",
-    title: "7 Quick Lunch Ideas For Busy Weekdays",
-    category: "Recipes",
-    excerpt: "Goi y bua trua nhanh gon, can bang va de duy tri lau dai.",
-    cover:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 3,
-    slug: "seasonal-fruits-guide",
-    title: "Seasonal Fruit Guide: What To Buy This Month",
-    category: "Tips",
-    excerpt: "Huong dan chon trai cay theo mua de ngon hon va toi uu chi phi.",
-    cover:
-      "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=800&q=80",
-  },
-];
-
-const popularArticles = [
-  {
-    id: 1,
-    slug: "smart-grocery-budget",
-    title: "Cat chi phi di cho thong minh",
-    views: "12.8K",
-  },
-  {
-    id: 2,
-    slug: "quick-healthy-lunches",
-    title: "Bua trua nhanh cho dan van phong",
-    views: "9.1K",
-  },
-  {
-    id: 3,
-    slug: "seasonal-fruits-guide",
-    title: "Trai cay theo mua nen mua",
-    views: "8.4K",
-  },
-  {
-    id: 4,
-    slug: "immune-foods-everyday",
-    title: "Top thuc pham tang de khang",
-    views: "7.9K",
-  },
-];
-
-const comments = ref<CommentItem[]>([
-  {
-    id: 1,
-    initial: "H",
-    name: "Ha Tran",
-    time: "2 gio truoc",
-    content:
-      "Bai viet ro rang va de ap dung. Minh da bat dau tu phan rau trong bua trua.",
-  },
-  {
-    id: 2,
-    initial: "P",
-    name: "Phuc Nguyen",
-    time: "Hom qua",
-    content: "Phan chia block cuoi tuan rat huu ich cho nguoi di lam.",
-  },
-]);
-
+const comments = ref<NewsComment[]>([]);
 const showShareMenu = ref(false);
-const copied = ref(false);
-const likeCount = ref(124);
-const liked = ref(false);
-const saved = ref(false);
 const commentFocused = ref(false);
 const newComment = ref("");
 const readingProgress = ref(0);
 const sidebarElevated = ref(false);
-const activeSection = ref(sections.value[0]?.id || "");
+const activeSection = ref("");
 
 let sectionObserver: IntersectionObserver | null = null;
 let revealObserver: IntersectionObserver | null = null;
+
+watch(
+  articleComments,
+  (newComments) => {
+    comments.value = [...newComments];
+  },
+  { immediate: true },
+);
+
+watch(
+  sections,
+  (newSections) => {
+    activeSection.value = newSections[0]?.id || "";
+  },
+  { immediate: true },
+);
 
 const updateProgress = () => {
   const root = document.documentElement;
@@ -579,52 +381,55 @@ const updateProgress = () => {
 const scrollTo = (id: string) => {
   const target = document.getElementById(id);
   if (!target) return;
-  target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // Trừ đi chiều cao của header (khoảng 80-85px) để dừng đúng vị trí tiêu đề
+  const headerOffset = 85;
+  const elementPosition = target.getBoundingClientRect().top;
+  const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+  window.scrollTo({
+    top: offsetPosition,
+    behavior: "smooth",
+  });
 };
 
 const shareArticle = async (channel: string) => {
   if (channel === "copy") {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      copied.value = true;
-      setTimeout(() => {
-        copied.value = false;
-      }, 1200);
     } catch {
-      copied.value = false;
+      // no-op
     }
   }
 
   showShareMenu.value = false;
 };
 
-const toggleLike = () => {
-  liked.value = !liked.value;
-  likeCount.value += liked.value ? 1 : -1;
-};
-
-const submitComment = () => {
+const submitComment = async () => {
   const content = newComment.value.trim();
-  if (!content) return;
+  if (!content || isCreatingComment.value) return;
 
-  comments.value.unshift({
-    id: Date.now(),
-    initial: "U",
-    name: "Ban",
-    time: "Vua xong",
-    content,
+  if (!authStore.isLoggedIn || !authStore.user) {
+    await navigateTo(ROUTES.AUTH.LOGIN);
+    return;
+  }
+
+  if (!article.value?.slug) return;
+
+  await createArticleComment({
+    slug: article.value.slug,
+    payload: { content },
   });
-
   newComment.value = "";
 };
 
-onMounted(() => {
-  setTimeout(() => {
-    loading.value = false;
-  }, 520);
+const bindObservers = async () => {
+  sectionObserver?.disconnect();
+  revealObserver?.disconnect();
 
-  window.addEventListener("scroll", updateProgress, { passive: true });
-  updateProgress();
+  if (!hasArticle.value) return;
+
+  await nextTick();
 
   sectionObserver = new IntersectionObserver(
     (entries) => {
@@ -633,7 +438,10 @@ onMounted(() => {
         activeSection.value = entry.target.id;
       });
     },
-    { threshold: 0.3 },
+    {
+      threshold: 0.1,
+      rootMargin: "-90px 0px -70% 0px",
+    },
   );
 
   revealObserver = new IntersectionObserver(
@@ -646,16 +454,24 @@ onMounted(() => {
     { threshold: 0.15 },
   );
 
-  setTimeout(() => {
-    sections.value.forEach((section) => {
-      const node = document.getElementById(section.id);
-      if (node) sectionObserver?.observe(node);
-    });
+  sections.value.forEach((section) => {
+    const node = document.getElementById(section.id);
+    if (node) sectionObserver?.observe(node);
+  });
 
-    document
-      .querySelectorAll(".reveal")
-      .forEach((node) => revealObserver?.observe(node));
-  }, 650);
+  document
+    .querySelectorAll(".reveal")
+    .forEach((node) => revealObserver?.observe(node));
+};
+
+watch(sections, () => {
+  bindObservers();
+});
+
+onMounted(() => {
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  updateProgress();
+  bindObservers();
 });
 
 onUnmounted(() => {
@@ -805,6 +621,45 @@ onUnmounted(() => {
   color: #0f172a;
 }
 
+:deep(.article-content h1) {
+  scroll-margin-top: 7rem;
+  margin-top: 2rem;
+  color: #0f172a;
+  font-size: 1.55rem;
+  line-height: 1.3;
+  font-weight: 900;
+}
+
+:deep(.article-content p) {
+  margin-top: 1rem;
+  color: #334155;
+  font-size: 1.02rem;
+  line-height: 1.95;
+}
+
+:deep(.article-content ul),
+:deep(.article-content ol) {
+  margin-top: 1rem;
+  margin-left: 1.2rem;
+  color: #334155;
+  line-height: 1.85;
+}
+
+:deep(.article-content img) {
+  margin-top: 1rem;
+  width: 100%;
+  border-radius: 1rem;
+}
+
+:deep(.article-content blockquote) {
+  margin-top: 1rem;
+  border-left: 4px solid #f97316;
+  background: #fff7ed;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #9a3412;
+}
+
 .step-row {
   display: grid;
   grid-template-columns: 2rem 1fr;
@@ -910,11 +765,12 @@ onUnmounted(() => {
   align-self: start;
   display: grid;
   gap: 0.9rem;
-  transition: filter 0.25s ease;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform, box-shadow;
 }
 
 .sidebar.elevated {
-  filter: drop-shadow(0 14px 28px rgba(15, 23, 42, 0.15));
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
 }
 
 .panel {

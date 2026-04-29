@@ -2,6 +2,16 @@
   <SkProfilePage v-if="isLoading" />
   <div v-else class="min-h-screen bg-[#f5f5f5] pb-24 text-[#111827]">
     <div class="mx-auto max-w-7xl px-4 py-6 md:px-6">
+      <nav
+        aria-label="Breadcrumb"
+        class="mb-4 flex items-center gap-2 text-sm text-slate-500"
+      >
+        <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600"
+          >Trang chủ</NuxtLink
+        >
+        <i class="pi pi-angle-right text-xs" />
+        <span class="line-clamp-1 text-slate-700">Tài khoản cá nhân</span>
+      </nav>
       <section class="overflow-hidden rounded-2xl bg-white shadow-sm">
         <div class="h-20 bg-linear-to-b from-[#fff3e8] to-white" />
         <div class="px-6 pb-6">
@@ -159,7 +169,7 @@
               </form>
             </section>
 
-            <section
+            <!-- <section
               class="rounded-2xl bg-linear-to-r from-[#e8f5e9] to-[#f4fff4] p-5 shadow-sm"
             >
               <div class="flex items-center justify-between">
@@ -181,7 +191,7 @@
               <p class="mt-1 text-sm text-gray-600">
                 Còn 280 điểm để lên hạng Vàng
               </p>
-            </section>
+            </section> -->
           </template>
 
           <template v-if="activeMenu === 'orders'">
@@ -254,7 +264,7 @@
             </section>
           </template>
 
-          <template v-if="activeMenu === 'voucher'">
+          <!-- <template v-if="activeMenu === 'voucher'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Mã giảm giá</h2>
               <div
@@ -264,9 +274,9 @@
                 <p>Bạn chưa có mã giảm giá nào.</p>
               </div>
             </section>
-          </template>
+          </template> -->
 
-          <template v-if="activeMenu === 'favorite'">
+          <!-- <template v-if="activeMenu === 'favorite'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Sản phẩm yêu thích</h2>
               <div
@@ -276,7 +286,7 @@
                 <p>Danh sách yêu thích đang trống.</p>
               </div>
             </section>
-          </template>
+          </template> -->
 
           <template v-if="activeMenu === 'notify'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
@@ -290,7 +300,7 @@
             </section>
           </template>
 
-          <template v-if="activeMenu === 'security'">
+          <!-- <template v-if="activeMenu === 'security'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <h2 class="text-lg font-bold">Bảo mật tài khoản</h2>
               <div class="mt-4">
@@ -299,7 +309,7 @@
                 </p>
               </div>
             </section>
-          </template>
+          </template> -->
 
           <template v-if="activeMenu === 'changePassword'">
             <div
@@ -461,11 +471,11 @@ const avatarInput = ref<HTMLInputElement | null>(null);
 const menuItems = [
   { key: "profile", icon: "👤", label: "Hồ sơ cá nhân" },
   { key: "orders", icon: "📋", label: "Đơn hàng của tôi" },
-  { key: "voucher", icon: "🏷️", label: "Mã giảm giá" },
-  { key: "favorite", icon: "⭐", label: "Sản phẩm yêu thích" },
+  // { key: "voucher", icon: "🏷️", label: "Mã giảm giá" },
+  // { key: "favorite", icon: "⭐", label: "Sản phẩm yêu thích" },
   { key: "address", icon: "📍", label: "Địa chỉ" },
   { key: "notify", icon: "🔔", label: "Thông báo" },
-  { key: "security", icon: "🔐", label: "Bảo mật" },
+  // { key: "security", icon: "🔐", label: "Bảo mật" },
   { key: "changePassword", icon: "🔑", label: "Đổi mật khẩu" },
   { key: "logout", icon: "🚪", label: "Đăng xuất" },
 ] as const;
@@ -475,7 +485,7 @@ type MenuKey = (typeof menuItems)[number]["key"];
 const mobileTabs = [
   { key: "profile", icon: "👤", label: "Hồ sơ" },
   { key: "orders", icon: "📋", label: "Đơn hàng" },
-  { key: "favorite", icon: "⭐", label: "Yêu thích" },
+  // { key: "favorite", icon: "⭐", label: "Yêu thích" },
   { key: "changePassword", icon: "🔑", label: "Mật khẩu" },
   { key: "address", icon: "📍", label: "Địa chỉ" },
 ] as const satisfies ReadonlyArray<{

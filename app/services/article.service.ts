@@ -1,7 +1,9 @@
-import { getArticleListRequest, getCategoryListRequest } from '~/api/article.api'
-import type { ArticleListQueryParams, CategoryListQueryParams } from '~/types/article.type'
+import { createArticleCommentRequest, getArticleDetailRequest, getArticleListRequest, getCategoryListRequest } from '~/api/article.api'
+import type { CreateArticleCommentPayload, ArticleListQueryParams, CategoryListQueryParams } from '~/types/article.type'
 
 export const articleService = {
   getList: (params: ArticleListQueryParams) => getArticleListRequest(params),
-  getCategories: (params: CategoryListQueryParams) => getCategoryListRequest(params)
+  getCategories: (params: CategoryListQueryParams) => getCategoryListRequest(params),
+  getDetail: (slug: string) => getArticleDetailRequest(slug),
+  createComment: (slug: string, payload: CreateArticleCommentPayload) => createArticleCommentRequest(slug, payload)
 }

@@ -7,10 +7,15 @@
   >
     <div class="w-[min(1200px,92vw)] mx-auto pt-6">
       <!-- BREADCRUMB -->
-      <nav class="flex gap-2 text-[#6b7280] text-[13px]">
-        <NuxtLink :to="ROUTES.HOME" class="text-[#4b5563]">Trang chủ</NuxtLink>
-        <span>›</span>
-        <span>Giỏ hàng</span>
+      <nav
+        aria-label="Breadcrumb"
+        class="mb-4 flex items-center gap-2 text-sm text-slate-500"
+      >
+        <NuxtLink :to="ROUTES.HOME" class="hover:text-orange-600"
+          >Trang chủ</NuxtLink
+        >
+        <i class="pi pi-angle-right text-xs" />
+        <span class="line-clamp-1 text-slate-700">Giỏ hàng</span>
       </nav>
 
       <!-- HEAD ROW -->
@@ -271,9 +276,7 @@
                   Áp dụng
                 </button>
               </div>
-              <small
-v-if="voucherState === 'ok'"
-class="text-[#16a34a]"
+              <small v-if="voucherState === 'ok'" class="text-[#16a34a]"
                 >✓ Giảm 30.000đ</small
               >
               <small

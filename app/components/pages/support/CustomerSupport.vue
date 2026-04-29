@@ -10,12 +10,7 @@
               height="40"
               patternUnits="userSpaceOnUse"
             >
-              <circle
-cx="20"
-cy="20"
-r="3"
-fill="white"
-fill-opacity="0.10" />
+              <circle cx="20" cy="20" r="3" fill="white" fill-opacity="0.10" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#dots)" />
@@ -154,14 +149,10 @@ fill-opacity="0.10" />
       </div>
     </section>
 
-    <!-- ========================================================
-         SECTION 4 — FORM GỬI YÊU CẦU
-         ======================================================== -->
     <section class="py-12 bg-gray-50">
       <div class="max-w-[1200px] mx-auto px-5">
         <div class="form-grid">
-          <!-- LEFT: Form -->
-          <div ref="formRef" class="reveal">
+          <!-- <div ref="formRef" class="reveal">
             <h2 class="text-[1.75rem] font-black text-gray-900 text-left mb-1">
               Gửi Yêu Cầu Hỗ Trợ
             </h2>
@@ -169,7 +160,6 @@ fill-opacity="0.10" />
               Điền thông tin bên dưới, chúng tôi sẽ liên hệ trong vòng 2 giờ
             </p>
 
-            <!-- Success overlay -->
             <Transition name="succ-fade">
               <div v-if="submitSuccess" class="form-success">
                 <svg viewBox="0 0 90 90" class="w-20 h-20">
@@ -398,9 +388,8 @@ fill-opacity="0.10" />
                 {{ submitting ? "Đang gửi..." : "Gửi Yêu Cầu" }}
               </button>
             </form>
-          </div>
+          </div> -->
 
-          <!-- RIGHT: Info box -->
           <div ref="infoRef" class="reveal">
             <div
               class="bg-orange-50 border-[1.5px] border-orange-200 rounded-[1.25rem] p-7"
@@ -418,7 +407,7 @@ fill-opacity="0.10" />
                       Địa chỉ văn phòng
                     </p>
                     <p class="text-[0.875rem] text-gray-700 m-0 font-medium">
-                      123 Nguyễn Văn Linh, Quận Hải Châu, Đà Nẵng
+                      129 Cửa Đại, Hội An, Quảng Nam
                     </p>
                   </div>
                 </li>
@@ -467,14 +456,17 @@ fill-opacity="0.10" />
                 </li>
               </ul>
 
-              <!-- Map placeholder -->
               <div class="map-placeholder">
-                <i class="pi pi-map" style="font-size: 2rem; color: #9ca3af" />
-                <p>Bản đồ Google Maps</p>
-                <small>Nhấn để mở chỉ đường</small>
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3837.3526905121366!2d108.35621877459656!3d15.89058324419666!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31420dd67eeb973d%3A0x84c86c06492aad1d!2sThuc%20Quyen%20Coffee!5e0!3m2!1svi!2s!4v1777364268872!5m2!1svi!2s"
+                  width="100%"
+                  height="250"
+                  style="border: 0; border-radius: 30px"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
               </div>
 
-              <!-- SLA commitments -->
               <div
                 class="bg-green-50 border border-green-200 rounded-xl p-4 pb-[1rem]"
               >
@@ -1058,8 +1050,9 @@ onMounted(() => {
 /* ── SECTION 4 — FORM ───────────────────────────────── */
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  /* grid-template-columns: 1fr 1fr;
+  gap: 2rem; */
+  grid-template-columns: 1fr;
   align-items: start;
 }
 .field-row {
@@ -1234,26 +1227,9 @@ onMounted(() => {
 
 /* Map placeholder */
 .map-placeholder {
-  background: #e5e7eb;
-  border-radius: 12px;
-  height: 160px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  color: #6b7280;
-  font-size: 0.875rem;
   margin-bottom: 1.25rem;
   cursor: pointer;
   transition: background 0.2s;
-}
-.map-placeholder:hover {
-  background: #d1d5db;
-}
-.map-placeholder small {
-  font-size: 0.75rem;
-  color: #9ca3af;
 }
 
 /* ── SECTION 5 — STATS ──────────────────────────────── */
