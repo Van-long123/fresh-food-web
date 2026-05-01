@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
   },
   HOME: {
     AGGREGATE: '/v1/client/home/aggregate',
+    CAMPAIGN_PRODUCTS: (slug: string) => `/v1/client/home/campaigns/${slug}/products`,
     // CATEGORY_PRODUCTS: '/v1/client/home/category-products',
     // BLOGS: '/v1/client/home/blogs'
   },

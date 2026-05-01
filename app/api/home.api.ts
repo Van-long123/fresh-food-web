@@ -29,3 +29,11 @@ export const getHomeAggregateRequest = async (
 //   const response = await getAuthorizedAxios().get(API_ENDPOINTS.HOME.BLOGS, { params })
 //   return response.data
 // }
+
+export const getCampaignProductsRequest = async (
+  slug: string,
+  params: any
+): Promise<any> => {
+  const response = await getAuthorizedAxios().get(API_ENDPOINTS.HOME.CAMPAIGN_PRODUCTS(slug), { params })
+  return response.data
+}

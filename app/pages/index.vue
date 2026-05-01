@@ -118,7 +118,7 @@
 
             <div class="flex justify-center mt-6">
               <NuxtLink
-                :to="ROUTES.CATEGORY(selectedCampaignLink)"
+                :to="ROUTES.CAMPAIGN(selectedCampaignLink)"
                 class="text-[#006ee6] text-[13px] font-bold hover:underline flex items-center gap-1 group/link"
               >
                 Xem tất cả

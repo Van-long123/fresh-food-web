@@ -176,7 +176,7 @@
                   Bài Viết Mới Nhất
                 </h2>
                 <span class="text-sm font-semibold text-slate-500">
-                  {{ filteredArticles.length }} bài viết
+                  {{ articlesData?.pagination?.total || 0 }} bài viết
                 </span>
               </div>
 
@@ -212,11 +212,11 @@
                     :alt="article.title"
                     class="h-40 w-full rounded-xl object-cover"
                   />
-                  <p
+                  <!-- <p
                     class="mt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-emerald-600"
                   >
                     {{ article.category }}
-                  </p>
+                  </p> -->
                   <h3
                     class="mt-1 line-clamp-2 text-lg font-extrabold text-slate-900"
                   >
@@ -280,8 +280,9 @@
               <BasePagination
                 v-if="!loading && totalPages > 1"
                 v-model="currentPage"
-                :total="filteredArticles.length"
+                :total="articlesData?.pagination?.total || 0"
                 :per-page="pageSize"
+                item-label="bài viết"
               />
             </section>
           </div>
@@ -407,7 +408,7 @@ const {
   isLoading,
   loading,
   articlesData,
-  filteredArticles,
+
   pagedArticles,
   featured,
   popularPosts,

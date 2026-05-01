@@ -1,5 +1,6 @@
 import {
   getHomeAggregateRequest,
+  getCampaignProductsRequest
   // getHomeBlogsRequest,
   // getHomeCategoryProductsRequest
 } from '~/api/home.api'
@@ -11,6 +12,7 @@ import type {
 
 export const homeService = {
   getAggregate: (params: HomeAggregateQueryParams) => getHomeAggregateRequest(params),
+  getCampaignProducts: (slug: string, params: any) => getCampaignProductsRequest(slug, params),
   // getCategoryProducts: (params: HomeSectionProductsQueryParams) =>
   //   getHomeCategoryProductsRequest(params),
   // getBlogs: (params: HomeBlogsQueryParams) => getHomeBlogsRequest(params)

@@ -114,8 +114,8 @@
 
     <!-- Info line -->
     <p class="pagination-info">
-      Hiển thị {{ rangeStart }}–{{ rangeEnd }} trong tổng số {{ total }} sản
-      phẩm
+      Hiển thị {{ rangeStart }}–{{ rangeEnd }} trong tổng số {{ total }}
+      {{ itemLabel }}
     </p>
   </nav>
 </template>
@@ -129,10 +129,12 @@ const props = withDefaults(
     total: number;
     perPage?: number;
     maxVisible?: number;
+    itemLabel?: string;
   }>(),
   {
     perPage: 30,
     maxVisible: 5,
+    itemLabel: "sản phẩm",
   },
 );
 
@@ -155,33 +157,40 @@ const rangeEnd = computed(() =>
 
 const pages = computed<(number | "...")[]>(() => {
   const n = totalPages.value;
-  const mv = props.maxVisible;
   const cur = props.modelValue;
+  const mv = props.maxVisible; // window size around current
 
-  if (n <= mv + 2) {
+  if (n <= 7) {
     return Array.from({ length: n }, (_, i) => i + 1);
   }
 
-  if (cur <= 3) {
-    const left = Array.from({ length: Math.min(mv, n) }, (_, i) => i + 1);
-    return [...left, "...", n];
+  // Calculate range around current page
+  let start = Math.max(2, cur - Math.floor(mv / 2));
+  let end = Math.min(n - 1, start + mv - 1);
+
+  // Adjust start if end is at the limit
+  if (end === n - 1) {
+    start = Math.max(2, end - mv + 1);
   }
 
-  if (cur >= n - 2) {
-    const right = Array.from(
-      { length: Math.min(mv, n) },
-      (_, i) => n - Math.min(mv, n) + 1 + i,
-    );
-    return [1, "...", ...right];
+  const res: (number | "...")[] = [];
+  res.push(1);
+
+  if (start > 2) {
+    res.push("...");
   }
 
-  const half = Math.floor((mv - 1) / 2);
-  const center = Array.from(
-    { length: mv - 2 },
-    (_, i) => cur - half + i,
-  ).filter((p) => p > 1 && p < n);
+  for (let i = start; i <= end; i++) {
+    res.push(i);
+  }
 
-  return [1, "...", ...center, "...", n];
+  if (end < n - 1) {
+    res.push("...");
+  }
+
+  res.push(n);
+
+  return res;
 });
 
 const goTo = (page: number) => {

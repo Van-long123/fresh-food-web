@@ -175,8 +175,8 @@
           </div>
 
           <div class="mt-6 grid gap-3 sm:grid-cols-2">
-            <button class="cta-buy" @click="buyNow">🛒 Mua ngay</button>
-            <button class="cta-cart" @click="addToCart">Thêm vào giỏ</button>
+            <button class="cta-buy" @click="addToCart">🛒 Thêm vào giỏ</button>
+            <!-- <button class="cta-cart" @click="addToCart">Thêm vào giỏ</button> -->
           </div>
 
           <div

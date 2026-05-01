@@ -37,6 +37,7 @@ export const ROUTES = {
 
   // ── Catalog ──────────────────────────────────────────────────
   CATEGORY: (slug: string) => `/category/${slug}`,
+  CAMPAIGN: (slug: string) => `/campaign/${slug}`,
   PRODUCT_DETAIL: (slug: string) => `/product/${slug}`,
 
   // ── Cart ─────────────────────────────────────────────────────

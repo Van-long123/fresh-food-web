@@ -12,7 +12,7 @@
         <i class="pi pi-angle-right text-xs" />
         <span class="text-slate-400">Danh mục</span>
         <i class="pi pi-angle-right text-xs" />
-        <span class="line-clamp-1 text-slate-700">{{ categoryName }}</span>
+        <span class="text-slate-700">{{ categoryName }}</span>
       </nav>
 
       <div

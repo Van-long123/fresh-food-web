@@ -30,25 +30,31 @@ export const useNewsPage = () => {
     ...(categoriesData.value?.data.map((c) => c.title) || []),
   ]);
 
-  // const activeCategoryId = computed(() => {
-  //   if (activeCategory.value === "Tất cả") return undefined;
-  //   return categoriesData.value?.data.find(
-  //     (c) => c.title === activeCategory.value,
-  //   )?._id;
-  // });
+  const activeCategoryId = computed(() => {
+    if (activeCategory.value === "Tất cả") return undefined;
+    return categoriesData.value?.data.find(
+      (c) => c.title === activeCategory.value,
+    )?._id;
+  });
 
-  const listParams = computed(() => ({
-    page: 1,
-    limit: 1000,
-    keyword: keyword.value,
-    sortField:
-      sortBy.value === "popular"
-        ? "views"
-        : sortBy.value === "readTime"
-          ? "readTime"
-          : "publishedAt",
-    sortOrder: "desc" as const,
-  }));
+  const listParams = computed(() => {
+    const params: any = {
+      page: currentPage.value,
+      limit: pageSize,
+      keyword: keyword.value,
+      sortField:
+        sortBy.value === "popular"
+          ? "views"
+          : sortBy.value === "readTime"
+            ? "readTime"
+            : "publishedAt",
+      sortOrder: "desc" as const,
+    };
+    if (activeCategoryId.value) {
+      params.category_id = activeCategoryId.value;
+    }
+    return params;
+  });
 
   const featuredParams = computed(() => ({
     page: 1,
@@ -79,13 +85,14 @@ export const useNewsPage = () => {
     excerpt: a.shortDescription || "",
     category:
       categoriesData.value?.data.find(
-        (c: any) => c._id === a.article_category_id,
+        (c: any) => c._id === a.primary_category_id,
       )?.title || "Chưa phân loại",
     author: a.authorName || "Ẩn danh",
     authorInitial: a.authorName ? a.authorName.charAt(0).toUpperCase() : "A",
     date: formatDate(a.publishedAt),
     readTime: a.readTime || 0,
     cover: a.thumbnail || "",
+    categoryId: a.primary_category_id,
     views: a.views || 0,
   });
 
@@ -95,23 +102,9 @@ export const useNewsPage = () => {
   );
   const loading = computed(() => loadingArticles.value);
 
-  const allArticles = computed(() => articlesData.value?.data || []);
-
-  const allMappedArticles = computed(() =>
-    allArticles.value.map((a: any) => mapArticle(a)),
+  const pagedArticles = computed(() =>
+    (articlesData.value?.data || []).map(mapArticle),
   );
-
-  const filteredArticles = computed(() => {
-    if (activeCategory.value === "Tất cả") return allMappedArticles.value;
-    return allMappedArticles.value.filter(
-      (a: any) => a.category === activeCategory.value,
-    );
-  });
-
-  const pagedArticles = computed(() => {
-    const start = (currentPage.value - 1) * pageSize;
-    return filteredArticles.value.slice(start, start + pageSize);
-  });
 
   const featured = computed(() =>
     (featuredData.value?.data || []).map(mapArticle),
@@ -121,7 +114,7 @@ export const useNewsPage = () => {
   );
 
   const totalPages = computed(
-    () => Math.ceil(filteredArticles.value.length / pageSize) || 1,
+    () => articlesData.value?.pagination?.totalPages || 1,
   );
 
   // --- Observer (Animation) ---
@@ -184,7 +177,6 @@ export const useNewsPage = () => {
     isLoading,
     loading,
     articlesData,
-    filteredArticles,
     pagedArticles,
     featured,
     popularPosts,
