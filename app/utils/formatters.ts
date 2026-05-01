@@ -1,3 +1,5 @@
+import type { CouponType } from '~/types/voucher'
+
 /**
  * Định dạng chuỗi ngày tháng sang kiểu vi-VN (VD: 25 thg 4, 2024)
  */
@@ -19,3 +21,36 @@ export const formatCount = (num: number | undefined) => {
   if (num >= 1000) return (num / 1000).toFixed(1) + "k+";
   return num.toString();
 };
+
+/**
+ * Định dạng ngày hết hạn (25/04/2024)
+ */
+export const formatExpireDate = (date: string | Date | null): string => {
+  if (!date) return 'N/A'
+  return new Date(date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
+
+/**
+ * Tính số ngày còn lại của voucher
+ */
+export const formatExpireText = (endDate: string | Date | null): string => {
+  if (!endDate) return ''
+  const end = new Date(endDate)
+  const now = new Date()
+  const diffMs = end.getTime() - now.getTime()
+  if (diffMs <= 0) return 'Đã hết hạn'
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  if (diffDays === 1) return 'Còn 1 ngày'
+  return `Còn ${diffDays} ngày`
+}
+
+/**
+ * Tạo nhãn hiển thị giá trị giảm giá
+ */
+export const buildValueLabel = (type: CouponType, discountValue: number): string => {
+  if (type === 'percent') return `GIẢM ${discountValue}%`
+  if (type === 'freeship') {
+    return discountValue > 0 ? `GIẢM ${(discountValue / 1000).toFixed(0)}K SHIP` : '0Đ SHIP'
+  }
+  return `GIẢM ${(discountValue / 1000).toFixed(0)}K`
+}
