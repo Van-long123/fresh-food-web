@@ -79,3 +79,23 @@ export interface UpdateProfilePayload {
 }
 
 export type ForgotPasswordPageState = 'input' | 'success' | 'error'
+
+// OAuth / Social Login Types
+/** Các provider đăng nhập xã hội được hỗ trợ */
+export type OAuthProvider = 'google' | 'facebook'
+
+/** Payload gửi lên /verify-oauth để lấy thông tin user sau khi OAuth redirect */
+export interface VerifyOAuthPayload {
+  userId: string
+}
+
+/** Kiểu đăng nhập của người dùng */
+export type LoginType = 'local' | OAuthProvider
+
+/** Cấu hình hiển thị cho từng social button */
+export interface SocialLoginOption {
+  provider: OAuthProvider
+  label: string
+  loginUrl: string
+  icon: 'google' | 'facebook'
+}

@@ -108,13 +108,13 @@ useHead({
 
 const {
   routeKeyword,
-  selectedCategory,
+  // selectedCategory,
   currentPage,
   perPage,
   isLoading,
   products,
   pagination,
-  toggleCategory,
+  // toggleCategory,
   scrollToTop,
 } = useProductSearch();
 

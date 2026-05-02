@@ -1,4 +1,4 @@
-import { computed, onMounted, reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { ROUTES } from '~/constants/routes'
@@ -120,11 +120,11 @@ export const useLoginForm = () => {
 
       authStore.setUserFromApi(result)
 
-      toast.add({
+       toast.add({
         severity: 'success',
-        summary: 'Thành công',
-        detail: 'Đăng nhập thành công!',
-        life: 3000
+        summary: 'Đăng nhập thành công',
+        detail: `Chào mừng ${result.displayName || 'bạn'} đến với SmartFood! 🎉`,
+        life: 3500
       })
 
       await router.push(ROUTES.HOME)

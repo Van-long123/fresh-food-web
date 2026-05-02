@@ -298,8 +298,11 @@
           <!-- Social buttons -->
           <div class="grid grid-cols-2 gap-3 fade-up" style="--delay: 600ms">
             <button
+              id="btn-login-google"
               type="button"
-              class="flex items-center justify-center gap-2 py-2.5 px-4 border-[1.5px] border-gray-200 rounded-xl bg-white cursor-pointer text-sm font-semibold text-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-[transform,box-shadow,border-color,background] duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:border-gray-300 hover:bg-gray-50 active:translate-y-0"
+              :disabled="socialLoading"
+              class="flex items-center justify-center gap-2 py-2.5 px-4 border-[1.5px] border-gray-200 rounded-xl bg-white cursor-pointer text-sm font-semibold text-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-[transform,box-shadow,border-color,background] duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:border-gray-300 hover:bg-gray-50 active:translate-y-0 disabled:opacity-55 disabled:cursor-not-allowed"
+              @click="loginWithGoogle"
             >
               <svg
                 class="w-[1.125rem] h-[1.125rem] flex-shrink-0"
@@ -325,8 +328,11 @@
               Google
             </button>
             <button
+              id="btn-login-facebook"
               type="button"
-              class="flex items-center justify-center gap-2 py-2.5 px-4 border-[1.5px] border-gray-200 rounded-xl bg-white cursor-pointer text-sm font-semibold text-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-[transform,box-shadow,border-color,background] duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:border-blue-200 hover:bg-blue-50 active:translate-y-0"
+              :disabled="socialLoading"
+              class="flex items-center justify-center gap-2 py-2.5 px-4 border-[1.5px] border-gray-200 rounded-xl bg-white cursor-pointer text-sm font-semibold text-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-[transform,box-shadow,border-color,background] duration-150 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:border-blue-200 hover:bg-blue-50 active:translate-y-0 disabled:opacity-55 disabled:cursor-not-allowed"
+              @click="loginWithFacebook"
             >
               <svg
                 class="w-[1.125rem] h-[1.125rem] flex-shrink-0"
@@ -360,8 +366,10 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { ROUTES } from "~/constants/routes";
 import { useLoginForm } from "~/composables/auth/useLoginForm";
+import { useSocialAuth } from "~/composables/auth/useSocialAuth";
 
 useHead({
   title: "Đăng nhập - SmartFood",
@@ -370,7 +378,28 @@ useHead({
 
 definePageMeta({ layout: false, middleware: "guest" });
 
-const { form, errors, benefits, loading, handleSubmit } = useLoginForm();
+const { form, errors, benefits, loading, handleSubmit, processQueryToast } = useLoginForm();
+
+const {
+  isLoading: socialLoading,
+  loginWithGoogle,
+  loginWithFacebook,
+  handleOAuthError
+} = useSocialAuth();
+
+// Lifecycle hooks đặt tại đây theo đúng quy tắc composable
+onMounted(async () => {
+  // 1. Xử lý các query toast (registered, verified) từ useLoginForm
+  await processQueryToast();
+
+  // 2. Xử lý lỗi OAuth nếu BE redirect về với ?oauth_error=1
+  const route = useRoute();
+  if (route.query.oauth_error === '1') {
+    handleOAuthError();
+    // Xóa query param khỏi URL
+    await useRouter().replace({ path: ROUTES.AUTH.LOGIN });
+  }
+});
 </script>
 
 <style scoped>

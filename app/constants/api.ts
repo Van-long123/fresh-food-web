@@ -7,7 +7,11 @@ export const API_ENDPOINTS = {
     REFRESH_TOKEN: '/v1/client/users/refresh_token',
     UPDATE_PROFILE: '/v1/client/users/update',
     FORGOT_PASSWORD: '/v1/client/users/forgot-password',
-    RESET_PASSWORD: '/v1/client/users/reset-password'
+    RESET_PASSWORD: '/v1/client/users/reset-password',
+    // ── Social OAuth ──────────────────────────────────────────
+    GOOGLE_LOGIN: '/v1/client/users/google',
+    FACEBOOK_LOGIN: '/v1/client/users/facebook',
+    VERIFY_OAUTH: '/v1/client/users/verify-oauth'
   },
   HOME: {
     AGGREGATE: '/v1/client/home/aggregate',

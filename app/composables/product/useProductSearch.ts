@@ -7,7 +7,7 @@ import type { ProductQueryParams } from '~/types/product.type'
 export const useProductSearch = () => {
   const route = useRoute()
 
-  const selectedCategory = ref('')
+  // const selectedCategory = ref('')
   const currentPage = ref(1)
   const perPage = ref(30)
   
@@ -64,10 +64,10 @@ export const useProductSearch = () => {
   const products = computed(() => formattedData.value.data)
   const pagination = computed(() => formattedData.value.pagination)
 
-  const toggleCategory = (name: string) => {
-    selectedCategory.value = selectedCategory.value === name ? '' : name
-    currentPage.value = 1
-  }
+  // const toggleCategory = (name: string) => {
+  //   selectedCategory.value = selectedCategory.value === name ? '' : name
+  //   currentPage.value = 1
+  // }
 
   const scrollToTop = () => {
     if (typeof window !== 'undefined') {
@@ -77,14 +77,14 @@ export const useProductSearch = () => {
 
   return {
     routeKeyword,
-    selectedCategory,
+    // selectedCategory,
     currentPage,
     perPage,
     isLoading,
     error,
     products,
     pagination,
-    toggleCategory,
+    // toggleCategory,
     scrollToTop
   }
 }

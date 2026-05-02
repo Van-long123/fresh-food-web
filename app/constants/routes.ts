@@ -7,6 +7,7 @@ export const ROUTES = {
     REGISTER: '/auth/register',
     FORGOT_PASSWORD: '/auth/forgot-password',
     CHANGE_PASSWORD: '/auth/change-password',
+    LOGIN_SUCCESS: '/auth/login-success',
   },
 
   // ── Main navigation ─────────────────────────────────────────

@@ -5,7 +5,8 @@ import type {
   RegisterPayload,
   ResetPasswordPayload,
   UpdateProfilePayload,
-  VerifyAccountPayload
+  VerifyAccountPayload,
+  VerifyOAuthPayload
 } from '~/types/user.type'
 import { getAuthorizedAxios } from '~/utils/authorizedAxios'
 
@@ -49,5 +50,14 @@ export const forgotPasswordRequest = async (payload: ForgotPasswordPayload) => {
 
 export const resetPasswordRequest = async (payload: ResetPasswordPayload) => {
   const response = await getAuthorizedAxios().put(API_ENDPOINTS.AUTH.RESET_PASSWORD, payload)
+  return response.data
+}
+
+/**
+ * Gọi sau khi OAuth provider redirect về login-success
+ * BE đã set Cookie, FE chỉ cần lấy thông tin user để cập nhật store
+ */
+export const verifyOAuthRequest = async (payload: VerifyOAuthPayload) => {
+  const response = await getAuthorizedAxios().post(API_ENDPOINTS.AUTH.VERIFY_OAUTH, payload)
   return response.data
 }

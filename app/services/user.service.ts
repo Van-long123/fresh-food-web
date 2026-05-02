@@ -6,7 +6,8 @@ import {
   registerRequest,
   resetPasswordRequest,
   updateProfileRequest,
-  verifyAccountRequest
+  verifyAccountRequest,
+  verifyOAuthRequest
 } from '~/api/user.api'
 import type {
   ForgotPasswordPayload,
@@ -14,7 +15,8 @@ import type {
   RegisterPayload,
   ResetPasswordPayload,
   UpdateProfilePayload,
-  VerifyAccountPayload
+  VerifyAccountPayload,
+  VerifyOAuthPayload
 } from '~/types/user.type'
 
 export const userService = {
@@ -25,5 +27,6 @@ export const userService = {
   refreshToken: () => refreshTokenRequest(),
   updateProfile: (payload: UpdateProfilePayload | FormData) => updateProfileRequest(payload),
   forgotPassword: (payload: ForgotPasswordPayload) => forgotPasswordRequest(payload),
-  resetPassword: (payload: ResetPasswordPayload) => resetPasswordRequest(payload)
+  resetPassword: (payload: ResetPasswordPayload) => resetPasswordRequest(payload),
+  verifyOAuth: (payload: VerifyOAuthPayload) => verifyOAuthRequest(payload)
 }

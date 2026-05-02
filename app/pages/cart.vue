@@ -204,12 +204,12 @@
             <div class="flex justify-between my-2 text-[#374151]">
               <span>Tạm tính:</span><strong>{{ format(subtotal) }}đ</strong>
             </div>
-            <div class="flex justify-between my-2 text-[#374151]">
+            <!-- <div class="flex justify-between my-2 text-[#374151]">
               <span>Phí giao hàng:</span>
               <strong :class="shippingFee === 0 ? 'text-[#16a34a]' : ''">{{
                 shippingFee === 0 ? "🎉 Miễn phí" : `${format(shippingFee)}đ`
               }}</strong>
-            </div>
+            </div> -->
             <div class="flex justify-between my-2 text-[#374151]">
               <span>Giảm giá voucher:</span>
               <strong class="text-[#16a34a]"
@@ -372,18 +372,6 @@
       <!-- EMPTY STATE -->
       <section v-else class="min-h-[60vh] grid place-items-center text-center">
         <div>
-          <svg viewBox="0 0 120 120" class="w-[120px] cart-sway">
-            <path
-              d="M20 26h18l8 48h44l10-34H40"
-              fill="none"
-              stroke="#F97316"
-              stroke-width="8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <circle cx="52" cy="90" r="8" fill="#F97316" />
-            <circle cx="84" cy="90" r="8" fill="#F97316" />
-          </svg>
           <h2 class="m-0">Giỏ hàng trống trơn...</h2>
           <p class="mt-1.5 mb-0 text-[#6b7280]">
             Hãy khám phá ngay kho thực phẩm tươi ngon!
