@@ -1,9 +1,16 @@
 import { useQuery } from '@tanstack/vue-query'
+import type { MaybeRef } from 'vue'
+import { unref } from 'vue'
 import { getProductsRequest } from '~/api/product.api'
+import type { ProductQueryParams, ProductListResponse } from '~/types/product.type'
 
-export const useProductsQuery = () => {
+export const useProductsQuery = (params?: MaybeRef<ProductQueryParams>) => {
   return useQuery({
-    queryKey: ['products'],
-    queryFn: getProductsRequest
+    queryKey: ['products', params],
+    queryFn: () => getProductsRequest(unref(params))
   })
 }
+// unref(x)
+// Nếu x là ref → trả về x.value
+// Nếu x là computed → trả về x.value
+// Nếu x là value thường → trả nguyên giá trị

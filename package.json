@@ -16,6 +16,7 @@
     "@primevue/nuxt-module": "^4.5.4",
     "@primevue/themes": "^4.5.4",
     "@tanstack/vue-query": "^5.99.2",
+    "@vueuse/core": "^14.3.0",
     "axios": "^1.13.6",
     "dayjs": "^1.11.20",
     "lodash": "^4.17.23",

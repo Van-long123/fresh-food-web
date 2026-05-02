@@ -8,6 +8,35 @@ export interface Product {
   slug?: string
 }
 
+
+
+export interface PaginationMeta {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+export interface ProductListResponse {
+  data: Product[]
+  pagination: PaginationMeta
+}
+
+export interface ProductQueryParams {
+  page?: number
+  limit?: number
+  sortField?: string
+  sortOrder?: 'asc' | 'desc'
+  keyword?: string
+  status?: string
+  featured?: boolean | string
+  isBestPrice?: boolean | string
+  isOnlineExclusive?: boolean | string
+  minPrice?: number
+  maxPrice?: number
+  primary_category_id?: string
+}
+
 export interface ProductReviewUser {
   _id?: string
   displayName?: string
