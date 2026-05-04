@@ -163,19 +163,34 @@
             <div
               class="mt-2 inline-flex items-center gap-3 rounded-full border border-[#e5e7eb] bg-white px-3 py-2"
             >
-              <button class="qty-btn" @click="decreaseQty">-</button>
+              <button
+                class="qty-btn"
+                :disabled="quantity <= 1"
+                @click="decreaseQty"
+              >
+                -
+              </button>
               <input
                 v-model.number="quantity"
                 type="number"
                 min="1"
+                :max="stock || 1"
                 class="w-12 text-center text-base font-bold outline-none"
               />
-              <button class="qty-btn" @click="increaseQty">+</button>
+              <button
+                class="qty-btn"
+                :disabled="stock > 0 && quantity >= stock"
+                @click="increaseQty"
+              >
+                +
+              </button>
             </div>
           </div>
 
           <div class="mt-6 grid gap-3 sm:grid-cols-2">
-            <button class="cta-buy" @click="addToCart">🛒 Thêm vào giỏ</button>
+            <button class="cta-buy" :disabled="stock === 0" @click="addToCart">
+              {{ stock === 0 ? "Hết hàng" : "🛒 Thêm vào giỏ" }}
+            </button>
             <!-- <button class="cta-cart" @click="addToCart">Thêm vào giỏ</button> -->
           </div>
 
@@ -353,6 +368,7 @@ const categorySlug = computed(() => detail.value?.primary_category?.slug || "");
 const product = computed(() => ({
   id: String(detail.value?._id || ""),
   name: detail.value?.title || "",
+  slug: detail.value?.slug || "",
   price: Number(detail.value?.price || 0),
   originalPrice: Number(
     detail.value?.originalPrice || detail.value?.price || 0,
@@ -361,6 +377,8 @@ const product = computed(() => ({
   isOnlineExclusive: Boolean(detail.value?.isOnlineExclusive),
   image: detail.value?.thumbnail || "",
 }));
+
+const stock = computed(() => Number(detail.value?.stock || 0));
 
 const images = computed(() => {
   const rawImages = Array.isArray(detail.value?.images)
@@ -400,6 +418,20 @@ watch(
 );
 
 const quantity = ref(1);
+
+watch(
+  [quantity, stock],
+  ([nextQty, nextStock]) => {
+    if (nextQty < 1) {
+      quantity.value = 1;
+      return;
+    }
+    if (nextStock > 0 && nextQty > nextStock) {
+      quantity.value = nextStock;
+    }
+  },
+  { immediate: true },
+);
 
 const ratingSummary = computed(() => {
   const defaultTotalRating = Number(detail.value?.ratings?.totalRating || 0);
@@ -545,6 +577,7 @@ const decreaseQty = () => {
 };
 
 const increaseQty = () => {
+  if (stock.value > 0 && quantity.value >= stock.value) return;
   quantity.value += 1;
 };
 
@@ -553,11 +586,15 @@ const buyNow = () => {
 };
 
 const addToCart = () => {
+  if (stock.value === 0) return;
   pushToCart({
-    id: Number(product.value.id) || undefined,
+    id: product.value.id,
     name: product.value.name,
     price: product.value.price,
     image: product.value.image,
+    stock: stock.value,
+    slug: product.value.slug,
+    quantity: quantity.value,
   });
 };
 

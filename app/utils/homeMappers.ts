@@ -90,6 +90,7 @@ const mapProduct = (product: unknown): HomeProduct | null => {
   const slugSeed = raw.slug ?? title ?? id
   const originalPrice = toNullableNumber(raw.originalPrice ?? raw.compareAtPrice)
   const price = toNumber(raw.price ?? raw.salePrice, 0)
+  const stock = toNumber(raw.stock, 0)
 
   return {
     id: typeof id === 'number' || typeof id === 'string' ? id : String(id),
@@ -101,6 +102,7 @@ const mapProduct = (product: unknown): HomeProduct | null => {
     discountPercent: toNullableNumber(raw.discountPercent ?? raw.discount),
     isBestPrice: toBoolean(raw.isBestPrice),
     isOnlineExclusive: toBoolean(raw.isOnlineExclusive),
+    stock,
     buttonText: normalizeText(raw.buttonText, 'Mua')
   }
 }

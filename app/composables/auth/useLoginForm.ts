@@ -119,6 +119,13 @@ export const useLoginForm = () => {
       })
 
       authStore.setUserFromApi(result)
+      
+      try {
+        const { syncAfterLogin } = useCart()
+        await syncAfterLogin()
+      } catch (err) {
+        console.error('Lỗi đồng bộ giỏ hàng sau đăng nhập:', err)
+      }
 
        toast.add({
         severity: 'success',

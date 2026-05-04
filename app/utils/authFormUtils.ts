@@ -1,4 +1,4 @@
-export const EMAIL_REGEX = /^[\w-.]+@[\w-]+\.[a-z]{2,}$/i
+export const EMAIL_REGEX = /^\S+@\S+\.\S+$/
 export const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,256}$/
 export const PHONE_REGEX = /^[0-9]{8,11}$/
 

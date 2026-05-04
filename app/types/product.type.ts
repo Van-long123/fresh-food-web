@@ -5,6 +5,7 @@ export interface Product {
   price: number
   originalPrice?: number | null
   discountPercent?: number | null
+  stock?: number
   slug?: string
 }
 
@@ -98,6 +99,7 @@ export interface ProductDetailResponse {
   originalPrice: number
   discountPercentage: number
   isOnlineExclusive: boolean
+  stock: number
   ratings?: {
     totalRating: number
     numberOfRatings: number

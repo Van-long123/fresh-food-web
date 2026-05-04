@@ -38,7 +38,8 @@ import Aura from '@primevue/themes/aura';
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8017'
+      apiBaseUrl: 'http://localhost:8017'
+      // apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:8017'
     }
   },
 

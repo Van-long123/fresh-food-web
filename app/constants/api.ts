@@ -36,5 +36,14 @@ export const API_ENDPOINTS = {
   },
   VOUCHER: {
     LIST: '/v1/client/vouchers'
+  },
+  CART: {
+    GET: '/v1/client/cart',
+    ADD_ITEM: '/v1/client/cart/items',
+    UPDATE_ITEM: (productId: string) => `/v1/client/cart/items/${productId}`,
+    REMOVE_ITEM: (productId: string) => `/v1/client/cart/items/${productId}`,
+    REMOVE_ITEMS: '/v1/client/cart/items',
+    MERGE: '/v1/client/cart/merge',
+    VALIDATE: '/v1/client/cart/validate'
   }
 } as const

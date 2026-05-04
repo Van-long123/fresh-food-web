@@ -28,6 +28,7 @@ export interface HomeProduct {
   discountPercent: number | null
   isBestPrice: boolean
   isOnlineExclusive: boolean
+  stock: number
   buttonText: string
 }
 

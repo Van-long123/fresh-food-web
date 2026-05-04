@@ -128,11 +128,11 @@ const handleLogout = async () => {
   loggingOut.value = true;
   try {
     await userService.logout();
+    authStore.logout();
+    await router.replace(ROUTES.AUTH.LOGIN);
   } catch {
     // Không chặn luồng logout phía client nếu API lỗi.
   } finally {
-    authStore.logout();
-    await router.replace(ROUTES.AUTH.LOGIN);
     loggingOut.value = false;
   }
 };

@@ -263,6 +263,7 @@
       <Transition name="toast">
         <div
           v-if="visibleNotice"
+          :key="noticeKey"
           class="fixed right-4 top-20 z-[9999] w-80 overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/8"
         >
           <!-- Green accent bar -->
@@ -294,9 +295,9 @@
             <!-- Text -->
             <div class="flex-1 pt-0.5">
               <p class="text-[13px] font-bold text-gray-800">
-                Đã thêm vào giỏ hàng
+                {{ noticeTitle }}
               </p>
-              <p class="mt-0.5 line-clamp-1 text-[12px] text-gray-500">
+              <p class="mt-0.5 text-[12px] text-gray-500">
                 {{ notice }}
               </p>
             </div>
@@ -327,9 +328,8 @@
             class="mx-3.5 mb-3 h-0.5 overflow-hidden rounded-full bg-gray-100"
           >
             <div
-              :key="noticeKey"
-              class="h-full rounded-full bg-emerald-400 transition-none"
-              style="animation: toastProgress 2s linear forwards"
+              class="h-full rounded-full bg-emerald-400"
+              style="animation: toastProgress 4s linear forwards; transform-origin: left;"
             />
           </div>
         </div>
@@ -394,26 +394,28 @@
               class="group flex items-start gap-3 rounded-xl border border-[#f1f5f9] bg-[#fafbfc] p-2.5 transition-colors hover:border-[#e2e8f0] hover:bg-white"
             >
               <!-- Image -->
-              <div class="relative shrink-0">
+              <NuxtLink
+                :to="ROUTES.PRODUCT_DETAIL(item.slug || '')"
+                class="relative shrink-0 block"
+                @click="showCartPanel = false"
+              >
                 <img
                   :src="item.image"
                   :alt="item.name"
-                  class="h-14 w-14 rounded-lg border border-[#e2e8f0] object-cover"
+                  class="h-14 w-14 rounded-lg border border-[#e2e8f0] object-cover hover:opacity-80 transition-opacity"
                 />
-                <!-- <span
-                  v-if="item.variant"
-                  class="absolute -top-1 -left-1 rounded border border-white bg-[#0d9488] px-1 py-px text-[8px] font-bold uppercase tracking-wider text-white"
-                  >{{ item.variant }}</span > -->
-              </div>
+              </NuxtLink>
 
               <!-- Info -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-start justify-between gap-2">
-                  <p
-                    class="line-clamp-2 text-[13px] font-semibold leading-snug text-[#1e293b]"
+                  <NuxtLink
+                    :to="ROUTES.PRODUCT_DETAIL(item.slug || '')"
+                    class="line-clamp-2 text-[13px] font-semibold leading-snug text-[#1e293b] hover:text-[#f97316] transition-colors"
+                    @click="showCartPanel = false"
                   >
                     {{ item.name }}
-                  </p>
+                  </NuxtLink>
                   <button
                     class="shrink-0 grid h-6 w-6 place-items-center rounded-md text-[#cbd5e1] transition hover:bg-[#fef2f2] hover:text-[#ef4444]"
                     :aria-label="`Remove ${item.name} from cart`"
@@ -440,7 +442,7 @@
                   >
                     <button
                       class="qty-btn"
-                      :disabled="item.qty <= 1"
+                      :disabled="isItemUpdating(item.id)"
                       :aria-label="`Decrease quantity for ${item.name}`"
                       @click="decreaseQty(item.id)"
                     >
@@ -448,10 +450,11 @@
                     </button>
                     <span
                       class="w-6 text-center text-[12px] font-bold text-[#334155]"
-                      >{{ item.qty }}</span
+                      >{{ item.quantity }}</span
                     >
                     <button
                       class="qty-btn"
+                      :disabled="isItemUpdating(item.id)"
                       :aria-label="`Increase quantity for ${item.name}`"
                       @click="increaseQty(item.id)"
                     >
@@ -461,7 +464,7 @@
                   <p
                     class="text-[14px] font-bold tracking-tight text-[#0f172a]"
                   >
-                    {{ formatVnd(item.price * item.qty) }}
+                    {{ formatVnd(item.price * item.quantity) }}
                   </p>
                 </div>
               </div>
@@ -678,6 +681,7 @@ const headerDisplayName = computed(() => {
 const {
   cartItems,
   notice,
+  noticeTitle,
   noticeKey,
   itemCount,
   totalAmount,
@@ -685,6 +689,8 @@ const {
   increaseQty,
   decreaseQty,
   removeItem,
+  ensureCartReady,
+  isItemUpdating,
 } = useCart();
 
 const toggleCartPanel = () => {
@@ -711,15 +717,19 @@ const handleClickOutside = (event) => {
   showCartPanel.value = false;
 };
 
+let toastTimeout = null;
 watch(noticeKey, () => {
+  if (toastTimeout) clearTimeout(toastTimeout);
   visibleNotice.value = true;
-  setTimeout(() => {
+
+  toastTimeout = setTimeout(() => {
     visibleNotice.value = false;
-  }, 1800);
+  }, 4000);
 });
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
+  ensureCartReady();
 });
 
 onBeforeUnmount(() => {
@@ -795,12 +805,15 @@ onBeforeUnmount(() => {
   transform: translateX(12px) scale(0.96);
 }
 
+</style>
+
+<style>
 @keyframes toastProgress {
   from {
-    width: 100%;
+    transform: scaleX(1);
   }
   to {
-    width: 0%;
+    transform: scaleX(0);
   }
 }
 </style>

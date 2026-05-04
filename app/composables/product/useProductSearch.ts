@@ -55,6 +55,7 @@ export const useProductSearch = () => {
       discountPercent: item.discountPercentage ? Number(item.discountPercentage) : null,
       isBestPrice: Boolean(item.isBestPrice),
       isOnlineExclusive: Boolean(item.isOnlineExclusive),
+      stock: Number(item.stock || 0),
       buttonText: String(item.buttonText || 'Mua')
     }))
 

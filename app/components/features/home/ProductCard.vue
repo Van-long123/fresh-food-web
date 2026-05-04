@@ -84,7 +84,8 @@
 
         <!-- Action Button -->
         <button
-          class="w-full h-8 flex items-center justify-center gap-1.5 bg-[#eef5fd] text-[#006ee6] font-semibold text-[13px] rounded-full hover:bg-[#d6e7f9] transition-colors duration-200"
+          class="w-full h-8 flex items-center justify-center gap-1.5 bg-[#eef5fd] text-[#006ee6] font-semibold text-[13px] rounded-full hover:bg-[#d6e7f9] transition-colors duration-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          :disabled="isOutOfStock"
           @click="handleBuy"
         >
           <svg
@@ -101,7 +102,13 @@
               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
             />
           </svg>
-          {{ addedState ? "✓ Đã thêm" : product.buttonText || "Mua" }}
+          {{
+            isOutOfStock
+              ? "Hết hàng"
+              : addedState
+                ? "✓ Đã thêm"
+                : product.buttonText || "Mua"
+          }}
         </button>
       </div>
     </div>
@@ -133,6 +140,7 @@ const addedState = ref(false);
 const productDetailRoute = computed(() =>
   ROUTES.PRODUCT_DETAIL(props.product.slug || ""),
 );
+const isOutOfStock = computed(() => Number(props.product.stock || 0) <= 0);
 
 const formatPrice = (price: number): string => {
   return price.toLocaleString("vi-VN");
@@ -147,11 +155,14 @@ const calculateSaving = (original: number, current: number): string => {
 };
 
 const handleBuy = () => {
+  if (isOutOfStock.value) return;
   addToCart({
-    id: props.product.id ? Number(props.product.id) : undefined,
+    id: String(props.product.id),
     name: props.product.name,
     price: props.product.price,
     image: props.product.image,
+    stock: props.product.stock,
+    slug: props.product.slug,
   });
 
   addedState.value = true;

@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '~/stores/useAuthStore'
+import { useCartStore } from '~/stores/useCartStore'
 import { userService } from '~/services/user.service'
 import { API_ENDPOINTS } from '~/constants/api'
 import { ROUTES } from '~/constants/routes'
@@ -16,7 +17,7 @@ export const useSocialAuth = () => {
 
   const apiBaseUrl = computed(() => {
     const config = useRuntimeConfig()
-    return (config.public.apiBaseUrl as string) || 'http://localhost:8017'
+    return (config.public.apiBaseUrl as string)
   })
 
   const socialLoginOptions = computed<SocialLoginOption[]>(() => [
@@ -72,6 +73,13 @@ export const useSocialAuth = () => {
       const userInfo = await userService.verifyOAuth({ userId })
 
       authStore.setUserFromApi(userInfo)
+
+      try {
+        const { syncAfterLogin } = useCart()
+        await syncAfterLogin()
+      } catch (err) {
+        console.error('Lỗi đồng bộ giỏ hàng:', err)
+      }
 
       toast.add({
         severity: 'success',
