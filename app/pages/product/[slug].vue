@@ -595,6 +595,7 @@ const addToCart = () => {
     stock: stock.value,
     slug: product.value.slug,
     quantity: quantity.value,
+    categoryId: detail.value?.primary_category?._id || null,
   });
 };
 

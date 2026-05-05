@@ -51,7 +51,7 @@
                 type="button"
                 class="border-0 bg-transparent text-[#ef4444] text-[13px] hover:underline transition-all"
                 :disabled="!selectedItems.length"
-                @click="showConfirmModal = true"
+                @click="removeSelected"
               >
                 Xóa đã chọn
               </button>
@@ -158,20 +158,43 @@
 
                 <!-- Price -->
                 <div class="text-right">
-                  <p
-                    v-if="item.originalPrice"
-                    class="m-0 text-[#6b7280] line-through text-[13px]"
-                  >
-                    {{ format(item.originalPrice) }}đ
-                  </p>
-                  <p
-                    class="mt-1 mb-0 text-[#ea580c] text-[22px] font-extrabold"
-                  >
-                    {{ format(item.price) }}đ
-                  </p>
-                  <small class="text-[#6b7280]"
-                    >= {{ format(item.price * item.quantity) }}đ</small
-                  >
+                  <template v-if="(itemDiscountMap[item.id] || 0) > 0">
+                    <p class="m-0 text-[#6b7280] line-through text-[13px]">
+                      {{ format(item.price * item.quantity) }}đ
+                    </p>
+                    <p
+                      class="mt-1 mb-0 text-[#ea580c] text-[22px] font-extrabold"
+                    >
+                      {{
+                        format(
+                          Math.max(
+                            0,
+                            item.price * item.quantity -
+                              (itemDiscountMap[item.id] || 0),
+                          ),
+                        )
+                      }}đ
+                    </p>
+                    <small class="text-[#16a34a]"
+                      >-{{ format(itemDiscountMap[item.id] || 0) }}đ</small
+                    >
+                  </template>
+                  <template v-else>
+                    <p
+                      v-if="item.originalPrice"
+                      class="m-0 text-[#6b7280] line-through text-[13px]"
+                    >
+                      {{ format(item.originalPrice) }}đ
+                    </p>
+                    <p
+                      class="mt-1 mb-0 text-[#ea580c] text-[22px] font-extrabold"
+                    >
+                      {{ format(item.price) }}đ
+                    </p>
+                    <small class="text-[#6b7280]"
+                      >= {{ format(item.price * item.quantity) }}đ</small
+                    >
+                  </template>
                 </div>
 
                 <!-- Remove -->
@@ -274,29 +297,33 @@
                   type="text"
                   placeholder="Nhập mã voucher"
                   class="border rounded-[10px] p-2.5"
+                  :disabled="!!appliedVoucher"
                   :class="
-                    voucherState === 'ok'
-                      ? 'border-[#16a34a]'
-                      : voucherState === 'error'
-                        ? 'border-[#ef4444] voucher-shake'
-                        : 'border-[#e5e7eb]'
+                    appliedVoucher ? 'border-[#16a34a]' : 'border-[#e5e7eb]'
                   "
                 />
                 <button
+                  v-if="!appliedVoucher"
                   type="button"
-                  class="border-0 rounded-[10px] bg-[#f97316] text-white px-3 font-bold"
-                  @click="applyVoucher"
+                  :disabled="isApplying"
+                  class="border-0 rounded-[10px] bg-[#f97316] text-white px-3 font-bold flex items-center gap-1"
+                  @click="() => handleApplyVoucher()"
                 >
-                  Áp dụng
+                  <i v-if="isApplying" class="pi pi-spinner pi-spin"></i>
+                  <span>Áp dụng</span>
+                </button>
+                <button
+                  v-else
+                  type="button"
+                  class="border border-[#ef4444] rounded-[10px] bg-white text-[#ef4444] px-3 font-bold"
+                  @click="() => removeVoucher()"
+                >
+                  Bỏ
                 </button>
               </div>
-              <small v-if="voucherState === 'ok'" class="text-[#16a34a]"
-                >✓ Giảm 30.000đ</small
-              >
-              <small
-                v-if="voucherState === 'error'"
-                class="mt-1 block text-[#ef4444]"
-                >Mã không hợp lệ</small
+              <small v-if="appliedVoucher" class="text-[#16a34a] mt-1 block"
+                >✓ Đã áp dụng mã {{ appliedVoucher.code }} (giảm
+                {{ format(voucherDiscount) }}đ)</small
               >
               <NuxtLink
                 :to="ROUTES.VOUCHERS"
@@ -489,6 +516,7 @@ import { ROUTES } from "~/constants/routes";
 import SkCartPage from "~/components/skeletons/SkCartPage.vue";
 import { useCart } from "~/composables/cart/useCart";
 import { useProductsQuery } from "~/queries/product/useProductsQuery";
+import { useApplyVoucher } from "~/composables/voucher/useApplyVoucher";
 
 useHead({
   title: "Giỏ hàng - SmartFood",
@@ -542,8 +570,16 @@ const displayItems = computed(() =>
   })),
 );
 
+const {
+  appliedVoucher,
+  voucherDiscount,
+  voucherBreakdown,
+  isApplying,
+  applyVoucher: mutateVoucher,
+  removeVoucher,
+} = useApplyVoucher();
+
 const voucherInput = ref("");
-const voucherState = ref<"idle" | "ok" | "error">("idle");
 const removeAskId = ref<string | null>(null);
 const qtyBumpId = ref<string | null>(null);
 const showConfirmModal = ref(false);
@@ -554,6 +590,14 @@ const freeShipTarget = 150000;
 
 const selectedItems = computed(() =>
   displayItems.value.filter((item) => item.checked),
+);
+const selectedItemsSignature = computed(() =>
+  selectedItems.value
+    .map(
+      (item) =>
+        `${item.id}:${item.quantity}:${item.price}:${item.categoryId || ""}`,
+    )
+    .join("|"),
 );
 const selectedCount = computed(() => selectedItems.value.length);
 const allSelected = computed(
@@ -569,19 +613,24 @@ const subtotal = computed(() =>
 const shippingFee = computed(() =>
   subtotal.value >= freeShipTarget ? 0 : 25000,
 );
-const voucherDiscount = computed(() =>
-  voucherState.value === "ok" ? 30000 : 0,
-);
 const grandTotal = computed(() =>
   Math.max(0, subtotal.value + shippingFee.value - voucherDiscount.value),
 );
 const freeShipPercent = computed(() =>
   Math.min(100, Math.round((subtotal.value / freeShipTarget) * 100)),
 );
-const freeShipRemaining = computed(() =>
-  Math.max(0, freeShipTarget - subtotal.value),
-);
 const format = (n: number) => n.toLocaleString("vi-VN");
+const itemDiscountMap = computed<Record<string, number>>(
+  () => voucherBreakdown.value || {},
+);
+
+const buildVoucherPayloadItems = () =>
+  selectedItems.value.map((item) => ({
+    productId: item.productId,
+    categoryId: item.categoryId,
+    quantity: item.quantity,
+    price: item.price,
+  }));
 
 const toggleAll = (e: Event) => {
   const t = e.target as HTMLInputElement;
@@ -624,9 +673,26 @@ const changeQty = async (id: string, delta: number) => {
   }, 250);
 };
 
-const applyVoucher = () => {
-  const code = voucherInput.value.trim().toUpperCase();
-  voucherState.value = ["SMART30", "SALE30"].includes(code) ? "ok" : "error";
+watch([subtotal, selectedItemsSignature], ([newTotal]) => {
+  if (appliedVoucher.value && newTotal < appliedVoucher.value.minOrderValue) {
+    // Auto-remove silently when order value drops.
+    // The user will see the price change and the total pulse animation.
+    removeVoucher({ silent: true });
+  } else if (appliedVoucher.value) {
+    // Recalculate scope-based discounts whenever cart composition changes.
+    handleApplyVoucher({ silent: true });
+  }
+});
+
+const handleApplyVoucher = (options: { silent?: boolean } = {}) => {
+  const code = (appliedVoucher.value?.code || voucherInput.value)
+    .trim()
+    .toUpperCase();
+  if (!code) return;
+  mutateVoucher(
+    { code, orderValue: subtotal.value, items: buildVoucherPayloadItems() },
+    options,
+  );
 };
 
 const checkoutNow = () => {

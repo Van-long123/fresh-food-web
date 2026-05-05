@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '~/stores/useCartStore'
 import { useAuthStore } from '~/stores/useAuthStore'
@@ -13,6 +14,7 @@ type ProductInput = {
   stock?: number
   slug?: string
   quantity?: number
+  categoryId?: string | null
 }
 
 const CART_TTL = 1000 * 60 * 60 * 24 * 7
@@ -47,8 +49,18 @@ const setUpdating = (productId: string, value: boolean) => {
 const isItemUpdating = (productId: string) => updatingIds.value.has(productId)
 
 export const useCart = () => {
+  const toast = useToast()
   const store = useCartStore()
   const authStore = useAuthStore()
+
+  const showErrorToast = (error: any) => {
+    toast.add({
+      severity: 'error',
+      summary: 'Lỗi',
+      detail: error?.response?.data?.message || 'Có lỗi xảy ra với giỏ hàng.',
+      life: 3000
+    })
+  }
 
   // Chỉ lấy các state cốt lõi từ Pinia
   const {
@@ -72,6 +84,7 @@ export const useCart = () => {
       payload.items.map((item) => ({
         id: item.productId,
         productId: item.productId,
+        categoryId: item.categoryId || null,
         name: item.name,
         image: item.image,
         price: item.price,
@@ -137,21 +150,25 @@ export const useCart = () => {
   const syncAfterLogin = async () => {
     if (!authStore.isLoggedIn) return
 
-    if (!cartItems.value.length) {
-      const response = await cartService.getCart()
+    try {
+      if (!cartItems.value.length) {
+        const response = await cartService.getCart()
+        applyCartResponse(response)
+        return
+      }
+
+      const payload: CartRequestItem[] = cartItems.value.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity
+      }))
+
+      const response = await cartService.mergeCart(payload)
+      store.clearGuestCart() 
+      if (typeof window !== 'undefined') localStorage.removeItem('smartfood-cart')
       applyCartResponse(response)
-      return
+    } catch (error) {
+      showErrorToast(error)
     }
-
-    const payload: CartRequestItem[] = cartItems.value.map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity
-    }))
-
-    const response = await cartService.mergeCart(payload)
-    store.clearGuestCart() 
-    if (typeof window !== 'undefined') localStorage.removeItem('smartfood-cart')
-    applyCartResponse(response)
   }
 
   const addToCart = async (product: ProductInput) => {
@@ -165,9 +182,13 @@ export const useCart = () => {
     }
 
     if (authStore.isLoggedIn) {
-      const response = await cartService.addItem({ productId, quantity })
-      applyCartResponse(response)
-      triggerNotice(`Đã thêm "${product.name}" vào giỏ hàng`, 'Thành công')
+      try {
+        const response = await cartService.addItem({ productId, quantity })
+        applyCartResponse(response)
+        triggerNotice(`Đã thêm "${product.name}" vào giỏ hàng`, 'Thành công')
+      } catch (error) {
+        showErrorToast(error)
+      }
       return
     }
 
@@ -188,6 +209,7 @@ export const useCart = () => {
       localItems.unshift({
         id: productId,
         productId,
+        categoryId: product.categoryId || null,
         name: product.name,
         image: product.image || '',
         price: product.price,
@@ -198,13 +220,17 @@ export const useCart = () => {
       })
     }
 
-    const response = await cartService.validateCart(
-      localItems.map((item) => ({ productId: item.productId, quantity: item.quantity }))
-    )
-    applyCartResponse(response)
-    
-    if (!existing) {
-      triggerNotice(`Đã thêm "${product.name}" vào giỏ hàng`, 'Thành công')
+    try {
+      const response = await cartService.validateCart(
+        localItems.map((item) => ({ productId: item.productId, quantity: item.quantity }))
+      )
+      applyCartResponse(response)
+      
+      if (!existing) {
+        triggerNotice(`Đã thêm "${product.name}" vào giỏ hàng`, 'Thành công')
+      }
+    } catch (error) {
+      showErrorToast(error)
     }
   }
 
@@ -214,8 +240,12 @@ export const useCart = () => {
     setUpdating(productId, true)
     try {
       if (authStore.isLoggedIn) {
-        const response = await cartService.updateItem(productId, quantity)
-        applyCartResponse(response)
+        try {
+          const response = await cartService.updateItem(productId, quantity)
+          applyCartResponse(response)
+        } catch (error) {
+          showErrorToast(error)
+        }
         return
       }
 
@@ -232,10 +262,14 @@ export const useCart = () => {
       target.quantity = nextQty
       store.setCartItems(localItems)
       
-      const response = await cartService.validateCart(
-        localItems.map((item) => ({ productId: item.productId, quantity: item.quantity }))
-      )
-      applyCartResponse(response)
+      try {
+        const response = await cartService.validateCart(
+          localItems.map((item) => ({ productId: item.productId, quantity: item.quantity }))
+        )
+        applyCartResponse(response)
+      } catch (error) {
+        showErrorToast(error)
+      }
     } finally {
       setUpdating(productId, false)
     }
@@ -265,9 +299,13 @@ export const useCart = () => {
 
   const removeItem = async (id: string) => {
     if (authStore.isLoggedIn) {
-      const response = await cartService.removeItem(id)
-      applyCartResponse(response)
-      triggerNotice('Đã xóa sản phẩm khỏi giỏ hàng', 'Giỏ hàng')
+      try {
+        const response = await cartService.removeItem(id)
+        applyCartResponse(response)
+        triggerNotice('Đã xóa sản phẩm khỏi giỏ hàng', 'Giỏ hàng')
+      } catch (error) {
+        showErrorToast(error)
+      }
       return
     }
 
@@ -279,8 +317,12 @@ export const useCart = () => {
     if (!ids.length) return
 
     if (authStore.isLoggedIn) {
-      const response = await cartService.removeItems(ids)
-      applyCartResponse(response)
+      try {
+        const response = await cartService.removeItems(ids)
+        applyCartResponse(response)
+      } catch (error) {
+        showErrorToast(error)
+      }
       return
     }
 
@@ -306,6 +348,7 @@ export const useCart = () => {
     
     // Actions & Helpers
     formatVnd,
+    triggerNotice,
     ensureCartReady,
     syncAfterLogin,
     addToCart,
@@ -317,3 +360,4 @@ export const useCart = () => {
     isItemUpdating
   }
 }
+

@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import type { ForgotPasswordPageState } from '~/types/user.type'
 import { useForgotPasswordMutation } from '~/mutations/user/useForgotPasswordMutation'
 import { validateForgotPasswordEmail } from '~/utils/authFormUtils'
@@ -6,6 +7,7 @@ import { validateForgotPasswordEmail } from '~/utils/authFormUtils'
 const TOTAL_SECONDS = 59
 
 export const useForgotPassword = () => {
+  const toast = useToast()
   const forgotPasswordMutation = useForgotPasswordMutation()
 
   const state = ref<ForgotPasswordPageState>('input')
@@ -57,8 +59,14 @@ export const useForgotPassword = () => {
       state.value = 'success'
       startCountdown()
       return { ok: true as const }
-    } catch {
+    } catch (error: any) {
       state.value = 'error'
+      toast.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: error?.response?.data?.message || 'Gửi yêu cầu thất bại, vui lòng thử lại.',
+        life: 3000
+      })
       return { ok: false as const }
     }
   }
@@ -70,7 +78,13 @@ export const useForgotPassword = () => {
       await forgotPasswordMutation.mutateAsync({ email: email.value })
       startCountdown()
       return { ok: true as const }
-    } catch {
+    } catch (error: any) {
+      toast.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: error?.response?.data?.message || 'Gửi yêu cầu thất bại, vui lòng thử lại.',
+        life: 3000
+      })
       return { ok: false as const }
     }
   }

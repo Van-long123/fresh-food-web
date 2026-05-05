@@ -10,6 +10,7 @@ import {
   isValidEmail,
   isValidPassword
 } from '~/utils/authFormUtils'
+import { useCart } from '~/composables/cart/useCart'
 
 interface LoginForm {
   email: string
@@ -28,6 +29,7 @@ export const useLoginForm = () => {
   const route = useRoute()
   const authStore = useAuthStore()
   const loginMutation = useLoginMutation()
+  const { syncAfterLogin } = useCart()
 
   const form = reactive<LoginForm>({ email: '', password: '', remember: false })
   const errors = reactive<FormErrors>({ email: '', password: '' })
@@ -121,10 +123,14 @@ export const useLoginForm = () => {
       authStore.setUserFromApi(result)
       
       try {
-        const { syncAfterLogin } = useCart()
         await syncAfterLogin()
       } catch (err) {
-        console.error('Lỗi đồng bộ giỏ hàng sau đăng nhập:', err)
+        toast.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Lỗi đồng bộ giỏ hàng sau đăng nhập',
+        life: 3000
+      })
       }
 
        toast.add({
@@ -135,8 +141,13 @@ export const useLoginForm = () => {
       })
 
       await router.push(ROUTES.HOME)
-    } catch {
-      // Toast lỗi được xử lý tập trung ở authorizedAxios interceptor.
+    } catch (error: any) {
+      toast.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: error?.response?.data?.message || 'Đăng nhập thất bại, vui lòng thử lại.',
+        life: 3000
+      })
     }
   }
 

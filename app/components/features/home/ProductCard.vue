@@ -140,7 +140,11 @@ const addedState = ref(false);
 const productDetailRoute = computed(() =>
   ROUTES.PRODUCT_DETAIL(props.product.slug || ""),
 );
-const isOutOfStock = computed(() => Number(props.product.stock || 0) <= 0);
+const isOutOfStock = computed(() => {
+  const stock = props.product.stock;
+  // Nếu stock chưa được load từ API (undefined/null), giả sử sản phẩm còn hàng
+  return stock !== undefined && stock !== null && Number(stock) <= 0;
+});
 
 const formatPrice = (price: number): string => {
   return price.toLocaleString("vi-VN");
@@ -163,6 +167,7 @@ const handleBuy = () => {
     image: props.product.image,
     stock: props.product.stock,
     slug: props.product.slug,
+    categoryId: (props.product as any).categoryId || null,
   });
 
   addedState.value = true;

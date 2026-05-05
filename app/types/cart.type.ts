@@ -14,6 +14,7 @@ export interface CartAdjustment {
 export interface CartItem {
   id: string
   productId: string
+  categoryId?: string | null
   name: string
   image: string
   price: number
@@ -27,6 +28,7 @@ export interface CartItem {
 export interface CartResponse {
   items: Array<{
     productId: string
+    categoryId?: string | null
     name: string
     image: string
     price: number

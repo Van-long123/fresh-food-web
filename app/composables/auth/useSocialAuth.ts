@@ -2,16 +2,17 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'primevue/usetoast'
 import { useAuthStore } from '~/stores/useAuthStore'
-import { useCartStore } from '~/stores/useCartStore'
 import { userService } from '~/services/user.service'
 import { API_ENDPOINTS } from '~/constants/api'
 import { ROUTES } from '~/constants/routes'
 import type { OAuthProvider, SocialLoginOption } from '~/types/user.type'
+import { useCart } from '~/composables/cart/useCart'
 
 export const useSocialAuth = () => {
   const router = useRouter()
   const toast = useToast()
   const authStore = useAuthStore()
+  const { syncAfterLogin } = useCart()
 
   const isLoading = ref(false)
 
@@ -75,10 +76,16 @@ export const useSocialAuth = () => {
       authStore.setUserFromApi(userInfo)
 
       try {
-        const { syncAfterLogin } = useCart()
         await syncAfterLogin()
       } catch (err) {
-        console.error('Lỗi đồng bộ giỏ hàng:', err)
+      console.log("🚀 ~ handleSubmit ~ err:", err)
+
+        toast.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: 'Lỗi đồng bộ giỏ hàng sau đăng nhập',
+        life: 3000
+      })
       }
 
       toast.add({

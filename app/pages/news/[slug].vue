@@ -307,6 +307,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { useToast } from "primevue/usetoast";
 import { useCreateArticleCommentMutation } from "~/mutations/article/useCreateArticleCommentMutation";
 import { useAuthStore } from "~/stores/useAuthStore";
 import { useNewsDetail } from "~/composables/news/useNewsDetail";
@@ -340,6 +341,7 @@ const {
 } = useNewsDetail();
 
 const authStore = useAuthStore();
+const toast = useToast();
 const { mutateAsync: createArticleComment, isPending: isCreatingComment } =
   useCreateArticleCommentMutation();
 
@@ -416,11 +418,20 @@ const submitComment = async () => {
 
   if (!article.value?.slug) return;
 
-  await createArticleComment({
-    slug: article.value.slug,
-    payload: { content },
-  });
-  newComment.value = "";
+  try {
+    await createArticleComment({
+      slug: article.value.slug,
+      payload: { content },
+    });
+    newComment.value = "";
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: "Lỗi",
+      detail: error?.response?.data?.message || "Không thể gửi bình luận, vui lòng thử lại.",
+      life: 3000,
+    });
+  }
 };
 
 const bindObservers = async () => {

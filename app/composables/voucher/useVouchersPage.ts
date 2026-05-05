@@ -72,7 +72,6 @@ const resolveStatus = (voucher: any): CouponStatus => {
 }
 
 const mapVoucher = (v: any): MappedCoupon => {
-  console.log("🚀 ~ mapVoucher ~ v:", v)
   const type = v.type as CouponType
   return {
     id: String(v._id),

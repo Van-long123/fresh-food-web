@@ -1,4 +1,5 @@
 import { computed, reactive, ref } from 'vue'
+import { useToast } from 'primevue/usetoast'
 import { useRouter } from 'vue-router'
 import { ROUTES } from '~/constants/routes'
 import { usePasswordStrength } from '~/composables/auth/usePasswordStrength'
@@ -21,6 +22,7 @@ interface RegisterForm {
 }
 
 export const useRegisterForm = () => {
+  const toast = useToast()
   const router = useRouter()
   const registerMutation = useRegisterMutation()
 
@@ -203,8 +205,13 @@ export const useRegisterForm = () => {
 
       fireConfetti()
       await router.push({ path: ROUTES.AUTH.LOGIN, query: { registered: '1' } })
-    } catch {
-      // Toast lỗi được xử lý tập trung ở authorizedAxios interceptor.
+    } catch (error: any) {
+      toast.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: error?.response?.data?.message || 'Đăng ký thất bại, vui lòng thử lại.',
+        life: 3000
+      })
     }
   }
 

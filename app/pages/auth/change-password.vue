@@ -407,8 +407,13 @@ const handleSubmit = async () => {
       detail: "Mật khẩu của bạn đã được thay đổi.",
       life: 5000,
     });
-  } catch {
-    // Toast lỗi được xử lý tập trung ở authorizedAxios interceptor.
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: "Lỗi",
+      detail: error?.response?.data?.message || "Đã có lỗi xảy ra, vui lòng thử lại.",
+      life: 5000,
+    });
   }
 };
 </script>

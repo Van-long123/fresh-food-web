@@ -10,32 +10,7 @@ type ApiErrorResponse = {
 let authorizedAxiosInstance: AxiosInstance | null = null
 let refreshTokenPromise: Promise<string | undefined> | null = null
 let logoutPromise: Promise<void> | null = null
-let lastErrorToastMessage = ''
-let lastErrorToastAt = 0
 
-const showErrorToast = (message: string) => {
-  if (!import.meta.client) return
-
-  const now = Date.now()
-  if (message === lastErrorToastMessage && now - lastErrorToastAt < 1200) {
-    return
-  }
-
-  lastErrorToastMessage = message
-  lastErrorToastAt = now
-
-  try {
-    ToastEventBus.emit('add', {
-      severity: 'error',
-      summary: 'Lỗi',
-      detail: message,
-      life: 3500
-    })
-  } catch {
-    // Trường hợp chưa mount ToastService thì fallback về console để không làm hỏng luồng API.
-    console.error(message)
-  }
-}
 
 const performLogout = async (baseURL: string) => {
   if (logoutPromise) return logoutPromise
@@ -96,16 +71,7 @@ const createAuthorizedAxios = (baseURL: string) => {
         return refreshTokenPromise.then((_accessToken) => instance(originalRequest))
       }
 
-      // Xử lý tập trung phần hiển thị thông báo lỗi trả về từ mọi API ở đây
-      let errorMessage = error.message
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message
-      }
 
-      // Ngoại trừ mã 410 - GONE phục vụ việc tự động refresh lại token.
-      if (status !== 410) {
-        showErrorToast(errorMessage || 'Có lỗi xảy ra, vui lòng thử lại.')
-      }
 
       return Promise.reject(error)
     }

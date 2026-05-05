@@ -78,7 +78,7 @@ const toBoolean = (value: unknown, fallback = false): boolean => {
   return fallback
 }
 
-const mapProduct = (product: unknown): HomeProduct | null => {
+export const mapProduct = (product: unknown): HomeProduct | null => {
   if (!product || typeof product !== 'object') return null
 
   const raw = product as Record<string, unknown>
@@ -90,7 +90,7 @@ const mapProduct = (product: unknown): HomeProduct | null => {
   const slugSeed = raw.slug ?? title ?? id
   const originalPrice = toNullableNumber(raw.originalPrice ?? raw.compareAtPrice)
   const price = toNumber(raw.price ?? raw.salePrice, 0)
-  const stock = toNumber(raw.stock, 0)
+  const stock = toNumber(raw.stock ?? raw.quantity ?? raw.inventory ?? raw.inventory_quantity, 0)
 
   return {
     id: typeof id === 'number' || typeof id === 'string' ? id : String(id),

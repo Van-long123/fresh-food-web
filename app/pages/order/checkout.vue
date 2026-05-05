@@ -676,7 +676,8 @@ import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useOrderStore } from "~/stores/useOrderStore";
 import { useAuthStore } from "~/stores/useAuthStore";
-import type { OrderProduct, OrderInfo, Voucher  } from "~/stores/useOrderStore";
+import { useToast } from "primevue/usetoast";
+import type { OrderProduct, OrderInfo, Voucher } from "~/stores/useOrderStore";
 import { ROUTES } from "~/constants/routes";
 import { useProvincesQuery } from "~/queries/location/useProvincesQuery";
 import type { Province } from "~/types/location.type";
@@ -694,6 +695,7 @@ useHead({
 const router = useRouter();
 const orderStore = useOrderStore();
 const authStore = useAuthStore();
+const toast = useToast();
 
 // ── Province API ─────────────────────────────────────────────────────────────
 
@@ -1105,8 +1107,15 @@ async function handleCheckout() {
     // Save to store and redirect
     orderStore.setOrderInfo(payload);
     router.push(ROUTES.ORDER.INFO);
-  } catch (err) {
-    console.error("Checkout error:", err);
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: "Lỗi",
+      detail:
+        error?.response?.data?.message ||
+        "Thanh toán thất bại, vui lòng thử lại.",
+      life: 4000,
+    });
   } finally {
     isSubmitting.value = false;
   }
