@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import ChangePasswordPage from "~/pages/auth/change-password.vue";
 import { ROUTES } from "~/constants/routes";
 import { userService } from "~/services/user.service";
+import { getProvincesRequest } from "~/api/location.api";
+import { isValidPhone } from "~/utils/authFormUtils";
 import { useAuthStore } from "~/stores/useAuthStore";
 import { useProfile } from "~/composables/useProfile";
 import SkProfilePage from "~/components/skeletons/SkProfilePage.vue";
@@ -59,7 +61,6 @@ const mobileTabs = [
 const activeMenu = ref<MenuKey>("profile");
 const loggingOut = ref(false);
 const rankProgressVisible = ref(false);
-const showAddressModal = ref(false);
 
 const orders = [
   {
@@ -97,18 +98,99 @@ const orders = [
   },
 ];
 
-const defaultAddress = ref("25 Nguyễn Trãi, P.Bến Thành, Q.1, TP.HCM");
+// Address management (local list + create/edit modal)
+type Address = {
+  id: string;
+  fullName: string;
+  phone: string;
+  street: string;
+  ward: string;
+  district: string;
+  city: string;
+  isDefault?: boolean;
+};
 
-const addressForm = ref({
-  name: "",
+const addresses = ref<Address[]>([
+  {
+    id: "a1",
+    fullName: "Nguyễn Văn A",
+    phone: "0912345678",
+    street: "25 Nguyễn Trãi",
+    ward: "Phường Bến Thành",
+    district: "Quận 1",
+    city: "TP.HCM",
+    isDefault: true,
+  },
+  {
+    id: "b1",
+    fullName: "Trần Thị B",
+    phone: "0987654321",
+    street: "123 Lê Lợi",
+    ward: "Phường 5",
+    district: "Quận 3",
+    city: "TP.HCM",
+    isDefault: false,
+  },
+]);
+
+const selectedAddressId = ref<string | null>(
+  addresses.value.find((a) => a.isDefault)?.id || null,
+);
+
+const modalMode = ref<"create" | "edit">("create");
+const editingId = ref<string | null>(null);
+const showAddressModal = ref(false);
+
+const addressForm = ref<Partial<Address>>({
+  fullName: "",
   phone: "",
-  detail: "",
-  city: "TP.HCM",
-  district: "Quận 1",
-  ward: "Phường 1",
-  default: true,
+  street: "",
+  ward: "",
+  district: "",
+  city: "",
+  isDefault: false,
 });
 
+const provinces = ref<any[]>([]);
+const districts = computed(() => {
+  const p = provinces.value.find((p: any) => p.name === addressForm.value.city);
+  return p?.districts || [];
+});
+const wards = computed(() => {
+  const d = districts.value.find(
+    (d: any) => d.name === addressForm.value.district,
+  );
+  return d?.wards || [];
+});
+
+// Options for PrimeVue Select
+const provinceOptions = computed(() =>
+  provinces.value.map((p: any) => ({ label: p.name, value: p.name })),
+);
+const districtOptions = computed(() =>
+  districts.value.map((d: any) => ({ label: d.name, value: d.name })),
+);
+const wardOptions = computed(() =>
+  wards.value.map((w: any) => ({ label: w.name, value: w.name })),
+);
+
+watch(
+  () => addressForm.value.city,
+  () => {
+    addressForm.value.district = "";
+    addressForm.value.ward = "";
+  },
+);
+
+watch(
+  () => addressForm.value.district,
+  () => {
+    addressForm.value.ward = "";
+  },
+);
+
+const wasSubmitted = ref(false);
+const validationErrors = ref<{ [k: string]: string }>({});
 const statusClass = (status: string) => {
   if (status === "Đang giao") return "bg-blue-100 text-blue-700";
   if (status === "Thành công") return "bg-green-100 text-green-700";
@@ -117,8 +199,150 @@ const statusClass = (status: string) => {
 
 const formatVnd = (v: number) => v.toLocaleString("vi-VN");
 
+const loadProvinces = async () => {
+  try {
+    const res = await getProvincesRequest();
+    provinces.value = res;
+  } catch {
+    provinces.value = [];
+  }
+};
+
+const openCreateAddress = () => {
+  modalMode.value = "create";
+  editingId.value = null;
+  addressForm.value = {
+    fullName: "",
+    phone: "",
+    street: "",
+    ward: "",
+    district: "",
+    city: provinces.value?.[0]?.name || "TP.HCM",
+    isDefault: false,
+  };
+  wasSubmitted.value = false;
+  validationErrors.value = {};
+  showAddressModal.value = true;
+};
+
+const openEditAddress = (a: Address) => {
+  modalMode.value = "edit";
+  editingId.value = a.id;
+  addressForm.value = { ...a };
+  wasSubmitted.value = false;
+  validationErrors.value = {};
+  showAddressModal.value = true;
+};
+
+const setDefaultAddress = (id: string) => {
+  addresses.value = addresses.value.map((a) => ({
+    ...a,
+    isDefault: a.id === id,
+  }));
+  selectedAddressId.value = id;
+};
+
+const validateAddressForm = (): boolean => {
+  validationErrors.value = {};
+  if (
+    !addressForm.value.fullName ||
+    !String(addressForm.value.fullName).trim()
+  ) {
+    validationErrors.value.fullName = "Tên người nhận là bắt buộc.";
+  }
+  if (
+    !addressForm.value.phone ||
+    !isValidPhone(String(addressForm.value.phone))
+  ) {
+    validationErrors.value.phone = "Số điện thoại không hợp lệ.";
+  }
+  if (!addressForm.value.street || !String(addressForm.value.street).trim()) {
+    validationErrors.value.street = "Địa chỉ chi tiết là bắt buộc.";
+  }
+  if (!addressForm.value.city) {
+    validationErrors.value.city = "Vui lòng chọn Tỉnh/Thành.";
+  }
+  if (!addressForm.value.district) {
+    validationErrors.value.district = "Vui lòng chọn Quận/Huyện.";
+  }
+  if (!addressForm.value.ward) {
+    validationErrors.value.ward = "Vui lòng chọn Phường/Xã.";
+  }
+  return Object.keys(validationErrors.value).length === 0;
+};
+
+watch(
+  () => [
+    addressForm.value.fullName,
+    addressForm.value.phone,
+    addressForm.value.street,
+    addressForm.value.city,
+    addressForm.value.district,
+    addressForm.value.ward,
+  ],
+  () => {
+    if (wasSubmitted.value) {
+      validateAddressForm();
+    }
+  },
+  { deep: true },
+);
+
 const saveAddress = () => {
-  defaultAddress.value = `${addressForm.value.detail}, ${addressForm.value.ward}, ${addressForm.value.district}, ${addressForm.value.city}`;
+  wasSubmitted.value = true;
+  if (!validateAddressForm()) return;
+
+  if (modalMode.value === "create") {
+    const id = `a${Date.now()}`;
+    const newAddr: Address = {
+      id,
+      fullName: String(addressForm.value.fullName || ""),
+      phone: String(addressForm.value.phone || ""),
+      street: String(addressForm.value.street || ""),
+      ward: String(addressForm.value.ward || ""),
+      district: String(addressForm.value.district || ""),
+      city: String(addressForm.value.city || ""),
+      isDefault: Boolean(addressForm.value.isDefault),
+    };
+    if (newAddr.isDefault) {
+      addresses.value = addresses.value.map((a) => ({
+        ...a,
+        isDefault: false,
+      }));
+      selectedAddressId.value = id;
+    }
+    addresses.value.unshift(newAddr);
+  } else if (modalMode.value === "edit" && editingId.value) {
+    addresses.value = addresses.value.map((a) => {
+      if (a.id !== editingId.value) return a;
+      const updated: Address = {
+        ...a,
+        fullName: String(addressForm.value.fullName || a.fullName),
+        phone: String(addressForm.value.phone || a.phone),
+        street: String(addressForm.value.street || a.street),
+        ward: String(addressForm.value.ward || a.ward),
+        district: String(addressForm.value.district || a.district),
+        city: String(addressForm.value.city || a.city),
+        isDefault: Boolean(addressForm.value.isDefault),
+      };
+      return updated;
+    });
+    if (addressForm.value.isDefault) {
+      setDefaultAddress(editingId.value);
+    }
+  }
+
+  // Hậu kiểm: Đảm bảo luôn có đúng 1 địa chỉ mặc định nếu danh sách không trống
+  const defaultCount = addresses.value.filter((a) => a.isDefault).length;
+  if (defaultCount !== 1 && addresses.value.length > 0) {
+    // Nếu có nhiều hơn 1 hoặc không có cái nào, lấy cái đầu tiên làm mặc định
+    addresses.value = addresses.value.map((a, idx) => ({
+      ...a,
+      isDefault: idx === 0,
+    }));
+    selectedAddressId.value = addresses.value[0].id;
+  }
+
   showAddressModal.value = false;
 };
 
@@ -141,6 +365,7 @@ onMounted(() => {
   requestAnimationFrame(() => {
     rankProgressVisible.value = true;
   });
+  loadProvinces();
 });
 </script>
 
@@ -393,15 +618,79 @@ onMounted(() => {
           <template v-if="activeMenu === 'address'">
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <div class="flex items-center justify-between">
-                <h2 class="text-lg font-bold">Địa chỉ</h2>
+                <h2 class="text-lg font-bold">Địa chỉ giao hàng</h2>
                 <button
                   class="rounded-full border border-[#f47f20] px-3 py-1 text-sm font-semibold text-[#f47f20]"
-                  @click="showAddressModal = true"
+                  @click="openCreateAddress()"
                 >
                   + Thêm địa chỉ
                 </button>
               </div>
-              <p class="mt-2 text-sm text-gray-600">{{ defaultAddress }}</p>
+
+              <div class="mt-4">
+                <TransitionGroup name="list" tag="div" class="space-y-3">
+                  <template #default>
+                    <div
+                      v-for="addr in addresses"
+                      :key="addr.id"
+                      class="flex items-start justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-gray-300 hover:shadow-md"
+                    >
+                      <div class="flex items-start gap-3 flex-1 min-w-0">
+                        <input
+                          type="radio"
+                          name="selectedAddress"
+                          :value="addr.id"
+                          v-model="selectedAddressId"
+                          class="mt-1 h-4 w-4 shrink-0 accent-[#f47f20]"
+                          @change="() => setDefaultAddress(addr.id)"
+                        />
+                        <div class="flex-1 min-w-0">
+                          <div
+                            class="flex flex-wrap items-center gap-x-2 gap-y-1"
+                          >
+                            <p class="font-semibold text-gray-900 text-sm">
+                              {{ addr.fullName }}
+                            </p>
+                            <span class="text-gray-300 text-xs select-none"
+                              >|</span
+                            >
+                            <p class="text-sm text-gray-500">
+                              {{ addr.phone }}
+                            </p>
+                            <span
+                              v-if="addr.isDefault"
+                              class="rounded-full bg-orange-50 border border-orange-200 px-2 py-0.5 text-xs font-semibold text-[#f47f20]"
+                              >Mặc định</span
+                            >
+                          </div>
+                          <p
+                            class="mt-1 text-sm text-gray-500 leading-relaxed truncate"
+                          >
+                            {{ addr.street }}, {{ addr.ward }},
+                            {{ addr.district }}, {{ addr.city }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="flex items-center gap-2 shrink-0">
+                        <button
+                          class="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800"
+                          @click="openEditAddress(addr)"
+                        >
+                          ✏️ Sửa
+                        </button>
+                      </div>
+                    </div>
+                  </template>
+                </TransitionGroup>
+
+                <div
+                  v-if="addresses.length === 0"
+                  class="mt-8 flex flex-col items-center gap-2 text-center"
+                >
+                  <p class="text-sm text-gray-400">Bạn chưa có địa chỉ nào.</p>
+                </div>
+              </div>
             </section>
           </template>
 
@@ -477,88 +766,183 @@ onMounted(() => {
           class="fixed inset-0 z-40 flex items-end justify-center bg-black/50 p-4 md:items-center"
           @click.self="showAddressModal = false"
         >
-          <div class="w-full max-w-lg rounded-2xl bg-white p-5">
-            <div class="mb-4 flex items-center justify-between">
-              <h3 class="text-lg font-bold">Chỉnh sửa địa chỉ</h3>
+          <div class="w-full max-w-lg rounded-2xl bg-white p-6">
+            <!-- Header -->
+            <div class="mb-5 flex items-center justify-between">
+              <h3 class="text-lg font-bold text-gray-800">
+                {{
+                  modalMode === "create" ? "Thêm địa chỉ" : "Chỉnh sửa địa chỉ"
+                }}
+              </h3>
               <button
-                class="text-gray-400 hover:text-gray-600"
+                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition"
                 @click="showAddressModal = false"
               >
-                <i class="pi pi-times" />
+                <i class="pi pi-times text-sm" />
               </button>
             </div>
-            <form class="space-y-4" @submit.prevent="saveAddress">
-              <div class="grid gap-4 sm:grid-cols-2">
-                <label class="field">
-                  <span>Tên người nhận</span>
-                  <input
-                    v-model="addressForm.name"
-                    class="input"
+
+            <form class="space-y-5" @submit.prevent="saveAddress">
+              <!-- Tên + SĐT -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1">
+                  <label
+                    class="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                    >Họ tên <span class="text-red-500">*</span></label
+                  >
+                  <InputText
+                    v-model="addressForm.fullName"
                     placeholder="VD: Nguyễn Văn A"
+                    class="w-full"
+                    :class="{ 'p-invalid': validationErrors.fullName }"
                   />
-                </label>
-                <label class="field">
-                  <span>Số điện thoại</span>
-                  <input
+                  <small
+                    v-if="validationErrors.fullName"
+                    class="text-red-500 text-xs mt-0.5"
+                  >
+                    {{ validationErrors.fullName }}
+                  </small>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label
+                    class="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                    >Số điện thoại <span class="text-red-500">*</span></label
+                  >
+                  <InputText
                     v-model="addressForm.phone"
-                    class="input"
                     placeholder="VD: 0912..."
+                    class="w-full"
+                    :class="{ 'p-invalid': validationErrors.phone }"
                   />
+                  <small
+                    v-if="validationErrors.phone"
+                    class="text-red-500 text-xs mt-0.5"
+                  >
+                    {{ validationErrors.phone }}
+                  </small>
+                </div>
+              </div>
+
+              <!-- Tỉnh/Thành + Quận/Huyện -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1">
+                  <label
+                    class="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                    >Tỉnh/Thành phố <span class="text-red-500">*</span></label
+                  >
+                  <Select
+                    v-model="addressForm.city"
+                    :options="provinceOptions"
+                    option-label="label"
+                    option-value="value"
+                    placeholder="Chọn tỉnh/thành"
+                    class="w-full"
+                    :class="{ 'p-invalid': validationErrors.city }"
+                    filter
+                  />
+                  <small
+                    v-if="validationErrors.city"
+                    class="text-red-500 text-xs mt-0.5"
+                  >
+                    {{ validationErrors.city }}
+                  </small>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <label
+                    class="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                    >Quận/Huyện <span class="text-red-500">*</span></label
+                  >
+                  <Select
+                    v-model="addressForm.district"
+                    :options="districtOptions"
+                    option-label="label"
+                    option-value="value"
+                    placeholder="Chọn quận/huyện"
+                    class="w-full"
+                    :class="{ 'p-invalid': validationErrors.district }"
+                    :disabled="!addressForm.city"
+                    filter
+                  />
+                  <small
+                    v-if="validationErrors.district"
+                    class="text-red-500 text-xs mt-0.5"
+                  >
+                    {{ validationErrors.district }}
+                  </small>
+                </div>
+              </div>
+
+              <!-- Phường/Xã + Số nhà -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1">
+                  <label
+                    class="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                    >Phường/Xã <span class="text-red-500">*</span></label
+                  >
+                  <Select
+                    v-model="addressForm.ward"
+                    :options="wardOptions"
+                    option-label="label"
+                    option-value="value"
+                    placeholder="Chọn phường/xã"
+                    class="w-full"
+                    :class="{ 'p-invalid': validationErrors.ward }"
+                    :disabled="!addressForm.district"
+                    filter
+                  />
+                  <small
+                    v-if="validationErrors.ward"
+                    class="text-red-500 text-xs mt-0.5"
+                  >
+                    {{ validationErrors.ward }}
+                  </small>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <label
+                    class="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                    >Số nhà / Đường <span class="text-red-500">*</span></label
+                  >
+                  <InputText
+                    v-model="addressForm.street"
+                    placeholder="123 Đường Lê Lợi"
+                    class="w-full"
+                    :class="{ 'p-invalid': validationErrors.street }"
+                  />
+                  <small
+                    v-if="validationErrors.street"
+                    class="text-red-500 text-xs mt-0.5"
+                  >
+                    {{ validationErrors.street }}
+                  </small>
+                </div>
+              </div>
+
+              <!-- Checkbox mặc định -->
+              <div>
+                <label class="flex items-center gap-2 text-sm">
+                  <input
+                    v-model="addressForm.isDefault"
+                    type="checkbox"
+                    class="h-4 w-4 rounded accent-[#f47f20]"
+                  />
+                  <span class="text-gray-600">Đặt làm địa chỉ mặc định</span>
                 </label>
               </div>
 
-              <label class="field">
-                <span>Địa chỉ chi tiết</span>
-                <input
-                  v-model="addressForm.detail"
-                  class="input"
-                  placeholder="Số nhà, tên đường..."
-                />
-              </label>
-
-              <div class="grid gap-3 sm:grid-cols-3">
-                <label class="field">
-                  <span>Tỉnh/Thành</span>
-                  <select v-model="addressForm.city" class="input">
-                    <option>TP.HCM</option>
-                    <option>Hà Nội</option>
-                  </select>
-                </label>
-                <label class="field">
-                  <span>Quận/Huyện</span>
-                  <select v-model="addressForm.district" class="input">
-                    <option>Quận 1</option>
-                    <option>Quận 7</option>
-                  </select>
-                </label>
-                <label class="field">
-                  <span>Phường/Xã</span>
-                  <select v-model="addressForm.ward" class="input">
-                    <option>Phường 1</option>
-                    <option>Phường 2</option>
-                  </select>
-                </label>
-              </div>
-
-              <label class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="addressForm.default"
-                  type="checkbox"
-                  class="h-4 w-4 accent-[#f47f20]"
-                />
-                <span class="text-gray-600">Đặt làm địa chỉ mặc định</span>
-              </label>
-
-              <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <!-- Actions -->
+              <div class="flex justify-end gap-3 border-t border-gray-100 pt-4">
                 <button
                   type="button"
-                  class="rounded-full border border-gray-300 px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  class="rounded-full border border-gray-300 px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
                   @click="showAddressModal = false"
                 >
                   Hủy
                 </button>
                 <button
-                  class="rounded-full bg-[#f47f20] px-8 py-2 text-sm font-semibold text-white transition hover:bg-[#e06d10]"
+                  type="submit"
+                  class="rounded-full bg-[#f47f20] px-8 py-2 text-sm font-semibold text-white hover:bg-[#e06d10] transition"
                 >
                   Lưu địa chỉ
                 </button>

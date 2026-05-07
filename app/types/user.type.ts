@@ -4,12 +4,6 @@ export interface AuthUser {
   phone: string
   email?: string
   address?: string
-  ward?: string
-  wardCode?: number
-  district?: string
-  districtCode?: number
-  province?: string
-  provinceCode?: number
   avatar?: string
   birthday?: string
   gender?: string
@@ -22,12 +16,6 @@ export interface ApiAuthUser {
   phone: string
   email?: string
   address?: string
-  ward?: string
-  ward_code?: number
-  district?: string
-  district_code?: number
-  province?: string
-  province_code?: number
   avatar?: string
   birthday?: string
   gender?: string
@@ -67,12 +55,6 @@ export interface UpdateProfilePayload {
   avatar?: string
   birthday?: string
   address?: string
-  ward?: string
-  ward_code?: number | null
-  district?: string
-  district_code?: number | null
-  province?: string
-  province_code?: number | null
   gender?: string
   current_password?: string
   new_password?: string
