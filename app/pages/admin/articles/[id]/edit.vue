@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+import Dropdown from "primevue/dropdown";
+import Calendar from "primevue/calendar";
 import { ROUTES } from "~/constants/routes";
 import type { AdminArticleForm } from "~/types/admin-article.type";
 import { validateAdminArticle } from "~/validations/admin/article.schema";

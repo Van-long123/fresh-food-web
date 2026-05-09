@@ -16,7 +16,7 @@ const toggleDropdown = (key: string) => {
 <template>
   <aside
     id="sidebar"
-    class="fixed top-0 left-0 z-20 flex h-full w-64 flex-col pt-16 font-normal transition-width duration-75 lg:flex"
+    class="fixed top-0 left-0 z-40 flex h-full w-64 flex-col pt-20 font-normal transition-width duration-75 lg:flex"
     aria-label="Sidebar"
   >
     <div
@@ -116,6 +116,30 @@ const toggleDropdown = (key: string) => {
                     class="flex items-center rounded-xl px-3 py-2 pl-10 text-sm text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                     active-class="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
                     >Reviews</NuxtLink
+                  >
+                </li>
+                <li>
+                  <NuxtLink
+                    :to="ROUTES.ADMIN.ARTICLES"
+                    class="flex items-center rounded-xl px-3 py-2 pl-10 text-sm text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                    active-class="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
+                    >Articles</NuxtLink
+                  >
+                </li>
+                <li>
+                  <NuxtLink
+                    :to="ROUTES.ADMIN.ROLES"
+                    class="flex items-center rounded-xl px-3 py-2 pl-10 text-sm text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                    active-class="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
+                    >Roles</NuxtLink
+                  >
+                </li>
+                <li>
+                  <NuxtLink
+                    :to="ROUTES.ADMIN.PAYMENTS"
+                    class="flex items-center rounded-xl px-3 py-2 pl-10 text-sm text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                    active-class="bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white"
+                    >Payments</NuxtLink
                   >
                 </li>
               </ul>

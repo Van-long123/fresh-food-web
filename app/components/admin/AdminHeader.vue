@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import InputText from "primevue/inputtext";
 import { ROUTES } from "~/constants/routes";
 </script>
 
 <template>
   <nav
-    class="fixed z-30 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/80"
+    class="fixed z-50 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/80"
   >
     <div class="px-4 py-3 lg:px-6">
       <div class="flex items-center justify-between gap-4">
@@ -28,10 +29,12 @@ import { ROUTES } from "~/constants/routes";
                 >Admin</span
               >
             </NuxtLink>
-            <div
-              class="hidden text-xs text-slate-400 md:flex md:items-center md:gap-2"
-            >
-              <span>Admin</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4 lg:gap-6">
+          <div class="hidden items-center gap-2 lg:flex">
+            <div class="flex items-center gap-1.5 text-xs">
               <i class="pi pi-angle-right text-[0.6rem]"></i>
               <span class="text-slate-500">Dashboard</span>
             </div>
@@ -40,18 +43,20 @@ import { ROUTES } from "~/constants/routes";
 
         <div class="flex flex-1 items-center justify-end gap-3">
           <div class="hidden w-full max-w-md lg:block">
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-search text-slate-400"></i>
+            <div class="relative w-full">
+              <i
+                class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10"
+              ></i>
               <InputText
                 id="topbar-search"
                 type="text"
                 placeholder="Search orders, users, products"
-                class="w-full"
+                class="w-full !pl-10"
               />
-            </span>
+            </div>
           </div>
 
-          <button
+          <!-- <button
             type="button"
             class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500"
           >
@@ -62,7 +67,7 @@ import { ROUTES } from "~/constants/routes";
             class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500"
           >
             <i class="pi pi-moon text-base"></i>
-          </button>
+          </button> -->
 
           <button
             id="user-menu-button-2"

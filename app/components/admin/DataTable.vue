@@ -228,7 +228,6 @@ defineSlots<{
         v-for="column in columns"
         :key="column.key"
         :field="column.key"
-        :header="column.label"
         :class="column.class"
         :sortable="sortable && column.sortable"
       >

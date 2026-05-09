@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+import Checkbox from "primevue/checkbox";
 import { ROUTES } from "~/constants/routes";
 import type {
   AdminRoleForm,

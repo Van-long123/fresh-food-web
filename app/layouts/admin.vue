@@ -6,13 +6,13 @@ import AdminSidebar from "~/components/admin/AdminSidebar.vue";
 <template>
   <div class="bg-slate-50 dark:bg-slate-950">
     <AdminHeader />
-    <div class="flex overflow-hidden bg-slate-50 pt-16 dark:bg-slate-950">
+    <div class="flex overflow-hidden bg-slate-50 pt-20 dark:bg-slate-950">
       <AdminSidebar />
       <div
         id="main-content"
         class="relative min-h-screen w-full overflow-y-auto bg-slate-50 lg:ml-64 dark:bg-slate-950"
       >
-        <main class="pb-12">
+        <main class="space-y-6 pb-12 pt-6">
           <slot />
         </main>
 
