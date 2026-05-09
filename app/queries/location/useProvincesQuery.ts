@@ -3,8 +3,8 @@ import { getProvincesRequest } from '~/api/location.api'
 
 export const useProvincesQuery = () => {
   return useQuery({
-    queryKey: ['locations', 'provinces'],
+    queryKey: ['provinces'],
     queryFn: getProvincesRequest,
-    staleTime: 1000 * 60 * 60
+    staleTime: Infinity
   })
 }

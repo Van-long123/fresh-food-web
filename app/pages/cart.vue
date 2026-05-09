@@ -65,7 +65,6 @@
                 v-for="item in displayItems"
                 :key="item.id"
                 class="grid gap-3.5 rounded-2xl border border-[#e5e7eb] bg-white p-4 relative"
-                :class="item.isAdjusted ? 'border-[#fdba74] bg-[#fff7ed]' : ''"
                 style="grid-template-columns: 26px 80px 1fr auto 40px"
               >
                 <!-- Checkbox -->
@@ -158,43 +157,20 @@
 
                 <!-- Price -->
                 <div class="text-right">
-                  <template v-if="(itemDiscountMap[item.id] || 0) > 0">
-                    <p class="m-0 text-[#6b7280] line-through text-[13px]">
-                      {{ format(item.price * item.quantity) }}đ
-                    </p>
-                    <p
-                      class="mt-1 mb-0 text-[#ea580c] text-[22px] font-extrabold"
-                    >
-                      {{
-                        format(
-                          Math.max(
-                            0,
-                            item.price * item.quantity -
-                              (itemDiscountMap[item.id] || 0),
-                          ),
-                        )
-                      }}đ
-                    </p>
-                    <small class="text-[#16a34a]"
-                      >-{{ format(itemDiscountMap[item.id] || 0) }}đ</small
-                    >
-                  </template>
-                  <template v-else>
-                    <p
-                      v-if="item.originalPrice"
-                      class="m-0 text-[#6b7280] line-through text-[13px]"
-                    >
-                      {{ format(item.originalPrice) }}đ
-                    </p>
-                    <p
-                      class="mt-1 mb-0 text-[#ea580c] text-[22px] font-extrabold"
-                    >
-                      {{ format(item.price) }}đ
-                    </p>
-                    <small class="text-[#6b7280]"
-                      >= {{ format(item.price * item.quantity) }}đ</small
-                    >
-                  </template>
+                  <p
+                    v-if="item.originalPrice"
+                    class="m-0 text-[#6b7280] line-through text-[13px]"
+                  >
+                    {{ format(item.originalPrice) }}đ
+                  </p>
+                  <p
+                    class="mt-1 mb-0 text-[#ea580c] text-[22px] font-extrabold"
+                  >
+                    {{ format(item.price) }}đ
+                  </p>
+                  <small class="text-[#6b7280]"
+                    >= {{ format(item.price * item.quantity) }}đ</small
+                  >
                 </div>
 
                 <!-- Remove -->

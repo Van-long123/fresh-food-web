@@ -46,5 +46,16 @@ export const API_ENDPOINTS = {
     REMOVE_ITEMS: '/v1/client/cart/items',
     MERGE: '/v1/client/cart/merge',
     VALIDATE: '/v1/client/cart/validate'
+  },
+  LOCATION: {
+    PROVINCES: '/v1/client/ghn/provinces',
+    DISTRICTS: '/v1/client/ghn/districts',
+    WARDS: '/v1/client/ghn/wards'
+  },
+  ADDRESS: {
+    LIST: '/v1/client/addresses',
+    CREATE: '/v1/client/addresses',
+    UPDATE: (id: string) => `/v1/client/addresses/${id}`,
+    DELETE: (id: string) => `/v1/client/addresses/${id}`
   }
 } as const

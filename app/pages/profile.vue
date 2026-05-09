@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import ChangePasswordPage from "~/pages/auth/change-password.vue";
 import { ROUTES } from "~/constants/routes";
 import { userService } from "~/services/user.service";
-import { getProvincesRequest } from "~/api/location.api";
-import { isValidPhone } from "~/utils/authFormUtils";
 import { useAuthStore } from "~/stores/useAuthStore";
-import { useProfile } from "~/composables/useProfile";
+import { useProfile } from "~/composables/profile/useProfile";
 import SkProfilePage from "~/components/skeletons/SkProfilePage.vue";
+import { useAddress } from "~/composables/profile/useAddress";
+import ConfirmDialog from "primevue/confirmdialog";
 
 definePageMeta({ middleware: "auth" });
 
@@ -35,6 +35,27 @@ const {
   selectGender,
   GENDER_OPTIONS,
 } = useProfile();
+
+const {
+  addresses,
+  isAddressesLoading,
+  selectedAddressId,
+  modalMode,
+  showAddressModal,
+  addressForm,
+  provinceOptions,
+  districtOptions,
+  wardOptions,
+  isLoadingProvinces,
+  isLoadingDistricts,
+  isLoadingWards,
+  validationErrors,
+  openCreateAddress,
+  openEditAddress,
+  setDefaultAddress,
+  saveAddress,
+  confirmDeleteAddress,
+} = useAddress();
 
 const menuItems = [
   { key: "profile", icon: "👤", label: "Hồ sơ cá nhân" },
@@ -98,99 +119,6 @@ const orders = [
   },
 ];
 
-// Address management (local list + create/edit modal)
-type Address = {
-  id: string;
-  fullName: string;
-  phone: string;
-  street: string;
-  ward: string;
-  district: string;
-  city: string;
-  isDefault?: boolean;
-};
-
-const addresses = ref<Address[]>([
-  {
-    id: "a1",
-    fullName: "Nguyễn Văn A",
-    phone: "0912345678",
-    street: "25 Nguyễn Trãi",
-    ward: "Phường Bến Thành",
-    district: "Quận 1",
-    city: "TP.HCM",
-    isDefault: true,
-  },
-  {
-    id: "b1",
-    fullName: "Trần Thị B",
-    phone: "0987654321",
-    street: "123 Lê Lợi",
-    ward: "Phường 5",
-    district: "Quận 3",
-    city: "TP.HCM",
-    isDefault: false,
-  },
-]);
-
-const selectedAddressId = ref<string | null>(
-  addresses.value.find((a) => a.isDefault)?.id || null,
-);
-
-const modalMode = ref<"create" | "edit">("create");
-const editingId = ref<string | null>(null);
-const showAddressModal = ref(false);
-
-const addressForm = ref<Partial<Address>>({
-  fullName: "",
-  phone: "",
-  street: "",
-  ward: "",
-  district: "",
-  city: "",
-  isDefault: false,
-});
-
-const provinces = ref<any[]>([]);
-const districts = computed(() => {
-  const p = provinces.value.find((p: any) => p.name === addressForm.value.city);
-  return p?.districts || [];
-});
-const wards = computed(() => {
-  const d = districts.value.find(
-    (d: any) => d.name === addressForm.value.district,
-  );
-  return d?.wards || [];
-});
-
-// Options for PrimeVue Select
-const provinceOptions = computed(() =>
-  provinces.value.map((p: any) => ({ label: p.name, value: p.name })),
-);
-const districtOptions = computed(() =>
-  districts.value.map((d: any) => ({ label: d.name, value: d.name })),
-);
-const wardOptions = computed(() =>
-  wards.value.map((w: any) => ({ label: w.name, value: w.name })),
-);
-
-watch(
-  () => addressForm.value.city,
-  () => {
-    addressForm.value.district = "";
-    addressForm.value.ward = "";
-  },
-);
-
-watch(
-  () => addressForm.value.district,
-  () => {
-    addressForm.value.ward = "";
-  },
-);
-
-const wasSubmitted = ref(false);
-const validationErrors = ref<{ [k: string]: string }>({});
 const statusClass = (status: string) => {
   if (status === "Đang giao") return "bg-blue-100 text-blue-700";
   if (status === "Thành công") return "bg-green-100 text-green-700";
@@ -198,153 +126,6 @@ const statusClass = (status: string) => {
 };
 
 const formatVnd = (v: number) => v.toLocaleString("vi-VN");
-
-const loadProvinces = async () => {
-  try {
-    const res = await getProvincesRequest();
-    provinces.value = res;
-  } catch {
-    provinces.value = [];
-  }
-};
-
-const openCreateAddress = () => {
-  modalMode.value = "create";
-  editingId.value = null;
-  addressForm.value = {
-    fullName: "",
-    phone: "",
-    street: "",
-    ward: "",
-    district: "",
-    city: provinces.value?.[0]?.name || "TP.HCM",
-    isDefault: false,
-  };
-  wasSubmitted.value = false;
-  validationErrors.value = {};
-  showAddressModal.value = true;
-};
-
-const openEditAddress = (a: Address) => {
-  modalMode.value = "edit";
-  editingId.value = a.id;
-  addressForm.value = { ...a };
-  wasSubmitted.value = false;
-  validationErrors.value = {};
-  showAddressModal.value = true;
-};
-
-const setDefaultAddress = (id: string) => {
-  addresses.value = addresses.value.map((a) => ({
-    ...a,
-    isDefault: a.id === id,
-  }));
-  selectedAddressId.value = id;
-};
-
-const validateAddressForm = (): boolean => {
-  validationErrors.value = {};
-  if (
-    !addressForm.value.fullName ||
-    !String(addressForm.value.fullName).trim()
-  ) {
-    validationErrors.value.fullName = "Tên người nhận là bắt buộc.";
-  }
-  if (
-    !addressForm.value.phone ||
-    !isValidPhone(String(addressForm.value.phone))
-  ) {
-    validationErrors.value.phone = "Số điện thoại không hợp lệ.";
-  }
-  if (!addressForm.value.street || !String(addressForm.value.street).trim()) {
-    validationErrors.value.street = "Địa chỉ chi tiết là bắt buộc.";
-  }
-  if (!addressForm.value.city) {
-    validationErrors.value.city = "Vui lòng chọn Tỉnh/Thành.";
-  }
-  if (!addressForm.value.district) {
-    validationErrors.value.district = "Vui lòng chọn Quận/Huyện.";
-  }
-  if (!addressForm.value.ward) {
-    validationErrors.value.ward = "Vui lòng chọn Phường/Xã.";
-  }
-  return Object.keys(validationErrors.value).length === 0;
-};
-
-watch(
-  () => [
-    addressForm.value.fullName,
-    addressForm.value.phone,
-    addressForm.value.street,
-    addressForm.value.city,
-    addressForm.value.district,
-    addressForm.value.ward,
-  ],
-  () => {
-    if (wasSubmitted.value) {
-      validateAddressForm();
-    }
-  },
-  { deep: true },
-);
-
-const saveAddress = () => {
-  wasSubmitted.value = true;
-  if (!validateAddressForm()) return;
-
-  if (modalMode.value === "create") {
-    const id = `a${Date.now()}`;
-    const newAddr: Address = {
-      id,
-      fullName: String(addressForm.value.fullName || ""),
-      phone: String(addressForm.value.phone || ""),
-      street: String(addressForm.value.street || ""),
-      ward: String(addressForm.value.ward || ""),
-      district: String(addressForm.value.district || ""),
-      city: String(addressForm.value.city || ""),
-      isDefault: Boolean(addressForm.value.isDefault),
-    };
-    if (newAddr.isDefault) {
-      addresses.value = addresses.value.map((a) => ({
-        ...a,
-        isDefault: false,
-      }));
-      selectedAddressId.value = id;
-    }
-    addresses.value.unshift(newAddr);
-  } else if (modalMode.value === "edit" && editingId.value) {
-    addresses.value = addresses.value.map((a) => {
-      if (a.id !== editingId.value) return a;
-      const updated: Address = {
-        ...a,
-        fullName: String(addressForm.value.fullName || a.fullName),
-        phone: String(addressForm.value.phone || a.phone),
-        street: String(addressForm.value.street || a.street),
-        ward: String(addressForm.value.ward || a.ward),
-        district: String(addressForm.value.district || a.district),
-        city: String(addressForm.value.city || a.city),
-        isDefault: Boolean(addressForm.value.isDefault),
-      };
-      return updated;
-    });
-    if (addressForm.value.isDefault) {
-      setDefaultAddress(editingId.value);
-    }
-  }
-
-  // Hậu kiểm: Đảm bảo luôn có đúng 1 địa chỉ mặc định nếu danh sách không trống
-  const defaultCount = addresses.value.filter((a) => a.isDefault).length;
-  if (defaultCount !== 1 && addresses.value.length > 0) {
-    // Nếu có nhiều hơn 1 hoặc không có cái nào, lấy cái đầu tiên làm mặc định
-    addresses.value = addresses.value.map((a, idx) => ({
-      ...a,
-      isDefault: idx === 0,
-    }));
-    selectedAddressId.value = addresses.value[0].id;
-  }
-
-  showAddressModal.value = false;
-};
 
 const handleLogout = async () => {
   if (loggingOut.value) return;
@@ -365,7 +146,6 @@ onMounted(() => {
   requestAnimationFrame(() => {
     rankProgressVisible.value = true;
   });
-  loadProvinces();
 });
 </script>
 
@@ -632,24 +412,24 @@ onMounted(() => {
                   <template #default>
                     <div
                       v-for="addr in addresses"
-                      :key="addr.id"
+                      :key="addr._id"
                       class="flex items-start justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-gray-300 hover:shadow-md"
                     >
                       <div class="flex items-start gap-3 flex-1 min-w-0">
                         <input
                           type="radio"
                           name="selectedAddress"
-                          :value="addr.id"
+                          :value="addr._id"
                           v-model="selectedAddressId"
                           class="mt-1 h-4 w-4 shrink-0 accent-[#f47f20]"
-                          @change="() => setDefaultAddress(addr.id)"
+                          @change="() => setDefaultAddress(addr._id)"
                         />
                         <div class="flex-1 min-w-0">
                           <div
                             class="flex flex-wrap items-center gap-x-2 gap-y-1"
                           >
                             <p class="font-semibold text-gray-900 text-sm">
-                              {{ addr.fullName }}
+                              {{ addr.username }}
                             </p>
                             <span class="text-gray-300 text-xs select-none"
                               >|</span
@@ -658,7 +438,7 @@ onMounted(() => {
                               {{ addr.phone }}
                             </p>
                             <span
-                              v-if="addr.isDefault"
+                              v-if="addr.default === 1"
                               class="rounded-full bg-orange-50 border border-orange-200 px-2 py-0.5 text-xs font-semibold text-[#f47f20]"
                               >Mặc định</span
                             >
@@ -666,8 +446,8 @@ onMounted(() => {
                           <p
                             class="mt-1 text-sm text-gray-500 leading-relaxed truncate"
                           >
-                            {{ addr.street }}, {{ addr.ward }},
-                            {{ addr.district }}, {{ addr.city }}
+                            {{ addr.address }}, {{ addr.ward }},
+                            {{ addr.district }}, {{ addr.province }}
                           </p>
                         </div>
                       </div>
@@ -679,13 +459,19 @@ onMounted(() => {
                         >
                           ✏️ Sửa
                         </button>
+                        <button
+                          class="flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 hover:text-red-800"
+                          @click="confirmDeleteAddress(addr._id)"
+                        >
+                          🗑️ Xóa
+                        </button>
                       </div>
                     </div>
                   </template>
                 </TransitionGroup>
 
                 <div
-                  v-if="addresses.length === 0"
+                  v-if="!addresses || addresses.length === 0"
                   class="mt-8 flex flex-col items-center gap-2 text-center"
                 >
                   <p class="text-sm text-gray-400">Bạn chưa có địa chỉ nào.</p>
@@ -839,6 +625,7 @@ onMounted(() => {
                     class="w-full"
                     :class="{ 'p-invalid': validationErrors.city }"
                     filter
+                    disabled
                   />
                   <small
                     v-if="validationErrors.city"
@@ -952,6 +739,7 @@ onMounted(() => {
         </div>
       </Transition>
     </Teleport>
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 

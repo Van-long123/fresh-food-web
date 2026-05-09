@@ -1,16 +1,16 @@
-export interface Ward {
-  code: number
-  name: string
+export interface GhnProvince {
+  ProvinceID: number
+  ProvinceName: string
 }
 
-export interface District {
-  code: number
-  name: string
-  wards: Ward[]
+export interface GhnDistrict {
+  DistrictID: number
+  DistrictName: string
+  ProvinceID: number
 }
 
-export interface Province {
-  code: number
-  name: string
-  districts: District[]
+export interface GhnWard {
+  WardCode: string
+  WardName: string
+  DistrictID: number
 }

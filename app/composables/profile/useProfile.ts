@@ -3,6 +3,18 @@ import { useAuthStore } from '~/stores/useAuthStore'
 import { userService } from '~/services/user.service'
 import { useToast } from 'primevue/usetoast'
 import { isValidPhone, PHONE_FORMAT_MESSAGE } from '~/utils/authFormUtils'
+import { useLocation } from '~/composables/location/useLocation'
+
+export type Address = {
+  id: string
+  fullName: string
+  phone: string
+  street: string
+  ward: string
+  district: string
+  city: string
+  isDefault?: boolean
+}
 
 export const useProfile = () => {
   const authStore = useAuthStore()
@@ -65,13 +77,11 @@ export const useProfile = () => {
     const file = target.files?.[0]
     if (!file) return
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Vui lòng chọn định dạng ảnh (jpg, png,...)', life: 3000 })
       return
     }
 
-    // Validate file size (e.g., 5MB limit)
     if (file.size > 5 * 1024 * 1024) {
       toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Kích thước ảnh không được vượt quá 5MB', life: 3000 })
       return
@@ -84,7 +94,6 @@ export const useProfile = () => {
   const saveProfile = async () => {
     if (saving.value) return
     
-    // Validation
     if (!editForm.value.name.trim()) {
        toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Họ tên không được để trống', life: 3000 })
        return
@@ -107,7 +116,6 @@ export const useProfile = () => {
     const age = today.getFullYear() - birthDate.getFullYear()
     const m = today.getMonth() - birthDate.getMonth()
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      // Age check adjustment for precision
       if (age < 16) {
         toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Bạn phải đủ 16 tuổi trở lên', life: 3000 })
         return
@@ -171,7 +179,189 @@ export const useProfile = () => {
     editForm.value.gender = g
   }
 
+  // --- Address Logic ---
+  const addresses = ref<Address[]>([
+   
+  ])
+
+  const selectedAddressId = ref<string | null>(
+    addresses.value.find((a) => a.isDefault)?.id || null,
+  )
+
+  const modalMode = ref<'create' | 'edit'>('create')
+  const editingId = ref<string | null>(null)
+  const showAddressModal = ref(false)
+
+  const addressForm = ref<Partial<Address>>({
+    fullName: '',
+    phone: '',
+    street: '',
+    ward: '',
+    district: '',
+    city: 'Đà Nẵng',
+    isDefault: false,
+  })
+
+  const {
+    provinces,
+    districts,
+    wards,
+    isLoadingProvinces,
+    isLoadingDistricts,
+    isLoadingWards,
+  } = useLocation(
+    computed(() => addressForm.value.city),
+    computed(() => addressForm.value.district),
+  )
+
+  const provinceOptions = computed(() =>
+    provinces.value.map((p: any) => ({
+      label: p.ProvinceName,
+      value: p.ProvinceName,
+    })),
+  )
+  const districtOptions = computed(() =>
+    districts.value.map((d: any) => ({
+      label: d.DistrictName,
+      value: d.DistrictName,
+    })),
+  )
+  const wardOptions = computed(() =>
+    wards.value.map((w: any) => ({ label: w.WardName, value: w.WardName })),
+  )
+
+  watch(
+    () => addressForm.value.city,
+    () => {
+      addressForm.value.district = ''
+      addressForm.value.ward = ''
+    },
+  )
+
+  watch(
+    () => addressForm.value.district,
+    () => {
+      addressForm.value.ward = ''
+    },
+  )
+
+  const wasSubmitted = ref(false)
+  const validationErrors = ref<{ [k: string]: string }>({})
+
+  const openCreateAddress = () => {
+    modalMode.value = 'create'
+    editingId.value = null
+    addressForm.value = {
+      fullName: '',
+      phone: '',
+      street: '',
+      ward: '',
+      district: '',
+      city: 'Đà Nẵng',
+      isDefault: false,
+    }
+    wasSubmitted.value = false
+    validationErrors.value = {}
+    showAddressModal.value = true
+  }
+
+  const openEditAddress = (a: Address) => {
+    modalMode.value = 'edit'
+    editingId.value = a.id
+    addressForm.value = { ...a }
+    wasSubmitted.value = false
+    validationErrors.value = {}
+    showAddressModal.value = true
+  }
+
+  const setDefaultAddress = (id: string) => {
+    addresses.value = addresses.value.map((a) => ({
+      ...a,
+      isDefault: a.id === id,
+    }))
+    selectedAddressId.value = id
+  }
+
+  const validateAddressForm = (): boolean => {
+    validationErrors.value = {}
+    if (!addressForm.value.fullName || !String(addressForm.value.fullName).trim()) {
+      validationErrors.value.fullName = 'Tên người nhận là bắt buộc.'
+    }
+    if (!addressForm.value.phone || !isValidPhone(String(addressForm.value.phone))) {
+      validationErrors.value.phone = 'Số điện thoại không hợp lệ.'
+    }
+    if (!addressForm.value.street || !String(addressForm.value.street).trim()) {
+      validationErrors.value.street = 'Địa chỉ chi tiết là bắt buộc.'
+    }
+    if (!addressForm.value.city) {
+      validationErrors.value.city = 'Vui lòng chọn Tỉnh/Thành.'
+    }
+    if (!addressForm.value.district) {
+      validationErrors.value.district = 'Vui lòng chọn Quận/Huyện.'
+    }
+    if (!addressForm.value.ward) {
+      validationErrors.value.ward = 'Vui lòng chọn Phường/Xã.'
+    }
+    return Object.keys(validationErrors.value).length === 0
+  }
+
+  const saveAddress = () => {
+    wasSubmitted.value = true
+    if (!validateAddressForm()) return
+
+    if (modalMode.value === 'create') {
+      const id = `a${Date.now()}`
+      const newAddr: Address = {
+        id,
+        fullName: String(addressForm.value.fullName || ''),
+        phone: String(addressForm.value.phone || ''),
+        street: String(addressForm.value.street || ''),
+        ward: String(addressForm.value.ward || ''),
+        district: String(addressForm.value.district || ''),
+        city: String(addressForm.value.city || ''),
+        isDefault: Boolean(addressForm.value.isDefault),
+      }
+      if (newAddr.isDefault) {
+        addresses.value = addresses.value.map((a) => ({
+          ...a,
+          isDefault: false,
+        }))
+        selectedAddressId.value = id
+      }
+      addresses.value.unshift(newAddr)
+    } else if (modalMode.value === 'edit' && editingId.value) {
+      addresses.value = addresses.value.map((a) => {
+        if (a.id !== editingId.value) return a
+        return {
+          ...a,
+          fullName: String(addressForm.value.fullName || a.fullName),
+          phone: String(addressForm.value.phone || a.phone),
+          street: String(addressForm.value.street || a.street),
+          ward: String(addressForm.value.ward || a.ward),
+          district: String(addressForm.value.district || a.district),
+          city: String(addressForm.value.city || a.city),
+          isDefault: Boolean(addressForm.value.isDefault),
+        }
+      })
+      if (addressForm.value.isDefault) {
+        setDefaultAddress(editingId.value)
+      }
+    }
+
+    const defaultCount = addresses.value.filter((a) => a.isDefault).length
+    if (defaultCount !== 1 && addresses.value.length > 0) {
+      addresses.value = addresses.value.map((a, idx) => ({
+        ...a,
+        isDefault: idx === 0,
+      }))
+      selectedAddressId.value = addresses.value[0].id
+    }
+
+    showAddressModal.value = false
+  }
+
   return {
+    // Profile
     user,
     isLoading,
     saving,
@@ -185,6 +375,25 @@ export const useProfile = () => {
     onAvatarChange,
     saveProfile,
     selectGender,
-    GENDER_OPTIONS
+    GENDER_OPTIONS,
+    // Address
+    addresses,
+    selectedAddressId,
+    modalMode,
+    editingId,
+    showAddressModal,
+    addressForm,
+    provinceOptions,
+    districtOptions,
+    wardOptions,
+    isLoadingProvinces,
+    isLoadingDistricts,
+    isLoadingWards,
+    wasSubmitted,
+    validationErrors,
+    openCreateAddress,
+    openEditAddress,
+    setDefaultAddress,
+    saveAddress
   }
 }
