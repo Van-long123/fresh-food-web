@@ -447,7 +447,7 @@ onUnmounted(() => {
 .loading-fullpage {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 40;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -664,7 +664,7 @@ onUnmounted(() => {
 .loading-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: 40;
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);

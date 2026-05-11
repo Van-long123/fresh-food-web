@@ -3,24 +3,13 @@ import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
 import { isValidPhone } from '~/utils/authFormUtils'
 import { useLocation } from '~/composables/location/useLocation'
+import { useAddressesQuery } from '~/queries/address/useAddressQueries'
 import {
-  useAddressesQuery,
   useCreateAddressMutation,
   useUpdateAddressMutation,
   useDeleteAddressMutation
-} from '~/queries/address/useAddressQueries'
-import type { Address as ApiAddress } from '~/types/address.type'
-
-export type AddressFormType = {
-  id?: string
-  fullName: string
-  phone: string
-  street: string
-  ward: string
-  district: string
-  city: string
-  isDefault: boolean
-}
+} from '~/mutations/address/useAddressMutations'
+import type { Address as ApiAddress, AddressFormType } from '~/types/address.type'
 
 export const useAddress = () => {
   const toast = useToast()
@@ -34,10 +23,10 @@ export const useAddress = () => {
   const selectedAddressId = computed(() => {
     return addresses.value?.find((a) => a.default === 1)?._id || null
   })
-
   const modalMode = ref<'create' | 'edit'>('create')
   const editingId = ref<string | null>(null)
   const showAddressModal = ref(false)
+  const isInitializing = ref(false)
 
   const addressForm = ref<AddressFormType>({
     fullName: '',
@@ -68,10 +57,12 @@ export const useAddress = () => {
     })),
   )
   const districtOptions = computed(() =>
-    districts.value.map((d: any) => ({
-      label: d.DistrictName,
-      value: d.DistrictName,
-    })),
+    districts.value
+      .filter((d: any) => !d.DistrictName.includes('Hoàng Sa'))
+      .map((d: any) => ({
+        label: d.DistrictName,
+        value: d.DistrictName,
+      })),
   )
   const wardOptions = computed(() =>
     wards.value.map((w: any) => ({ label: w.WardName, value: w.WardName })),
@@ -80,6 +71,7 @@ export const useAddress = () => {
   watch(
     () => addressForm.value.city,
     () => {
+      if (isInitializing.value) return
       addressForm.value.district = ''
       addressForm.value.ward = ''
     },
@@ -88,6 +80,7 @@ export const useAddress = () => {
   watch(
     () => addressForm.value.district,
     () => {
+      if (isInitializing.value) return
       addressForm.value.ward = ''
     },
   )
@@ -113,6 +106,7 @@ export const useAddress = () => {
   }
 
   const openEditAddress = (a: ApiAddress) => {
+    isInitializing.value = true
     modalMode.value = 'edit'
     editingId.value = a._id
     
@@ -125,10 +119,14 @@ export const useAddress = () => {
       ward: a.ward,
       isDefault: a.default === 1,
     }
-    
     wasSubmitted.value = false
     validationErrors.value = {}
     showAddressModal.value = true
+    
+    // Tắt cờ sau khi các watcher đã được kích hoạt xong ở lần gán đầu tiên
+    setTimeout(() => {
+      isInitializing.value = false
+    }, 100)
   }
 
   const validateAddressForm = (): boolean => {

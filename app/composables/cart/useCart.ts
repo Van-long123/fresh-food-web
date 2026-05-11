@@ -80,21 +80,31 @@ export const useCart = () => {
 
   // sync cart từ server + xử lý stock adjustment
   const applyCartResponse = (payload: CartResponse) => {
-    store.setCartItems(
-      payload.items.map((item) => ({
-        id: item.productId,
-        productId: item.productId,
-        categoryId: item.categoryId || null,
-        name: item.name,
-        image: item.image,
-        price: item.price,
-        originalPrice: item.originalPrice,
-        stock: item.stock,
-        quantity: item.quantity,
-        slug: item.slug,
-        unit: item.unit
-      }))
-    )
+    // Merge duplicates if server returns them for any reason
+    const mergedItemsMap = new Map<string, any>();
+    
+    payload.items.forEach((item) => {
+      const existing = mergedItemsMap.get(item.productId);
+      if (existing) {
+        existing.quantity += item.quantity;
+      } else {
+        mergedItemsMap.set(item.productId, {
+          id: item.productId,
+          productId: item.productId,
+          categoryId: item.categoryId || null,
+          name: item.name,
+          image: item.image,
+          price: item.price,
+          originalPrice: item.originalPrice,
+          stock: item.stock,
+          quantity: item.quantity,
+          slug: item.slug,
+          unit: item.unit
+        });
+      }
+    });
+
+    store.setCartItems(Array.from(mergedItemsMap.values()));
 
     if (hasAdjustments(payload)) {
       const adjusted = new Set<string>()

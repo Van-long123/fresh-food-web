@@ -165,8 +165,8 @@
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 ></path>
               </svg>
-              <span
-                >123 Nguyễn Văn Linh, phường Nam Dương, Quận Hải Châu, Thành phố
+              <span>
+                123 Nguyễn Văn Linh, phường Nam Dương, Quận Hải Châu, Thành phố
                 Đà Nẵng, Việt Nam</span
               >
             </li>

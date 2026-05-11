@@ -57,5 +57,11 @@ export const API_ENDPOINTS = {
     CREATE: '/v1/client/addresses',
     UPDATE: (id: string) => `/v1/client/addresses/${id}`,
     DELETE: (id: string) => `/v1/client/addresses/${id}`
+  },
+  CHECKOUT: {
+    SHIPPING_FEE: '/v1/client/checkout/shipping-fee'
+  },
+  ORDER: {
+    CREATE: '/v1/client/orders'
   }
 } as const

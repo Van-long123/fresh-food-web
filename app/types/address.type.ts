@@ -27,3 +27,14 @@ export interface AddressPayload {
   ward_code: string
   default: 0 | 1
 }
+
+export type AddressFormType = {
+  id?: string
+  fullName: string
+  phone: string
+  street: string
+  ward: string
+  district: string
+  city: string
+  isDefault: boolean
+}

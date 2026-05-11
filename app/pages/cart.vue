@@ -218,12 +218,6 @@
             <div class="flex justify-between my-2 text-[#374151]">
               <span>Tạm tính:</span><strong>{{ format(subtotal) }}đ</strong>
             </div>
-            <!-- <div class="flex justify-between my-2 text-[#374151]">
-              <span>Phí giao hàng:</span>
-              <strong :class="shippingFee === 0 ? 'text-[#16a34a]' : ''">{{
-                shippingFee === 0 ? "🎉 Miễn phí" : `${format(shippingFee)}đ`
-              }}</strong>
-            </div> -->
             <div class="flex justify-between my-2 text-[#374151]">
               <span>Giảm giá voucher:</span>
               <strong class="text-[#16a34a]"
@@ -237,32 +231,7 @@
               <span>TỔNG CỘNG:</span><strong>{{ format(grandTotal) }}đ</strong>
             </div>
 
-            <!-- Free ship bar -->
-            <div class="mt-3">
-              <!-- <p class="m-0 text-[13px] text-[#4b5563]">
-                <template v-if="shippingFee > 0"
-                  >Mua thêm {{ format(freeShipRemaining) }}đ để miễn phí vận
-                  chuyển! 🚚</template
-                >
-                <template v-else>🎉 Bạn được miễn phí vận chuyển!</template>
-              </p> -->
-              <div
-                class="mt-2 h-1.5 rounded-full bg-[#e5e7eb] overflow-hidden relative"
-              >
-                <span
-                  class="block h-full bg-[#f97316] transition-[width] duration-500"
-                  :style="{ width: `${freeShipPercent}%` }"
-                />
-                <template v-if="shippingFee === 0">
-                  <i
-                    v-for="n in 4"
-                    :key="n"
-                    class="confetti-dot"
-                    :style="{ '--i': `${n}` }"
-                  />
-                </template>
-              </div>
-            </div>
+
 
             <!-- Voucher -->
             <div class="mt-3.5">
@@ -318,11 +287,9 @@
             <!-- Checkout button -->
             <button
               type="button"
-              :disabled="loadingCheckout"
               class="w-full mt-3.5 h-[52px] border-0 rounded-xl text-white text-base font-extrabold bg-gradient-to-r from-[#f97316] to-[#ea580c] flex justify-center items-center gap-2 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_12px_22px_rgba(249,115,22,0.32)] active:scale-[0.98]"
               @click="checkoutNow"
             >
-              <span v-if="loadingCheckout" class="checkout-spin" />
               Đặt hàng ngay →
             </button>
 
@@ -494,12 +461,15 @@ import { useCart } from "~/composables/cart/useCart";
 import { useProductsQuery } from "~/queries/product/useProductsQuery";
 import { useApplyVoucher } from "~/composables/voucher/useApplyVoucher";
 
+import { useOrderStore } from "~/stores/useOrderStore";
+
 useHead({
   title: "Giỏ hàng - SmartFood",
   meta: [{ name: "description", content: "Trang Giỏ hàng của SmartFood" }],
 });
 
 const router = useRouter();
+const orderStore = useOrderStore();
 const {
   cartItems,
   isLoading,
@@ -559,10 +529,8 @@ const voucherInput = ref("");
 const removeAskId = ref<string | null>(null);
 const qtyBumpId = ref<string | null>(null);
 const showConfirmModal = ref(false);
-const loadingCheckout = ref(false);
 const totalPulse = ref(false);
 const showMobileFloat = ref(false);
-const freeShipTarget = 150000;
 
 const selectedItems = computed(() =>
   displayItems.value.filter((item) => item.checked),
@@ -586,14 +554,8 @@ const subtotal = computed(() =>
     0,
   ),
 );
-const shippingFee = computed(() =>
-  subtotal.value >= freeShipTarget ? 0 : 25000,
-);
 const grandTotal = computed(() =>
-  Math.max(0, subtotal.value + shippingFee.value - voucherDiscount.value),
-);
-const freeShipPercent = computed(() =>
-  Math.min(100, Math.round((subtotal.value / freeShipTarget) * 100)),
+  Math.max(0, subtotal.value - voucherDiscount.value),
 );
 const format = (n: number) => n.toLocaleString("vi-VN");
 const itemDiscountMap = computed<Record<string, number>>(
@@ -672,11 +634,25 @@ const handleApplyVoucher = (options: { silent?: boolean } = {}) => {
 };
 
 const checkoutNow = () => {
-  loadingCheckout.value = true;
-  setTimeout(() => {
-    loadingCheckout.value = false;
-    router.push(ROUTES.ORDER.CHECKOUT);
-  }, 1000);
+  if (selectedItems.value.length === 0) return;
+
+  orderStore.setCheckoutData({
+    products: selectedItems.value.map((item) => ({
+      id: item.id, // Keep as string or original type
+      title: item.name,
+      thumbnail: item.image || "",
+      quantity: item.quantity,
+      priceNew: item.price,
+      totalPrice: item.price * item.quantity,
+    })),
+    voucherCode: appliedVoucher.value?.code,
+    discountVoucher: voucherDiscount.value,
+    shippingFee: 0,
+    subtotal: subtotal.value,
+    grandTotal: grandTotal.value,
+  });
+
+  router.push(ROUTES.ORDER.CHECKOUT);
 };
 
 const { data: suggestData } = useProductsQuery({ limit: 6 });

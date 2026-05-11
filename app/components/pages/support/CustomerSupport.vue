@@ -407,7 +407,8 @@
                       Địa chỉ văn phòng
                     </p>
                     <p class="text-[0.875rem] text-gray-700 m-0 font-medium">
-                      129 Cửa Đại, Hội An, Quảng Nam
+                      123 Nguyễn Văn Linh, phường Nam Dương, Quận Hải Châu,
+                      Thành phố Đà Nẵng, Việt Nam
                     </p>
                   </div>
                 </li>

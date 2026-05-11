@@ -357,7 +357,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useOrderStore } from "~/stores/useOrderStore";
 import { ROUTES } from "~/constants/routes";
@@ -376,48 +376,14 @@ const router = useRouter();
 const orderStore = useOrderStore();
 
 // ── Data ──────────────────────────────────────────────────────────────────
-// const orderInfo = computed(() => orderStore.orderInfo);
+const orderInfo = computed(() => orderStore.orderInfo);
 
-const orderInfo = ref({
-  userInfo: {
-    fullname: "Nguyễn Văn An",
-    phone: "0901234567",
-    address: "123 Đường Lê Lợi",
-    ward: "Phường Hải Châu 1",
-    district: "Quận Hải Châu",
-    province: "Đà Nẵng",
-    note: "Vui lòng gọi trước khi giao 30 phút",
-  },
-  products: [
-    {
-      id: 1,
-      title: "Gà rán giòn sốt mật ong",
-      thumbnail: "https://picsum.photos/seed/food1/200/200",
-      quantity: 2,
-      totalPrice: 120000,
-    },
-    {
-      id: 2,
-      title: "Bún bò Huế đặc biệt",
-      thumbnail: "https://picsum.photos/seed/food2/200/200",
-      quantity: 1,
-      totalPrice: 65000,
-    },
-    {
-      id: 3,
-      title: "Cơm tấm sườn bì chả",
-      thumbnail: "https://picsum.photos/seed/food3/200/200",
-      quantity: 1,
-      totalPrice: 55000,
-    },
-  ],
-  voucherCode: "SUMMER2025",
-  discountVoucher: 20000,
-  shippingFee: 30000,
-  totalPrice: 250000, // 240000 - 20000 + 30000
-  deliveryMethod: 2,
-  paymentMethod: 0,
+onMounted(() => {
+  if (!orderInfo.value) {
+    router.push(ROUTES.ORDER.CHECKOUT);
+  }
 });
+
 // Payment method reactive ref
 const paymentMethod = ref<number>(orderInfo.value?.paymentMethod ?? 0);
 

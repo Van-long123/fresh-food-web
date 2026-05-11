@@ -151,8 +151,6 @@ export const useLoginForm = () => {
     }
   }
 
-  onMounted(processQueryToast)
-
   return {
     form,
     errors,
