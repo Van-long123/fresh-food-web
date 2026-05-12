@@ -75,17 +75,6 @@ export interface ProductCategoryInfo {
   thumbnail?: string
 }
 
-export interface ProductSuggestion {
-  _id: string
-  title: string
-  slug: string
-  thumbnail: string
-  price: number
-  originalPrice: number
-  discountPercentage: number
-  isOnlineExclusive: boolean
-  isBestPrice: boolean
-}
 
 export interface ProductDetailResponse {
   _id: string
@@ -108,5 +97,31 @@ export interface ProductDetailResponse {
   primary_category?: ProductCategoryInfo | null
   categories?: ProductCategoryInfo[]
   reviews?: ProductReview[]
-  suggestions?: ProductSuggestion[]
 }
+
+// ─── Recommendation API (Python microservice → Node.js → Frontend) ────────────
+
+export interface ProductRecommendationItem {
+  _id: string
+  title: string
+  slug: string | null
+  price: number
+  images: string[]
+  ratings: {
+    totalRating: number
+    numberOfRatings: number
+  }
+  primary_category_id: string | null
+  featured: boolean
+  isBestPrice: boolean
+  isOnlineExclusive: boolean
+  similarity_score: number
+}
+
+export interface ProductRecommendationResponse {
+  success: boolean
+  product_id: string
+  total: number
+  recommendations: ProductRecommendationItem[]
+}
+

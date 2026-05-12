@@ -32,7 +32,8 @@ export const API_ENDPOINTS = {
   PRODUCT: {
     LIST: '/v1/client/products',
     DETAIL: (slug: string) => `/v1/client/products/${slug}/details`,
-    CREATE_REVIEW: (slug: string) => `/v1/client/products/${slug}/reviews`
+    CREATE_REVIEW: (slug: string) => `/v1/client/products/${slug}/reviews`,
+    RECOMMENDATIONS: (id: string) => `/v1/client/products/${id}/recommendations`
   },
   VOUCHER: {
     LIST: '/v1/client/vouchers',

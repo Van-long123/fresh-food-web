@@ -304,8 +304,32 @@
 
       <section class="mt-8">
         <h2 class="text-xl font-bold mb-4">Có thể bạn cũng thích</h2>
+
+        <!-- Loading skeleton -->
+        <div v-if="isLoadingRecommendations" class="flex gap-3 overflow-hidden">
+          <div
+            v-for="n in 5"
+            :key="n"
+            class="w-[200px] shrink-0 rounded-2xl bg-white p-3 shadow-sm"
+          >
+            <Skeleton height="180px" class="mb-2 rounded-xl" />
+            <Skeleton height="1rem" class="mb-1" />
+            <Skeleton height="1rem" width="60%" />
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <p
+          v-else-if="recommendations.length === 0"
+          class="text-sm text-gray-400"
+        >
+          Không có sản phẩm tương tự.
+        </p>
+
+        <!-- Carousel -->
         <Carousel
-          :value="suggestions"
+          v-else
+          :value="recommendations"
           :numVisible="5"
           :numScroll="1"
           :responsiveOptions="responsiveOptions"
@@ -343,6 +367,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useProductDetailQuery } from "~/queries/product/useProductDetailQuery";
+import { useProductRecommendations } from "~/composables/product/useProductRecommendations";
 import { useCart } from "~/composables/cart/useCart";
 import SkProductDetailPage from "~/components/skeletons/SkProductDetailPage.vue";
 import { ROUTES } from "~/constants/routes";
@@ -359,6 +384,11 @@ const route = useRoute();
 const slug = computed(() => String(route.params.slug || ""));
 
 const { data: detail, isLoading } = useProductDetailQuery(slug);
+
+// Product _id (needed for recommendations — Python service needs ObjectId, not slug)
+const productId = computed(() => String(detail.value?._id || ''))
+
+const { recommendations, isLoadingRecommendations } = useProductRecommendations(productId, { limit: 8 })
 
 const categoryName = computed(
   () => detail.value?.primary_category?.title || "Danh mục",
@@ -515,25 +545,6 @@ const reviews = computed(() => {
     createdAt: review.createdAt
       ? new Date(review.createdAt).toLocaleDateString("vi-VN")
       : "",
-  }));
-});
-
-const suggestions = computed<HomeProduct[]>(() => {
-  const rawSuggestions = Array.isArray(detail.value?.suggestions)
-    ? detail.value.suggestions
-    : [];
-
-  return rawSuggestions.map((item) => ({
-    id: String(item._id || ""),
-    slug: item.slug || "",
-    name: item.title || "",
-    image: item.thumbnail || "",
-    price: Number(item.price || 0),
-    originalPrice: Number(item.originalPrice || 0),
-    discountPercent: Number(item.discountPercentage || 0),
-    isBestPrice: Boolean(item.isBestPrice),
-    isOnlineExclusive: Boolean(item.isOnlineExclusive),
-    buttonText: "Mua",
   }));
 });
 
