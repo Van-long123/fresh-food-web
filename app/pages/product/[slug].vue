@@ -188,8 +188,18 @@
           </div>
 
           <div class="mt-6 grid gap-3 sm:grid-cols-2">
-            <button class="cta-buy" :disabled="stock === 0" @click="addToCart">
-              {{ stock === 0 ? "Hết hàng" : "🛒 Thêm vào giỏ" }}
+            <button
+              class="cta-buy"
+              :disabled="stock === 0 || quantity > stock"
+              @click="addToCart"
+            >
+              {{
+                stock === 0
+                  ? "Hết hàng"
+                  : quantity > stock
+                    ? "Vượt quá tồn kho"
+                    : "🛒 Thêm vào giỏ"
+              }}
             </button>
             <!-- <button class="cta-cart" @click="addToCart">Thêm vào giỏ</button> -->
           </div>
@@ -386,9 +396,12 @@ const slug = computed(() => String(route.params.slug || ""));
 const { data: detail, isLoading } = useProductDetailQuery(slug);
 
 // Product _id (needed for recommendations — Python service needs ObjectId, not slug)
-const productId = computed(() => String(detail.value?._id || ''))
+const productId = computed(() => String(detail.value?._id || ""));
 
-const { recommendations, isLoadingRecommendations } = useProductRecommendations(productId, { limit: 8 })
+const { recommendations, isLoadingRecommendations } = useProductRecommendations(
+  productId,
+  { limit: 8 },
+);
 
 const categoryName = computed(
   () => detail.value?.primary_category?.title || "Danh mục",
@@ -598,6 +611,7 @@ const buyNow = () => {
 
 const addToCart = () => {
   if (stock.value === 0) return;
+  if (quantity.value > stock.value) return;
   pushToCart({
     id: product.value.id,
     name: product.value.name,

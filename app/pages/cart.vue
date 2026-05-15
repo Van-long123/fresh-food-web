@@ -1,5 +1,10 @@
 <template>
   <SkCartPage v-if="isLoading" />
+  <AppLoading
+    v-else-if="isValidating"
+    variant="overlay"
+    message="Đang kiểm tra tồn kho..."
+  />
   <div
     v-else
     class="bg-[#f8fafc] min-h-screen text-[#111827] pb-[90px]"
@@ -64,7 +69,10 @@
               <article
                 v-for="item in displayItems"
                 :key="item.id"
-                class="grid gap-3.5 rounded-2xl border border-[#e5e7eb] bg-white p-4 relative"
+                class="grid gap-3.5 rounded-2xl border border-[#e5e7eb] bg-white p-4 relative transition-opacity"
+                :class="{
+                  'opacity-50 pointer-events-none': item.isOutOfStock,
+                }"
                 style="grid-template-columns: 26px 80px 1fr auto 40px"
               >
                 <!-- Checkbox -->
@@ -73,14 +81,15 @@
                     v-model="checkedMap[item.id]"
                     type="checkbox"
                     class="hidden"
+                    :disabled="item.isOutOfStock"
                   />
                   <span
-                    class="w-[18px] h-[18px] rounded-md border border-[#d1d5db] block"
-                    :class="
-                      item.checked
-                        ? 'bg-[#f97316] border-[#f97316] shadow-[inset_0_0_0_3px_#fff]'
-                        : ''
-                    "
+                    class="w-[18px] h-[18px] rounded-md border border-[#d1d5db] block transition-all"
+                    :class="{
+                      'bg-[#f97316] border-[#f97316] shadow-[inset_0_0_0_3px_#fff]':
+                        item.checked && !item.isOutOfStock,
+                      'bg-[#e5e7eb] border-[#d1d5db]': item.isOutOfStock,
+                    }"
                   />
                 </label>
 
@@ -125,7 +134,13 @@
                     >
                   </div>
                   <p
-                    v-if="item.lowStock"
+                    v-if="item.isOutOfStock"
+                    class="mt-2 mb-0 text-[#ef4444] text-[13px] font-semibold"
+                  >
+                    ❌ Sản phẩm đã hết hàng
+                  </p>
+                  <p
+                    v-else-if="item.lowStock"
                     class="mt-2 mb-0 text-[#ef4444] text-[12px]"
                   >
                     ⚠️ Chỉ còn {{ item.stock }} sản phẩm
@@ -133,8 +148,8 @@
                   <div class="mt-2.5 flex items-center gap-2.5">
                     <button
                       type="button"
-                      :disabled="item.isUpdating"
-                      class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:enabled:bg-[#f97316] hover:enabled:border-[#f97316] hover:enabled:text-white"
+                      :disabled="item.isUpdating || item.isOutOfStock"
+                      class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:enabled:bg-[#f97316] hover:enabled:border-[#f97316] hover:enabled:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       @click="changeQty(item.id, -1)"
                     >
                       -
@@ -146,8 +161,8 @@
                     >
                     <button
                       type="button"
-                      :disabled="item.isUpdating"
-                      class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:enabled:bg-[#f97316] hover:enabled:border-[#f97316] hover:enabled:text-white"
+                      :disabled="item.isUpdating || item.isOutOfStock"
+                      class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:enabled:bg-[#f97316] hover:enabled:border-[#f97316] hover:enabled:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       @click="changeQty(item.id, 1)"
                     >
                       +
@@ -231,8 +246,6 @@
               <span>TỔNG CỘNG:</span><strong>{{ format(grandTotal) }}đ</strong>
             </div>
 
-
-
             <!-- Voucher -->
             <div class="mt-3.5">
               <label class="text-[13px] font-bold">Mã giảm giá / Voucher</label>
@@ -287,10 +300,14 @@
             <!-- Checkout button -->
             <button
               type="button"
-              class="w-full mt-3.5 h-[52px] border-0 rounded-xl text-white text-base font-extrabold bg-gradient-to-r from-[#f97316] to-[#ea580c] flex justify-center items-center gap-2 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[0_12px_22px_rgba(249,115,22,0.32)] active:scale-[0.98]"
+              :disabled="isValidating"
+              class="w-full mt-3.5 h-[52px] border-0 rounded-xl text-white text-base font-extrabold bg-gradient-to-r from-[#f97316] to-[#ea580c] flex justify-center items-center gap-2 transition-[transform,box-shadow] hover:disabled:opacity-75 hover:enabled:-translate-y-0.5 hover:enabled:shadow-[0_12px_22px_rgba(249,115,22,0.32)] active:enabled:scale-[0.98]"
               @click="checkoutNow"
             >
-              Đặt hàng ngay →
+              <i v-if="isValidating" class="pi pi-spinner pi-spin"></i>
+              <span>{{
+                isValidating ? "Đang kiểm tra..." : "Đặt hàng ngay →"
+              }}</span>
             </button>
 
             <!-- Trust row -->
@@ -321,53 +338,71 @@
 
         <!-- SUGGESTIONS -->
         <section class="mt-6">
-          <h3 class="m-0 mb-2.5">🔥 Thường Được Mua Cùng</h3>
-          <div class="flex gap-2.5 overflow-x-auto pb-2 snap-x snap-mandatory">
-            <article
-              v-for="item in suggestItems"
-              :key="item.id"
-              class="min-w-[180px] border border-[#e5e7eb] rounded-xl bg-white p-2.5 snap-start"
-            >
-              <NuxtLink
-                :to="ROUTES.PRODUCT_DETAIL(item.slug || '')"
-                class="w-full aspect-square rounded-[10px] relative overflow-hidden bg-slate-50 block hover:opacity-80 transition-opacity"
-              >
-                <img
-                  v-if="item.image"
-                  :src="item.image"
-                  :alt="item.name"
-                  class="h-full w-full object-cover"
-                />
-              </NuxtLink>
-              <NuxtLink
-                :to="ROUTES.PRODUCT_DETAIL(item.slug || '')"
-                class="block"
-              >
-                <h4
-                  class="mt-2 mb-0 min-h-[40px] text-sm hover:text-[#ea580c] transition-colors"
+          <h3 class="m-0 mb-2.5">🎁 Sản Phẩm Ưu Đãi</h3>
+          <Carousel
+            :value="suggestItems"
+            :num-visible="6"
+            :num-scroll="1"
+            responsive-options="[
+              { breakpoint: '1024px', numVisible: 4, numScroll: 1 },
+              { breakpoint: '768px', numVisible: 2, numScroll: 1 },
+              { breakpoint: '480px', numVisible: 1, numScroll: 1 }
+            ]"
+            circular
+            :show-indicators="false"
+            :show-navigation-pane="false"
+            class="suggestions-carousel"
+          >
+            <template #item="slotProps">
+              <div class="px-2">
+                <article
+                  class="border border-[#e5e7eb] rounded-xl bg-white p-2.5 h-full"
                 >
-                  {{ item.name }}
-                </h4>
-              </NuxtLink>
-              <p class="mt-1.5 mb-0">
-                <strong class="text-[#ea580c]"
-                  >{{ format(item.price) }}đ</strong
-                >
-                <span
-                  v-if="item.originalPrice > item.price"
-                  class="text-[#9ca3af] line-through ml-1 text-[13px]"
-                  >{{ format(item.originalPrice) }}đ</span
-                >
-              </p>
-              <button
-                type="button"
-                class="mt-2 w-[30px] h-[30px] border-0 rounded-full bg-[#f97316] text-white text-lg"
-                @click="quickAdd(item)"
-              >
-                +
-              </button>
-            </article>
-          </div>
+                  <NuxtLink
+                    :to="ROUTES.PRODUCT_DETAIL(slotProps.data.slug || '')"
+                    class="w-full aspect-square rounded-[10px] relative overflow-hidden bg-slate-50 block hover:opacity-80 transition-opacity"
+                  >
+                    <img
+                      v-if="slotProps.data.image"
+                      :src="slotProps.data.image"
+                      :alt="slotProps.data.name"
+                      class="h-full w-full object-cover"
+                    />
+                  </NuxtLink>
+                  <NuxtLink
+                    :to="ROUTES.PRODUCT_DETAIL(slotProps.data.slug || '')"
+                    class="block"
+                  >
+                    <h4
+                      class="mt-2 mb-0 min-h-[40px] text-sm hover:text-[#ea580c] transition-colors line-clamp-2"
+                    >
+                      {{ slotProps.data.name }}
+                    </h4>
+                  </NuxtLink>
+                  <div
+                    v-if="slotProps.data.originalPrice > slotProps.data.price"
+                    class="mt-1 mb-0"
+                  >
+                    <p class="text-[#9ca3af] line-through text-[12px] mb-1">
+                      {{ format(slotProps.data.originalPrice) }}đ
+                    </p>
+                  </div>
+                  <p class="mt-1.5 mb-0">
+                    <strong class="text-[#ea580c]"
+                      >{{ format(slotProps.data.price) }}đ</strong
+                    >
+                  </p>
+                  <button
+                    type="button"
+                    class="mt-2 w-full h-[32px] border-0 rounded-lg bg-[#f97316] text-white text-sm font-semibold hover:bg-[#ea580c] transition-colors"
+                    @click="quickAdd(slotProps.data)"
+                  >
+                    + Thêm vào giỏ
+                  </button>
+                </article>
+              </div>
+            </template>
+          </Carousel>
         </section>
       </template>
 
@@ -400,10 +435,12 @@
         </div>
         <button
           type="button"
-          class="border-0 rounded-full bg-[#f97316] text-white font-bold px-[18px] py-2.5"
+          :disabled="isValidating || hasSelectedOutOfStock"
+          class="border-0 rounded-full bg-[#f97316] text-white font-bold px-[18px] py-2.5 flex items-center gap-1.5 transition-opacity hover:disabled:opacity-75"
           @click="checkoutNow"
         >
-          Đặt hàng
+          <i v-if="isValidating" class="pi pi-spinner pi-spin text-sm"></i>
+          <span>{{ isValidating ? "Kiểm tra..." : "Đặt hàng" }}</span>
         </button>
       </div>
     </Transition>
@@ -455,11 +492,14 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useToast } from "primevue/usetoast";
 import { ROUTES } from "~/constants/routes";
 import SkCartPage from "~/components/skeletons/SkCartPage.vue";
 import { useCart } from "~/composables/cart/useCart";
+import { useCheckout } from "~/composables/checkout/useCheckout";
 import { useProductsQuery } from "~/queries/product/useProductsQuery";
 import { useApplyVoucher } from "~/composables/voucher/useApplyVoucher";
+import Carousel from "primevue/carousel";
 
 import { useOrderStore } from "~/stores/useOrderStore";
 
@@ -468,8 +508,8 @@ useHead({
   meta: [{ name: "description", content: "Trang Giỏ hàng của SmartFood" }],
 });
 
-const router = useRouter();
 const orderStore = useOrderStore();
+const { isValidating, itemsOutOfStock, proceedToCheckout } = useCheckout();
 const {
   cartItems,
   isLoading,
@@ -491,7 +531,8 @@ watch(
     const updated = { ...checkedMap.value };
     next.forEach((item) => {
       if (updated[item.id] === undefined) {
-        updated[item.id] = true;
+        // Chỉ tự động tích chọn nếu sản phẩm còn hàng
+        updated[item.id] = (item.stock || 0) > 0;
       }
     });
     Object.keys(updated).forEach((id) => {
@@ -504,16 +545,53 @@ watch(
   { immediate: true },
 );
 
-const displayItems = computed(() =>
-  cartItems.value.map((item) => ({
-    ...item,
-    checked: Boolean(checkedMap.value[item.id]),
-    isUpdating: isItemUpdating(item.id),
-    isAdjusted: adjustedIds.value.has(item.id),
-    lowStock: item.stock > 0 && item.stock <= 5,
-    unitLabel: item.unit || "Hộp",
-    sku: item.productId.slice(-6).toUpperCase(),
-  })),
+// Auto-uncheck items marked as out-of-stock
+watch(itemsOutOfStock, (outOfStockIds) => {
+  if (outOfStockIds.size > 0) {
+    const updated = { ...checkedMap.value };
+    outOfStockIds.forEach((id) => {
+      updated[id] = false;
+    });
+    checkedMap.value = updated;
+  }
+});
+
+const displayItems = computed(() => {
+  return [...cartItems.value]
+    .filter((item) => !item.deleted && item.status !== "inactive")
+    .sort((a, b) => {
+      const aOOS =
+        itemsOutOfStock.value.has(a.id) || Number(a.stock || 0) === 0;
+      const bOOS =
+        itemsOutOfStock.value.has(b.id) || Number(b.stock || 0) === 0;
+
+      // 1. Đẩy sản phẩm hết hàng xuống dưới cùng
+      if (aOOS !== bOOS) return aOOS ? 1 : -1;
+
+      // 2. Sản phẩm còn hàng: Sắp xếp theo thời gian thêm vào (Mới nhất lên trên)
+      const aTime = new Date(a.addedAt || 0).getTime();
+      const bTime = new Date(b.addedAt || 0).getTime();
+      return bTime - aTime;
+    })
+    .map((item) => {
+      const isOutOfStock =
+        itemsOutOfStock.value.has(item.id) || Number(item.stock || 0) === 0;
+      return {
+        ...item,
+        isOutOfStock,
+        // Ép trạng thái checked về false nếu hết hàng để không gửi lên validate
+        checked: !isOutOfStock && Boolean(checkedMap.value[item.id]),
+        isUpdating: isItemUpdating(item.id),
+        isAdjusted: adjustedIds.value.has(item.id),
+        lowStock: item.stock > 0 && item.stock <= 5,
+        unitLabel: item.unit || "Hộp",
+        sku: item.productId.slice(-6).toUpperCase(),
+      };
+    });
+});
+
+const hasSelectedOutOfStock = computed(() =>
+  selectedItems.value.some((it) => Number(it.stock || 0) === 0),
 );
 
 const {
@@ -633,12 +711,12 @@ const handleApplyVoucher = (options: { silent?: boolean } = {}) => {
   );
 };
 
-const checkoutNow = () => {
+const checkoutNow = async () => {
   if (selectedItems.value.length === 0) return;
 
-  orderStore.setCheckoutData({
+  const checkoutPayload = {
     products: selectedItems.value.map((item) => ({
-      id: item.id, // Keep as string or original type
+      id: item.id,
       title: item.name,
       thumbnail: item.image || "",
       quantity: item.quantity,
@@ -650,26 +728,58 @@ const checkoutNow = () => {
     shippingFee: 0,
     subtotal: subtotal.value,
     grandTotal: grandTotal.value,
-  });
+  };
 
-  router.push(ROUTES.ORDER.CHECKOUT);
+  // Callback để tự động bỏ tích items hết hàng
+  const handleOutOfStock = (outOfStockIds: Set<string>) => {
+    const updated = { ...checkedMap.value };
+    outOfStockIds.forEach((id) => {
+      updated[id] = false;
+    });
+    checkedMap.value = updated;
+  };
+
+  // Gọi composable để thực hiện kiểm tra auth, validate stock, và redirect checkout
+  await proceedToCheckout(
+    selectedItems.value,
+    checkoutPayload,
+    handleOutOfStock,
+  );
 };
 
-const { data: suggestData } = useProductsQuery({ limit: 6 });
+const { data: suggestData } = useProductsQuery({
+  limit: 20,
+  sortField: "discountPercentage",
+  sortOrder: "desc",
+});
 
 const suggestItems = computed(() => {
   const raw = suggestData.value?.data || [];
   return raw
+    .filter((item: any) => (item.stock || 0) > 0)
     .map((item: any) => ({
       id: String(item._id || item.id || ""),
       name: item.title || item.name || "",
       price: Number(item.price || 0),
-      originalPrice: Number(item.originalPrice || 0),
+      originalPrice: Number(item.originalPrice || item.price || 0),
       image: item.thumbnail || item.image || "",
       stock: Number(item.stock || 0),
       slug: item.slug || "",
+      discount:
+        item.discountPercentage ||
+        Math.round(
+          ((Number(item.originalPrice || item.price) - Number(item.price)) /
+            Number(item.originalPrice || item.price)) *
+            100,
+        ),
     }))
-    .filter((item: any) => item.id && item.name);
+    .filter(
+      (item: any) => item.id && item.name && item.originalPrice > item.price,
+    )
+    .sort(
+      (a: any, b: any) =>
+        b.originalPrice - b.price - (a.originalPrice - a.price),
+    );
 });
 
 const quickAdd = async (item: (typeof suggestItems.value)[number]) => {
@@ -845,5 +955,48 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Carousel styles */
+:deep(.suggestions-carousel) {
+  .p-carousel-content {
+    gap: 0.625rem;
+  }
+
+  .p-carousel-item {
+    padding: 0;
+  }
+
+  .p-carousel-next,
+  .p-carousel-prev {
+    background-color: #f97316;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+
+    &:hover {
+      background-color: #ea580c;
+    }
+  }
+
+  .p-carousel-next {
+    right: -50px;
+
+    @media (max-width: 1024px) {
+      right: -35px;
+    }
+  }
+
+  .p-carousel-prev {
+    left: -50px;
+
+    @media (max-width: 1024px) {
+      left: -35px;
+    }
+  }
 }
 </style>

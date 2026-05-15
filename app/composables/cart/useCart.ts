@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
+import ToastEventBus from 'primevue/toasteventbus'
 import { storeToRefs } from 'pinia'
 import { useCartStore } from '~/stores/useCartStore'
 import { useAuthStore } from '~/stores/useAuthStore'
@@ -29,10 +30,8 @@ const isReady = ref(false)
 const updatingIds = ref(new Set<string>())
 
 // Helpers cho UI State
-const triggerNotice = (message: string, title = 'Thành công') => {
-  notice.value = message
-  noticeTitle.value = title
-  noticeKey.value += 1
+const clearToastQueue = () => {
+  ToastEventBus.emit('remove-all-groups')
 }
 
 const setStockNotice = (ids: Set<string>) => {
@@ -52,6 +51,23 @@ export const useCart = () => {
   const toast = useToast()
   const store = useCartStore()
   const authStore = useAuthStore()
+
+  const triggerNotice = (message: string, title = 'Thành công') => {
+    const severity =
+      title === 'Thành công'
+        ? 'success'
+        : message.includes('hết hàng') || message.includes('giới hạn')
+          ? 'warn'
+          : 'info'
+
+    clearToastQueue()
+    toast.add({
+      severity,
+      summary: title,
+      detail: message,
+      life: 3000,
+    })
+  }
 
   const showErrorToast = (error: any) => {
     toast.add({
@@ -122,9 +138,9 @@ export const useCart = () => {
         payload.adjustments.clamped.forEach((item) => adjusted.add(item.productId))
       }
 
-      const noticeMsg = messages.join(' ')
+      // Ưu tiên sử dụng message cụ thể từ Server gửi về (ví dụ: "Đã đạt giới hạn tồn kho...")
+      const noticeMsg = (payload as any).message || messages.join(' ')
       setStockNotice(adjusted)
-      // setStockNotice(noticeMsg, adjusted)
       triggerNotice(noticeMsg, 'Thông báo giỏ hàng')
     } else {
       setStockNotice(new Set())
@@ -133,7 +149,6 @@ export const useCart = () => {
   }
 
   const ensureCartReady = async () => {
-    if (isReady.value) return
     // Nó nhảy từ false -> true và giữ nguyên true mãi mãi cho đến khi bạn F5 trình duyệt.
     isReady.value = true
     isLoading.value = true
@@ -186,61 +201,90 @@ export const useCart = () => {
     const quantity = Math.max(1, Number(product.quantity || 1))
     const stock = typeof product.stock === 'number' ? product.stock : Number.POSITIVE_INFINITY
 
-    if (stock === 0) {
-      triggerNotice('Sản phẩm đã hết hàng', 'Thông báo')
+    // Kiểm tra stock ở frontend trước khi gửi request
+    if (stock <= 0) {
+      triggerNotice(`${product.name} đã hết hàng`, 'Thông báo')
       return
     }
 
     if (authStore.isLoggedIn) {
+      setUpdating(productId, true)
       try {
         const response = await cartService.addItem({ productId, quantity })
         applyCartResponse(response)
-        triggerNotice(`Đã thêm "${product.name}" vào giỏ hàng`, 'Thành công')
-      } catch (error) {
-        showErrorToast(error)
+        
+        // Nếu Server không trả về message đặc biệt (như giới hạn tồn kho), thì mới báo thành công
+        if (!(response as any).message) {
+          triggerNotice(`Đã thêm "${product.name}" vào giỏ hàng`, 'Thành công')
+        }
+      } catch (error: any) {
+        const serverMsg = error?.response?.data?.message || ''
+        
+        // Xử lý các error message từ backend
+        if (serverMsg.includes('hết hàng')) {
+          triggerNotice(serverMsg, 'Thông báo')
+        } else if (serverMsg.includes('giới hạn') || serverMsg.includes('vượt quá')) {
+          triggerNotice(serverMsg, 'Thông báo') // Sẽ tự động thành 'warn' do triggerNotice check nội dung
+        } else if (serverMsg.includes('không còn tồn tại') || serverMsg.includes('ngừng kinh doanh')) {
+          triggerNotice(serverMsg, 'Thông báo')
+        } else {
+          showErrorToast(error)
+        }
+      } finally {
+        setUpdating(productId, false)
       }
       return
     }
 
-    // copy an toàn để tính toán trước; localItems thây đổi gì thì cartItems cũng ko thây đổi (trừ nested object(dùng lodash) vì này là coppy nôgn)
-    const localItems = cartItems.value.map((item) => ({ ...item }))
-    const existing = localItems.find((item) => item.productId === productId)
-    const nextQty = (existing?.quantity || 0) + quantity
-    const clampedQty = Math.min(nextQty, stock)
-
-    if (existing) {
-      if (nextQty > stock) {
-        triggerNotice(`Đã đạt giới hạn tồn kho (${stock} sản phẩm)`, 'Thông báo')
-      } else {
-        triggerNotice(`Đã cập nhật số lượng "${product.name}"`, 'Thành công')
-      }
-      existing.quantity = clampedQty
-    } else {
-      localItems.unshift({
-        id: productId,
-        productId,
-        categoryId: product.categoryId || null,
-        name: product.name,
-        image: product.image || '',
-        price: product.price,
-        originalPrice: null,
-        stock: Number.isFinite(stock) ? stock : 0,
-        quantity: clampedQty,
-        slug: product.slug
-      })
-    }
-
+    // GUEST USER LOGIC: Đạt chuẩn Production (Check stock thực tế từ API trước khi add)
+    setUpdating(productId, true)
     try {
+      // 1. Check stock của sản phẩm này trước
+      const checkRes = await cartService.validateCart([{ productId, quantity }])
+      const validatedItem = checkRes.items.find(i => i.productId === productId)
+
+      // Nếu stock thực tế từ DB trả về = 0
+      if (!validatedItem || validatedItem.stock <= 0) {
+        triggerNotice(`Sản phẩm "${product.name}" đã hết hàng`, 'Thông báo')
+        return
+      }
+
+      // 2. Nếu OK, tiến hành merge vào giỏ hàng local
+      const localItems = cartItems.value.map((item) => ({ ...item }))
+      const existing = localItems.find((item) => item.productId === productId)
+      
+      if (existing) {
+        existing.quantity += quantity
+      } else {
+        localItems.unshift({
+          id: productId,
+          productId,
+          categoryId: product.categoryId || null,
+          name: product.name,
+          image: product.image || '',
+          price: product.price,
+          originalPrice: null,
+          stock: validatedItem.stock,
+          quantity: quantity,
+          slug: product.slug
+        })
+      }
+
+      // 3. Validate toàn bộ giỏ hàng mới để chuẩn hóa các sản phẩm khác (nếu có)
       const response = await cartService.validateCart(
         localItems.map((item) => ({ productId: item.productId, quantity: item.quantity }))
       )
+
       applyCartResponse(response)
-      
-      if (!existing) {
+
+      // Hiển thị thông báo
+      if (!(response as any).message) {
         triggerNotice(`Đã thêm "${product.name}" vào giỏ hàng`, 'Thành công')
       }
     } catch (error) {
       showErrorToast(error)
+    } finally {
+      setUpdating(productId, false)
     }
   }
 
@@ -289,11 +333,7 @@ export const useCart = () => {
     const item = cartItems.value.find((it) => it.productId === id)
     if (!item) return
     
-    if (item.quantity >= item.stock) {
-      triggerNotice(`Đã đạt giới hạn tồn kho (${item.stock} sản phẩm)`, 'Thông báo')
-      return
-    }
-    
+    // Luôn gọi API để check stock thời gian thực thay vì tự check ở FE
     await updateItemQuantity(id, item.quantity + 1)
   }
 

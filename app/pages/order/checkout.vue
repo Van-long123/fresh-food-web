@@ -183,27 +183,37 @@
                 :class="
                   paymentMethod === 0
                     ? 'bg-green-50 border border-green-200'
-                    : 'bg-blue-50 border border-blue-200'
+                    : paymentMethod === 1
+                    ? 'bg-blue-50 border border-blue-200'
+                    : 'bg-pink-50 border border-pink-200'
                 "
               >
                 <i
                   :class="
                     paymentMethod === 0
                       ? 'pi pi-money-bill text-green-600'
-                      : 'pi pi-credit-card text-blue-600'
+                      : paymentMethod === 1
+                      ? 'pi pi-qrcode text-blue-600'
+                      : 'pi pi-wallet text-pink-600'
                   "
                   class="text-sm"
                 ></i>
                 <span
                   class="text-sm font-medium"
                   :class="
-                    paymentMethod === 0 ? 'text-green-700' : 'text-blue-700'
+                    paymentMethod === 0
+                      ? 'text-green-700'
+                      : paymentMethod === 1
+                      ? 'text-blue-700'
+                      : 'text-pink-700'
                   "
                 >
                   {{
                     paymentMethod === 0
-                      ? "Thanh toán khi nhận hàng — an toàn & tiện lợi"
-                      : "Thanh toán qua ZaloPay — nhanh chóng & bảo mật"
+                      ? 'Thanh toán khi nhận hàng — an toàn & tiện lợi'
+                      : paymentMethod === 1
+                      ? 'VietQR qua PayOS — quét mã nhanh chóng'
+                      : 'Thanh toán qua MoMo — tiện lợi & bảo mật'
                   }}
                 </span>
               </div>
@@ -644,10 +654,8 @@ const note = ref("");
 
 const paymentOptions = [
   { label: "Thanh toán khi nhận hàng (COD)", value: 0 },
-  { label: "Thanh toán qua ZaloPay", value: 1 },
-  { label: "Thanh toán qua MoMo", value: 2 },
-  { label: "Thanh toán qua VNPAY", value: 3 },
-  { label: "Thanh toán qua PayPal", value: 4 },
+  { label: "VietQR qua PayOS", value: 1 },
+  { label: "Ví điện tử MoMo", value: 2 },
 ];
 const paymentMethod = ref(0);
 

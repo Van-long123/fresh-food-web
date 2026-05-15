@@ -63,6 +63,7 @@ export const API_ENDPOINTS = {
     SHIPPING_FEE: '/v1/client/checkout/shipping-fee'
   },
   ORDER: {
+    VALIDATE_STOCK: '/v1/client/orders/validate-stock',
     CREATE: '/v1/client/orders'
   }
 } as const

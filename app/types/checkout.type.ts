@@ -27,3 +27,34 @@ export interface ShippingFeeResponse {
   isFallback: boolean
   address: ShippingFeeAddressInfo
 }
+
+export interface SelectedCartItem {
+  id: string
+  name: string
+  image: string
+  price: number
+  originalPrice?: number | null
+  quantity: number
+  slug: string
+  stock: number
+  categoryId?: string | null
+}
+
+export interface CheckoutPayload {
+  products: SelectedCartItem[]
+  voucherCode?: string
+  discountVoucher: number
+  subtotal: number
+  grandTotal: number
+}
+
+export interface StockValidationItem {
+  productId: string
+  quantity: number
+}
+
+export interface ValidationResponse {
+  valid: Array<{ productId: string; quantity: number; currentStock: number; name: string }>
+  clamped: Array<{ productId: string; name: string; requestedQty: number; currentStock: number }>
+  outOfStock: Array<{ productId: string; name: string; currentStock: number }>
+}

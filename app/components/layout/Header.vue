@@ -256,86 +256,6 @@
       </div>
     </div>
 
-    <!-- Thay thế đoạn notice cũ bằng component này -->
-
-    <!-- Trong <template> -->
-    <Teleport to="body">
-      <Transition name="toast">
-        <div
-          v-if="visibleNotice"
-          :key="noticeKey"
-          class="fixed right-4 top-20 z-[9999] w-80 overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/8"
-        >
-          <!-- Green accent bar -->
-          <div
-            class="h-1 w-full bg-gradient-to-r from-emerald-400 to-green-500"
-          />
-
-          <div class="flex items-start gap-3 p-3.5">
-            <!-- Icon -->
-            <div
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5 text-emerald-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-            </div>
-
-            <!-- Text -->
-            <div class="flex-1 pt-0.5">
-              <p class="text-[13px] font-bold text-gray-800">
-                {{ noticeTitle }}
-              </p>
-              <p class="mt-0.5 text-[12px] text-gray-500">
-                {{ notice }}
-              </p>
-            </div>
-
-            <!-- Checkmark -->
-            <div
-              class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 mt-0.5"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-3 w-3 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="3"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <!-- Progress bar countdown -->
-          <div
-            class="mx-3.5 mb-3 h-0.5 overflow-hidden rounded-full bg-gray-100"
-          >
-            <div
-              class="h-full rounded-full bg-emerald-400"
-              style="animation: toastProgress 4s linear forwards; transform-origin: left;"
-            />
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
-
     <Transition name="cart-backdrop">
       <div
         v-if="showCartPanel"
@@ -348,7 +268,7 @@
       <section
         v-if="showCartPanel"
         ref="cartPanelRef"
-        class="fixed right-4 top-[72px] z-60 w-[min(400px,92vw)] rounded-2xl border border-[#e5e7eb]/80 bg-white text-[#0f172a] shadow-[0_20px_50px_rgba(15,23,42,0.15)]"
+        class="fixed right-4 top-18 z-60 w-[min(400px,92vw)] rounded-2xl border border-[#e5e7eb]/80 bg-white text-[#0f172a] shadow-[0_20px_50px_rgba(15,23,42,0.15)]"
         aria-label="Mini cart"
         @click.stop
       >
@@ -386,7 +306,7 @@
         </div>
 
         <!-- Cart Items -->
-        <div class="max-h-[320px] overflow-y-auto px-4 py-3">
+        <div class="max-h-80 overflow-y-auto px-4 py-3">
           <div class="space-y-2.5">
             <article
               v-for="item in cartItems"
@@ -660,7 +580,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
 import { useCart } from "~/composables/cart/useCart";
@@ -680,9 +600,6 @@ const headerDisplayName = computed(() => {
 
 const {
   cartItems,
-  notice,
-  noticeTitle,
-  noticeKey,
   itemCount,
   totalAmount,
   formatVnd,
@@ -716,16 +633,6 @@ const handleClickOutside = (event) => {
   if (panel.contains(target)) return;
   showCartPanel.value = false;
 };
-
-let toastTimeout = null;
-watch(noticeKey, () => {
-  if (toastTimeout) clearTimeout(toastTimeout);
-  visibleNotice.value = true;
-
-  toastTimeout = setTimeout(() => {
-    visibleNotice.value = false;
-  }, 4000);
-});
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside);
@@ -789,22 +696,6 @@ onBeforeUnmount(() => {
   opacity: 0;
   transform: translateY(-6px);
 }
-
-.toast-enter-active {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.toast-leave-active {
-  transition: all 0.2s ease-in;
-}
-.toast-enter-from {
-  opacity: 0;
-  transform: translateX(100%) scale(0.9);
-}
-.toast-leave-to {
-  opacity: 0;
-  transform: translateX(12px) scale(0.96);
-}
-
 </style>
 
 <style>

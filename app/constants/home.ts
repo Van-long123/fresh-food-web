@@ -1,7 +1,7 @@
 export const HOME_DEFAULTS = {
-  campaignProductLimit: 20,
+  campaignProductLimit: 30,
   categorySectionLimit: 100,
-  categoryProductLimit: 20,
+  categoryProductLimit: 30,
   blogLimit: 9
 } as const
 

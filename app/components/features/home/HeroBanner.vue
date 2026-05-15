@@ -102,25 +102,24 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import banner1 from "@/assets/images/hero-banner/WPVzLAblob.webp";
-import banner2 from "@/assets/images/hero-banner/FWFWMQblob.webp";
+
 const slides = ref([
   {
     image:
-      "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=2000",
+      "https://res.cloudinary.com/dnraaygwf/image/upload/v1778662048/photo-1542838132-92c53300491e_am4sst.avif",
     title: "MÓN NGON MỖI NGÀY",
     description: "Chất Lượng - Tiện Lợi - Tiết Kiệm",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&q=80&w=2000",
+      "https://res.cloudinary.com/dnraaygwf/image/upload/v1778662053/photo-1604719312566-8912e9227c6a_lmwqwn.avif",
     title: "THỰC PHẨM TƯƠI SỐNG",
     description:
       "Giảm đến 30% cho các sản phẩm thịt cá, rau củ quả trong tuần lễ vàng.",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?auto=format&fit=crop&q=80&w=2000",
+      "https://res.cloudinary.com/dnraaygwf/image/upload/v1778662048/photo-1583258292688-d0213dc5a3a8_a70tvd.avif",
     title: "TRÁI CÂY NHẬP KHẨU",
     description: "Táo, Nho, Cherry nhập khẩu trực tiếp, đảm bảo độ tươi ngon.",
   },
