@@ -5,6 +5,7 @@ export interface OrderProduct {
   quantity: number
   totalPrice: number
   priceNew?: number
+  categoryId?: string | null
 }
 
 export interface CartDetail {

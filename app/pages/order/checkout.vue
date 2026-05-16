@@ -124,250 +124,358 @@
               </div>
             </div>
 
-            <!-- Section 2: Voucher áp dụng (Copied from info.vue) -->
-            <div
-              v-if="selectedVoucherCode"
-              class="bg-white rounded-xl shadow-sm p-5"
-            >
-              <div class="flex items-center gap-2 mb-3">
-                <span
-                  class="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0"
+            <!-- Section 2: Voucher & Steps -->
+            <Card class="shadow-sm border border-gray-100">
+              <template #content>
+                <div class="flex items-center gap-2 mb-4">
+                  <span
+                    class="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0"
+                  >
+                    <i class="pi pi-ticket text-orange-500 text-xs"></i>
+                  </span>
+                  <h2 class="text-base font-bold text-gray-800">
+                    Voucher áp dụng
+                  </h2>
+                </div>
+
+                <!-- Case 1: Voucher already applied (from cart or just applied) -->
+                <div
+                  v-if="selectedVoucherCode && !showVoucherInput"
+                  class="flex flex-col gap-3"
                 >
-                  <i class="pi pi-ticket text-orange-500 text-xs"></i>
-                </span>
-                <h2 class="text-base font-bold text-gray-800">
-                  Voucher áp dụng
-                </h2>
-              </div>
-              <div
-                class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg px-4 py-2"
-              >
-                <i class="pi pi-tag text-orange-500 text-sm"></i>
-                <span
-                  class="text-sm font-bold text-orange-600 tracking-widest uppercase"
-                  >{{ selectedVoucherCode }}</span
-                >
-                <span
-                  class="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-1"
-                  >ÁP DỤNG</span
-                >
-              </div>
-            </div>
+                  <div
+                    class="inline-flex items-center gap-2 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg px-4 py-3"
+                  >
+                    <div
+                      class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm"
+                    >
+                      <i class="pi pi-tag text-orange-500 text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                      <span
+                        class="text-sm font-bold text-orange-600 tracking-widest uppercase block"
+                        >{{ selectedVoucherCode }}</span
+                      >
+                      <span class="text-xs text-orange-500 mt-0.5 block"
+                        >Tiết kiệm {{ formatCurrency(discountVoucher) }}</span
+                      >
+                    </div>
+                    <i class="pi pi-check-circle text-green-500 text-lg"></i>
+                  </div>
+                  <div class="flex gap-2">
+                    <Button
+                      label="Đổi mã khác"
+                      icon="pi pi-pencil"
+                      severity="secondary"
+                      class="flex-1"
+                      size="small"
+                      @click="
+                        () => {
+                          showVoucherInput = true;
+                          voucherCode = '';
+                          voucherError = '';
+                        }
+                      "
+                    />
+                    <Button
+                      label="Bỏ áp dụng"
+                      icon="pi pi-trash"
+                      severity="danger"
+                      variant="text"
+                      class="flex-1 !text-red-500 hover:!bg-red-50"
+                      size="small"
+                      @click="clearVoucher"
+                    />
+                  </div>
+                </div>
+
+                <!-- Case 2: No voucher or editing voucher -->
+                <div v-else class="flex flex-col gap-3">
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="relative flex-1">
+                      <i
+                        class="pi pi-ticket absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
+                      ></i>
+                      <InputText
+                        v-model="voucherCode"
+                        placeholder="Nhập mã voucher"
+                        class="w-full !pl-9"
+                        @keyup.enter="handleApplyVoucher"
+                      />
+                    </div>
+                    <Button
+                      label="Áp dụng"
+                      class="!bg-[#f47f20] !border-[#f47f20] text-white font-semibold px-6"
+                      :loading="isApplyingVoucher"
+                      @click="handleApplyVoucher"
+                    />
+                  </div>
+                  <InlineMessage
+                    v-if="voucherError"
+                    severity="error"
+                    class="w-full"
+                  >
+                    {{ voucherError }}
+                  </InlineMessage>
+
+                  <div
+                    v-if="showVoucherInput && selectedVoucherCode"
+                    class="mt-1"
+                  >
+                    <Button
+                      label="Quay lại dùng mã cũ"
+                      severity="secondary"
+                      variant="text"
+                      class="w-full !text-gray-500 text-xs"
+                      size="small"
+                      @click="
+                        () => {
+                          showVoucherInput = false;
+                          voucherCode = selectedVoucherCode;
+                          voucherError = '';
+                        }
+                      "
+                    />
+                  </div>
+                </div>
+              </template>
+            </Card>
             <!-- Section 3: Phương thức thanh toán (Copied from info.vue) -->
-            <div class="bg-white rounded-xl shadow-sm p-5">
-              <div class="flex items-center gap-2 mb-4">
-                <span
-                  class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"
-                >
-                  <i class="pi pi-wallet text-blue-600 text-xs"></i>
-                </span>
-                <h2 class="text-base font-bold text-gray-800">
-                  Phương thức thanh toán
-                </h2>
-              </div>
+            <Card class="shadow-sm border border-gray-100">
+              <template #content>
+                <div class="flex items-center gap-2 mb-4">
+                  <span
+                    class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"
+                  >
+                    <i class="pi pi-wallet text-blue-600 text-xs"></i>
+                  </span>
+                  <h2 class="text-base font-bold text-gray-800">
+                    Phương thức thanh toán
+                  </h2>
+                </div>
 
-              <Select
-                v-model="paymentMethod"
-                :options="paymentOptions"
-                option-label="label"
-                option-value="value"
-                class="w-full mb-4"
-                :pt="{
-                  root: { class: 'w-full border border-gray-200 rounded-lg' },
-                }"
-              />
+                <Select
+                  v-model="paymentMethod"
+                  :options="paymentOptions"
+                  option-label="label"
+                  option-value="value"
+                  class="w-full mb-4"
+                  :pt="{
+                    root: { class: 'w-full border border-gray-200 rounded-lg' },
+                  }"
+                />
 
-              <!-- Payment info badge -->
-              <div
-                class="flex items-center gap-2 p-3 rounded-lg"
-                :class="
-                  paymentMethod === 0
-                    ? 'bg-green-50 border border-green-200'
-                    : paymentMethod === 1
-                    ? 'bg-blue-50 border border-blue-200'
-                    : 'bg-pink-50 border border-pink-200'
-                "
-              >
-                <i
+                <ul class="space-y-2 mb-4">
+                  <li
+                    v-for="(step, index) in paymentSteps"
+                    :key="step"
+                    class="flex items-center gap-2 text-sm text-gray-600"
+                  >
+                    <span
+                      class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold"
+                    >
+                      {{ String(index + 1).padStart(2, "0") }}
+                    </span>
+                    <span>{{ step }}</span>
+                  </li>
+                </ul>
+
+                <!-- Payment info badge -->
+                <div
+                  class="flex items-center gap-2 p-3 rounded-lg"
                   :class="
                     paymentMethod === 0
-                      ? 'pi pi-money-bill text-green-600'
+                      ? 'bg-green-50 border border-green-200'
                       : paymentMethod === 1
-                      ? 'pi pi-qrcode text-blue-600'
-                      : 'pi pi-wallet text-pink-600'
-                  "
-                  class="text-sm"
-                ></i>
-                <span
-                  class="text-sm font-medium"
-                  :class="
-                    paymentMethod === 0
-                      ? 'text-green-700'
-                      : paymentMethod === 1
-                      ? 'text-blue-700'
-                      : 'text-pink-700'
+                        ? 'bg-blue-50 border border-blue-200'
+                        : 'bg-pink-50 border border-pink-200'
                   "
                 >
-                  {{
-                    paymentMethod === 0
-                      ? 'Thanh toán khi nhận hàng — an toàn & tiện lợi'
-                      : paymentMethod === 1
-                      ? 'VietQR qua PayOS — quét mã nhanh chóng'
-                      : 'Thanh toán qua MoMo — tiện lợi & bảo mật'
-                  }}
-                </span>
-              </div>
-            </div>
+                  <i
+                    :class="
+                      paymentMethod === 0
+                        ? 'pi pi-money-bill text-green-600'
+                        : paymentMethod === 1
+                          ? 'pi pi-qrcode text-blue-600'
+                          : 'pi pi-wallet text-pink-600'
+                    "
+                    class="text-sm"
+                  ></i>
+                  <span
+                    class="text-sm font-medium"
+                    :class="
+                      paymentMethod === 0
+                        ? 'text-green-700'
+                        : paymentMethod === 1
+                          ? 'text-blue-700'
+                          : 'text-pink-700'
+                    "
+                  >
+                    {{
+                      paymentMethod === 0
+                        ? "Thanh toán khi nhận hàng — an toàn & tiện lợi"
+                        : paymentMethod === 1
+                          ? "VietQR qua PayOS — quét mã nhanh chóng"
+                          : "Thanh toán qua MoMo — tiện lợi & bảo mật"
+                    }}
+                  </span>
+                </div>
+              </template>
+            </Card>
           </div>
 
           <!-- ── RIGHT COLUMN (5/12) ──────────────────────────────── -->
           <div class="lg:col-span-5 flex flex-col gap-5">
             <!-- Section 1: Giỏ hàng -->
-            <div class="bg-white rounded-xl shadow-sm p-4">
-              <div class="flex items-center gap-2 mb-4">
-                <span
-                  class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0"
-                >
-                  <i class="pi pi-shopping-bag text-red-600 text-xs"></i>
-                </span>
-                <h2 class="text-base font-bold text-gray-800">Giỏ hàng</h2>
-                <span
-                  class="ml-auto text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full font-medium"
-                >
-                  {{ cartProducts.length }} sản phẩm
-                </span>
-              </div>
-
-              <div class="divide-y divide-gray-100 max-h-72 overflow-y-auto">
-                <div
-                  v-for="item in cartProducts"
-                  :key="item.id"
-                  class="flex items-center gap-3 py-3 first:pt-0"
-                >
-                  <div
-                    class="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-100"
+            <Card class="shadow-sm border border-gray-100">
+              <template #content>
+                <div class="flex items-center gap-2 mb-4">
+                  <span
+                    class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0"
                   >
-                    <img
-                      v-if="item.thumbnail"
-                      :src="item.thumbnail"
-                      :alt="item.title"
-                      class="w-full h-full object-cover"
-                      width="56"
-                      height="56"
-                    />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <NuxtLink
-                      :to="`/product/${item.id}`"
-                      class="text-sm font-medium text-gray-800 line-clamp-2 leading-tight hover:text-red-600 transition-colors"
-                      >{{ item.title }}</NuxtLink
+                    <i class="pi pi-shopping-bag text-red-600 text-xs"></i>
+                  </span>
+                  <h2 class="text-base font-bold text-gray-800">Giỏ hàng</h2>
+                  <span
+                    class="ml-auto text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full font-medium"
+                  >
+                    {{ cartProducts.length }} sản phẩm
+                  </span>
+                </div>
+
+                <div class="divide-y divide-gray-100 max-h-72 overflow-y-auto">
+                  <div
+                    v-for="item in cartProducts"
+                    :key="item.id"
+                    class="flex items-center gap-3 py-3 first:pt-0"
+                  >
+                    <div
+                      class="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-100"
                     >
-                    <span class="text-xs text-gray-400 mt-0.5 block"
-                      >x{{ item.quantity }}</span
-                    >
-                  </div>
-                  <div class="text-right flex-shrink-0">
-                    <p class="text-sm font-bold text-red-600">
-                      {{ formatCurrency(item.totalPrice) }}
-                    </p>
+                      <img
+                        v-if="item.thumbnail"
+                        :src="item.thumbnail"
+                        :alt="item.title"
+                        class="w-full h-full object-cover"
+                        width="56"
+                        height="56"
+                      />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <NuxtLink
+                        :to="`/product/${item.id}`"
+                        class="text-sm font-medium text-gray-800 line-clamp-2 leading-tight hover:text-red-600 transition-colors"
+                        >{{ item.title }}</NuxtLink
+                      >
+                      <span class="text-xs text-gray-400 mt-0.5 block"
+                        >x{{ item.quantity }}</span
+                      >
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                      <p class="text-sm font-bold text-red-600">
+                        {{ formatCurrency(item.totalPrice) }}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </template>
+            </Card>
 
             <!-- Section 2: Tổng tiền -->
-            <div class="bg-white rounded-xl shadow-sm p-4 sticky top-6">
-              <div class="flex items-center gap-2 mb-4">
-                <span
-                  class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"
-                >
-                  <i class="pi pi-receipt text-green-600 text-xs"></i>
-                </span>
-                <h2 class="text-base font-bold text-gray-800">
-                  Chi tiết thanh toán
-                </h2>
-              </div>
-
-              <div class="space-y-2.5 mb-4">
-                <!-- Đơn giá -->
-                <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-500">Đơn giá</span>
-                  <span class="text-sm font-medium text-gray-800">{{
-                    formatCurrency(basePrice)
-                  }}</span>
-                </div>
-
-                <!-- Voucher giảm giá -->
-                <div
-                  v-if="discountVoucher > 0"
-                  class="flex items-center justify-between"
-                >
-                  <span class="text-sm text-gray-500 flex items-center gap-1">
-                    <i class="pi pi-tag text-orange-400 text-xs"></i> Voucher
-                    giảm giá
-                  </span>
-                  <span class="text-sm font-medium text-orange-500"
-                    >-{{ formatCurrency(discountVoucher) }}</span
-                  >
-                </div>
-
-                <!-- Phí vận chuyển -->
-                <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-500 flex items-center gap-1">
-                    <i class="pi pi-truck text-gray-400 text-xs"></i> Phí vận
-                    chuyển
-                    <i
-                      v-if="isFetchingShippingFee"
-                      class="pi pi-spin pi-spinner text-[#f47f20] text-xs ml-1"
-                    ></i>
-                  </span>
+            <Card class="shadow-sm border border-gray-100 sticky top-6">
+              <template #content>
+                <div class="flex items-center gap-2 mb-4">
                   <span
-                    v-if="isFetchingShippingFee"
-                    class="text-sm text-gray-400 animate-pulse"
-                    >Đang tính...</span
+                    class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"
                   >
-                  <span v-else class="text-sm font-medium text-gray-800">{{
-                    formatCurrency(shippingFee)
-                  }}</span>
+                    <i class="pi pi-receipt text-green-600 text-xs"></i>
+                  </span>
+                  <h2 class="text-base font-bold text-gray-800">
+                    Chi tiết thanh toán
+                  </h2>
                 </div>
 
-                <hr class="border-gray-200" />
+                <div class="space-y-2.5 mb-4">
+                  <!-- Đơn giá -->
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Đơn giá</span>
+                    <span class="text-sm font-medium text-gray-800">{{
+                      formatCurrency(subtotal)
+                    }}</span>
+                  </div>
 
-                <!-- Thành tiền -->
-                <div class="flex items-center justify-between">
-                  <span class="text-base font-bold text-gray-900"
-                    >Thành tiền</span
+                  <!-- Voucher giảm giá -->
+                  <div
+                    v-if="discountVoucher > 0"
+                    class="flex items-center justify-between"
                   >
-                  <span class="text-xl font-extrabold text-red-600">{{
-                    formatCurrency(grandTotal)
-                  }}</span>
+                    <span class="text-sm text-gray-500 flex items-center gap-1">
+                      <i class="pi pi-tag text-orange-400 text-xs"></i> Voucher
+                      giảm giá
+                    </span>
+                    <span class="text-sm font-medium text-orange-500"
+                      >-{{ formatCurrency(discountVoucher) }}</span
+                    >
+                  </div>
+
+                  <!-- Phí vận chuyển -->
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500 flex items-center gap-1">
+                      <i class="pi pi-truck text-gray-400 text-xs"></i> Phí vận
+                      chuyển
+                      <i
+                        v-if="isFetchingShippingFee"
+                        class="pi pi-spin pi-spinner text-[#f47f20] text-xs ml-1"
+                      ></i>
+                    </span>
+                    <span
+                      v-if="isFetchingShippingFee"
+                      class="text-sm text-gray-400 animate-pulse"
+                      >Đang tính...</span
+                    >
+                    <span v-else class="text-sm font-medium text-gray-800">{{
+                      formatCurrency(shippingFee)
+                    }}</span>
+                  </div>
+
+                  <hr class="border-gray-200" />
+
+                  <!-- Thành tiền -->
+                  <div class="flex items-center justify-between">
+                    <span class="text-base font-bold text-gray-900"
+                      >Thành tiền</span
+                    >
+                    <span class="text-xl font-extrabold text-red-600">{{
+                      formatCurrency(grandTotal)
+                    }}</span>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Checkout Button -->
-              <Button
-                label="Thanh toán"
-                severity="contrast"
-                :disabled="isFetchingShippingFee"
-                class="w-full !bg-red-600 !border-red-600 hover:!bg-red-700 hover:!border-red-700 !text-white font-bold py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
-                icon="pi pi-lock"
-                icon-pos="left"
-                :loading="isSubmitting"
-                @click="handleCheckout"
-              />
+                <!-- Checkout Button -->
+                <Button
+                  label="Thanh toán"
+                  severity="contrast"
+                  :disabled="isFetchingShippingFee"
+                  class="w-full !bg-red-600 !border-red-600 hover:!bg-red-700 hover:!border-red-700 !text-white font-bold py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
+                  icon="pi pi-lock"
+                  icon-pos="left"
+                  :loading="isSubmitting"
+                  @click="handleCheckout"
+                />
 
-              <div class="text-center mt-3">
-                <NuxtLink
-                  :to="ROUTES.CART"
-                  class="text-sm text-gray-500 hover:text-red-600 transition-colors inline-flex items-center gap-1"
-                >
-                  <i class="pi pi-arrow-left text-xs"></i> Quay lại giỏ hàng
-                </NuxtLink>
-              </div>
-              <p class="text-xs text-gray-400 mt-2 text-center">
-                (Đã bao gồm VAT nếu có)
-              </p>
-            </div>
+                <div class="text-center mt-3">
+                  <NuxtLink
+                    :to="ROUTES.CART"
+                    class="text-sm text-gray-500 hover:text-red-600 transition-colors inline-flex items-center gap-1"
+                  >
+                    <i class="pi pi-arrow-left text-xs"></i> Quay lại giỏ hàng
+                  </NuxtLink>
+                </div>
+                <p class="text-xs text-gray-400 mt-2 text-center">
+                  (Đã bao gồm VAT nếu có)
+                </p>
+              </template>
+            </Card>
           </div>
         </div>
       </div>
@@ -608,16 +716,13 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useOrderStore } from "~/stores/useOrderStore";
-import { useAuthStore } from "~/stores/useAuthStore";
 import { useToast } from "primevue/usetoast";
-import type { OrderProduct, OrderInfo } from "~/types/order.type";
 import { ROUTES } from "~/constants/routes";
 import { useAddress } from "~/composables/profile/useAddress";
-import { useShippingFee } from "~/composables/checkout/useShippingFee";
-import { getAuthorizedAxios } from "~/utils/authorizedAxios";
-import { API_ENDPOINTS } from "~/constants/api";
 import ConfirmDialog from "primevue/confirmdialog";
 import AddressSelectorDialog from "~/components/pages/checkout/AddressSelectorDialog.vue";
+import { useCheckout } from "~/composables/checkout/useCheckout";
+import { useCartStore } from "~/stores/useCartStore";
 
 useHead({
   title: "Thanh toán — SmartFood",
@@ -631,7 +736,7 @@ useHead({
 
 const router = useRouter();
 const orderStore = useOrderStore();
-const authStore = useAuthStore();
+const cartStore = useCartStore();
 const toast = useToast();
 
 const {
@@ -651,13 +756,27 @@ const {
 const localSelectedAddressId = ref<string | null>(null);
 const isSelectorOpen = ref(false);
 const note = ref("");
+const showVoucherInput = ref(true);
 
-const paymentOptions = [
-  { label: "Thanh toán khi nhận hàng (COD)", value: 0 },
-  { label: "VietQR qua PayOS", value: 1 },
-  { label: "Ví điện tử MoMo", value: 2 },
-];
-const paymentMethod = ref(0);
+const {
+  cartProducts,
+  subtotal,
+  shippingFee,
+  isFetchingShippingFee,
+  fetchShippingFee,
+  grandTotal,
+  voucherCode,
+  discountVoucher,
+  voucherError,
+  isApplyingVoucher,
+  applyVoucher,
+  clearVoucher,
+  isSubmitting,
+  submitCODOrder,
+  paymentMethod,
+  paymentOptions,
+  paymentSteps,
+} = useCheckout({ selectedAddressId: localSelectedAddressId });
 
 // ── Checkout Data from Store ──────────────────────────────────────────────────
 const checkoutData = computed(() => orderStore.checkoutData);
@@ -672,32 +791,14 @@ onMounted(() => {
       life: 3000,
     });
     router.push(ROUTES.CART);
+    return;
   }
+
+  showVoucherInput.value = !checkoutData.value.voucherCode;
 });
 
 const selectedVoucherCode = computed(
   () => checkoutData.value?.voucherCode || null,
-);
-const discountVoucher = computed(
-  () => checkoutData.value?.discountVoucher || 0,
-);
-
-const cartProducts = computed(() => checkoutData.value?.products || []);
-const basePrice = computed(() => checkoutData.value?.subtotal || 0);
-
-// ── Shipping Fee (GHN)
-const {
-  shippingFee: ghnShippingFee,
-  isFetchingShippingFee,
-  fetchShippingFee,
-} = useShippingFee(localSelectedAddressId, cartProducts);
-
-// shippingFee và grandTotal phụ thuộc vào ghnShippingFee nên phải khai báo sau
-const shippingFee = computed(
-  () => ghnShippingFee.value ?? checkoutData.value?.shippingFee ?? 0,
-);
-const grandTotal = computed(
-  () => basePrice.value - discountVoucher.value + shippingFee.value,
 );
 
 const selectedAddress = computed(() => {
@@ -736,11 +837,19 @@ watch(
   { deep: true },
 );
 
-// ── Checkout logic ────────────────────────────────────────────────────────────
-const isSubmitting = ref(false);
+const handleApplyVoucher = async () => {
+  const ok = await applyVoucher();
+  if (ok) {
+    showVoucherInput.value = false;
+  }
+};
 
-async function handleCheckout() {
-  if (!localSelectedAddressId.value) {
+const handleCheckout = async () => {
+  const selectedAddress = addresses.value?.find(
+    (a: any) => a._id === localSelectedAddressId.value,
+  );
+
+  if (!selectedAddress) {
     toast.add({
       severity: "warn",
       summary: "Cảnh báo",
@@ -749,64 +858,38 @@ async function handleCheckout() {
     });
     return;
   }
-  const selectedAddress = addresses.value?.find(
-    (a: any) => a._id === localSelectedAddressId.value,
-  );
-  if (!selectedAddress) {
+
+  const result = await submitCODOrder({
+    addressId: selectedAddress._id,
+    note: note.value,
+    selectedAddress,
+  });
+
+  if (result) {
+    // Thông báo thành công
     toast.add({
-      severity: "warn",
-      summary: "Cảnh báo",
-      detail: "Địa chỉ không hợp lệ",
+      severity: "success",
+      summary: "Thành công",
+      detail: "Đơn hàng của bạn đã được đặt thành công!",
       life: 3000,
     });
-    return;
-  }
 
-  isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Xóa các sản phẩm đã thanh toán khỏi giỏ hàng local
+    const checkoutProductIds = new Set(cartProducts.value.map(p => String(p.id)));
+    const remainingItems = cartStore.cartItems.filter(item => !checkoutProductIds.has(String(item.productId)));
+    cartStore.setCartItems(remainingItems);
 
-  try {
-    const payload = {
-      userInfo: {
-        fullname: selectedAddress.username,
-        phone: selectedAddress.phone,
-        address: selectedAddress.address,
-        ward: selectedAddress.ward,
-        district: selectedAddress.district,
-        province: selectedAddress.province,
-        note: note.value,
-      },
-      products: cartProducts.value,
-      deliveryMethod: 1, // Fixed since we removed selection
-      paymentMethod: paymentMethod.value,
-      voucherCode: selectedVoucherCode.value,
-      discountVoucher: discountVoucher.value,
-      shippingFee: shippingFee.value,
-      totalPrice: grandTotal.value,
-    } satisfies OrderInfo;
-
-    // Call Order API
-    await getAuthorizedAxios().post(API_ENDPOINTS.ORDER.CREATE, payload);
-
-    orderStore.setOrderInfo(payload);
-    router.push(ROUTES.ORDER.INFO);
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail:
-        error?.response?.data?.message ||
-        "Thanh toán thất bại, vui lòng thử lại.",
-      life: 4000,
+    // Thanh toán thành công, quay về trang profile với tab đơn hàng
+    router.push({
+      path: ROUTES.PROFILE,
+      query: { tab: "orders" },
     });
-  } finally {
-    isSubmitting.value = false;
   }
-}
+};
 
-function formatCurrency(value: number): string {
+const formatCurrency = (value: number): string => {
   return `${value.toLocaleString("vi-VN")}đ`;
-}
+};
 </script>
 
 <style scoped>

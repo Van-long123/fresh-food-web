@@ -189,7 +189,11 @@
                 </div>
 
                 <!-- Remove -->
-                <div class="relative">
+                <!-- pointer-events: auto; Cho phép: các event chuột hoạt động bình thường -->
+                <div
+                  class="relative"
+                  :class="{ 'pointer-events-auto': item.isOutOfStock }"
+                >
                   <button
                     type="button"
                     class="w-[30px] h-[30px] border-0 rounded-lg bg-transparent text-[#9ca3af] hover:text-[#ef4444] hover:bg-[#fef2f2]"
@@ -722,6 +726,7 @@ const checkoutNow = async () => {
       quantity: item.quantity,
       priceNew: item.price,
       totalPrice: item.price * item.quantity,
+      categoryId: item.categoryId || null,
     })),
     voucherCode: appliedVoucher.value?.code,
     discountVoucher: voucherDiscount.value,

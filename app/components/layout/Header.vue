@@ -412,11 +412,13 @@
               Xem giỏ hàng
             </NuxtLink>
             <button
-              class="h-10 rounded-lg bg-linear-to-r from-[#f97316] to-[#ef4444] text-[13px] font-bold text-white transition hover:shadow-md hover:shadow-orange-200/50"
+              class="h-10 rounded-lg bg-linear-to-r from-[#f97316] to-[#ef4444] text-[13px] font-bold text-white transition hover:shadow-md hover:shadow-orange-200/50 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               aria-label="Proceed to checkout"
-              @click="showCartPanel = false"
+              :disabled="isValidating"
+              @click="handleHeaderCheckout"
             >
-              Thanh toán
+              <i v-if="isValidating" class="pi pi-spinner pi-spin"></i>
+              <span>{{ isValidating ? "Đang xử lý..." : "Thanh toán" }}</span>
             </button>
           </div>
         </div>
@@ -585,6 +587,7 @@ import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
 import { useCart } from "~/composables/cart/useCart";
 import { useAuthStore } from "~/stores/useAuthStore";
+import { useCheckout } from "~/composables/checkout/useCheckout";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -610,6 +613,8 @@ const {
   isItemUpdating,
 } = useCart();
 
+const { proceedToCheckout, isValidating } = useCheckout();
+
 const toggleCartPanel = () => {
   showCartPanel.value = !showCartPanel.value;
 };
@@ -622,6 +627,30 @@ const handleSearch = () => {
     });
     isMobileMenuOpen.value = false;
   }
+};
+
+const handleHeaderCheckout = async () => {
+  if (cartItems.value.length === 0) return;
+
+  const checkoutPayload = {
+    products: cartItems.value.map((item) => ({
+      id: item.id,
+      title: item.name,
+      thumbnail: item.image || "",
+      quantity: item.quantity,
+      priceNew: item.price,
+      totalPrice: item.price * item.quantity,
+      categoryId: item.categoryId || null,
+    })),
+    voucherCode: undefined,
+    discountVoucher: 0,
+    shippingFee: 0,
+    subtotal: totalAmount.value,
+    grandTotal: totalAmount.value,
+  };
+
+  await proceedToCheckout(cartItems.value, checkoutPayload);
+  showCartPanel.value = false;
 };
 
 const handleClickOutside = (event) => {

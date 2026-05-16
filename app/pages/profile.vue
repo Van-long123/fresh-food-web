@@ -79,6 +79,7 @@ const mobileTabs = [
   label: string;
 }>;
 
+const route = useRoute();
 const activeMenu = ref<MenuKey>("profile");
 const loggingOut = ref(false);
 const rankProgressVisible = ref(false);
@@ -146,6 +147,12 @@ onMounted(() => {
   requestAnimationFrame(() => {
     rankProgressVisible.value = true;
   });
+
+  // Chuyển sang tab tương ứng nếu có query param ?tab=...
+  const tab = route.query.tab as MenuKey;
+  if (tab && menuItems.some((item) => item.key === tab)) {
+    activeMenu.value = tab;
+  }
 });
 </script>
 

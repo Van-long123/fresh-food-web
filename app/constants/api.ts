@@ -60,7 +60,8 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/v1/client/addresses/${id}`
   },
   CHECKOUT: {
-    SHIPPING_FEE: '/v1/client/checkout/shipping-fee'
+    SHIPPING_FEE: '/v1/client/checkout/shipping-fee',
+    COD: '/v1/client/checkout/cod'
   },
   ORDER: {
     VALIDATE_STOCK: '/v1/client/orders/validate-stock',

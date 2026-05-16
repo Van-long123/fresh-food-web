@@ -149,6 +149,9 @@ export const useCart = () => {
   }
 
   const ensureCartReady = async () => {
+    // Ngăn chặn gọi đúp đồng thời hoặc gọi lại khi đã khởi tạo
+    if (isReady.value || isLoading.value) return
+
     // Nó nhảy từ false -> true và giữ nguyên true mãi mãi cho đến khi bạn F5 trình duyệt.
     isReady.value = true
     isLoading.value = true

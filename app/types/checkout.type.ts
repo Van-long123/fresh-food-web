@@ -58,3 +58,16 @@ export interface ValidationResponse {
   clamped: Array<{ productId: string; name: string; requestedQty: number; currentStock: number }>
   outOfStock: Array<{ productId: string; name: string; currentStock: number }>
 }
+
+export interface CodCheckoutProduct {
+  productId: string
+  quantity: number
+}
+
+export interface CodCheckoutPayload {
+  addressId: string
+  products: CodCheckoutProduct[]
+  voucherCode?: string
+  note?: string
+  shippingFee?: number
+}
