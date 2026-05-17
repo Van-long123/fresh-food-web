@@ -309,14 +309,16 @@
         <div class="max-h-80 overflow-y-auto px-4 py-3">
           <div class="space-y-2.5">
             <article
-              v-for="item in cartItems"
+              v-for="item in displayCartItems"
               :key="item.id"
               class="group flex items-start gap-3 rounded-xl border border-[#f1f5f9] bg-[#fafbfc] p-2.5 transition-colors hover:border-[#e2e8f0] hover:bg-white"
+              :class="{ 'opacity-50': item.isOutOfStock }"
             >
               <!-- Image -->
               <NuxtLink
                 :to="ROUTES.PRODUCT_DETAIL(item.slug || '')"
                 class="relative shrink-0 block"
+                :class="{ 'pointer-events-none': item.isOutOfStock }"
                 @click="showCartPanel = false"
               >
                 <img
@@ -332,6 +334,7 @@
                   <NuxtLink
                     :to="ROUTES.PRODUCT_DETAIL(item.slug || '')"
                     class="line-clamp-2 text-[13px] font-semibold leading-snug text-[#1e293b] hover:text-[#f97316] transition-colors"
+                    :class="{ 'pointer-events-none': item.isOutOfStock }"
                     @click="showCartPanel = false"
                   >
                     {{ item.name }}
@@ -362,7 +365,7 @@
                   >
                     <button
                       class="qty-btn"
-                      :disabled="isItemUpdating(item.id)"
+                      :disabled="isItemUpdating(item.id) || item.isOutOfStock"
                       :aria-label="`Decrease quantity for ${item.name}`"
                       @click="decreaseQty(item.id)"
                     >
@@ -374,18 +377,26 @@
                     >
                     <button
                       class="qty-btn"
-                      :disabled="isItemUpdating(item.id)"
+                      :disabled="isItemUpdating(item.id) || item.isOutOfStock"
                       :aria-label="`Increase quantity for ${item.name}`"
                       @click="increaseQty(item.id)"
                     >
                       +
                     </button>
                   </div>
-                  <p
-                    class="text-[14px] font-bold tracking-tight text-[#0f172a]"
-                  >
-                    {{ formatVnd(item.price * item.quantity) }}
-                  </p>
+                  <div class="text-right">
+                    <p
+                      v-if="item.isOutOfStock"
+                      class="text-[11px] text-red-500 font-bold leading-none mb-1"
+                    >
+                      Hết hàng
+                    </p>
+                    <p
+                      class="text-[14px] font-bold tracking-tight text-[#0f172a]"
+                    >
+                      {{ formatVnd(item.price * item.quantity) }}
+                    </p>
+                  </div>
                 </div>
               </div>
             </article>
@@ -613,7 +624,31 @@ const {
   isItemUpdating,
 } = useCart();
 
-// const { proceedToCheckout, isValidating } = useCheckout();
+const { itemsOutOfStock } = useCheckout();
+
+const displayCartItems = computed(() => {
+  return [...cartItems.value]
+    .filter((item) => !item.deleted && item.status !== "inactive")
+    .sort((a, b) => {
+      const aOOS = itemsOutOfStock.value?.has(a.id) || Number(a.stock || 0) === 0;
+      const bOOS = itemsOutOfStock.value?.has(b.id) || Number(b.stock || 0) === 0;
+
+      // 1. Đẩy sản phẩm hết hàng xuống dưới cùng
+      if (aOOS !== bOOS) return aOOS ? 1 : -1;
+
+      // 2. Sản phẩm còn hàng: Sắp xếp theo thời gian thêm vào (Mới nhất lên trên)
+      const aTime = new Date(a.addedAt || 0).getTime();
+      const bTime = new Date(b.addedAt || 0).getTime();
+      return bTime - aTime;
+    })
+    .map((item) => {
+      const isOutOfStock = itemsOutOfStock.value?.has(item.id) || Number(item.stock || 0) === 0;
+      return {
+        ...item,
+        isOutOfStock
+      };
+    });
+});
 
 const toggleCartPanel = () => {
   showCartPanel.value = !showCartPanel.value;
