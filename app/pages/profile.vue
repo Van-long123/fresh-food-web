@@ -6,9 +6,14 @@ import { ROUTES } from "~/constants/routes";
 import { userService } from "~/services/user.service";
 import { useAuthStore } from "~/stores/useAuthStore";
 import { useProfile } from "~/composables/profile/useProfile";
+import { useOrderQuery } from "~/queries/order/useOrderQuery";
 import SkProfilePage from "~/components/skeletons/SkProfilePage.vue";
 import { useAddress } from "~/composables/profile/useAddress";
 import ConfirmDialog from "primevue/confirmdialog";
+import { useToast } from "primevue/usetoast";
+import { formatVnd } from "~/utils/currency";
+import { formatDate, mapOrderStatus } from "~/utils/formatters";
+import { useMergeCartMutation } from "~/mutations/cart/useCartMutations";
 
 definePageMeta({ middleware: "auth" });
 
@@ -19,6 +24,8 @@ useHead({
 
 const router = useRouter();
 const authStore = useAuthStore();
+const toast = useToast();
+const { mutate: mergeCart, isPending: isMerging } = useMergeCartMutation();
 const {
   user,
   isLoading,
@@ -84,49 +91,46 @@ const activeMenu = ref<MenuKey>("profile");
 const loggingOut = ref(false);
 const rankProgressVisible = ref(false);
 
-const orders = [
-  {
-    code: "DH240115",
-    date: "15/01/2026",
-    status: "Đang giao",
-    total: 324000,
-    images: [
-      "https://picsum.photos/seed/o-1/80/80",
-      "https://picsum.photos/seed/o-2/80/80",
-      "https://picsum.photos/seed/o-3/80/80",
-    ],
-  },
-  {
-    code: "DH240102",
-    date: "02/01/2026",
-    status: "Thành công",
-    total: 518000,
-    images: [
-      "https://picsum.photos/seed/o-4/80/80",
-      "https://picsum.photos/seed/o-5/80/80",
-      "https://picsum.photos/seed/o-6/80/80",
-    ],
-  },
-  {
-    code: "DH231228",
-    date: "28/12/2025",
-    status: "Đã hủy",
-    total: 189000,
-    images: [
-      "https://picsum.photos/seed/o-7/80/80",
-      "https://picsum.photos/seed/o-8/80/80",
-      "https://picsum.photos/seed/o-9/80/80",
-    ],
-  },
-];
+const { orders, isOrdersLoading, refetchOrders } = useOrderQuery();
 
 const statusClass = (status: string) => {
-  if (status === "Đang giao") return "bg-blue-100 text-blue-700";
-  if (status === "Thành công") return "bg-green-100 text-green-700";
-  return "bg-red-100 text-red-700";
+  if (["shipping", "processing", "confirmed"].includes(status))
+    return "bg-blue-100 text-blue-700";
+  if (status === "delivered") return "bg-green-100 text-green-700";
+  if (["cancelled", "returned"].includes(status))
+    return "bg-red-100 text-red-700";
+  return "bg-orange-100 text-orange-700"; // pending
 };
 
-const formatVnd = (v: number) => v.toLocaleString("vi-VN");
+const reorderOrder = (order: any) => {
+  // Trích xuất danh sách sản phẩm từ order.items
+  const payload = order.items.map((item: any) => ({
+    productId: item.productId,
+    quantity: item.quantity,
+  }));
+
+  // Kích hoạt mutation để đẩy vào giỏ hàng
+  mergeCart(payload, {
+    onSuccess: () => {
+      toast.add({
+        severity: "success",
+        summary: "Thành công",
+        detail: "Đã thêm toàn bộ sản phẩm vào giỏ hàng!",
+        life: 2000,
+      });
+      // Điều hướng về trang giỏ hàng
+      router.push("/cart");
+    },
+    onError: () => {
+      toast.add({
+        severity: "error",
+        summary: "Lỗi",
+        detail: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại.",
+        life: 2000,
+      });
+    },
+  });
+};
 
 const handleLogout = async () => {
   if (loggingOut.value) return;
@@ -142,6 +146,13 @@ const handleLogout = async () => {
     loggingOut.value = false;
   }
 };
+
+// Theo dõi khi người dùng chuyển sang tab đơn hàng thì load lại dữ liệu
+watch(activeMenu, (newVal) => {
+  if (newVal === "orders") {
+    refetchOrders();
+  }
+});
 
 onMounted(() => {
   requestAnimationFrame(() => {
@@ -351,13 +362,13 @@ onMounted(() => {
             <section class="rounded-2xl bg-white p-5 shadow-sm">
               <div class="flex items-center justify-between">
                 <h2 class="text-lg font-bold">Đơn hàng gần đây</h2>
-                <button class="text-sm font-semibold text-[#006ee6]">
+                <!-- <button class="text-sm font-semibold text-[#006ee6]">
                   Xem tất cả
-                </button>
+                </button> -->
               </div>
 
               <article
-                v-for="(order, idx) in orders"
+                v-for="(order, idx) in orders || []"
                 :key="order.code"
                 class="order-card mt-3 rounded-xl border border-gray-100 p-4"
                 :style="{ animationDelay: `${idx * 80}ms` }"
@@ -366,39 +377,70 @@ onMounted(() => {
                   class="flex flex-wrap items-center justify-between gap-2 text-sm"
                 >
                   <p class="font-semibold">#{{ order.code }}</p>
-                  <p class="text-gray-500">{{ order.date }}</p>
+                  <p class="text-gray-500">
+                    {{ formatDate(String(order.createdAt)) }}
+                  </p>
                   <span
                     class="rounded-full px-2 py-1 text-xs font-semibold"
                     :class="statusClass(order.status)"
                   >
-                    {{ order.status }}
+                    {{ mapOrderStatus(order.status) }}
                   </span>
                 </div>
                 <div class="mt-3 flex items-center justify-between gap-3">
                   <div class="flex -space-x-2">
                     <img
-                      v-for="img in order.images"
+                      v-for="img in order.items
+                        .map((item) => item.thumbnail)
+                        .slice(0, 3)"
                       :key="img"
-                      :src="img"
+                      :src="img || '/images/placeholder.jpg'"
                       alt="item"
                       class="h-10 w-10 rounded-lg border-2 border-white object-cover"
                     />
+                    <div
+                      v-if="order.items.length > 3"
+                      class="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-white bg-gray-100 text-xs font-semibold text-gray-500"
+                    >
+                      +{{ order.items.length - 3 }}
+                    </div>
                   </div>
                   <p class="font-bold text-[#f47f20]">
-                    {{ formatVnd(order.total) }}đ
+                    {{ formatVnd(order.totalPrice) }}đ
                   </p>
                 </div>
                 <div class="mt-3 flex items-center justify-between">
-                  <button class="text-sm font-semibold text-[#006ee6]">
-                    Xem chi tiết
-                  </button>
-                  <button
-                    class="rounded-full bg-[#f47f20] px-3 py-1 text-sm font-semibold text-white"
+                  <NuxtLink
+                    :to="`/order/${order._id}`"
+                    class="text-sm font-semibold text-[#006ee6] hover:underline"
                   >
-                    Mua lại
+                    Xem chi tiết
+                  </NuxtLink>
+                  <button
+                    @click="reorderOrder(order)"
+                    :disabled="isMerging"
+                    class="rounded-full bg-[#f47f20] px-3 py-1 text-sm font-semibold text-white hover:bg-[#e06d10] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                  >
+                    <i
+                      v-if="isMerging"
+                      class="pi pi-spinner animate-spin text-xs"
+                    ></i>
+                    <span>{{ isMerging ? "Xử lý..." : "Mua lại" }}</span>
                   </button>
                 </div>
               </article>
+
+              <div
+                v-if="!isOrdersLoading && (!orders || orders.length === 0)"
+                class="mt-8 flex flex-col items-center gap-2 text-center"
+              >
+                <p class="text-sm text-gray-400">Bạn chưa có đơn hàng nào.</p>
+              </div>
+              <div v-if="isOrdersLoading" class="mt-8 flex justify-center">
+                <span
+                  class="inline-block h-6 w-6 animate-spin rounded-full border-2 border-[#f47f20] border-t-transparent"
+                />
+              </div>
             </section>
           </template>
 

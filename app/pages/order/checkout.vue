@@ -875,8 +875,12 @@ const handleCheckout = async () => {
     });
 
     // Xóa các sản phẩm đã thanh toán khỏi giỏ hàng local
-    const checkoutProductIds = new Set(cartProducts.value.map(p => String(p.id)));
-    const remainingItems = cartStore.cartItems.filter(item => !checkoutProductIds.has(String(item.productId)));
+    const checkoutProductIds = new Set(
+      cartProducts.value.map((p) => String(p.id)),
+    );
+    const remainingItems = cartStore.cartItems.filter(
+      (item) => !checkoutProductIds.has(String(item.productId)),
+    );
     cartStore.setCartItems(remainingItems);
 
     // Thanh toán thành công, quay về trang profile với tab đơn hàng

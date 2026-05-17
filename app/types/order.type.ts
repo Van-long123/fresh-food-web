@@ -75,3 +75,21 @@ export interface OrderPayload {
   shippingFee: number
   totalPrice: number
 }
+
+export interface MyOrder {
+  _id: string
+  code: string
+  status: string
+  totalPrice: number
+  createdAt: string | number
+  paymentMethod: number
+  paymentStatus: string
+  items: Array<{
+    productId: string
+    title: string
+    thumbnail: string
+    quantity: number
+    price: number
+    totalPrice: number
+  }>
+}

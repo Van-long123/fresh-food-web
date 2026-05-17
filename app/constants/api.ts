@@ -65,6 +65,9 @@ export const API_ENDPOINTS = {
   },
   ORDER: {
     VALIDATE_STOCK: '/v1/client/orders/validate-stock',
-    CREATE: '/v1/client/orders'
+    CREATE: '/v1/client/orders',
+    MY_ORDERS: '/v1/client/orders/my-orders',
+    DETAIL: (id: string) => `/v1/client/orders/${id}`,
+    CANCEL: (id: string) => `/v1/client/orders/${id}/cancel`
   }
 } as const

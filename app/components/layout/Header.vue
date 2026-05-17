@@ -406,12 +406,12 @@
           <div class="mt-3 grid grid-cols-2 gap-2">
             <NuxtLink
               :to="ROUTES.CART"
-              class="flex h-10 items-center justify-center rounded-lg border border-[#f97316] text-[13px] font-bold text-[#f97316] transition hover:bg-[#fff7ed]"
+              class="h-10 rounded-lg bg-linear-to-r from-[#f97316] to-[#ef4444] text-[13px] font-bold text-white transition hover:shadow-md hover:shadow-orange-200/50 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               @click="showCartPanel = false"
             >
-              Xem giỏ hàng
+              Tiến hành thanh toán
             </NuxtLink>
-            <button
+            <!-- <button
               class="h-10 rounded-lg bg-linear-to-r from-[#f97316] to-[#ef4444] text-[13px] font-bold text-white transition hover:shadow-md hover:shadow-orange-200/50 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               aria-label="Proceed to checkout"
               :disabled="isValidating"
@@ -419,7 +419,7 @@
             >
               <i v-if="isValidating" class="pi pi-spinner pi-spin"></i>
               <span>{{ isValidating ? "Đang xử lý..." : "Thanh toán" }}</span>
-            </button>
+            </button> -->
           </div>
         </div>
       </section>
@@ -613,7 +613,7 @@ const {
   isItemUpdating,
 } = useCart();
 
-const { proceedToCheckout, isValidating } = useCheckout();
+// const { proceedToCheckout, isValidating } = useCheckout();
 
 const toggleCartPanel = () => {
   showCartPanel.value = !showCartPanel.value;
@@ -629,29 +629,29 @@ const handleSearch = () => {
   }
 };
 
-const handleHeaderCheckout = async () => {
-  if (cartItems.value.length === 0) return;
+// const handleHeaderCheckout = async () => {
+//   if (cartItems.value.length === 0) return;
 
-  const checkoutPayload = {
-    products: cartItems.value.map((item) => ({
-      id: item.id,
-      title: item.name,
-      thumbnail: item.image || "",
-      quantity: item.quantity,
-      priceNew: item.price,
-      totalPrice: item.price * item.quantity,
-      categoryId: item.categoryId || null,
-    })),
-    voucherCode: undefined,
-    discountVoucher: 0,
-    shippingFee: 0,
-    subtotal: totalAmount.value,
-    grandTotal: totalAmount.value,
-  };
+//   const checkoutPayload = {
+//     products: cartItems.value.map((item) => ({
+//       id: item.id,
+//       title: item.name,
+//       thumbnail: item.image || "",
+//       quantity: item.quantity,
+//       priceNew: item.price,
+//       totalPrice: item.price * item.quantity,
+//       categoryId: item.categoryId || null,
+//     })),
+//     voucherCode: undefined,
+//     discountVoucher: 0,
+//     shippingFee: 0,
+//     subtotal: totalAmount.value,
+//     grandTotal: totalAmount.value,
+//   };
 
-  await proceedToCheckout(cartItems.value, checkoutPayload);
-  showCartPanel.value = false;
-};
+//   await proceedToCheckout(cartItems.value, checkoutPayload);
+//   showCartPanel.value = false;
+// };
 
 const handleClickOutside = (event) => {
   if (!showCartPanel.value) return;

@@ -54,3 +54,19 @@ export const buildValueLabel = (type: CouponType, discountValue: number): string
   }
   return `GIẢM ${(discountValue / 1000).toFixed(0)}K`
 }
+
+/**
+ * Ánh xạ trạng thái đơn hàng sang tiếng Việt
+ */
+export const mapOrderStatus = (status: string): string => {
+  const map: Record<string, string> = {
+    pending: "Chờ xác nhận",
+    confirmed: "Đã xác nhận",
+    processing: "Đang xử lý",
+    shipping: "Đang giao",
+    delivered: "Thành công",
+    cancelled: "Đã hủy",
+    returned: "Trả hàng"
+  }
+  return map[status] || status
+}

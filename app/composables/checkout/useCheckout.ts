@@ -6,8 +6,8 @@ import { useAuthStore } from '~/stores/useAuthStore'
 import { useOrderStore } from '~/stores/useOrderStore'
 import { ROUTES } from '~/constants/routes'
 import { useShippingFee } from '~/composables/checkout/useShippingFee'
-import { checkoutService } from '~/services/checkout.service'
-import { voucherService } from '~/services/voucher.service'
+import { useValidateStockMutation, useCreateCodOrderMutation } from '~/mutations/checkout/useCheckoutMutations'
+import { useValidateVoucherMutation } from '~/mutations/voucher/useValidateVoucherMutation'
 import type { 
   SelectedCartItem, 
   CheckoutPayload, 
@@ -44,6 +44,10 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
   const authStore = useAuthStore()
   const orderStore = useOrderStore()
   const { selectedAddressId } = options
+
+  const validateStockMutation = useValidateStockMutation()
+  const validateVoucherMutation = useValidateVoucherMutation()
+  const createCodOrderMutation = useCreateCodOrderMutation()
 
   const cartProducts = computed(() => orderStore.checkoutData?.products || [])
   const subtotal = computed(() =>
@@ -98,7 +102,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
    */
   const validateStockOnBackend = async (items: StockValidationItem[]): Promise<ValidationResponse> => {
     try {
-      return await checkoutService.validateStock(items)
+      return await validateStockMutation.mutateAsync(items)
     } catch (error: any) {
       const errorMessage =
         error?.response?.data?.message || 'Lỗi kiểm tra tồn kho'
@@ -292,7 +296,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
         price: item.priceNew ?? (item.quantity ? item.totalPrice / item.quantity : 0)
       }))
 
-      const response = await voucherService.validate({
+      const response = await validateVoucherMutation.mutateAsync({
         code,
         orderValue: subtotal.value,
         items
@@ -383,7 +387,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
         shippingFee: shippingFee.value
       }
 
-      await checkoutService.createCodOrder(checkoutPayload)
+      await createCodOrderMutation.mutateAsync(checkoutPayload)
 
       const orderInfo: OrderInfo = {
         userInfo: {
