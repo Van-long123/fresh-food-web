@@ -4,7 +4,9 @@ import type {
   ProductDetailResponse,
   ProductQueryParams,
   ProductListResponse,
-  ProductRecommendationResponse
+  ProductRecommendationResponse,
+  ReviewEligibilityResponse,
+  SubmitReviewPayload
 } from '~/types/product.type'
 import { getAuthorizedAxios } from '~/utils/authorizedAxios'
 
@@ -24,4 +26,14 @@ export const getProductRecommendationsRequest = async (
 ): Promise<ProductRecommendationResponse> => {
   const response = await getAuthorizedAxios().get(API_ENDPOINTS.PRODUCT.RECOMMENDATIONS(id), { params })
   return response.data as ProductRecommendationResponse
+}
+
+export const checkReviewEligibilityRequest = async (slug: string): Promise<ReviewEligibilityResponse> => {
+  const response = await getAuthorizedAxios().get(API_ENDPOINTS.PRODUCT.REVIEW_ELIGIBILITY(slug))
+  return response.data as ReviewEligibilityResponse
+}
+
+export const submitProductReviewRequest = async (slug: string, payload: SubmitReviewPayload): Promise<any> => {
+  const response = await getAuthorizedAxios().post(API_ENDPOINTS.PRODUCT.CREATE_REVIEW(slug), payload)
+  return response.data
 }

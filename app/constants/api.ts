@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
     LIST: '/v1/client/products',
     DETAIL: (slug: string) => `/v1/client/products/${slug}/details`,
     CREATE_REVIEW: (slug: string) => `/v1/client/products/${slug}/reviews`,
+    REVIEW_ELIGIBILITY: (slug: string) => `/v1/client/products/${slug}/review-eligibility`,
     RECOMMENDATIONS: (id: string) => `/v1/client/products/${id}/recommendations`
   },
   VOUCHER: {

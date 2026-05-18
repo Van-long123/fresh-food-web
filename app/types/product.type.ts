@@ -53,7 +53,21 @@ export interface ProductReview {
   images: string[]
   status: string
   createdAt: string
+  updatedAt?: string | null
   user?: ProductReviewUser
+}
+
+export interface ReviewEligibilityResponse {
+  success: boolean
+  isEligible: boolean
+  existingReview: ProductReview | null
+  targetOrderId?: string | null
+}
+
+export interface SubmitReviewPayload {
+  rating: number
+  comment: string
+  images?: string[]
 }
 
 export interface ProductRatingDistribution {

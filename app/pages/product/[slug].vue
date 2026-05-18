@@ -270,6 +270,90 @@
               </div>
             </div>
 
+            <div class="mt-6">
+              <div v-if="isLoggedIn && isReviewEligible" class="review-card">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="text-lg font-black text-gray-900">
+                      {{ reviewFormTitle }}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                      Cảm ơn bạn đã dành thời gian chia sẻ trải nghiệm.
+                    </p>
+                  </div>
+                  <div class="review-chip">SmartFood</div>
+                </div>
+
+                <div class="mt-4 grid gap-4">
+                  <div class="review-rating">
+                    <div class="flex items-center gap-3">
+                      <Rating
+                        v-model="reviewRating"
+                        :cancel="false"
+                        class="rating-control"
+                      />
+                      <span class="text-sm text-gray-500">
+                        {{ reviewRatingText }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <textarea
+                      v-model="reviewComment"
+                      rows="4"
+                      class="review-textarea"
+                      placeholder="Chia sẻ cảm nhận của bạn về hương vị và chất lượng sản phẩm..."
+                    />
+                  </div>
+
+                  <button
+                    class="review-submit"
+                    :disabled="isSubmitting"
+                    @click="submitReview"
+                  >
+                    <ProgressSpinner
+                      v-if="isSubmitting"
+                      style="width: 18px; height: 18px"
+                      strokeWidth="6"
+                    />
+                    <span>{{
+                      isUpdateMode ? "Cập nhật ngay" : "Gửi đánh giá"
+                    }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div v-else-if="existingReview" class="review-locked">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="text-base font-bold text-gray-900">
+                      Đánh giá gần nhất của bạn
+                    </p>
+                    <p class="text-sm text-gray-600">
+                      {{ reviewEligibilityMessage }}
+                    </p>
+                  </div>
+                  <div class="review-chip">Đã đánh giá</div>
+                </div>
+                <div class="mt-3">
+                  <Rating
+                    v-model="reviewRating"
+                    :cancel="false"
+                    :readonly="true"
+                    class="rating-control"
+                  />
+                  <p class="mt-2 text-sm text-gray-700">
+                    {{ reviewComment || "Bạn chưa để lại nhận xét." }}
+                  </p>
+                </div>
+              </div>
+
+              <div v-else class="review-hint">
+                {{ reviewEligibilityMessage }}
+              </div>
+            </div>
+
             <article
               v-for="review in reviews"
               :key="review.id"
@@ -291,8 +375,30 @@
                   </div>
                 </div>
                 <div class="flex-1">
-                  <p class="font-semibold">{{ review.name }}</p>
-                  <p class="text-sm text-gray-600">{{ review.content }}</p>
+                  <div class="flex items-center gap-2">
+                    <p class="font-semibold">{{ review.name }}</p>
+                    <div v-if="review.rating" class="flex items-center">
+                      <svg
+                        v-for="i in 5"
+                        :key="i"
+                        viewBox="0 0 20 20"
+                        class="h-3.5 w-3.5"
+                        :class="
+                          i <= review.rating
+                            ? 'text-[#f59e0b]'
+                            : 'text-gray-300'
+                        "
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.176 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                  <p v-if="review.content" class="text-sm text-gray-600 mt-0.5">
+                    {{ review.content }}
+                  </p>
                   <p class="mt-1 text-xs text-gray-500">
                     {{ review.createdAt }}
                   </p>
@@ -376,9 +482,15 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { useToast } from "primevue/usetoast";
+import Rating from "primevue/rating";
+import ProgressSpinner from "primevue/progressspinner";
 import { useProductDetailQuery } from "~/queries/product/useProductDetailQuery";
+import { useReviewEligibilityQuery } from "~/queries/product/useReviewEligibilityQuery";
+import { useSubmitReviewMutation } from "~/mutations/product/useSubmitReviewMutation";
 import { useProductRecommendations } from "~/composables/product/useProductRecommendations";
 import { useCart } from "~/composables/cart/useCart";
+import { useAuthStore } from "~/stores/useAuthStore";
 import SkProductDetailPage from "~/components/skeletons/SkProductDetailPage.vue";
 import { ROUTES } from "~/constants/routes";
 import type { HomeProduct } from "~/types/home.type";
@@ -394,6 +506,25 @@ const route = useRoute();
 const slug = computed(() => String(route.params.slug || ""));
 
 const { data: detail, isLoading } = useProductDetailQuery(slug);
+
+const authStore = useAuthStore();
+const isLoggedIn = computed(() => authStore.isLoggedIn);
+const reviewEligibilityEnabled = computed(
+  () => isLoggedIn.value && Boolean(slug.value),
+);
+const { data: reviewEligibility, isLoading: isCheckingEligibility } =
+  useReviewEligibilityQuery(slug, reviewEligibilityEnabled);
+
+const existingReview = computed(
+  () => reviewEligibility.value?.existingReview || null,
+);
+const isReviewEligible = computed(() => {
+  return Boolean(reviewEligibility.value?.isEligible);
+});
+const isUpdateMode = computed(() => Boolean(existingReview.value));
+const reviewFormTitle = computed(() =>
+  isUpdateMode.value ? "Cập nhật đánh giá của bạn" : "Gửi đánh giá của bạn",
+);
 
 // Product _id (needed for recommendations — Python service needs ObjectId, not slug)
 const productId = computed(() => String(detail.value?._id || ""));
@@ -554,6 +685,7 @@ const reviews = computed(() => {
     name: review.user?.displayName || "Khách hàng",
     avatar: review.user?.avatar || "",
     content: review.comment || "",
+    rating: Number(review.rating || 0),
     images: Array.isArray(review.images) ? review.images : [],
     createdAt: review.createdAt
       ? new Date(review.createdAt).toLocaleDateString("vi-VN")
@@ -579,6 +711,31 @@ const roundedAverage = computed(() =>
   Math.round(ratingSummary.value.averageRating),
 );
 
+const reviewRating = ref(0);
+const reviewComment = ref("");
+const reviewImages = ref<string[]>([]);
+const reviewRatingText = computed(() =>
+  reviewRating.value > 0
+    ? `Bạn chọn ${reviewRating.value} sao`
+    : "Hãy chọn số sao phù hợp",
+);
+
+watch(
+  existingReview,
+  (review) => {
+    if (review) {
+      reviewRating.value = Number(review.rating || 0);
+      reviewComment.value = review.comment || "";
+      reviewImages.value = Array.isArray(review.images) ? review.images : [];
+      return;
+    }
+    reviewRating.value = 0;
+    reviewComment.value = "";
+    reviewImages.value = [];
+  },
+  { immediate: true },
+);
+
 const getRatingCount = (score: number) => {
   const found = ratingSummary.value.distribution.find(
     (item) => item.star === score,
@@ -595,6 +752,10 @@ const getRatingPercent = (score: number) => {
 const formatVnd = (value: number) => value.toLocaleString("vi-VN");
 
 const { addToCart: pushToCart } = useCart();
+
+const toast = useToast();
+const { mutateAsync: submitReviewMutation, isPending: isSubmitting } =
+  useSubmitReviewMutation(slug);
 
 const decreaseQty = () => {
   if (quantity.value > 1) quantity.value -= 1;
@@ -623,6 +784,42 @@ const addToCart = () => {
     categoryId: detail.value?.primary_category?._id || null,
   });
 };
+
+const submitReview = async () => {
+  if (!isReviewEligible.value) return;
+
+  if (reviewRating.value < 1) {
+    toast.add({
+      severity: "warn",
+      summary: "Vui lòng chọn số sao",
+      detail: "Bạn cần chọn ít nhất 1 sao để gửi đánh giá.",
+      life: 2500,
+    });
+    return;
+  }
+
+  await submitReviewMutation({
+    rating: reviewRating.value,
+    comment: reviewComment.value.trim(),
+    images: reviewImages.value,
+  });
+};
+
+const reviewEligibilityMessage = computed(() => {
+  if (isCheckingEligibility.value) {
+    return "Đang kiểm tra điều kiện đánh giá...";
+  }
+  if (!isLoggedIn.value) {
+    return "Bạn cần đăng nhập để gửi đánh giá cho sản phẩm này.";
+  }
+  if (!isReviewEligible.value && existingReview.value) {
+    return "Bạn đã đánh giá sản phẩm này. Hãy mua lại sản phẩm để có thể cập nhật đánh giá mới!";
+  }
+  if (!isReviewEligible.value) {
+    return "Bạn cần mua sản phẩm này và nhận hàng thành công để gửi đánh giá.";
+  }
+  return "";
+});
 
 const copyOrShare = async (key: string) => {
   if (key !== "copy") return;
@@ -752,6 +949,125 @@ watch(
   opacity: 0;
   transform: translateY(18px);
   animation: fadeInUp 0.45s ease forwards;
+}
+
+.review-card {
+  border-radius: 18px;
+  border: 1px solid rgba(244, 127, 32, 0.15);
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 55%, #fff1e6 100%);
+  padding: 18px;
+  box-shadow: 0 18px 45px rgba(244, 127, 32, 0.08);
+}
+
+.review-chip {
+  border-radius: 999px;
+  background: rgba(244, 127, 32, 0.12);
+  color: #f47f20;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+}
+
+.review-rating {
+  border-radius: 14px;
+  border: 1px solid rgba(244, 127, 32, 0.18);
+  background: #fff;
+  padding: 12px 14px;
+}
+
+.review-textarea {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #1f2937;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.review-textarea:focus {
+  outline: none;
+  border-color: #f47f20;
+  box-shadow: 0 0 0 3px rgba(244, 127, 32, 0.15);
+}
+
+.review-submit {
+  height: 46px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fc5c22, #f59e0b);
+  color: #fff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.review-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.review-submit:not(:disabled):hover {
+  filter: brightness(1.05);
+}
+
+.review-submit:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.review-hint {
+  border-radius: 16px;
+  border: 1px dashed #e5e7eb;
+  background: #fff;
+  padding: 14px 16px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.review-locked {
+  border-radius: 18px;
+  border: 1px solid rgba(244, 127, 32, 0.2);
+  background: #fffaf3;
+  padding: 16px;
+  box-shadow: 0 12px 30px rgba(244, 127, 32, 0.08);
+}
+
+:deep(.rating-control .p-rating-icon) {
+  color: #e5e7eb;
+  fill: #e5e7eb;
+  font-size: 22px;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    fill 0.2s ease;
+}
+
+:deep(.rating-control .p-rating-option-active .p-rating-icon) {
+  color: #f59e0b !important;
+  fill: #f59e0b !important;
+}
+
+:deep(.rating-control:hover .p-rating-icon) {
+  color: #e5e7eb !important;
+  fill: #e5e7eb !important;
+}
+
+:deep(.rating-control:hover .p-rating-option:hover .p-rating-icon),
+:deep(
+  .rating-control:hover
+    .p-rating-option:has(~ .p-rating-option:hover)
+    .p-rating-icon
+) {
+  color: #f59e0b !important;
+  fill: #f59e0b !important;
+  transform: translateY(-1px);
 }
 
 .lightbox-image {

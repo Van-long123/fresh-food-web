@@ -91,7 +91,7 @@ export const useOrderDetail = (orderId: string) => {
   }
 
   function reviewProduct(item: any) {
-    router.push({ path: `/product/${item.productId}`, query: { review: "true" } });
+    router.push({ path: `/product/${item.productId}` });
   }
 
   function buyAgain(item: any) {
