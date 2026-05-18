@@ -6,14 +6,15 @@ import { useAuthStore } from '~/stores/useAuthStore'
 import { useOrderStore } from '~/stores/useOrderStore'
 import { ROUTES } from '~/constants/routes'
 import { useShippingFee } from '~/composables/checkout/useShippingFee'
-import { useValidateStockMutation, useCreateCodOrderMutation } from '~/mutations/checkout/useCheckoutMutations'
+import { useValidateStockMutation, useCreateCodOrderMutation, useCreatePayOSOrderMutation } from '~/mutations/checkout/useCheckoutMutations'
 import { useValidateVoucherMutation } from '~/mutations/voucher/useValidateVoucherMutation'
 import type { 
   SelectedCartItem, 
   CheckoutPayload, 
   StockValidationItem, 
   ValidationResponse,
-  CodCheckoutPayload
+  CodCheckoutPayload,
+  PayOSCheckoutPayload
 } from '~/types/checkout.type'
 import type { OrderInfo } from '~/types/order.type'
 
@@ -28,14 +29,15 @@ const voucherError = ref('')
 const paymentMethod = ref(0)
 
 const paymentOptions = [
-  { label: 'Thanh toán khi nhận hàng (COD)', value: 0 }
+  { label: 'Thanh toán khi nhận hàng (COD)', value: 0 },
+  { label: 'VietQR qua PayOS', value: 1 }
 ]
 
 const paymentSteps = [
   'Xác nhận thông tin giao hàng',
   'Kiểm tra tồn kho thời gian thực',
   'Áp dụng voucher (nếu có)',
-  'Xác nhận đơn và thanh toán COD'
+  'Xác nhận đơn và thanh toán'
 ]
 
 export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } = {}) => {
@@ -48,6 +50,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
   const validateStockMutation = useValidateStockMutation()
   const validateVoucherMutation = useValidateVoucherMutation()
   const createCodOrderMutation = useCreateCodOrderMutation()
+  const createPayOSOrderMutation = useCreatePayOSOrderMutation()
 
   const cartProducts = computed(() => orderStore.checkoutData?.products || [])
   const subtotal = computed(() =>
@@ -433,6 +436,71 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
     }
   }
 
+  const submitPayOSOrder = async (payload: {
+    addressId: string
+    note?: string
+  }) => {
+    if (!validateAuthentication()) return
+
+    if (!payload.addressId) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng chọn địa chỉ giao hàng',
+        life: 3000
+      })
+      return
+    }
+
+    const orderProducts = cartProducts.value.map((item) => ({
+      productId: String(item.id),
+      quantity: item.quantity
+    }))
+
+    if (!orderProducts.length) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Giỏ hàng trống',
+        detail: 'Vui lòng chọn sản phẩm để thanh toán',
+        life: 3000
+      })
+      return
+    }
+
+    isSubmitting.value = true
+
+    try {
+      const checkoutPayload: PayOSCheckoutPayload = {
+        addressId: payload.addressId,
+        products: orderProducts,
+        voucherCode: voucherCode.value || undefined,
+        note: payload.note || '',
+        shippingFee: shippingFee.value
+      }
+
+      const result = await createPayOSOrderMutation.mutateAsync(checkoutPayload)
+
+      if (result?.checkoutUrl) {
+        // Redirect sang trang cổng thanh toán PayOS (VietQR)
+        window.location.href = result.checkoutUrl
+      }
+
+      return result
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        'Tạo liên kết thanh toán thất bại, vui lòng thử lại.'
+      toast.add({
+        severity: 'error',
+        summary: 'Lỗi PayOS',
+        detail: message,
+        life: 4000
+      })
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
   return {
     isValidating,
     itemsNeedingAdjustment,
@@ -455,6 +523,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
     clearVoucher,
     isSubmitting,
     submitCODOrder,
+    submitPayOSOrder,
     paymentMethod,
     paymentOptions,
     paymentSteps

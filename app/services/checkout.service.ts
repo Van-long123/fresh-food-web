@@ -1,16 +1,19 @@
 import { 
   getShippingFeeRequest, 
   validateStockRequest, 
-  createCodOrderRequest 
+  createCodOrderRequest,
+  createPayOSOrderRequest
 } from '~/api/checkout.api'
 import type { 
   ShippingFeePayload, 
   StockValidationItem,
-  CodCheckoutPayload
+  CodCheckoutPayload,
+  PayOSCheckoutPayload
 } from '~/types/checkout.type'
 
 export const checkoutService = {
   getShippingFee: (payload: ShippingFeePayload) => getShippingFeeRequest(payload),
   validateStock: (items: StockValidationItem[]) => validateStockRequest(items),
-  createCodOrder: (payload: CodCheckoutPayload) => createCodOrderRequest(payload)
+  createCodOrder: (payload: CodCheckoutPayload) => createCodOrderRequest(payload),
+  createPayOSOrder: (payload: PayOSCheckoutPayload) => createPayOSOrderRequest(payload)
 }

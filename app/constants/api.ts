@@ -62,7 +62,8 @@ export const API_ENDPOINTS = {
   },
   CHECKOUT: {
     SHIPPING_FEE: '/v1/client/checkout/shipping-fee',
-    COD: '/v1/client/checkout/cod'
+    COD: '/v1/client/checkout/cod',
+    PAYOS: '/v1/client/checkout/payos'
   },
   ORDER: {
     VALIDATE_STOCK: '/v1/client/orders/validate-stock',

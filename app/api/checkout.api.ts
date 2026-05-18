@@ -5,7 +5,9 @@ import type {
   ShippingFeeResponse, 
   StockValidationItem, 
   ValidationResponse,
-  CodCheckoutPayload
+  CodCheckoutPayload,
+  PayOSCheckoutPayload,
+  PayOSCheckoutResponse
 } from '../types/checkout.type'
 
 export const getShippingFeeRequest = async (payload: ShippingFeePayload): Promise<ShippingFeeResponse> => {
@@ -21,4 +23,9 @@ export const validateStockRequest = async (items: StockValidationItem[]): Promis
 export const createCodOrderRequest = async (payload: CodCheckoutPayload): Promise<any> => {
   const response = await getAuthorizedAxios().post(API_ENDPOINTS.CHECKOUT.COD, payload)
   return response.data
+}
+
+export const createPayOSOrderRequest = async (payload: PayOSCheckoutPayload): Promise<PayOSCheckoutResponse> => {
+  const response = await getAuthorizedAxios().post(API_ENDPOINTS.CHECKOUT.PAYOS, payload)
+  return response.data.data
 }

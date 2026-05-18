@@ -20,7 +20,7 @@
       <h1 class="text-3xl font-black uppercase tracking-wider mb-2">HÓA ĐƠN</h1>
       <div class="text-sm text-gray-600 mb-1">
         <span class="font-medium">Mã đơn:</span>
-        <span class="font-mono">#{{ order._id }}</span>
+        <span class="font-mono">#{{ order.orderCode || order._id }}</span>
       </div>
       <div class="text-sm text-gray-600 mb-1">
         <span class="font-medium">Ngày đặt:</span>

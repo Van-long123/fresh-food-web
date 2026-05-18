@@ -71,3 +71,11 @@ export interface CodCheckoutPayload {
   note?: string
   shippingFee?: number
 }
+
+// Alias - PayOS dùng cùng payload structure với COD
+export type PayOSCheckoutPayload = CodCheckoutPayload
+
+export interface PayOSCheckoutResponse {
+  checkoutUrl: string
+  orderId: string
+}

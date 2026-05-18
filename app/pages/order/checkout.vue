@@ -267,12 +267,13 @@
 
                 <ul class="space-y-2 mb-4">
                   <li
-                    v-for="(step, index) in paymentSteps"
+                    v-for="(step, index) in (paymentMethod === 0 ? paymentSteps : payosSteps)"
                     :key="step"
                     class="flex items-center gap-2 text-sm text-gray-600"
                   >
                     <span
-                      class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-bold"
+                      class="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
+                      :class="paymentMethod === 1 ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'"
                     >
                       {{ String(index + 1).padStart(2, "0") }}
                     </span>
@@ -286,18 +287,14 @@
                   :class="
                     paymentMethod === 0
                       ? 'bg-green-50 border border-green-200'
-                      : paymentMethod === 1
-                        ? 'bg-blue-50 border border-blue-200'
-                        : 'bg-pink-50 border border-pink-200'
+                      : 'bg-blue-50 border border-blue-200'
                   "
                 >
                   <i
                     :class="
                       paymentMethod === 0
                         ? 'pi pi-money-bill text-green-600'
-                        : paymentMethod === 1
-                          ? 'pi pi-qrcode text-blue-600'
-                          : 'pi pi-wallet text-pink-600'
+                        : 'pi pi-qrcode text-blue-600'
                     "
                     class="text-sm"
                   ></i>
@@ -306,17 +303,13 @@
                     :class="
                       paymentMethod === 0
                         ? 'text-green-700'
-                        : paymentMethod === 1
-                          ? 'text-blue-700'
-                          : 'text-pink-700'
+                        : 'text-blue-700'
                     "
                   >
                     {{
                       paymentMethod === 0
                         ? "Thanh toán khi nhận hàng — an toàn & tiện lợi"
-                        : paymentMethod === 1
-                          ? "VietQR qua PayOS — quét mã nhanh chóng"
-                          : "Thanh toán qua MoMo — tiện lợi & bảo mật"
+                        : "VietQR qua PayOS — quét mã nhanh chóng"
                     }}
                   </span>
                 </div>
@@ -453,11 +446,16 @@
 
                 <!-- Checkout Button -->
                 <Button
-                  label="Thanh toán"
+                  :label="paymentMethod === 1 ? 'Thanh toán qua PayOS' : 'Thanh toán'"
                   severity="contrast"
                   :disabled="isFetchingShippingFee"
-                  class="w-full !bg-red-600 !border-red-600 hover:!bg-red-700 hover:!border-red-700 !text-white font-bold py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
-                  icon="pi pi-lock"
+                  :class="[
+                    'w-full !text-white font-bold py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg',
+                    paymentMethod === 1
+                      ? '!bg-blue-600 !border-blue-600 hover:!bg-blue-700 hover:!border-blue-700'
+                      : '!bg-red-600 !border-red-600 hover:!bg-red-700 hover:!border-red-700'
+                  ]"
+                  :icon="paymentMethod === 1 ? 'pi pi-qrcode' : 'pi pi-lock'"
                   icon-pos="left"
                   :loading="isSubmitting"
                   @click="handleCheckout"
@@ -773,6 +771,7 @@ const {
   clearVoucher,
   isSubmitting,
   submitCODOrder,
+  submitPayOSOrder,
   paymentMethod,
   paymentOptions,
   paymentSteps,
@@ -844,6 +843,14 @@ const handleApplyVoucher = async () => {
   }
 };
 
+const payosSteps = [
+  'Xác nhận thông tin giao hàng',
+  'Kiểm tra tồn kho thời gian thực',
+  'Áp dụng voucher (nếu có)',
+  'Chuyển hướng đến cổng thanh toán PayOS',
+  'Quét mã VietQR bằng ứng dụng ngân hàng'
+]
+
 const handleCheckout = async () => {
   const selectedAddress = addresses.value?.find(
     (a: any) => a._id === localSelectedAddressId.value,
@@ -859,6 +866,18 @@ const handleCheckout = async () => {
     return;
   }
 
+  // Phân nhánh theo phương thức thanh toán
+  if (paymentMethod.value === 1) {
+    // PayOS: Tạo link thanh toán và redirect
+    await submitPayOSOrder({
+      addressId: selectedAddress._id,
+      note: note.value,
+    });
+    // Nếu thành công → window.location.href = checkoutUrl (trong submitPayOSOrder)
+    return;
+  }
+
+  // COD flow
   const result = await submitCODOrder({
     addressId: selectedAddress._id,
     note: note.value,
@@ -866,7 +885,6 @@ const handleCheckout = async () => {
   });
 
   if (result) {
-    // Thông báo thành công
     toast.add({
       severity: "success",
       summary: "Thành công",
@@ -874,7 +892,6 @@ const handleCheckout = async () => {
       life: 3000,
     });
 
-    // Xóa các sản phẩm đã thanh toán khỏi giỏ hàng local
     const checkoutProductIds = new Set(
       cartProducts.value.map((p) => String(p.id)),
     );
@@ -883,7 +900,6 @@ const handleCheckout = async () => {
     );
     cartStore.setCartItems(remainingItems);
 
-    // Thanh toán thành công, quay về trang profile với tab đơn hàng
     router.push({
       path: ROUTES.PROFILE,
       query: { tab: "orders" },

@@ -25,7 +25,7 @@
           <div class="text-xs text-gray-400">
             Đơn hàng /
             <span class="font-mono text-gray-600 font-semibold"
-              >#{{ order._id }}</span
+              >#{{ order.orderCode || order._id }}</span
             >
           </div>
         </div>
@@ -60,11 +60,12 @@
               Mã đơn hàng
             </div>
             <div class="font-mono font-black text-xl text-gray-900">
-              #{{ order._id }}
+              #{{ order.orderCode || order._id }}
             </div>
             <div class="text-xs text-gray-400 mt-1">
               {{ formatDateTime(order.createdAt) }}
             </div>
+
           </div>
 
           <div class="text-right flex-shrink-0">

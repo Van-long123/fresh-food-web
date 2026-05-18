@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/vue-query'
 import { checkoutService } from '~/services/checkout.service'
-import type { StockValidationItem, CodCheckoutPayload } from '~/types/checkout.type'
+import type { StockValidationItem, CodCheckoutPayload, PayOSCheckoutPayload } from '~/types/checkout.type'
 
 export const useValidateStockMutation = () => {
   return useMutation({
@@ -11,5 +11,11 @@ export const useValidateStockMutation = () => {
 export const useCreateCodOrderMutation = () => {
   return useMutation({
     mutationFn: (payload: CodCheckoutPayload) => checkoutService.createCodOrder(payload)
+  })
+}
+
+export const useCreatePayOSOrderMutation = () => {
+  return useMutation({
+    mutationFn: (payload: PayOSCheckoutPayload) => checkoutService.createPayOSOrder(payload)
   })
 }
