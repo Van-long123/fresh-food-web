@@ -15,7 +15,9 @@
       <header class="flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-3">
           <button
-            @click="router.push({ path: ROUTES.PROFILE, query: { tab: 'orders' } })"
+            @click="
+              router.push({ path: ROUTES.PROFILE, query: { tab: 'orders' } })
+            "
             class="text-sm text-gray-500 hover:text-[#f47f20] flex items-center gap-2 transition-colors"
           >
             <span class="text-lg leading-none">←</span>
@@ -65,7 +67,6 @@
             <div class="text-xs text-gray-400 mt-1">
               {{ formatDateTime(order.createdAt) }}
             </div>
-
           </div>
 
           <div class="text-right flex-shrink-0">
@@ -455,7 +456,10 @@
               :disabled="isConfirmingReceived"
               class="text-sm bg-green-600 text-white rounded-full px-4 py-2 hover:bg-green-700 transition font-semibold shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <i v-if="isConfirmingReceived" class="pi pi-spinner animate-spin"></i>
+              <i
+                v-if="isConfirmingReceived"
+                class="pi pi-spinner animate-spin"
+              ></i>
               <span v-else>✓</span>
               {{ isConfirmingReceived ? "Đang xác nhận..." : "Đã nhận hàng" }}
             </button>
