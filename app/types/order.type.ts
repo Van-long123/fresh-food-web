@@ -59,6 +59,7 @@ export interface OrderInfo {
 export interface CheckoutData {
   products: OrderProduct[]
   voucherCode?: string
+  voucherType?: string | null
   discountVoucher: number
   shippingFee: number
   subtotal: number

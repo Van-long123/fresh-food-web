@@ -302,11 +302,13 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
       const response = await validateVoucherMutation.mutateAsync({
         code,
         orderValue: subtotal.value,
+        shippingFee: shippingFee.value,
         items
       })
 
       const discountAmount = Number(response?.discountAmount || 0)
       const validCode = response?.voucher?.code || code
+      const voucherType = response?.voucher?.type || null
 
       // Update local refs
       discountVoucher.value = discountAmount
@@ -318,6 +320,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
         orderStore.setCheckoutData({
           ...existingCheckout,
           voucherCode: validCode,
+          voucherType,
           discountVoucher: discountAmount,
           subtotal: subtotal.value,
           grandTotal: Math.max(0, subtotal.value - discountAmount + shippingFee.value)
@@ -346,6 +349,67 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
       isApplyingVoucher.value = false
     }
   }
+
+  /**
+   * [Premium UX] Tự động đồng bộ lại số tiền giảm khi phí vận chuyển thay đổi.
+   * Kới được: người dùng đổi địa chỉ nhận hàng và đang có voucher freeship hoạt động.
+   */
+  watch(
+    () => shippingFee.value,
+    async (newFee, oldFee) => {
+      if (newFee === oldFee) return
+      // Chỉ re-apply khi đang có voucher được áp dụng
+      if (!voucherCode.value) return
+      // Tránh re-apply khi đang trong quá trình áp dụng
+      if (isApplyingVoucher.value) return
+
+      // Silent re-apply: không hiển thị toast thành công để không spam UX
+      isApplyingVoucher.value = true
+      try {
+        const items = cartProducts.value.map((item) => ({
+          productId: String(item.id),
+          categoryId: item.categoryId || undefined,
+          quantity: item.quantity,
+          price: item.priceNew ?? (item.quantity ? item.totalPrice / item.quantity : 0)
+        }))
+
+        const response = await validateVoucherMutation.mutateAsync({
+          code: voucherCode.value,
+          orderValue: subtotal.value,
+          shippingFee: newFee,
+          items
+        })
+
+        const discountAmount = Number(response?.discountAmount || 0)
+        discountVoucher.value = discountAmount
+
+        // Đồng bộ lại store
+        const existingCheckout = orderStore.checkoutData
+        if (existingCheckout) {
+          orderStore.setCheckoutData({
+            ...existingCheckout,
+            discountVoucher: discountAmount,
+            grandTotal: Math.max(0, subtotal.value - discountAmount + newFee)
+          })
+        }
+      } catch {
+        // Nếu re-apply thất bại (ví dụ: voucher hết hạn), xóa voucher để tránh tính sai
+        voucherCode.value = ''
+        discountVoucher.value = 0
+        const existingCheckout = orderStore.checkoutData
+        if (existingCheckout) {
+          orderStore.setCheckoutData({
+            ...existingCheckout,
+            voucherCode: undefined,
+            discountVoucher: 0,
+            grandTotal: Math.max(0, subtotal.value + newFee)
+          })
+        }
+      } finally {
+        isApplyingVoucher.value = false
+      }
+    }
+  )
 
   const submitCODOrder = async (payload: {
     addressId: string

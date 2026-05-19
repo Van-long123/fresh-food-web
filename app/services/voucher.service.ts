@@ -3,5 +3,5 @@ import type { VoucherValidationItem } from '~/types/voucher'
 
 export const voucherService = {
   getList: (params: VoucherListQueryParams = {}) => getVoucherListRequest(params),
-  validate: (payload: { code: string; orderValue: number; items?: VoucherValidationItem[] }) => validateVoucherRequest(payload)
+  validate: (payload: { code: string; orderValue: number; items?: VoucherValidationItem[]; shippingFee?: number }) => validateVoucherRequest(payload)
 }

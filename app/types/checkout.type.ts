@@ -43,6 +43,7 @@ export interface SelectedCartItem {
 export interface CheckoutPayload {
   products: SelectedCartItem[]
   voucherCode?: string
+  voucherType?: string | null
   discountVoucher: number
   subtotal: number
   grandTotal: number

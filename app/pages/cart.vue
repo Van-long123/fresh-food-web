@@ -234,7 +234,7 @@
           >
             <h3 class="m-0 mb-3">Tóm Tắt Đơn Hàng</h3>
 
-            <div class="flex justify-between my-2 text-[#374151]">
+            <!-- <div class="flex justify-between my-2 text-[#374151]">
               <span>Tạm tính:</span><strong>{{ format(subtotal) }}đ</strong>
             </div>
             <div class="flex justify-between my-2 text-[#374151]">
@@ -242,15 +242,13 @@
               <strong class="text-[#16a34a]"
                 >-{{ format(voucherDiscount) }}đ</strong
               >
-            </div>
+            </div> -->
             <div
               class="flex justify-between my-2 text-[#374151] border-t border-[#f3f4f6] pt-2.5 text-[20px] font-black text-[#ea580c]"
               :class="{ 'total-pulse': totalPulse }"
             >
-              <span>TỔNG CỘNG:</span><strong>{{ format(grandTotal) }}đ</strong>
+              <!-- <span>TỔNG CỘNG:</span><strong>{{ format(grandTotal) }}đ</strong>
             </div>
-
-            <!-- Voucher -->
             <div class="mt-3.5">
               <label class="text-[13px] font-bold">Mã giảm giá / Voucher</label>
               <div class="mt-[7px] grid grid-cols-[1fr_auto] gap-2">
@@ -291,7 +289,8 @@
                 :to="ROUTES.VOUCHERS"
                 class="inline-block mt-1.5 text-[#f97316] text-[13px]"
                 >Xem mã của tôi</NuxtLink
-              >
+              > -->
+              <span>TỔNG CỘNG:</span><strong>{{ format(subtotal) }}đ</strong>
             </div>
 
             <!-- ETA -->
@@ -316,7 +315,7 @@
 
             <!-- Trust row -->
             <div class="mt-2.5 grid gap-1 text-[#6b7280] text-[12px]">
-              <span>🔒 Thanh toán an toàn SSL</span>
+              <span>🔒 Thanh toán an toàn</span>
               <span>🔄 Đổi trả dễ dàng 24h</span>
               <span>🚚 Giao hàng nhanh 2h</span>
             </div>
@@ -324,14 +323,7 @@
             <!-- Pay icons -->
             <div class="mt-2.5 flex gap-1.5 flex-wrap">
               <span
-                v-for="p in [
-                  'VISA',
-                  'Master',
-                  'Momo',
-                  'VNPay',
-                  'ZaloPay',
-                  'COD',
-                ]"
+                v-for="p in ['PayOS', 'COD']"
                 :key="p"
                 class="border border-[#e5e7eb] rounded-lg px-2 py-[5px] text-[11px] text-[#9ca3af] hover:text-[#374151]"
                 >{{ p }}</span
@@ -433,8 +425,10 @@
         class="fixed left-0 right-0 bottom-0 z-[35] bg-white border-t border-[#e5e7eb] shadow-[0_-8px_22px_rgba(15,23,42,0.12)] px-4 py-3 hidden max-[768px]:flex justify-between items-center"
       >
         <div>
+          <!-- <strong>{{ selectedCount }} sản phẩm · {{ format(grandTotal) }}đ</strong -->
+
           <strong
-            >{{ selectedCount }} sản phẩm · {{ format(grandTotal) }}đ</strong
+            >{{ selectedCount }} sản phẩm · {{ format(subtotal) }}đ</strong
           >
         </div>
         <button
@@ -502,7 +496,7 @@ import SkCartPage from "~/components/skeletons/SkCartPage.vue";
 import { useCart } from "~/composables/cart/useCart";
 import { useCheckout } from "~/composables/checkout/useCheckout";
 import { useProductsQuery } from "~/queries/product/useProductsQuery";
-import { useApplyVoucher } from "~/composables/voucher/useApplyVoucher";
+// import { useApplyVoucher } from "~/composables/voucher/useApplyVoucher";
 import Carousel from "primevue/carousel";
 
 import { useOrderStore } from "~/stores/useOrderStore";
@@ -598,16 +592,16 @@ const hasSelectedOutOfStock = computed(() =>
   selectedItems.value.some((it) => Number(it.stock || 0) === 0),
 );
 
-const {
-  appliedVoucher,
-  voucherDiscount,
-  voucherBreakdown,
-  isApplying,
-  applyVoucher: mutateVoucher,
-  removeVoucher,
-} = useApplyVoucher();
+// const {
+//   appliedVoucher,
+//   voucherDiscount,
+//   voucherBreakdown,
+//   isApplying,
+//   applyVoucher: mutateVoucher,
+//   removeVoucher,
+// } = useApplyVoucher();
 
-const voucherInput = ref("");
+// const voucherInput = ref("");
 const removeAskId = ref<string | null>(null);
 const qtyBumpId = ref<string | null>(null);
 const showConfirmModal = ref(false);
@@ -636,21 +630,21 @@ const subtotal = computed(() =>
     0,
   ),
 );
-const grandTotal = computed(() =>
-  Math.max(0, subtotal.value - voucherDiscount.value),
-);
+// const grandTotal = computed(() =>
+//   Math.max(0, subtotal.value - voucherDiscount.value),
+// );
 const format = (n: number) => n.toLocaleString("vi-VN");
-const itemDiscountMap = computed<Record<string, number>>(
-  () => voucherBreakdown.value || {},
-);
+// const itemDiscountMap = computed<Record<string, number>>(
+//   () => voucherBreakdown.value || {},
+// );
 
-const buildVoucherPayloadItems = () =>
-  selectedItems.value.map((item) => ({
-    productId: item.productId,
-    categoryId: item.categoryId,
-    quantity: item.quantity,
-    price: item.price,
-  }));
+// const buildVoucherPayloadItems = () =>
+//   selectedItems.value.map((item) => ({
+//     productId: item.productId,
+//     categoryId: item.categoryId,
+//     quantity: item.quantity,
+//     price: item.price,
+//   }));
 
 const toggleAll = (e: Event) => {
   const t = e.target as HTMLInputElement;
@@ -693,27 +687,27 @@ const changeQty = async (id: string, delta: number) => {
   }, 250);
 };
 
-watch([subtotal, selectedItemsSignature], ([newTotal]) => {
-  if (appliedVoucher.value && newTotal < appliedVoucher.value.minOrderValue) {
-    // Auto-remove silently when order value drops.
-    // The user will see the price change and the total pulse animation.
-    removeVoucher({ silent: true });
-  } else if (appliedVoucher.value) {
-    // Recalculate scope-based discounts whenever cart composition changes.
-    handleApplyVoucher({ silent: true });
-  }
-});
+// watch([subtotal, selectedItemsSignature], ([newTotal]) => {
+//   if (appliedVoucher.value && newTotal < appliedVoucher.value.minOrderValue) {
+//     // Auto-remove silently when order value drops.
+//     // The user will see the price change and the total pulse animation.
+//     removeVoucher({ silent: true });
+//   } else if (appliedVoucher.value) {
+//     // Recalculate scope-based discounts whenever cart composition changes.
+//     handleApplyVoucher({ silent: true });
+//   }
+// });
 
-const handleApplyVoucher = (options: { silent?: boolean } = {}) => {
-  const code = (appliedVoucher.value?.code || voucherInput.value)
-    .trim()
-    .toUpperCase();
-  if (!code) return;
-  mutateVoucher(
-    { code, orderValue: subtotal.value, items: buildVoucherPayloadItems() },
-    options,
-  );
-};
+// const handleApplyVoucher = (options: { silent?: boolean } = {}) => {
+//   const code = (appliedVoucher.value?.code || voucherInput.value)
+//     .trim()
+//     .toUpperCase();
+//   if (!code) return;
+//   mutateVoucher(
+//     { code, orderValue: subtotal.value, items: buildVoucherPayloadItems() },
+//     options,
+//   );
+// };
 
 const checkoutNow = async () => {
   if (selectedItems.value.length === 0) return;
@@ -728,11 +722,12 @@ const checkoutNow = async () => {
       totalPrice: item.price * item.quantity,
       categoryId: item.categoryId || null,
     })),
-    voucherCode: appliedVoucher.value?.code,
-    discountVoucher: voucherDiscount.value,
+    voucherCode: undefined,
+    discountVoucher: 0,
+
     shippingFee: 0,
     subtotal: subtotal.value,
-    grandTotal: grandTotal.value,
+    grandTotal: subtotal.value,
   };
 
   // Callback để tự động bỏ tích items hết hàng
@@ -802,7 +797,7 @@ const onScroll = () => {
   showMobileFloat.value = window.scrollY > 260;
 };
 
-watch(grandTotal, () => {
+watch(subtotal, () => {
   totalPulse.value = true;
   setTimeout(() => {
     totalPulse.value = false;

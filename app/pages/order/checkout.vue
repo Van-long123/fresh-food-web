@@ -6,6 +6,12 @@
       variant="overlay"
       message="Đang xử lý đơn hàng..."
     />
+    <!-- AppLoading overlay khi đang đồng bộ lại voucher (đổi địa chỉ) -->
+    <AppLoading
+      v-if="isApplyingVoucher && !isSubmitting"
+      variant="overlay"
+      message="Đang cập nhật voucher..."
+    />
     <div class="min-h-screen bg-gray-50 py-8">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
@@ -231,7 +237,7 @@
                       @click="
                         () => {
                           showVoucherInput = false;
-                          voucherCode = selectedVoucherCode;
+                          voucherCode = selectedVoucherCode || '';
                           voucherError = '';
                         }
                       "
@@ -267,13 +273,19 @@
 
                 <ul class="space-y-2 mb-4">
                   <li
-                    v-for="(step, index) in (paymentMethod === 0 ? paymentSteps : payosSteps)"
+                    v-for="(step, index) in paymentMethod === 0
+                      ? paymentSteps
+                      : payosSteps"
                     :key="step"
                     class="flex items-center gap-2 text-sm text-gray-600"
                   >
                     <span
                       class="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
-                      :class="paymentMethod === 1 ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'"
+                      :class="
+                        paymentMethod === 1
+                          ? 'bg-blue-50 text-blue-600'
+                          : 'bg-green-50 text-green-600'
+                      "
                     >
                       {{ String(index + 1).padStart(2, "0") }}
                     </span>
@@ -301,9 +313,7 @@
                   <span
                     class="text-sm font-medium"
                     :class="
-                      paymentMethod === 0
-                        ? 'text-green-700'
-                        : 'text-blue-700'
+                      paymentMethod === 0 ? 'text-green-700' : 'text-blue-700'
                     "
                   >
                     {{
@@ -397,14 +407,18 @@
                     }}</span>
                   </div>
 
-                  <!-- Voucher giảm giá -->
+                  <!-- Voucher giảm giá / Freeship -->
                   <div
                     v-if="discountVoucher > 0"
                     class="flex items-center justify-between"
                   >
                     <span class="text-sm text-gray-500 flex items-center gap-1">
-                      <i class="pi pi-tag text-orange-400 text-xs"></i> Voucher
-                      giảm giá
+                      <i class="pi pi-tag text-orange-400 text-xs"></i>
+                      {{
+                        appliedVoucherType === "freeship"
+                          ? "Voucher Freeship"
+                          : "Voucher giảm giá"
+                      }}
                     </span>
                     <span class="text-sm font-medium text-orange-500"
                       >-{{ formatCurrency(discountVoucher) }}</span
@@ -446,14 +460,16 @@
 
                 <!-- Checkout Button -->
                 <Button
-                  :label="paymentMethod === 1 ? 'Thanh toán qua PayOS' : 'Thanh toán'"
+                  :label="
+                    paymentMethod === 1 ? 'Thanh toán qua PayOS' : 'Thanh toán'
+                  "
                   severity="contrast"
                   :disabled="isFetchingShippingFee"
                   :class="[
                     'w-full !text-white font-bold py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg',
                     paymentMethod === 1
                       ? '!bg-blue-600 !border-blue-600 hover:!bg-blue-700 hover:!border-blue-700'
-                      : '!bg-red-600 !border-red-600 hover:!bg-red-700 hover:!border-red-700'
+                      : '!bg-red-600 !border-red-600 hover:!bg-red-700 hover:!border-red-700',
                   ]"
                   :icon="paymentMethod === 1 ? 'pi pi-qrcode' : 'pi pi-lock'"
                   icon-pos="left"
@@ -800,6 +816,11 @@ const selectedVoucherCode = computed(
   () => checkoutData.value?.voucherCode || null,
 );
 
+// Loại voucher hiện tại (để phân biệt freeship vs giảm giá trên UI)
+const appliedVoucherType = computed(
+  () => checkoutData.value?.voucherType || null,
+);
+
 const selectedAddress = computed(() => {
   if (!addresses.value || !localSelectedAddressId.value) return null;
   return (
@@ -814,9 +835,9 @@ watch(
   (newList) => {
     if (newList && newList.length > 0 && !localSelectedAddressId.value) {
       const defaultAddr = newList.find((a: any) => a.default === 1);
-      if (defaultAddr) {
+      if (defaultAddr?._id) {
         localSelectedAddressId.value = defaultAddr._id;
-      } else {
+      } else if (newList[0]?._id) {
         localSelectedAddressId.value = newList[0]._id;
       }
     }
@@ -844,12 +865,12 @@ const handleApplyVoucher = async () => {
 };
 
 const payosSteps = [
-  'Xác nhận thông tin giao hàng',
-  'Kiểm tra tồn kho thời gian thực',
-  'Áp dụng voucher (nếu có)',
-  'Chuyển hướng đến cổng thanh toán PayOS',
-  'Quét mã VietQR bằng ứng dụng ngân hàng'
-]
+  "Xác nhận thông tin giao hàng",
+  "Kiểm tra tồn kho thời gian thực",
+  "Áp dụng voucher (nếu có)",
+  "Chuyển hướng đến cổng thanh toán PayOS",
+  "Quét mã VietQR bằng ứng dụng ngân hàng",
+];
 
 const handleCheckout = async () => {
   const selectedAddress = addresses.value?.find(

@@ -16,7 +16,7 @@ export const getVoucherListRequest = async (
   return response.data
 }
 
-export const validateVoucherRequest = async (payload: { code: string; orderValue: number; items?: VoucherValidationItem[] }): Promise<VoucherValidationResponse> => {
+export const validateVoucherRequest = async (payload: { code: string; orderValue: number; items?: VoucherValidationItem[]; shippingFee?: number }): Promise<VoucherValidationResponse> => {
   const response = await getAuthorizedAxios().post(API_ENDPOINTS.VOUCHER.VALIDATE, payload)
   return response.data
 }

@@ -281,6 +281,7 @@
               Giỏ hàng
             </h3>
             <span
+              v-if="itemCount > 0"
               class="rounded-full bg-[#fff7ed] px-2 py-0.5 text-[11px] font-bold text-[#ea580c]"
               >{{ itemCount }} sản phẩm</span
             >
@@ -307,7 +308,7 @@
 
         <!-- Cart Items -->
         <div class="max-h-80 overflow-y-auto px-4 py-3">
-          <div class="space-y-2.5">
+          <div v-if="displayCartItems.length" class="space-y-2.5">
             <article
               v-for="item in displayCartItems"
               :key="item.id"
@@ -401,10 +402,33 @@
               </div>
             </article>
           </div>
+          <div
+            v-else
+            class="flex flex-col items-center justify-center py-6 px-4 text-center"
+          >
+            <div
+              class="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mb-3"
+            >
+              <i class="pi pi-shopping-cart text-[#f47f20] text-xl"></i>
+            </div>
+            <p class="text-[13px] font-semibold text-gray-500 mb-3.5">
+              Giỏ hàng của bạn đang trống
+            </p>
+            <NuxtLink
+              :to="ROUTES.HOME"
+              class="w-full h-9 rounded-lg bg-gradient-to-r from-[#f97316] to-[#ef4444] text-[12px] font-bold text-white flex items-center justify-center gap-2 hover:shadow-md hover:shadow-orange-200/50 transition-all"
+              @click="showCartPanel = false"
+            >
+              Khám phá sản phẩm
+            </NuxtLink>
+          </div>
         </div>
 
         <!-- Footer -->
-        <div class="border-t border-[#f1f5f9] px-5 pb-4 pt-3.5">
+        <div
+          v-if="displayCartItems.length"
+          class="border-t border-[#f1f5f9] px-5 pb-4 pt-3.5"
+        >
           <div class="flex items-center justify-between">
             <span class="text-[13px] font-semibold text-[#64748b]"
               >Tổng cộng</span
@@ -414,10 +438,10 @@
               >{{ formatVnd(totalAmount) }}</strong
             >
           </div>
-          <div class="mt-3 grid grid-cols-2 gap-2">
+          <div class="mt-3">
             <NuxtLink
               :to="ROUTES.CART"
-              class="h-10 rounded-lg bg-linear-to-r from-[#f97316] to-[#ef4444] text-[13px] font-bold text-white transition hover:shadow-md hover:shadow-orange-200/50 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              class="w-full h-10 rounded-lg bg-linear-to-r from-[#f97316] to-[#ef4444] text-[13px] font-bold text-white transition hover:shadow-md hover:shadow-orange-200/50 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               @click="showCartPanel = false"
             >
               Tiến hành thanh toán
@@ -630,8 +654,10 @@ const displayCartItems = computed(() => {
   return [...cartItems.value]
     .filter((item) => !item.deleted && item.status !== "inactive")
     .sort((a, b) => {
-      const aOOS = itemsOutOfStock.value?.has(a.id) || Number(a.stock || 0) === 0;
-      const bOOS = itemsOutOfStock.value?.has(b.id) || Number(b.stock || 0) === 0;
+      const aOOS =
+        itemsOutOfStock.value?.has(a.id) || Number(a.stock || 0) === 0;
+      const bOOS =
+        itemsOutOfStock.value?.has(b.id) || Number(b.stock || 0) === 0;
 
       // 1. Đẩy sản phẩm hết hàng xuống dưới cùng
       if (aOOS !== bOOS) return aOOS ? 1 : -1;
@@ -642,10 +668,11 @@ const displayCartItems = computed(() => {
       return bTime - aTime;
     })
     .map((item) => {
-      const isOutOfStock = itemsOutOfStock.value?.has(item.id) || Number(item.stock || 0) === 0;
+      const isOutOfStock =
+        itemsOutOfStock.value?.has(item.id) || Number(item.stock || 0) === 0;
       return {
         ...item,
-        isOutOfStock
+        isOutOfStock,
       };
     });
 });
