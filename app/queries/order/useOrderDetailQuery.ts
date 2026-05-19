@@ -36,3 +36,9 @@ export const useCancelOrderMutation = (orderId: string) => {
     }
   })
 }
+
+export const useConfirmReceivedMutation = (orderId: string) => {
+  return useMutation({
+    mutationFn: () => orderService.confirmReceived(orderId),
+  })
+}

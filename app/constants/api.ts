@@ -70,6 +70,7 @@ export const API_ENDPOINTS = {
     CREATE: '/v1/client/orders',
     MY_ORDERS: '/v1/client/orders/my-orders',
     DETAIL: (id: string) => `/v1/client/orders/${id}`,
-    CANCEL: (id: string) => `/v1/client/orders/${id}/cancel`
+    CANCEL: (id: string) => `/v1/client/orders/${id}/cancel`,
+    RECEIVED: (id: string) => `/v1/client/orders/${id}/received`
   }
 } as const

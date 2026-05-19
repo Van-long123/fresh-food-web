@@ -15,7 +15,7 @@
       <header class="flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-3">
           <button
-            @click="router.back()"
+            @click="router.push({ path: ROUTES.PROFILE, query: { tab: 'orders' } })"
             class="text-sm text-gray-500 hover:text-[#f47f20] flex items-center gap-2 transition-colors"
           >
             <span class="text-lg leading-none">←</span>
@@ -452,9 +452,12 @@
             <button
               v-if="order.status === 'shipping'"
               @click="confirmReceived"
-              class="text-sm bg-green-600 text-white rounded-full px-4 py-2 hover:bg-green-700 transition font-semibold shadow-sm"
+              :disabled="isConfirmingReceived"
+              class="text-sm bg-green-600 text-white rounded-full px-4 py-2 hover:bg-green-700 transition font-semibold shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              ✓ Đã nhận hàng
+              <i v-if="isConfirmingReceived" class="pi pi-spinner animate-spin"></i>
+              <span v-else>✓</span>
+              {{ isConfirmingReceived ? "Đang xác nhận..." : "Đã nhận hàng" }}
             </button>
           </div>
           <div class="flex items-center gap-2 ml-auto">
@@ -487,6 +490,7 @@ import { useRoute } from "vue-router";
 import ConfirmDialog from "primevue/confirmdialog";
 import { useOrderDetail } from "~/composables/order/useOrderDetail";
 import { formatVnd } from "~/utils/currency";
+import { ROUTES } from "~/constants/routes";
 
 const route = useRoute();
 const orderId = route.params.id as string;
@@ -495,6 +499,7 @@ const {
   orderData,
   isLoading,
   isCancelling,
+  isConfirmingReceived,
   isMergingCart,
   order,
   items,

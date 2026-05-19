@@ -2,7 +2,11 @@ import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "primevue/usetoast";
 import { useConfirm } from "primevue/useconfirm";
-import { useOrderDetailQuery as useOrderQuery, useCancelOrderMutation } from "~/queries/order/useOrderDetailQuery";
+import {
+  useOrderDetailQuery as useOrderQuery,
+  useCancelOrderMutation,
+  useConfirmReceivedMutation,
+} from "~/queries/order/useOrderDetailQuery";
 import { useMergeCartMutation } from "~/mutations/cart/useCartMutations";
 import {
   STATUS_MAP,
@@ -18,6 +22,7 @@ export const useOrderDetail = (orderId: string) => {
 
   const { data: orderData, isLoading, error } = useOrderQuery(orderId);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrderMutation(orderId);
+  const { mutate: confirmReceivedMutation, isPending: isConfirmingReceived } = useConfirmReceivedMutation(orderId);
   const { mutate: mergeCart, isPending: isMergingCart } = useMergeCartMutation();
  
   const order = computed(() => orderData.value || {});
@@ -49,6 +54,8 @@ export const useOrderDetail = (orderId: string) => {
       if (idx <= currentStepIndex.value && order.value.createdAt) {
         if (idx === 0) {
           time = formatDateTime(order.value.createdAt);
+        } else if (step.key === "delivered" && order.value.deliveredAt) {
+          time = formatDateTime(order.value.deliveredAt);
         } else if (idx === currentStepIndex.value && order.value.updatedAt) {
           time = formatDateTime(order.value.updatedAt);
         }
@@ -147,14 +154,41 @@ export const useOrderDetail = (orderId: string) => {
   }
 
   function confirmReceived() {
-    order.value.status = "delivered";
-    toast.add({ severity: "success", summary: "Xác nhận", detail: "Cảm ơn bạn đã xác nhận nhận hàng!", life: 3000 });
+    confirm.require({
+      message: "Bạn có chắc chắn đã nhận được đơn hàng này và muốn hoàn tất giao dịch?",
+      header: "Xác nhận đã nhận hàng",
+      icon: "pi pi-check-circle",
+      acceptLabel: "Đã nhận hàng",
+      rejectLabel: "Chưa",
+      acceptClass: "p-button-success",
+      accept: () => {
+        confirmReceivedMutation(undefined, {
+          onSuccess: () => {
+            toast.add({
+              severity: "success",
+              summary: "Thành công",
+              detail: "Đơn hàng đã được xác nhận giao thành công",
+              life: 3000,
+            });
+          },
+          onError: (error: any) => {
+            toast.add({
+              severity: "error",
+              summary: "Lỗi",
+              detail: error?.response?.data?.message || "Không thể xác nhận đã nhận hàng. Vui lòng thử lại.",
+              life: 3000,
+            });
+          },
+        });
+      },
+    });
   }
 
   return {
     orderData,
     isLoading,
     isCancelling,
+    isConfirmingReceived,
     isMergingCart,
     error,
     order,

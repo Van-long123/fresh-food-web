@@ -16,3 +16,8 @@ export const cancelOrderRequest = async (id: string): Promise<any> => {
   const response = await getAuthorizedAxios().put(API_ENDPOINTS.ORDER.CANCEL(id))
   return response.data
 }
+
+export const confirmOrderReceivedRequest = async (id: string): Promise<any> => {
+  const response = await getAuthorizedAxios().put(API_ENDPOINTS.ORDER.RECEIVED(id))
+  return response.data
+}
