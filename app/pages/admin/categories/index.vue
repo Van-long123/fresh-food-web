@@ -10,6 +10,7 @@ import type { AdminCategoryListItem } from "~/types/admin-category.type";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const searchQuery = ref("");

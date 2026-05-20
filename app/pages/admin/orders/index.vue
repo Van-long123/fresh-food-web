@@ -10,6 +10,7 @@ import type { AdminOrderListItem } from "~/types/admin-order.type";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const searchQuery = ref("");

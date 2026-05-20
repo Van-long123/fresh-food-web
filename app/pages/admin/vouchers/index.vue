@@ -10,6 +10,7 @@ import type { AdminVoucherListItem } from "~/types/admin-voucher.type";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const searchQuery = ref("");

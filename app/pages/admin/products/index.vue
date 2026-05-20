@@ -12,6 +12,7 @@ import type { AdminProductListItem } from "~/types/admin-product.type";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const searchQuery = ref("");

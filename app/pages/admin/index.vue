@@ -4,6 +4,7 @@ import Tag from "primevue/tag";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 useHead({

@@ -52,6 +52,10 @@ export const useSocialAuth = () => {
     window.location.href = urlMap[provider]
   }
 
+  const getRedirectPathByRole = (role?: string) => {
+    return role === 'admin' ? ROUTES.ADMIN.DASHBOARD : ROUTES.HOME
+  }
+
   const loginWithGoogle = () => redirectToOAuth('google')
   const loginWithFacebook = () => redirectToOAuth('facebook')
 
@@ -95,7 +99,7 @@ export const useSocialAuth = () => {
         life: 3500
       })
 
-      await router.replace(ROUTES.HOME)
+      await router.replace(getRedirectPathByRole(userInfo.role))
     } catch {
       toast.add({
         severity: 'error',

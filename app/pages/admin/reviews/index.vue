@@ -9,6 +9,7 @@ import { validateReviewStatus } from "~/validations/admin/review.schema";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const searchQuery = ref("");

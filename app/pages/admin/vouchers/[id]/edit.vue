@@ -7,6 +7,7 @@ import { validateAdminVoucher } from "~/validations/admin/voucher.schema";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const route = useRoute();

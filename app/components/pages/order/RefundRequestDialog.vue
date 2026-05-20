@@ -58,16 +58,20 @@ const bankOptions = computed(() => {
   }));
 });
 
+// Lấy trạng thái của yêu cầu hoàn tiền hiện tại
 const refundStatus = computed(() => props.refundRequest?.status || "");
 const isWaitingBankInfo = computed(
   () => refundStatus.value === "approved_waiting_bank_info",
 );
 const isRejected = computed(() => refundStatus.value === "rejected");
+
+// Kiểm tra có yêu cầu hoàn tiền nào đang tồn tại (không phải bị từ chối)
 const hasExistingRequest = computed(() => {
   if (!props.refundRequest?._id) return false;
   return props.refundRequest.status !== "rejected";
 });
 
+// Lọc ra danh sách các sản phẩm được người dùng tick chọn
 const selectedItems = computed(() => {
   return props.items
     .filter((item) => selectedMap.value[item.productId]?.checked)
@@ -95,6 +99,7 @@ const canSubmitBankInfo = computed(() => {
   );
 });
 
+//Xóa sạch dữ liệu trên form (bỏ chọn sản phẩm, xóa lý do, xóa các link ảnh đã upload).
 const resetForm = () => {
   selectedMap.value = props.items.reduce(
     (acc, item) => {
@@ -313,7 +318,9 @@ const submitBankInfoForm = () => {
                   v-model="selectedMap[item.productId]!.quantity"
                   :min="1"
                   :max="item.quantity"
-                  :disabled="!selectedMap[item.productId]!.checked || isRejected"
+                  :disabled="
+                    !selectedMap[item.productId]!.checked || isRejected
+                  "
                   class="w-24"
                   inputClass="w-full"
                   showButtons

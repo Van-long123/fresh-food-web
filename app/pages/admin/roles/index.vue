@@ -10,6 +10,7 @@ import type { AdminRoleListItem } from "~/types/admin-role.type";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const columns: DataTableColumn[] = [

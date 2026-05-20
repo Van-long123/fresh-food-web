@@ -7,6 +7,7 @@ import { validateAdminUser } from "~/validations/admin/user.schema";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const route = useRoute();

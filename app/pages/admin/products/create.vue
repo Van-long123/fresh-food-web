@@ -7,6 +7,7 @@ import { validateAdminProduct } from "~/validations/admin/product.schema";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const router = useRouter();

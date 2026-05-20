@@ -2,6 +2,7 @@ export interface AuthUser {
   id: string
   fullname: string
   phone: string
+  role: string
   email?: string
   address?: string
   avatar?: string
@@ -14,6 +15,7 @@ export interface ApiAuthUser {
   _id: string
   displayName: string
   phone: string
+  role: string
   email?: string
   address?: string
   avatar?: string

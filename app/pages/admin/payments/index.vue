@@ -9,6 +9,7 @@ import { validateRefund } from "~/validations/admin/payment.schema";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const searchQuery = ref("");

@@ -7,6 +7,7 @@ import { validateAdminCategory } from "~/validations/admin/category.schema";
 
 definePageMeta({
   layout: "admin",
+  middleware: ["auth", "admin"],
 });
 
 const route = useRoute();

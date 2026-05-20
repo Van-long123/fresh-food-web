@@ -49,6 +49,10 @@ export const useLoginForm = () => {
     })
   }
 
+  const getRedirectPathByRole = (role?: string) => {
+    return role === 'admin' ? ROUTES.ADMIN.DASHBOARD : ROUTES.HOME
+  }
+
   const processQueryToast = async () => {
     if (route.query.registered === '1') {
       toast.add({
@@ -140,7 +144,7 @@ export const useLoginForm = () => {
         life: 3500
       })
 
-      await router.push(ROUTES.HOME)
+      await router.push(getRedirectPathByRole(result.role))
     } catch (error: any) {
       toast.add({
         severity: 'error',
