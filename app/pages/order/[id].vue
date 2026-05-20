@@ -3,6 +3,13 @@
     class="max-w-[900px] mx-auto space-y-4 px-4 py-6 animate-fadeUp pb-24 lg:pb-6"
   >
     <ConfirmDialog />
+    <RefundRequestDialog
+      v-if="orderData"
+      v-model:visible="showRefundDialog"
+      :order-id="order._id || orderId"
+      :items="items"
+      :refund-request="refundRequest"
+    />
 
     <div v-if="isLoading" class="flex justify-center items-center h-64">
       <i class="pi pi-spinner animate-spin text-4xl text-[#f47f20]"></i>
@@ -466,6 +473,14 @@
           </div>
           <div class="flex items-center gap-2 ml-auto">
             <button
+              v-if="canOpenRefund"
+              @click="openRefundDialog"
+              class="text-sm border border-orange-200 text-orange-600 rounded-full px-4 py-2 hover:bg-orange-50 transition flex items-center gap-2"
+            >
+              <span>↩️</span>
+              <span>{{ refundActionLabel }}</span>
+            </button>
+            <button
               @click="router.push('/support')"
               class="text-sm border border-gray-200 rounded-full px-4 py-2 hover:border-[#f47f20] hover:text-[#f47f20] transition flex items-center gap-2"
             >
@@ -492,6 +507,8 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import ConfirmDialog from "primevue/confirmdialog";
+import RefundRequestDialog from "~/components/pages/order/RefundRequestDialog.vue";
+import { useRefundRequestQuery } from "~/queries/refund/useRefundQuery";
 import { useOrderDetail } from "~/composables/order/useOrderDetail";
 import { formatVnd } from "~/utils/currency";
 import { ROUTES } from "~/constants/routes";
@@ -510,6 +527,7 @@ const {
   payment,
   showCancelConfirm,
   cancelMessage,
+  showRefundDialog,
   subtotal,
   totalQty,
   currentStepIndex,
@@ -519,6 +537,7 @@ const {
   paymentMeta,
   paymentStatusClass,
   paymentMethodMeta,
+  isRefundable,
   formatDateTime,
   copyTransactionId,
   reviewProduct,
@@ -527,8 +546,28 @@ const {
   onAcceptCancel,
   triggerCancel,
   confirmReceived,
+  openRefundDialog,
   router,
 } = useOrderDetail(orderId);
+
+const { data: refundRequestData } = useRefundRequestQuery(orderId);
+const refundRequest = computed(() => refundRequestData.value || null);
+
+const refundActionLabel = computed(() => {
+  const status = refundRequest.value?.status;
+  if (status === "approved_waiting_bank_info")
+    return "Nhập thông tin nhận tiền";
+  if (status === "pending") return "Xem yêu cầu hoàn tiền";
+  if (status === "processing_refund") return "Đang hoàn tiền";
+  if (status === "rejected") return "Xem lý do từ chối";
+  return "Trả hàng / Hoàn tiền";
+});
+
+const canOpenRefund = computed(() => {
+  const status = refundRequest.value?.status;
+  if (status && status !== "completed") return true;
+  return isRefundable.value;
+});
 
 useHead({
   title: computed(() =>

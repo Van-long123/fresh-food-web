@@ -72,5 +72,11 @@ export const API_ENDPOINTS = {
     DETAIL: (id: string) => `/v1/client/orders/${id}`,
     CANCEL: (id: string) => `/v1/client/orders/${id}/cancel`,
     RECEIVED: (id: string) => `/v1/client/orders/${id}/received`
+  },
+  REFUND: {
+    UPLOAD: '/v1/client/refund-requests/upload',
+    CREATE: '/v1/client/refund-requests',
+    BY_ORDER: (orderId: string) => `/v1/client/refund-requests/order/${orderId}`,
+    BANK_INFO: (id: string) => `/v1/client/refund-requests/${id}/bank-info`
   }
 } as const

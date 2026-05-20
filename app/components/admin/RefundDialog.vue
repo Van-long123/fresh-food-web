@@ -24,9 +24,9 @@ const reason = defineModel<string>("reason", { default: "" });
 <template>
   <Dialog
     :visible="visible"
+    @update:visible="(v) => emit('update:visible', v)"
     modal
     header="Issue Refund"
-    :on-hide="() => emit('update:visible', false)"
     class="w-full max-w-md"
   >
     <div class="space-y-4">

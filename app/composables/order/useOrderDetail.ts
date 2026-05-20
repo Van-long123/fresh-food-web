@@ -31,6 +31,7 @@ export const useOrderDetail = (orderId: string) => {
 
   const showCancelConfirm = ref(false);
   const cancelMessage = "Bạn có chắc muốn hủy đơn hàng này? Hành động không thể hoàn tác.";
+  const showRefundDialog = ref(false);
 
   const subtotal = computed(() =>
     items.value.reduce((s: number, i: any) => s + i.totalPrice, 0),
@@ -41,6 +42,14 @@ export const useOrderDetail = (orderId: string) => {
   const currentStepIndex = computed(() =>
     TIMELINE_STEPS.findIndex((s) => s.key === order.value.status),
   );
+
+  const isRefundable = computed(() => {
+    if (order.value.status !== "delivered") return false;
+    if (!order.value.deliveredAt) return false;
+    const deliveredAt = new Date(order.value.deliveredAt).getTime();
+    if (Number.isNaN(deliveredAt)) return false;
+    return Date.now() - deliveredAt <= 24 * 60 * 60 * 1000;
+  });
 
   function formatDateTime(ts: string | number) {
     if (!ts) return "";
@@ -184,6 +193,14 @@ export const useOrderDetail = (orderId: string) => {
     });
   }
 
+  function openRefundDialog() {
+    showRefundDialog.value = true;
+  }
+
+  function closeRefundDialog() {
+    showRefundDialog.value = false;
+  }
+
   return {
     orderData,
     isLoading,
@@ -196,10 +213,12 @@ export const useOrderDetail = (orderId: string) => {
     payment,
     showCancelConfirm,
     cancelMessage,
+    showRefundDialog,
     subtotal,
     totalQty,
     currentStepIndex,
     timelineStepsWithTime,
+    isRefundable,
     statusMeta,
     statusBorderClass,
     paymentMeta,
@@ -213,6 +232,8 @@ export const useOrderDetail = (orderId: string) => {
     onAcceptCancel,
     triggerCancel,
     confirmReceived,
+    openRefundDialog,
+    closeRefundDialog,
     router
   };
 };
