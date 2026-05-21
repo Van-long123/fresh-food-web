@@ -24,22 +24,22 @@ import AdminSidebar from "~/components/admin/AdminSidebar.vue";
           >
             &copy; 2024
             <a href="/" class="hover:underline" target="_blank">SmartFood</a>.
-            All rights reserved.
+            Bảo lưu mọi quyền.
           </p>
           <ul
             class="flex flex-wrap items-center justify-center space-x-4 text-sm font-medium text-slate-500 dark:text-slate-300 md:space-x-6"
           >
             <li>
-              <a href="#" class="hover:underline">About</a>
+              <a href="#" class="hover:underline">Giới thiệu</a>
             </li>
             <li>
-              <a href="#" class="hover:underline">Privacy Policy</a>
+              <a href="#" class="hover:underline">Chính sách bảo mật</a>
             </li>
             <li>
-              <a href="#" class="hover:underline">Licensing</a>
+              <a href="#" class="hover:underline">Giấy phép</a>
             </li>
             <li>
-              <a href="#" class="hover:underline">Contact</a>
+              <a href="#" class="hover:underline">Liên hệ</a>
             </li>
           </ul>
         </footer>

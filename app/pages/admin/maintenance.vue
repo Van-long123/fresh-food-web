@@ -34,16 +34,16 @@ definePageMeta({
       <h1
         class="mb-4 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl dark:text-white"
       >
-        Under Maintenance
+        Đang bảo trì
       </h1>
       <p class="mb-8 text-lg font-light text-gray-500 dark:text-gray-400">
-        Sorry for the inconvenience but we're performing some maintenance at the
-        moment. If you need to you can always
+        Rất tiếc vì sự bất tiện này, hệ thống đang được bảo trì trong thời điểm
+        hiện tại. Nếu cần, bạn luôn có thể
         <a
           href="#"
           class="font-medium text-primary-600 hover:underline dark:text-primary-500"
-          >contact us</a
-        >, otherwise we'll be back online shortly!
+          >liên hệ với chúng tôi</a
+        >, hệ thống sẽ sớm hoạt động trở lại!
       </p>
       <NuxtLink
         :to="ROUTES.ADMIN.DASHBOARD"
@@ -56,7 +56,7 @@ definePageMeta({
             clip-rule="evenodd"
           ></path>
         </svg>
-        Go back home
+        Quay về tổng quan
       </NuxtLink>
     </div>
   </div>

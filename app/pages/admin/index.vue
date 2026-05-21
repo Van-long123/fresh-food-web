@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Chart from "primevue/chart";
 import Tag from "primevue/tag";
+import DataTable from "~/components/admin/DataTable.vue";
 
 definePageMeta({
   layout: "admin",
@@ -8,36 +9,36 @@ definePageMeta({
 });
 
 useHead({
-  title: "Dashboard - Admin SmartFood",
+  title: "Tổng quan - Quản trị SmartFood",
 });
 
 const stats = [
   {
-    title: "Total products",
-    value: "1,248",
+    title: "Tổng sản phẩm",
+    value: "1.248",
     trend: 4.2,
-    trendLabel: "vs last month",
+    trendLabel: "so với tháng trước",
     icon: "pi pi-box",
   },
   {
-    title: "Total orders",
-    value: "2,483",
+    title: "Tổng đơn hàng",
+    value: "2.483",
     trend: 12.4,
-    trendLabel: "vs last month",
+    trendLabel: "so với tháng trước",
     icon: "pi pi-shopping-bag",
   },
   {
-    title: "Total revenue",
-    value: "$84,920",
+    title: "Tổng doanh thu",
+    value: "2.130.000.000đ",
     trend: 8.2,
-    trendLabel: "vs last month",
+    trendLabel: "so với tháng trước",
     icon: "pi pi-wallet",
   },
   {
-    title: "Total customers",
+    title: "Tổng khách hàng",
     value: "892",
     trend: 6.1,
-    trendLabel: "vs last month",
+    trendLabel: "so với tháng trước",
     icon: "pi pi-users",
   },
 ];
@@ -45,132 +46,132 @@ const stats = [
 const recentOrders = [
   {
     id: "#ORD-1042",
-    customer: "Nguyen Van An",
-    total: "$128.50",
-    status: "Confirmed",
-    date: "May 6, 2026",
+    customer: "Nguyễn Văn An",
+    total: "3.200.000đ",
+    status: "confirmed",
+    date: "06/05/2026",
   },
   {
     id: "#ORD-1041",
-    customer: "Tran Minh Thu",
-    total: "$64.00",
-    status: "Preparing",
-    date: "May 6, 2026",
+    customer: "Trần Minh Thu",
+    total: "1.600.000đ",
+    status: "preparing",
+    date: "06/05/2026",
   },
   {
     id: "#ORD-1040",
-    customer: "Le Quang Huy",
-    total: "$212.90",
-    status: "Shipping",
-    date: "May 5, 2026",
+    customer: "Lê Quang Huy",
+    total: "5.300.000đ",
+    status: "shipping",
+    date: "05/05/2026",
   },
   {
     id: "#ORD-1039",
-    customer: "Pham Anh Dao",
-    total: "$45.00",
-    status: "Delivered",
-    date: "May 5, 2026",
+    customer: "Phạm Anh Đào",
+    total: "1.100.000đ",
+    status: "delivered",
+    date: "05/05/2026",
   },
   {
     id: "#ORD-1038",
-    customer: "Vo Minh Khoa",
-    total: "$97.30",
-    status: "Pending",
-    date: "May 4, 2026",
+    customer: "Võ Minh Khoa",
+    total: "2.400.000đ",
+    status: "pending",
+    date: "04/05/2026",
   },
 ];
 
 const topProducts = [
   {
     id: 1,
-    product: "Organic Salmon Bowl",
-    category: "Meal Box",
+    product: "Tô cá hồi hữu cơ",
+    category: "Suất ăn",
     sold: 312,
-    revenue: "$6,248",
+    revenue: "156.200.000đ",
     stock: 64,
     image: "https://flowbite.com/docs/images/products/apple-watch.png",
   },
   {
     id: 2,
-    product: "Fresh Avocado Salad",
-    category: "Healthy Food",
+    product: "Salad bơ tươi",
+    category: "Đồ ăn lành mạnh",
     sold: 285,
-    revenue: "$4,920",
+    revenue: "123.000.000đ",
     stock: 42,
     image: "https://flowbite.com/docs/images/products/apple-watch.png",
   },
   {
     id: 3,
-    product: "Premium Beef Steak",
-    category: "Ready Meals",
+    product: "Bít tết bò cao cấp",
+    category: "Suất ăn sẵn",
     sold: 244,
-    revenue: "$7,105",
+    revenue: "177.600.000đ",
     stock: 28,
     image: "https://flowbite.com/docs/images/products/apple-watch.png",
   },
   {
     id: 4,
-    product: "Vegan Bento Set",
-    category: "Meal Box",
+    product: "Set bento thuần chay",
+    category: "Suất ăn",
     sold: 198,
-    revenue: "$3,740",
+    revenue: "93.500.000đ",
     stock: 91,
     image: "https://flowbite.com/docs/images/products/apple-watch.png",
   },
   {
     id: 5,
-    product: "Healthy Granola Pack",
-    category: "Snacks",
+    product: "Hộp granola lành mạnh",
+    category: "Ăn vặt",
     sold: 176,
-    revenue: "$2,890",
+    revenue: "72.250.000đ",
     stock: 120,
     image: "https://flowbite.com/docs/images/products/apple-watch.png",
   },
 ];
 
 const orderColumns = [
-  { key: "id", label: "Order ID" },
-  { key: "customer", label: "Customer" },
-  { key: "total", label: "Total" },
-  { key: "status", label: "Status" },
-  { key: "date", label: "Date" },
-  { key: "actions", label: "Actions" },
+  { key: "id", label: "Mã đơn" },
+  { key: "customer", label: "Khách hàng" },
+  { key: "total", label: "Tổng tiền" },
+  { key: "status", label: "Trạng thái" },
+  { key: "date", label: "Ngày" },
+  { key: "actions", label: "Thao tác" },
 ];
 
 const productColumns = [
-  { key: "product", label: "Product" },
-  { key: "category", label: "Category" },
-  { key: "sold", label: "Sold" },
-  { key: "revenue", label: "Revenue" },
-  { key: "stock", label: "Stock" },
+  { key: "product", label: "Sản phẩm" },
+  { key: "category", label: "Danh mục" },
+  { key: "sold", label: "Đã bán" },
+  { key: "revenue", label: "Doanh thu" },
+  { key: "stock", label: "Tồn kho" },
 ];
 
 const statusSeverity: Record<string, string> = {
-  Pending: "warning",
-  Confirmed: "info",
-  Preparing: "warn",
-  Shipping: "help",
-  Delivered: "success",
+  pending: "warning",
+  confirmed: "info",
+  preparing: "warn",
+  shipping: "help",
+  delivered: "success",
 };
 
 const revenueChartData = {
   labels: [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+    "Tháng 1",
+    "Tháng 2",
+    "Tháng 3",
+    "Tháng 4",
+    "Tháng 5",
+    "Tháng 6",
+    "Tháng 7",
+    "Tháng 8",
+    "Tháng 9",
+    "Tháng 10",
+    "Tháng 11",
+    "Tháng 12",
   ],
   datasets: [
     {
-      label: "Revenue",
+      label: "Doanh thu",
       data: [12, 18, 22, 19, 25, 32, 35, 30, 28, 36, 40, 45],
       borderColor: "#2563eb",
       backgroundColor: "rgba(37, 99, 235, 0.12)",
@@ -181,10 +182,10 @@ const revenueChartData = {
 };
 
 const ordersChartData = {
-  labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  labels: ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"],
   datasets: [
     {
-      label: "Orders",
+      label: "Đơn hàng",
       data: [120, 190, 170, 220, 260, 210, 240],
       backgroundColor: "rgba(16, 185, 129, 0.6)",
       borderRadius: 12,
@@ -192,12 +193,20 @@ const ordersChartData = {
   ],
 };
 
+const topProductChartColors = [
+  "#1d4ed8",
+  "#2563eb",
+  "#3b82f6",
+  "#60a5fa",
+  "#93c5fd",
+];
+
 const topProductChartData = {
   labels: topProducts.map((item) => item.product),
   datasets: [
     {
       data: topProducts.map((item) => item.sold),
-      backgroundColor: ["#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd"],
+      backgroundColor: topProductChartColors,
     },
   ],
 };
@@ -215,6 +224,16 @@ const baseChartOptions = {
     },
   },
 };
+
+const topProductChartOptions = {
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  cutout: "55%",
+};
 </script>
 
 <template>
@@ -229,27 +248,22 @@ const baseChartOptions = {
           <p
             class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
           >
-            Analytics Overview
+            Tổng quan phân tích
           </p>
           <h1
             class="mt-2 text-2xl font-semibold text-slate-900 dark:text-white"
           >
-            Dashboard
+            Tổng quan
           </h1>
           <p class="mt-1 text-sm text-slate-500 dark:text-slate-300">
-            Overview of sales, orders, and inventory performance.
+            Tổng quan doanh số, đơn hàng và hiệu suất tồn kho.
           </p>
         </div>
         <div class="flex items-center gap-3">
           <button
             class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
           >
-            Export report
-          </button>
-          <button
-            class="rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
-          >
-            Create campaign
+            Xuất báo cáo
           </button>
         </div>
       </div>
@@ -277,14 +291,14 @@ const baseChartOptions = {
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-              Revenue analytics
+              Phân tích doanh thu
             </h2>
             <p class="text-sm text-slate-500 dark:text-slate-300">
-              Last 12 months revenue performance.
+              Hiệu suất doanh thu trong 12 tháng gần nhất.
             </p>
           </div>
           <button class="text-sm font-medium text-primary-600 hover:underline">
-            View report
+            Xem báo cáo
           </button>
         </div>
         <div class="mt-6 h-72">
@@ -301,14 +315,14 @@ const baseChartOptions = {
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-              Orders trend
+              Xu hướng đơn hàng
             </h2>
             <p class="text-sm text-slate-500 dark:text-slate-300">
-              Orders across the last 7 days.
+              Số đơn trong 7 ngày gần nhất.
             </p>
           </div>
           <button class="text-sm font-medium text-primary-600 hover:underline">
-            Review
+            Xem xét
           </button>
         </div>
         <div class="mt-6 h-72">
@@ -328,22 +342,47 @@ const baseChartOptions = {
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-              Top selling products
+              Sản phẩm bán chạy nhất
             </h2>
             <p class="text-sm text-slate-500 dark:text-slate-300">
-              Sales volume breakdown.
+              Phân bổ theo sản lượng bán.
             </p>
           </div>
           <button class="text-sm font-medium text-primary-600 hover:underline">
-            Manage
+            Quản lý
           </button>
         </div>
-        <div class="mt-6 h-72">
-          <Chart
-            type="doughnut"
-            :data="topProductChartData"
-            :options="{ plugins: { legend: { position: 'bottom' } } }"
-          />
+        <div class="mt-6 flex flex-col items-center justify-center">
+          <div class="h-44 w-44">
+            <Chart
+              type="doughnut"
+              :data="topProductChartData"
+              :options="topProductChartOptions"
+              style="
+                display: block;
+                box-sizing: border-box;
+                height: 180px;
+                width: 206px;
+              "
+            />
+          </div>
+          <div
+            class="mt-6 grid grid-cols-2 gap-x-4 gap-y-2 w-full border-t border-slate-100 dark:border-slate-800 pt-4"
+          >
+            <div
+              v-for="(item, index) in topProducts"
+              :key="item.id"
+              class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400"
+            >
+              <span
+                class="h-2.5 w-2.5 rounded-full shrink-0"
+                :style="{ backgroundColor: topProductChartColors[index] }"
+              ></span>
+              <span class="truncate" :title="item.product">{{
+                item.product
+              }}</span>
+            </div>
+          </div>
         </div>
       </section>
       <section
@@ -352,10 +391,10 @@ const baseChartOptions = {
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-              Quick actions
+              Thao tác nhanh
             </h2>
             <p class="text-sm text-slate-500 dark:text-slate-300">
-              Common admin tasks for faster workflows.
+              Các lối tắt quản trị phổ biến giúp tối ưu quy trình.
             </p>
           </div>
         </div>
@@ -368,7 +407,7 @@ const baseChartOptions = {
             >
               <i class="pi pi-plus"></i>
             </span>
-            Create product
+            Tạo sản phẩm
           </button>
           <button
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
@@ -378,7 +417,7 @@ const baseChartOptions = {
             >
               <i class="pi pi-ticket"></i>
             </span>
-            Issue voucher
+            Phát hành mã giảm giá
           </button>
           <button
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
@@ -388,7 +427,7 @@ const baseChartOptions = {
             >
               <i class="pi pi-user-plus"></i>
             </span>
-            Add customer
+            Thêm khách hàng
           </button>
           <button
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
@@ -398,7 +437,47 @@ const baseChartOptions = {
             >
               <i class="pi pi-chart-line"></i>
             </span>
-            View analytics
+            Xem phân tích
+          </button>
+          <button
+            class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
+          >
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10"
+            >
+              <i class="pi pi-shopping-cart"></i>
+            </span>
+            Quản lý đơn hàng
+          </button>
+          <button
+            class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
+          >
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-500/10"
+            >
+              <i class="pi pi-undo"></i>
+            </span>
+            Yêu cầu hoàn tiền
+          </button>
+          <button
+            class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
+          >
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10"
+            >
+              <i class="pi pi-pencil"></i>
+            </span>
+            Viết bài mới
+          </button>
+          <button
+            class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
+          >
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600 dark:bg-violet-500/10"
+            >
+              <i class="pi pi-star"></i>
+            </span>
+            Đánh giá & Phản hồi
           </button>
         </div>
       </section>
@@ -412,13 +491,25 @@ const baseChartOptions = {
         :page="1"
         :per-page="5"
       >
-        <template #title>Recent orders</template>
+        <template #title>Đơn hàng gần đây</template>
         <template #subtitle
-          >Track the latest purchases and fulfillment status.</template
+          >Theo dõi các đơn mới nhất và trạng thái xử lý.</template
         >
         <template #cell-status="{ value }">
           <Tag
-            :value="value"
+            :value="
+              value === 'pending'
+                ? 'Chờ xử lý'
+                : value === 'confirmed'
+                  ? 'Đã xác nhận'
+                  : value === 'preparing'
+                    ? 'Đang chế biến'
+                    : value === 'shipping'
+                      ? 'Đang giao hàng'
+                      : value === 'delivered'
+                        ? 'Đã giao'
+                        : value
+            "
             :severity="statusSeverity[value] || 'secondary'"
           />
         </template>
@@ -445,13 +536,15 @@ const baseChartOptions = {
         :page="1"
         :per-page="5"
       >
-        <template #title>Top products</template>
-        <template #subtitle>Best performing items this week.</template>
+        <template #title>Sản phẩm nổi bật</template>
+        <template #subtitle
+          >Những sản phẩm có hiệu suất tốt nhất tuần này.</template
+        >
         <template #cell-product="{ row }">
           <div class="flex items-center gap-3">
             <img
               :src="row.image"
-              alt="Product"
+              alt="Sản phẩm"
               class="h-10 w-10 rounded-xl object-cover"
             />
             <div>

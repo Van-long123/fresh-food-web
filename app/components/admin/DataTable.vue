@@ -174,10 +174,10 @@ defineSlots<{
     >
       <div>
         <h3 class="text-base font-semibold text-slate-900 dark:text-white">
-          <slot name="title">Data table</slot>
+          <slot name="title">Bảng dữ liệu</slot>
         </h3>
         <p class="text-sm text-slate-500 dark:text-slate-300">
-          <slot name="subtitle">Manage items and view details.</slot>
+          <slot name="subtitle">Quản lý dữ liệu và xem chi tiết.</slot>
         </p>
       </div>
       <div
@@ -189,7 +189,7 @@ defineSlots<{
           <InputText
             v-model="searchQuery"
             class="w-full"
-            placeholder="Search"
+            placeholder="Tìm kiếm"
           />
         </span>
       </div>
@@ -277,7 +277,7 @@ defineSlots<{
             <i class="pi pi-inbox text-lg"></i>
           </div>
           <div class="text-sm">
-            <slot name="empty">No data available.</slot>
+            <slot name="empty">Không có dữ liệu.</slot>
           </div>
         </div>
       </template>
@@ -295,15 +295,15 @@ defineSlots<{
       class="flex flex-col gap-3 border-t border-slate-200/70 px-5 py-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between"
     >
       <p class="text-sm text-slate-500 dark:text-slate-300">
-        Showing
+        Hiển thị
         <span class="font-medium text-slate-900 dark:text-white">{{
           tableFrom
         }}</span>
-        to
+        đến
         <span class="font-medium text-slate-900 dark:text-white">{{
           tableTo
         }}</span>
-        of
+        trong tổng số
         <span class="font-medium text-slate-900 dark:text-white">{{
           total
         }}</span>
@@ -312,12 +312,14 @@ defineSlots<{
         <div
           class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-300"
         >
-          <span>Per page</span>
+          <span>Mỗi trang</span>
           <Dropdown
-            class="min-w-[5.5rem]"
+            style="min-width: 5.5rem"
             :model-value="perPage"
             :options="[10, 15, 25, 50]"
-            @update:model-value="(value) => emit('update:perPage', value)"
+            @update:model-value="
+              (value: number) => emit('update:perPage', value)
+            "
           />
         </div>
         <div class="flex items-center gap-1">
@@ -327,7 +329,7 @@ defineSlots<{
             :disabled="page <= 1"
             @click="changePage(page - 1)"
           >
-            Prev
+            Trước
           </button>
           <button
             v-for="pageNumber in pageNumbers"
@@ -349,7 +351,7 @@ defineSlots<{
             :disabled="page >= totalPages"
             @click="changePage(page + 1)"
           >
-            Next
+            Sau
           </button>
         </div>
       </div>

@@ -10,7 +10,6 @@
 
       <main class="flex-1 min-w-0 px-4 sm:px-6 lg:px-0 py-6 pb-16">
         <HeroBanner />
-
         <section
           v-if="isError"
           class="rounded-xl border border-red-100 bg-red-50 p-5 mb-8"

@@ -10,7 +10,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   modelValue: "",
-  placeholder: "Search...",
+  placeholder: "Tìm kiếm...",
   showFilters: false,
 });
 
@@ -50,7 +50,7 @@ watch(
       class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
     >
       <i class="pi pi-filter"></i>
-      Filters
+      Bộ lọc
     </button>
     <slot name="actions"></slot>
   </div>

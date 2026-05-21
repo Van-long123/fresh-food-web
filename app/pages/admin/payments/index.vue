@@ -1,166 +1,335 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import AppDataTable from "~/components/admin/DataTable.vue";
 import PageHeader from "~/components/admin/PageHeader.vue";
 import SearchToolbar from "~/components/admin/SearchToolbar.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
-import type { DataTableColumn } from "~/components/admin/DataTable.vue";
-import type { AdminPaymentListItem } from "~/types/admin-payment.type";
-import { validateRefund } from "~/validations/admin/payment.schema";
+import StatusBadge from "~/components/admin/StatusBadge.vue";
+import { useAdminMockStore } from "~/stores/useAdminMockStore";
+import { useToast } from "primevue/usetoast";
+import { ROUTES } from "~/constants/routes";
 
 definePageMeta({
   layout: "admin",
   middleware: ["auth", "admin"],
 });
 
+const store = useAdminMockStore();
+const router = useRouter();
+const toast = useToast();
+
 const searchQuery = ref("");
-const refundReason = ref("");
-const refundErrors = ref<Record<string, string>>({});
-const refundTarget = ref<AdminPaymentListItem | null>(null);
+const statusFilter = ref<string>("all");
+const methodFilter = ref<string>("all");
+const selectedIds = ref<string[]>([]);
+
+// Pagination
+const page = ref(1);
+const perPage = ref(10);
+
+// Sorting
+const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
+
+// Refund State
+const refundTarget = ref<any | null>(null);
 const showRefundDialog = ref(false);
+const refundReason = ref("");
 const refundLoading = ref(false);
 
-const columns: DataTableColumn[] = [
-  { key: "id", label: "Payment ID" },
-  { key: "orderId", label: "Order" },
-  { key: "customer", label: "Customer" },
-  { key: "method", label: "Method" },
-  { key: "amount", label: "Amount" },
-  { key: "status", label: "Status" },
-  { key: "transactionId", label: "Transaction" },
-  { key: "createdAt", label: "Date" },
-  { key: "actions", label: "Actions" },
+const columns = [
+  { key: "id", label: "Mã thanh toán", sortable: true },
+  { key: "orderCode", label: "Mã đơn" },
+  { key: "customer", label: "Tên khách hàng" },
+  { key: "paymentMethod", label: "Phương thức", sortable: true },
+  { key: "amount", label: "Số tiền", sortable: true },
+  { key: "status", label: "Trạng thái", sortable: true },
+  { key: "transactionId", label: "Mã giao dịch" },
+  { key: "actions", label: "Thao tác" },
 ];
 
-const { listPayments, refundPayment } = usePaymentsApi();
-const { data, pending } = await useAsyncData("admin-payments", () =>
-  listPayments(),
-);
+const getOrderCode = (orderId: string) => {
+  const ord = store.orders.find((o) => o.id === orderId);
+  return ord ? `#${ord.orderCode}` : "Không có";
+};
 
-const payments = computed(
-  () => (data.value?.data || []) as AdminPaymentListItem[],
-);
+const getCustomerName = (userId: string) => {
+  const usr = store.users.find((u) => u.id === userId);
+  return usr ? usr.displayName : "Khách vãng lai";
+};
 
-const filteredPayments = computed(() => {
-  if (!searchQuery.value) return payments.value;
-  const keyword = searchQuery.value.toLowerCase();
-  return payments.value.filter((item) =>
-    [item.id, item.orderId, item.customer, item.method].some((field) =>
-      field.toLowerCase().includes(keyword),
-    ),
-  );
+const handleSortChange = (
+  sort: { key: string; direction: "asc" | "desc" } | null,
+) => {
+  sortState.value = sort;
+};
+
+// Filtered and sorted payments
+const processedPayments = computed(() => {
+  let list = [...store.payments];
+
+  // Search filter
+  if (searchQuery.value) {
+    const keyword = searchQuery.value.toLowerCase();
+    list = list.filter(
+      (p) =>
+        p.id.toLowerCase().includes(keyword) ||
+        p.transactionId.toLowerCase().includes(keyword) ||
+        getCustomerName(p.userId).toLowerCase().includes(keyword),
+    );
+  }
+
+  // Status filter
+  if (statusFilter.value !== "all") {
+    list = list.filter((p) => p.status === statusFilter.value);
+  }
+
+  // Method filter
+  if (methodFilter.value !== "all") {
+    list = list.filter((p) => p.paymentMethod === methodFilter.value);
+  }
+
+  // Sorting
+  if (sortState.value) {
+    const { key, direction } = sortState.value;
+    list.sort((a: any, b: any) => {
+      const valA = a[key];
+      const valB = b[key];
+
+      if (typeof valA === "string") {
+        return direction === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      } else {
+        return direction === "asc" ? valA - valB : valB - valA;
+      }
+    });
+  }
+
+  return list;
 });
 
-const total = computed(() => filteredPayments.value.length);
+const paginatedPayments = computed(() => {
+  const start = (page.value - 1) * perPage.value;
+  return processedPayments.value.slice(start, start + perPage.value);
+});
 
-const openRefund = (payment: AdminPaymentListItem) => {
+const total = computed(() => processedPayments.value.length);
+
+const handleSelectionChange = (ids: Array<string | number>) => {
+  selectedIds.value = ids.map((id) => String(id));
+};
+
+const handleStatusChange = (
+  paymentId: string,
+  status: "completed" | "cancelled" | "pending",
+) => {
+  store.updatePaymentStatus(paymentId, status);
+
+  // If payment completes, update the corresponding order status to processing/confirmed
+  if (status === "completed") {
+    const pay = store.payments.find((p) => p.id === paymentId);
+    if (pay) {
+      store.updateOrderStatus(pay.orderId, "confirmed");
+    }
+  }
+
+  toast.add({
+    severity: "info",
+    summary: "Đã mô phỏng trạng thái",
+    detail: `Đã đặt trạng thái thanh toán thành ${status}.`,
+    life: 3000,
+  });
+};
+
+const openRefundDialog = (payment: any) => {
   refundTarget.value = payment;
   refundReason.value = "";
-  refundErrors.value = {};
   showRefundDialog.value = true;
 };
 
-const submitRefund = async () => {
+const confirmRefund = async () => {
   if (!refundTarget.value) return;
-  refundErrors.value = validateRefund(
-    refundTarget.value.status,
-    refundReason.value,
-  );
-  if (Object.keys(refundErrors.value).length) return;
   refundLoading.value = true;
-  try {
-    await refundPayment(
-      refundTarget.value.id,
-      refundReason.value,
-      refundTarget.value.status,
-    );
-    showRefundDialog.value = false;
-    refundTarget.value = null;
-    refundReason.value = "";
-  } catch (error) {
-    console.error("Refund error:", error);
-  } finally {
-    refundLoading.value = false;
-  }
-};
+  await new Promise((resolve) => setTimeout(resolve, 600));
 
-const cancelRefund = () => {
-  showRefundDialog.value = false;
+  store.updatePaymentStatus(refundTarget.value.id, "cancelled");
+  store.updateOrderStatus(refundTarget.value.orderId, "returned");
+
+  toast.add({
+    severity: "success",
+    summary: "Đã hoàn tiền",
+    detail: `Đã hoàn ${Number(refundTarget.value.amount).toLocaleString()} VND cho mã thanh toán ${refundTarget.value.id}.`,
+    life: 3000,
+  });
+
   refundTarget.value = null;
-  refundReason.value = "";
+  showRefundDialog.value = false;
+  refundLoading.value = false;
 };
 </script>
 
 <template>
   <div class="px-4 pt-6 space-y-6">
     <PageHeader
-      title="Payments"
-      subtitle="Monitor transaction status and issue refunds."
+      title="Sổ thanh toán"
+      subtitle="Theo dõi giao dịch PayOS, thanh toán tiền mặt và xử lý hoàn tiền qua cổng thanh toán."
     />
 
-    <SearchToolbar
-      v-model="searchQuery"
-      placeholder="Search by payment ID, order, or customer..."
-    />
-
-    <DataTable
-      :columns="columns"
-      :data="filteredPayments"
-      :total="total"
-      :page="1"
-      :per-page="10"
-      :loading="pending"
+    <!-- Filter & Toolbar -->
+    <div
+      class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"
     >
-      <template #title>Payment history</template>
-      <template #subtitle>Track payment lifecycle and issue refunds.</template>
-      <template #cell-customer="{ value }">
-        <span class="font-medium text-slate-900 dark:text-white">{{
-          value
-        }}</span>
+      <div class="flex flex-wrap items-center gap-4">
+        <SearchToolbar
+          v-model="searchQuery"
+          placeholder="Tìm mã giao dịch, khách hàng..."
+        />
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-slate-500 uppercase"
+            >Phương thức:</span
+          >
+          <select
+            v-model="methodFilter"
+            class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+          >
+            <option value="all">Tất cả phương thức</option>
+            <option value="PayOS">PayOS (trực tuyến)</option>
+            <option value="COD">COD (thanh toán khi nhận hàng)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-slate-500 uppercase"
+            >Trạng thái:</span
+          >
+          <select
+            v-model="statusFilter"
+            class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+          >
+            <option value="all">Tất cả trạng thái</option>
+            <option value="pending">Chờ xử lý</option>
+            <option value="completed">Hoàn thành</option>
+            <option value="cancelled">Đã hủy / hoàn tiền</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <AppDataTable
+      :columns="columns"
+      :data="paginatedPayments"
+      :total="total"
+      v-model:page="page"
+      v-model:perPage="perPage"
+      :selectable="false"
+      :sortable="true"
+      @update:sort="handleSortChange"
+    >
+      <template #title>Nhật ký giao dịch</template>
+      <template #subtitle
+        >Trạng thái đồng bộ cổng thanh toán và công cụ mô phỏng.</template
+      >
+
+      <template #cell-id="{ row }">
+        <span
+          class="text-sm font-bold font-mono text-slate-800 dark:text-slate-200"
+          >{{ row.id }}</span
+        >
       </template>
-      <template #cell-amount="{ value }">
-        <span class="font-medium text-slate-900 dark:text-white">
-          ₫{{ Number(value).toLocaleString() }}
+
+      <template #cell-orderCode="{ row }">
+        <button
+          @click="router.push(ROUTES.ADMIN.ORDER_DETAIL(row.orderId))"
+          class="text-sm font-bold text-primary-600 hover:underline font-mono"
+        >
+          {{ getOrderCode(row.orderId) }}
+        </button>
+      </template>
+
+      <template #cell-customer="{ row }">
+        <span class="text-sm font-medium text-slate-900 dark:text-white">
+          {{ getCustomerName(row.userId) }}
         </span>
       </template>
-      <template #cell-method="{ value }">
-        <span class="capitalize text-slate-600 dark:text-slate-300">{{
-          value
-        }}</span>
+
+      <template #cell-paymentMethod="{ value }">
+        <span
+          class="text-xs font-bold bg-slate-100 text-slate-800 border px-2 py-0.5 rounded dark:bg-slate-800 dark:text-slate-200 dark:border-slate-750"
+        >
+          {{ value }}
+        </span>
       </template>
+
+      <template #cell-amount="{ value }">
+        <span class="text-sm font-bold text-slate-900 dark:text-white">
+          {{ Number(value).toLocaleString() }} VND
+        </span>
+      </template>
+
       <template #cell-status="{ value }">
         <StatusBadge :status="value" type="payment" />
       </template>
-      <template #cell-createdAt="{ value }">
-        <span class="text-sm text-slate-500 dark:text-slate-400">{{
-          value
-        }}</span>
-      </template>
-      <template #cell-actions="{ row }">
-        <button
-          type="button"
-          class="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-sm font-medium transition"
-          :class="
-            row.status === 'completed'
-              ? 'border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:text-red-400 dark:hover:bg-red-900/20'
-              : 'border-slate-300 text-slate-500 cursor-not-allowed opacity-50 dark:border-slate-700 dark:text-slate-400'
-          "
-          :disabled="row.status !== 'completed'"
-          @click="openRefund(row)"
-        >
-          <i class="pi pi-undo text-xs"></i>
-          Refund
-        </button>
-      </template>
-    </DataTable>
 
-    <RefundDialog
+      <template #cell-transactionId="{ value }">
+        <span
+          class="text-sm font-mono text-slate-500 dark:text-slate-400 font-semibold select-all"
+        >
+          {{ value }}
+        </span>
+      </template>
+
+      <template #cell-actions="{ row }">
+        <div class="flex items-center gap-2">
+          <!-- Pending controls -->
+          <template v-if="row.status === 'pending'">
+            <button
+              @click="handleStatusChange(row.id, 'completed')"
+              class="rounded bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 text-xs font-semibold"
+              title="Giả lập webhook thanh toán thành công"
+            >
+              Giả lập Thanh toán
+            </button>
+            <button
+              @click="handleStatusChange(row.id, 'cancelled')"
+              class="rounded bg-red-600 hover:bg-red-700 text-white px-2 py-1 text-xs font-semibold"
+              title="Giả lập webhook thanh toán thất bại"
+            >
+              Giả lập Hủy
+            </button>
+          </template>
+
+          <!-- Completed controls -->
+          <template v-else-if="row.status === 'completed'">
+            <button
+              @click="openRefundDialog(row)"
+              class="rounded bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 text-xs font-semibold"
+              title="Khởi tạo giao dịch hoàn tiền"
+            >
+              Hoàn tiền
+            </button>
+          </template>
+
+          <span v-else class="text-xs text-slate-400 italic"
+            >Không có hành động khả dụng</span
+          >
+        </div>
+      </template>
+    </AppDataTable>
+
+    <!-- Refund Confirmation Dialog -->
+    <ConfirmDialog
       :visible="showRefundDialog"
-      v-model:reason="refundReason"
-      :payment-id="refundTarget?.id"
+      title="Yêu cầu hoàn tiền"
+      message="Xác nhận thực hiện giả lập hoàn tiền. Thao tác này sẽ hủy giao dịch thanh toán và đánh dấu đơn hàng tương ứng ở trạng thái 'đã trả hàng' (returned)."
+      confirm-label="Xác nhận hoàn tiền"
+      cancel-label="Hủy bỏ"
       :loading="refundLoading"
-      @confirm="submitRefund"
-      @cancel="cancelRefund"
-      @update:visible="(v) => !v && cancelRefund()"
+      danger
+      @confirm="confirmRefund"
+      @cancel="() => (showRefundDialog = false)"
+      @update:visible="(v) => !v && (showRefundDialog = false)"
     />
   </div>
 </template>

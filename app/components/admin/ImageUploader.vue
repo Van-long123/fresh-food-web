@@ -100,8 +100,8 @@ const onDragOver = (event: DragEvent) => {
           clip-rule="evenodd"
         ></path>
       </svg>
-      <p>Drag and drop images here, or click to browse</p>
-      <p class="text-xs text-gray-400">Max {{ maxSize }}MB • {{ accept }}</p>
+      <p>Kéo thả ảnh vào đây hoặc bấm để chọn tệp</p>
+      <p class="text-xs text-gray-400">Tối đa {{ maxSize }}MB • {{ accept }}</p>
       <input
         ref="inputRef"
         type="file"
@@ -123,7 +123,7 @@ const onDragOver = (event: DragEvent) => {
       >
         <img
           :src="src"
-          alt="Preview"
+          alt="Xem trước"
           class="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
         />
         <button
@@ -131,7 +131,7 @@ const onDragOver = (event: DragEvent) => {
           class="absolute top-2 right-2 rounded-full bg-white/90 text-gray-700 text-xs px-2 py-1 shadow hover:bg-white"
           @click.stop="removeImage(index)"
         >
-          Remove
+          Xóa
         </button>
       </div>
     </div>

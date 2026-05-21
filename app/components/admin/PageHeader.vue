@@ -20,6 +20,10 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   showBackButton: false,
+  subtitle: undefined,
+  breadcrumb: undefined,
+  primaryAction: undefined,
+  secondaryAction: undefined,
 });
 
 const router = useRouter();
@@ -51,18 +55,18 @@ const router = useRouter();
         <button
           v-if="showBackButton"
           type="button"
-          @click="router.back()"
           class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
+          @click="router.back()"
         >
           <i class="pi pi-arrow-left"></i>
-          Back
+          Quay lại
         </button>
         <button
           v-if="secondaryAction"
           type="button"
-          @click="secondaryAction.onClick"
           :disabled="secondaryAction.loading"
           class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
+          @click="secondaryAction.onClick"
         >
           <i v-if="secondaryAction.icon" :class="secondaryAction.icon"></i>
           {{ secondaryAction.label }}
@@ -70,9 +74,9 @@ const router = useRouter();
         <button
           v-if="primaryAction"
           type="button"
-          @click="primaryAction.onClick"
           :disabled="primaryAction.loading"
           class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-700 disabled:opacity-50"
+          @click="primaryAction.onClick"
         >
           <i v-if="primaryAction.icon" :class="primaryAction.icon"></i>
           {{ primaryAction.label }}

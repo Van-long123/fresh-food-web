@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+const _props = defineProps<{
   modelValue: string;
   placeholder?: string;
 }>();
@@ -21,12 +21,13 @@ const updateValue = (event: Event) => {
     <div
       class="flex items-center gap-2 px-3 py-2 text-xs text-gray-500 bg-gray-50 dark:bg-gray-800 dark:text-gray-400"
     >
-      <span class="font-medium">Editor</span>
-      <span class="text-gray-400">Basic textarea placeholder</span>
+      <span class="font-medium">Trình soạn thảo</span>
+      <span class="text-gray-400">Ô nhập nội dung cơ bản</span>
     </div>
     <textarea
-      class="w-full min-h-[160px] p-3 text-sm text-gray-900 bg-white border-0 focus:ring-0 dark:bg-gray-900 dark:text-gray-100"
-      :placeholder="placeholder || 'Write content here...'"
+      class="w-full p-3 text-sm text-gray-900 bg-white border-0 focus:ring-0 dark:bg-gray-900 dark:text-gray-100"
+      style="min-height: 160px"
+      :placeholder="placeholder || 'Nhập nội dung tại đây...'"
       :value="modelValue"
       @input="updateValue"
     ></textarea>

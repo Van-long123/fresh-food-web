@@ -1,172 +1,192 @@
 <script setup lang="ts">
+import { reactive, ref } from "vue";
+import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+import PageHeader from "~/components/admin/PageHeader.vue";
+import ImageUploader from "~/components/admin/ImageUploader.vue";
+import { useAdminMockStore } from "~/stores/useAdminMockStore";
+import { useToast } from "primevue/usetoast";
+
 definePageMeta({
   layout: "admin",
   middleware: ["auth", "admin"],
 });
+
+const store = useAdminMockStore();
+const toast = useToast();
+const isSubmitting = ref(false);
+const errors = ref<Record<string, string>>({});
+
+const form = reactive({
+  websiteName: store.settings.websiteName,
+  logo: store.settings.logo,
+  phone: store.settings.phone,
+  email: store.settings.email,
+  address: store.settings.address,
+  copyright: store.settings.copyright,
+});
+
+const validateForm = () => {
+  const errs: Record<string, string> = {};
+  if (!form.websiteName.trim()) errs.websiteName = "Vui lòng nhập tên website.";
+  if (!form.email.trim()) {
+    errs.email = "Vui lòng nhập email.";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    errs.email = "Định dạng email không hợp lệ.";
+  }
+  if (!form.phone.trim()) errs.phone = "Vui lòng nhập số điện thoại.";
+  if (!form.address.trim()) errs.address = "Vui lòng nhập địa chỉ.";
+
+  errors.value = errs;
+  return Object.keys(errs).length === 0;
+};
+
+const submitForm = async () => {
+  if (!validateForm()) {
+    toast.add({
+      severity: "error",
+      summary: "Lỗi kiểm tra dữ liệu",
+      detail: "Vui lòng sửa các lỗi trước khi lưu.",
+      life: 3000,
+    });
+    return;
+  }
+
+  isSubmitting.value = true;
+  await new Promise((resolve) => setTimeout(resolve, 600));
+
+  try {
+    store.updateSettings({
+      websiteName: form.websiteName,
+      logo: form.logo,
+      phone: form.phone,
+      email: form.email,
+      address: form.address,
+      copyright: form.copyright,
+    });
+
+    toast.add({
+      severity: "success",
+      summary: "Đã lưu cài đặt",
+      detail: "Đã cập nhật thành công cấu hình hệ thống.",
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Lỗi",
+      detail: "Không thể cập nhật cài đặt.",
+      life: 3000,
+    });
+  } finally {
+    isSubmitting.value = false;
+  }
+};
 </script>
 
 <template>
-  <div
-    class="grid grid-cols-1 px-4 pt-6 xl:grid-cols-3 xl:gap-4 dark:bg-gray-900"
-  >
-    <div class="col-span-full xl:col-auto">
-      <div
-        class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800"
-      >
-        <div
-          class="items-center sm:flex xl:block 2xl:flex sm:space-x-4 xl:space-x-0 2xl:space-x-4"
+  <div class="px-4 pt-6 space-y-6">
+    <PageHeader
+      title="Cài đặt hệ thống"
+      subtitle="Điều chỉnh cấu hình website, nhận diện thương hiệu, metadata và thông tin liên hệ doanh nghiệp."
+    />
+
+    <div class="grid gap-6 lg:grid-cols-3">
+      <!-- Left: Logo Upload -->
+      <div class="space-y-6">
+        <section
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
         >
-          <img
-            class="mb-4 rounded-lg w-28 h-28 sm:mb-0 xl:mb-4 2xl:mb-0"
-            src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-            alt="Jese picture"
-          />
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+            Logo cửa hàng
+          </h2>
+          <p class="text-xs text-slate-400 mt-1 mb-4">
+            Tải lên logo thương hiệu nền trong, độ phân giải cao.
+          </p>
           <div>
-            <h3 class="mb-1 text-xl font-bold text-gray-900 dark:text-white">
-              Profile picture
-            </h3>
-            <div class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-              JPG, GIF or PNG. Max size of 800K
-            </div>
-            <div class="flex items-center space-x-4">
-              <button
-                type="button"
-                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                <svg
-                  class="w-4 h-4 mr-2 -ml-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                    clip-rule="evenodd"
-                  ></path>
-                </svg>
-                Upload picture
-              </button>
-              <button
-                type="button"
-                class="py-2 px-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-              >
-                Delete
-              </button>
-            </div>
+            <ImageUploader v-model="form.logo" />
           </div>
-        </div>
+        </section>
       </div>
-    </div>
-    <div class="col-span-2">
-      <div
-        class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800"
-      >
-        <h3 class="mb-4 text-xl font-semibold dark:text-white">
-          General information
-        </h3>
-        <form action="#">
-          <div class="grid grid-cols-6 gap-6">
-            <div class="col-span-6 sm:col-span-3">
-              <label
-                for="first-name"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >First Name</label
-              >
-              <input
-                id="first-name"
-                type="text"
-                name="first-name"
-                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Bonnie"
-                required
-              />
+
+      <!-- Right: General Info -->
+      <div class="space-y-6 lg:col-span-2">
+        <section
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
+        >
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+            Cấu hình chung
+          </h2>
+
+          <form @submit.prevent="submitForm" class="space-y-4">
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="md:col-span-2">
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >Tên website *</label
+                >
+                <InputText v-model="form.websiteName" class="mt-2 w-full" />
+                <p v-if="errors.websiteName" class="mt-1 text-xs text-red-500">
+                  {{ errors.websiteName }}
+                </p>
+              </div>
+
+              <div>
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >Email hỗ trợ *</label
+                >
+                <InputText v-model="form.email" class="mt-2 w-full font-mono" />
+                <p v-if="errors.email" class="mt-1 text-xs text-red-500">
+                  {{ errors.email }}
+                </p>
+              </div>
+
+              <div>
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >Hotline hỗ trợ *</label
+                >
+                <InputText v-model="form.phone" class="mt-2 w-full font-mono" />
+                <p v-if="errors.phone" class="mt-1 text-xs text-red-500">
+                  {{ errors.phone }}
+                </p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >Địa chỉ trụ sở *</label
+                >
+                <Textarea v-model="form.address" rows="2" class="mt-2 w-full" />
+                <p v-if="errors.address" class="mt-1 text-xs text-red-500">
+                  {{ errors.address }}
+                </p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >Dòng bản quyền chân trang</label
+                >
+                <InputText v-model="form.copyright" class="mt-2 w-full" />
+              </div>
             </div>
-            <div class="col-span-6 sm:col-span-3">
-              <label
-                for="last-name"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Last Name</label
-              >
-              <input
-                id="last-name"
-                type="text"
-                name="last-name"
-                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="Green"
-                required
-              />
-            </div>
-            <div class="col-span-6 sm:col-span-3">
-              <label
-                for="country"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Country</label
-              >
-              <input
-                id="country"
-                type="text"
-                name="country"
-                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="United States"
-                required
-              />
-            </div>
-            <div class="col-span-6 sm:col-span-3">
-              <label
-                for="city"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >City</label
-              >
-              <input
-                id="city"
-                type="text"
-                name="city"
-                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="e.g. San Francisco"
-                required
-              />
-            </div>
-            <div class="col-span-6 sm:col-span-3">
-              <label
-                for="email"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Email</label
-              >
-              <input
-                id="email"
-                type="email"
-                name="email"
-                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="example@company.com"
-                required
-              />
-            </div>
-            <div class="col-span-6 sm:col-span-3">
-              <label
-                for="phone-number"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >Phone Number</label
-              >
-              <input
-                id="phone-number"
-                type="number"
-                name="phone-number"
-                class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                placeholder="e.g. +(12)3456 789"
-                required
-              />
-            </div>
-            <div class="col-span-6">
+
+            <div
+              class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end"
+            >
               <button
-                class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 type="submit"
+                class="rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-50"
+                :disabled="isSubmitting"
               >
-                Save all
+                <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2"></i>
+                Lưu cài đặt
               </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </section>
       </div>
     </div>
   </div>
