@@ -177,7 +177,7 @@ export interface RefundRequestMock {
     accountNumber: string
     accountHolder: string
   } | null
-  status: 'pending' | 'approved_waiting_bank_info' | 'approved_waiting_pickup' | 'processing_refund' | 'completed' | 'rejected'
+  status: 'pending' | 'approved_waiting_pickup' | 'processing_refund' | 'completed' | 'rejected'
   refundMethod?: 'bank_transfer' | 'cash_on_pickup'
   rejectReason: string
   createdAt: string
@@ -949,7 +949,7 @@ export const useAdminMockStore = defineStore('adminMock', () => {
         { productId: 'prod-2', productName: 'Salad Ức Gà Sốt Mè Rang', quantity: 1, price: 79000 }
       ],
       bankInfo: null,
-      status: 'approved_waiting_bank_info',
+      status: 'processing_refund',
       rejectReason: '',
       createdAt: '2026-05-19T09:00:00.000Z',
       updatedAt: '2026-05-19T10:30:00.000Z'

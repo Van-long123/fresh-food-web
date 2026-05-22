@@ -555,8 +555,6 @@ const refundRequest = computed(() => refundRequestData.value || null);
 
 const refundActionLabel = computed(() => {
   const status = refundRequest.value?.status;
-  if (status === "approved_waiting_bank_info")
-    return "Nhập thông tin nhận tiền";
   if (status === "approved_waiting_pickup")
     return "Chờ shipper đến lấy hàng";
   if (status === "pending") return "Xem yêu cầu hoàn tiền";

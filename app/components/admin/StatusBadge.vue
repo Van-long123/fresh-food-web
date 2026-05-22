@@ -58,8 +58,6 @@ const statusMap: Record<string, Record<string, string>> = {
   refund: {
     pending:
       "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-    approved_waiting_bank_info:
-      "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
     approved_waiting_pickup:
       "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
     processing_refund:
@@ -97,7 +95,6 @@ const labelMap: Record<string, string> = {
   approved: "Đã duyệt",
   rejected: "Từ chối",
   expired: "Hết hạn",
-  approved_waiting_bank_info: "Chờ thông tin TK",
   approved_waiting_pickup: "Chờ lấy hàng & hoàn tiền",
   processing_refund: "Đang xử lý hoàn tiền",
 };

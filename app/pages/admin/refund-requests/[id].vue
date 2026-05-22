@@ -53,7 +53,7 @@ const handleApprove = async () => {
   await new Promise((resolve) => setTimeout(resolve, 700));
   
   const isCashOnPickup = request.value?.refundMethod === "cash_on_pickup";
-  const nextStatus = isCashOnPickup ? "approved_waiting_pickup" : "approved_waiting_bank_info";
+  const nextStatus = isCashOnPickup ? "approved_waiting_pickup" : "processing_refund";
   
   store.updateRefundStatus(request.value!.id, nextStatus);
   
@@ -62,7 +62,7 @@ const handleApprove = async () => {
     summary: "Đã duyệt yêu cầu",
     detail: isCashOnPickup
       ? "Yêu cầu hoàn tiền mặt khi shipper tới lấy đã được duyệt."
-      : "Khách hàng sẽ được yêu cầu cung cấp thông tin ngân hàng.",
+      : "Yêu cầu hoàn tiền đã được duyệt. Đang tiến hành xử lý chuyển khoản.",
     life: 3000,
   });
   showApproveDialog.value = false;
@@ -194,9 +194,9 @@ const openRejectDialog = () => {
             <i class="pi pi-check-square"></i>
             Xác nhận đã lấy hàng & hoàn tiền
           </button>
-          <!-- Reject button (pending, approved_waiting_bank_info or approved_waiting_pickup) -->
+          <!-- Reject button (pending or approved_waiting_pickup) -->
           <button
-            v-if="request.status === 'pending' || request.status === 'approved_waiting_bank_info' || request.status === 'approved_waiting_pickup'"
+            v-if="request.status === 'pending' || request.status === 'approved_waiting_pickup'"
             @click="openRejectDialog"
             class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:bg-slate-900 dark:hover:bg-red-900/20"
           >

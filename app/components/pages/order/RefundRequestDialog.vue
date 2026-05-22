@@ -10,7 +10,6 @@ import { useToast } from "primevue/usetoast";
 import { refundService } from "~/services/refund.service";
 import {
   useCreateRefundMutation,
-  useSubmitBankInfoMutation,
 } from "~/mutations/refund/useRefundMutations";
 
 import type { OrderItem, RefundRequestData } from "~/types/refund.type";
@@ -46,8 +45,6 @@ const accountHolder = ref("");
 const { mutate: createRefund, isPending: isCreating } = useCreateRefundMutation(
   props.orderId,
 );
-const { mutate: submitBankInfo, isPending: isSubmittingBank } =
-  useSubmitBankInfoMutation(props.orderId);
 
 const { data: bankData, pending: isBankLoading } = useFetch<{ data: any[] }>(
   "https://api.vietqr.io/v2/banks",
@@ -64,9 +61,6 @@ const bankOptions = computed(() => {
 
 // Lấy trạng thái của yêu cầu hoàn tiền hiện tại
 const refundStatus = computed(() => props.refundRequest?.status || "");
-const isWaitingBankInfo = computed(
-  () => refundStatus.value === "approved_waiting_bank_info",
-);
 const isWaitingPickup = computed(
   () => refundStatus.value === "approved_waiting_pickup",
 );
@@ -214,18 +208,7 @@ const submitRefundRequest = () => {
   });
 };
 
-const submitBankInfoForm = () => {
-  if (!props.refundRequest?._id || !canSubmitBankInfo.value) return;
 
-  submitBankInfo({
-    id: props.refundRequest._id,
-    payload: {
-      bankName: bankName.value.trim(),
-      accountNumber: accountNumber.value.trim(),
-      accountHolder: accountHolder.value.trim(),
-    },
-  });
-};
 </script>
 
 <template>
@@ -250,67 +233,6 @@ const submitBankInfoForm = () => {
       >
         Yêu cầu hoàn tiền đã bị từ chối. Lý do:
         {{ refundRequest?.rejectReason || "Không có lý do được cung cấp" }}
-      </div>
-
-      <!-- Trạng thái: Chờ nhập thông tin ngân hàng -->
-      <div v-if="isWaitingBankInfo" class="space-y-4">
-        <div
-          class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          ✅ Yêu cầu đã được duyệt. Vui lòng cung cấp thông tin tài khoản ngân hàng để nhận tiền hoàn.
-        </div>
-
-        <div class="grid gap-4 md:grid-cols-2">
-          <div class="md:col-span-2">
-            <label class="text-sm font-semibold text-gray-700">Ngân hàng</label>
-            <Dropdown
-              v-model="bankName"
-              :options="bankOptions"
-              optionLabel="label"
-              optionValue="value"
-              :loading="isBankLoading"
-              placeholder="Chọn ngân hàng"
-              class="mt-2 w-full"
-            />
-          </div>
-          <div>
-            <label class="text-sm font-semibold text-gray-700"
-              >Số tài khoản</label
-            >
-            <InputText v-model="accountNumber" class="mt-2 w-full" />
-          </div>
-          <div>
-            <label class="text-sm font-semibold text-gray-700"
-              >Chủ tài khoản</label
-            >
-            <InputText v-model="accountHolder" class="mt-2 w-full" />
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-3">
-          <button
-            class="rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
-            type="button"
-            @click="() => emit('update:visible', false)"
-          >
-            Đóng
-          </button>
-          <button
-            class="rounded-full bg-[#f47f20] px-6 py-2 text-sm font-semibold text-white shadow hover:bg-[#e06e10] disabled:opacity-60"
-            type="button"
-            :disabled="!canSubmitBankInfo || isSubmittingBank"
-            @click="submitBankInfoForm"
-          >
-            <span
-              v-if="isSubmittingBank"
-              class="inline-flex items-center gap-2"
-            >
-              <i class="pi pi-spin pi-spinner text-sm"></i>
-              Đang gửi...
-            </span>
-            <span v-else>Gửi thông tin</span>
-          </button>
-        </div>
       </div>
 
       <!-- Trạng thái: Chờ shipper đến lấy hàng (cash on pickup) -->
