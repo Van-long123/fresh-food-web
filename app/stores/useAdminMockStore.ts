@@ -930,6 +930,7 @@ export const useAdminMockStore = defineStore('adminMock', () => {
         accountHolder: 'PHAM MINH DUC'
       },
       status: 'pending',
+      refundMethod: 'bank_transfer',
       rejectReason: '',
       createdAt: '2026-05-20T14:30:00.000Z',
       updatedAt: null
@@ -950,6 +951,7 @@ export const useAdminMockStore = defineStore('adminMock', () => {
       ],
       bankInfo: null,
       status: 'processing_refund',
+      refundMethod: 'bank_transfer',
       rejectReason: '',
       createdAt: '2026-05-19T09:00:00.000Z',
       updatedAt: '2026-05-19T10:30:00.000Z'
@@ -976,6 +978,7 @@ export const useAdminMockStore = defineStore('adminMock', () => {
         accountHolder: 'VU QUOC ANH'
       },
       status: 'processing_refund',
+      refundMethod: 'bank_transfer',
       rejectReason: '',
       createdAt: '2026-05-18T11:00:00.000Z',
       updatedAt: '2026-05-18T13:00:00.000Z'
@@ -1000,6 +1003,7 @@ export const useAdminMockStore = defineStore('adminMock', () => {
         accountHolder: 'TRAN THI THU HA'
       },
       status: 'completed',
+      refundMethod: 'bank_transfer',
       rejectReason: '',
       createdAt: '2026-05-17T08:00:00.000Z',
       updatedAt: '2026-05-17T16:00:00.000Z'
@@ -1020,9 +1024,29 @@ export const useAdminMockStore = defineStore('adminMock', () => {
       ],
       bankInfo: null,
       status: 'rejected',
+      refundMethod: 'bank_transfer',
       rejectReason: 'Lý do hoàn tiền không hợp lệ. Sản phẩm vẫn còn trong hạn sử dụng và được giao đúng yêu cầu.',
       createdAt: '2026-05-16T15:00:00.000Z',
       updatedAt: '2026-05-16T17:00:00.000Z'
+    },
+    {
+      id: 'refund-6',
+      orderId: 'ord-1006',
+      userId: 'user-6',
+      customerName: 'Hoàng Ngọc Mai',
+      amount: 150000,
+      reason: 'Sản phẩm không đúng như mô tả trên hình ảnh.',
+      images: [],
+      videos: [],
+      items: [
+        { productId: 'prod-3', productName: 'Nước Ép Thải Độc Cần Tây Táo', quantity: 3, price: 50000 }
+      ],
+      bankInfo: null,
+      status: 'approved_waiting_pickup',
+      refundMethod: 'cash_on_pickup',
+      rejectReason: '',
+      createdAt: '2026-05-21T10:00:00.000Z',
+      updatedAt: '2026-05-21T11:00:00.000Z'
     }
   ])
 

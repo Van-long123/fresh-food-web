@@ -61,8 +61,8 @@ const handleApprove = async () => {
     severity: "success",
     summary: "Đã duyệt yêu cầu",
     detail: isCashOnPickup
-      ? "Yêu cầu hoàn tiền mặt khi shipper tới lấy đã được duyệt."
-      : "Yêu cầu hoàn tiền đã được duyệt. Đang tiến hành xử lý chuyển khoản.",
+      ? "Đã duyệt. Shipper sẽ đến lấy hàng và hoàn tiền mặt."
+      : "Đã duyệt. Tiến hành xử lý chuyển khoản.",
     life: 3000,
   });
   showApproveDialog.value = false;

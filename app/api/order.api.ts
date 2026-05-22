@@ -12,8 +12,8 @@ export const getOrderDetailRequest = async (id: string): Promise<any> => {
   return response.data.data
 }
 
-export const cancelOrderRequest = async (id: string): Promise<any> => {
-  const response = await getAuthorizedAxios().put(API_ENDPOINTS.ORDER.CANCEL(id))
+export const cancelOrderRequest = async (id: string, payload: Record<string, any> = {}): Promise<any> => {
+  const response = await getAuthorizedAxios().put(API_ENDPOINTS.ORDER.CANCEL(id), payload)
   return response.data
 }
 

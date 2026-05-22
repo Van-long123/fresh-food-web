@@ -24,6 +24,7 @@ const perPage = ref(10);
 const columns = [
   { key: "orderId", label: "Mã đơn hàng", sortable: true },
   { key: "customerName", label: "Khách hàng" },
+  { key: "refundMethod", label: "Phương thức hoàn" },
   { key: "amount", label: "Số tiền hoàn", sortable: true },
   { key: "status", label: "Trạng thái" },
   { key: "createdAt", label: "Ngày tạo", sortable: true },
@@ -71,8 +72,8 @@ const statusStats = computed(() => {
   const all = store.refundRequests;
   return {
     pending: all.filter((r) => r.status === "pending").length,
-    approved_waiting_bank_info: all.filter(
-      (r) => r.status === "approved_waiting_bank_info",
+    approved_waiting_pickup: all.filter(
+      (r) => r.status === "approved_waiting_pickup",
     ).length,
     processing_refund: all.filter((r) => r.status === "processing_refund")
       .length,
@@ -100,8 +101,8 @@ const statusStats = computed(() => {
       <div
         class="rounded-xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-800/40 dark:bg-sky-900/20"
       >
-        <p class="text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">Chờ TK</p>
-        <p class="mt-1 text-2xl font-bold text-sky-700 dark:text-sky-300">{{ statusStats.approved_waiting_bank_info }}</p>
+        <p class="text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wide">Chờ lấy hàng</p>
+        <p class="mt-1 text-2xl font-bold text-sky-700 dark:text-sky-300">{{ statusStats.approved_waiting_pickup }}</p>
       </div>
       <div
         class="rounded-xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-800/40 dark:bg-orange-900/20"
@@ -136,7 +137,7 @@ const statusStats = computed(() => {
         >
           <option value="all">Tất cả</option>
           <option value="pending">Chờ duyệt</option>
-          <option value="approved_waiting_bank_info">Chờ thông tin TK</option>
+          <option value="approved_waiting_pickup">Chờ lấy hàng & hoàn tiền</option>
           <option value="processing_refund">Đang xử lý hoàn tiền</option>
           <option value="completed">Đã hoàn tiền</option>
           <option value="rejected">Từ chối</option>
@@ -164,6 +165,13 @@ const statusStats = computed(() => {
         <div>
           <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ row.customerName }}</p>
           <p class="text-xs text-slate-500 dark:text-slate-400">{{ row.userId }}</p>
+        </div>
+      </template>
+
+      <template #cell-refundMethod="{ value }">
+        <div class="flex items-center gap-1.5 text-sm font-medium">
+          <span v-if="value === 'cash_on_pickup'" class="text-orange-600 dark:text-orange-400">💵 Tiền mặt</span>
+          <span v-else class="text-primary-600 dark:text-primary-400">🏦 Chuyển khoản</span>
         </div>
       </template>
 

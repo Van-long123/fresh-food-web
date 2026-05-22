@@ -4,11 +4,19 @@
   >
     <ConfirmDialog />
     <RefundRequestDialog
-      v-if="orderData"
+      v-if="orderData && showRefundDialog"
       v-model:visible="showRefundDialog"
       :order-id="order._id || orderId"
       :items="items"
       :refund-request="refundRequest"
+    />
+    <!-- Dialog dành riêng cho hủy đơn đã thanh toán PayOS → tạo yêu cầu hoàn tiền -->
+    <CancelWithRefundDialog
+      v-if="orderData && showCancelRefundDialog"
+      v-model:visible="showCancelRefundDialog"
+      :total-price="order.totalPrice || 0"
+      :is-pending="isCancelling"
+      @confirm="onConfirmCancelWithRefund"
     />
 
     <div v-if="isLoading" class="flex justify-center items-center h-64">
@@ -247,7 +255,7 @@
                       >x{{ item.quantity }}</span
                     >
                     <span class="text-xs text-gray-400"
-                      >{{ formatVnd(item.price) }}/sp</span
+                      >{{ formatVnd(item.price) }}đ/sp</span
                     >
                   </div>
                 </div>
@@ -257,7 +265,7 @@
                   class="flex-shrink-0 text-right flex flex-col justify-center gap-1.5"
                 >
                   <p class="font-bold text-sm text-gray-900">
-                    {{ formatVnd(item.totalPrice) }}
+                    {{ formatVnd(item.totalPrice) }}đ
                   </p>
                   <div class="flex flex-col gap-1 items-end">
                     <button
@@ -288,9 +296,9 @@
             <div class="space-y-2.5 text-sm text-gray-600">
               <div class="flex justify-between">
                 <span>Tạm tính ({{ totalQty }} SP)</span>
-                <span class="font-medium text-gray-800">{{
-                  formatVnd(subtotal)
-                }}</span>
+                <span class="font-medium text-gray-800"
+                  >{{ formatVnd(subtotal) }}đ</span
+                >
               </div>
               <div
                 v-if="order.voucherCode"
@@ -305,7 +313,7 @@
                   </span>
                 </div>
                 <span class="text-green-600 font-semibold"
-                  >− {{ formatVnd(order.discountVoucher) }}</span
+                  >− {{ formatVnd(order.discountVoucher) }}đ</span
                 >
               </div>
               <div class="flex justify-between">
@@ -320,7 +328,7 @@
                   {{
                     order.shippingFee === 0
                       ? "Miễn phí"
-                      : formatVnd(order.shippingFee)
+                      : formatVnd(order.shippingFee) + "đ"
                   }}
                 </span>
               </div>
@@ -333,7 +341,7 @@
                 Tổng thanh toán
               </div>
               <div class="font-black text-xl text-[#f47f20]">
-                {{ formatVnd(order.totalPrice) }}
+                {{ formatVnd(order.totalPrice) }}đ
               </div>
             </div>
 
@@ -342,7 +350,7 @@
               class="mt-3 p-3 bg-green-50 rounded-xl border border-green-100 flex items-center gap-2 text-sm font-semibold text-green-700"
             >
               <span>🎉</span>
-              <span>Tiết kiệm {{ formatVnd(order.discountVoucher) }}</span>
+              <span>Tiết kiệm {{ formatVnd(order.discountVoucher) }}đ</span>
             </div>
           </div>
 
@@ -424,9 +432,9 @@
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-gray-500">Số tiền</span>
-                <span class="font-bold text-[#f47f20]">{{
-                  formatVnd(payment.amount)
-                }}</span>
+                <span class="font-bold text-[#f47f20]"
+                  >{{ formatVnd(payment.amount) }}đ</span
+                >
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-gray-500">Thời gian</span>
@@ -508,6 +516,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import ConfirmDialog from "primevue/confirmdialog";
 import RefundRequestDialog from "~/components/pages/order/RefundRequestDialog.vue";
+import CancelWithRefundDialog from "~/components/pages/order/CancelWithRefundDialog.vue";
 import { useRefundRequestQuery } from "~/queries/refund/useRefundQuery";
 import { useOrderDetail } from "~/composables/order/useOrderDetail";
 import { formatVnd } from "~/utils/currency";
@@ -528,6 +537,7 @@ const {
   showCancelConfirm,
   cancelMessage,
   showRefundDialog,
+  showCancelRefundDialog,
   subtotal,
   totalQty,
   currentStepIndex,
@@ -538,12 +548,14 @@ const {
   paymentStatusClass,
   paymentMethodMeta,
   isRefundable,
+  isPaidViaPayOS,
   formatDateTime,
   copyTransactionId,
   reviewProduct,
   buyAgain,
   reorderAll,
   onAcceptCancel,
+  onConfirmCancelWithRefund,
   triggerCancel,
   confirmReceived,
   openRefundDialog,
@@ -555,8 +567,7 @@ const refundRequest = computed(() => refundRequestData.value || null);
 
 const refundActionLabel = computed(() => {
   const status = refundRequest.value?.status;
-  if (status === "approved_waiting_pickup")
-    return "Chờ shipper đến lấy hàng";
+  if (status === "approved_waiting_pickup") return "Chờ shipper đến lấy hàng";
   if (status === "pending") return "Xem yêu cầu hoàn tiền";
   if (status === "processing_refund") return "Đang hoàn tiền";
   if (status === "rejected") return "Xem lý do từ chối";

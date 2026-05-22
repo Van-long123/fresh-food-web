@@ -32,6 +32,14 @@ export const useOrderDetail = (orderId: string) => {
   const showCancelConfirm = ref(false);
   const cancelMessage = "Bạn có chắc muốn hủy đơn hàng này? Hành động không thể hoàn tác.";
   const showRefundDialog = ref(false);
+  // Điều khiển hiển thị dialog "hủy đơn hàng đã thanh toán qua PayOS + tạo yêu cầu hoàn tiền"
+  const showCancelRefundDialog = ref(false);
+
+  // Trả về true nếu đơn hàng đã được thanh toán thành công qua PayOS
+  const isPaidViaPayOS = computed(() => {
+    const p = payment.value as any;
+    return p?.paymentMethod === "PayOS" && p?.status === "completed";
+  });
 
   const subtotal = computed(() =>
     items.value.reduce((s: number, i: any) => s + i.totalPrice, 0),
@@ -145,10 +153,18 @@ export const useOrderDetail = (orderId: string) => {
   }
 
   function onAcceptCancel() {
-    cancelOrder();
+    // Hủy đơn hàng tiêu chuẩn (COD / Chưa thanh toán) — không cần thêm payload thông tin ngân hàng
+    cancelOrder({});
   }
 
   function triggerCancel() {
+    // Nếu đơn hàng đã thanh toán qua PayOS và giao dịch hoàn tất,
+    // hiển thị dialog "Hủy đơn + Hoàn tiền" riêng biệt thay vì hộp thoại xác nhận thông thường
+    if (isPaidViaPayOS.value) {
+      showCancelRefundDialog.value = true;
+      return;
+    }
+
     confirm.require({
       message: cancelMessage,
       header: "Xác nhận hủy đơn",
@@ -160,6 +176,16 @@ export const useOrderDetail = (orderId: string) => {
         onAcceptCancel();
       },
     });
+  }
+
+  function onConfirmCancelWithRefund(payload: {
+    reason: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolderName: string;
+  }) {
+    showCancelRefundDialog.value = false;
+    cancelOrder(payload);
   }
 
   function confirmReceived() {
@@ -214,11 +240,13 @@ export const useOrderDetail = (orderId: string) => {
     showCancelConfirm,
     cancelMessage,
     showRefundDialog,
+    showCancelRefundDialog,
     subtotal,
     totalQty,
     currentStepIndex,
     timelineStepsWithTime,
     isRefundable,
+    isPaidViaPayOS,
     statusMeta,
     statusBorderClass,
     paymentMeta,
@@ -230,6 +258,7 @@ export const useOrderDetail = (orderId: string) => {
     buyAgain,
     reorderAll,
     onAcceptCancel,
+    onConfirmCancelWithRefund,
     triggerCancel,
     confirmReceived,
     openRefundDialog,

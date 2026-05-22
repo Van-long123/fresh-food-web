@@ -15,16 +15,18 @@ export const useCancelOrderMutation = (orderId: string) => {
   const toast = useToast()
 
   return useMutation({
-    mutationFn: () => orderService.cancelOrder(orderId),
-    onSuccess: () => {
+    mutationFn: (payload: Record<string, any> = {}) => orderService.cancelOrder(orderId, payload),
+    onSuccess: (data: any) => {
+      const detail = data?.message || 'Đơn hàng đã được hủy thành công'
       toast.add({
         severity: 'success',
         summary: 'Thành công',
-        detail: 'Đơn hàng đã được hủy thành công',
-        life: 3000
+        detail,
+        life: 5000
       })
       queryClient.invalidateQueries({ queryKey: ['order-detail', orderId] })
       queryClient.invalidateQueries({ queryKey: ['my-orders'] })
+      queryClient.invalidateQueries({ queryKey: ['refund-requests', orderId] })
     },
     onError: (error: any) => {
       toast.add({

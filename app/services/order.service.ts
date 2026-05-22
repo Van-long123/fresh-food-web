@@ -8,6 +8,6 @@ import {
 export const orderService = {
   getMyOrders: () => getMyOrdersRequest(),
   getOrderDetail: (id: string) => getOrderDetailRequest(id),
-  cancelOrder: (id: string) => cancelOrderRequest(id),
+  cancelOrder: (id: string, payload: Record<string, any> = {}) => cancelOrderRequest(id, payload),
   confirmReceived: (id: string) => confirmOrderReceivedRequest(id),
 }

@@ -454,7 +454,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
         shippingFee: shippingFee.value
       }
 
-      await createCodOrderMutation.mutateAsync(checkoutPayload)
+      const res = await createCodOrderMutation.mutateAsync(checkoutPayload)
 
       const orderInfo: OrderInfo = {
         userInfo: {
@@ -484,7 +484,10 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
       }
 
       orderStore.setOrderInfo(orderInfo)
-      return orderInfo
+      return {
+        ...orderInfo,
+        orderId: res?.data?.orderId || ''
+      }
     } catch (error: any) {
       const message =
         error?.response?.data?.message ||

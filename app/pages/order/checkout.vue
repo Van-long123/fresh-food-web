@@ -921,10 +921,7 @@ const handleCheckout = async () => {
     );
     cartStore.setCartItems(remainingItems);
 
-    router.push({
-      path: ROUTES.PROFILE,
-      query: { tab: "orders" },
-    });
+    router.push(`/order/${result.orderId}`);
   }
 };
 
