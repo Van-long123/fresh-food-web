@@ -35,6 +35,10 @@ const uploadedImages = ref<string[]>([]);
 const uploadedVideos = ref<string[]>([]);
 const isUploadingEvidence = ref(false);
 
+// --- Refund Method ---
+const refundMethod = ref<"bank_transfer" | "cash_on_pickup">("bank_transfer");
+
+// --- Bank info fields (only for bank_transfer) ---
 const bankName = ref("");
 const accountNumber = ref("");
 const accountHolder = ref("");
@@ -63,6 +67,9 @@ const refundStatus = computed(() => props.refundRequest?.status || "");
 const isWaitingBankInfo = computed(
   () => refundStatus.value === "approved_waiting_bank_info",
 );
+const isWaitingPickup = computed(
+  () => refundStatus.value === "approved_waiting_pickup",
+);
 const isRejected = computed(() => refundStatus.value === "rejected");
 
 // Kiểm tra có yêu cầu hoàn tiền nào đang tồn tại (không phải bị từ chối)
@@ -70,6 +77,9 @@ const hasExistingRequest = computed(() => {
   if (!props.refundRequest?._id) return false;
   return props.refundRequest.status !== "rejected";
 });
+
+// Computed: có hiển thị form nhập thông tin ngân hàng không
+const isShowBankForm = computed(() => refundMethod.value === "bank_transfer");
 
 // Lọc ra danh sách các sản phẩm được người dùng tick chọn
 const selectedItems = computed(() => {
@@ -82,13 +92,22 @@ const selectedItems = computed(() => {
 });
 
 const canSubmitRequest = computed(() => {
-  return (
+  const baseValid =
     selectedItems.value.length > 0 &&
     reason.value.trim().length > 0 &&
     uploadedImages.value.length > 0 &&
     !isUploadingEvidence.value &&
-    !isRejected.value
-  );
+    !isRejected.value;
+
+  if (refundMethod.value === "bank_transfer") {
+    return (
+      baseValid &&
+      bankName.value.trim().length > 0 &&
+      accountNumber.value.trim().length > 0 &&
+      accountHolder.value.trim().length > 0
+    );
+  }
+  return baseValid;
 });
 
 const canSubmitBankInfo = computed(() => {
@@ -111,6 +130,10 @@ const resetForm = () => {
   reason.value = "";
   uploadedImages.value = [];
   uploadedVideos.value = [];
+  refundMethod.value = "bank_transfer";
+  bankName.value = "";
+  accountNumber.value = "";
+  accountHolder.value = "";
 };
 
 watch(
@@ -166,20 +189,29 @@ const removeEvidence = (type: "image" | "video", url: string) => {
 const submitRefundRequest = () => {
   if (!canSubmitRequest.value) return;
 
-  createRefund(
-    {
-      orderId: props.orderId,
-      items: selectedItems.value,
-      reason: reason.value.trim(),
-      images: uploadedImages.value,
-      videos: uploadedVideos.value,
+  const payload: any = {
+    orderId: props.orderId,
+    items: selectedItems.value,
+    reason: reason.value.trim(),
+    images: uploadedImages.value,
+    videos: uploadedVideos.value,
+    refundMethod: refundMethod.value,
+  };
+
+  // Chỉ gửi bankInfo nếu người dùng chọn bank_transfer
+  if (refundMethod.value === "bank_transfer") {
+    payload.bankInfo = {
+      bankName: bankName.value.trim(),
+      accountNumber: accountNumber.value.trim(),
+      accountHolder: accountHolder.value.trim(),
+    };
+  }
+
+  createRefund(payload, {
+    onSuccess: () => {
+      emit("update:visible", false);
     },
-    {
-      onSuccess: () => {
-        emit("update:visible", false);
-      },
-    },
-  );
+  });
 };
 
 const submitBankInfoForm = () => {
@@ -220,11 +252,12 @@ const submitBankInfoForm = () => {
         {{ refundRequest?.rejectReason || "Không có lý do được cung cấp" }}
       </div>
 
+      <!-- Trạng thái: Chờ nhập thông tin ngân hàng -->
       <div v-if="isWaitingBankInfo" class="space-y-4">
         <div
           class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
         >
-          Yêu cầu đã được duyệt. Vui lòng cung cấp thông tin nhận tiền.
+          ✅ Yêu cầu đã được duyệt. Vui lòng cung cấp thông tin tài khoản ngân hàng để nhận tiền hoàn.
         </div>
 
         <div class="grid gap-4 md:grid-cols-2">
@@ -280,7 +313,34 @@ const submitBankInfoForm = () => {
         </div>
       </div>
 
+      <!-- Trạng thái: Chờ shipper đến lấy hàng (cash on pickup) -->
+      <div v-else-if="isWaitingPickup" class="space-y-4">
+        <div
+          class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+        >
+          ✅ Yêu cầu đã được duyệt. Shipper sẽ liên hệ để đến lấy hàng và hoàn trả tiền mặt cho bạn.
+        </div>
+        <div
+          class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700 flex items-start gap-2"
+        >
+          <span class="text-base mt-0.5">📦</span>
+          <span>Vui lòng chuẩn bị sản phẩm cần hoàn trả và tiếp nhận shipper khi họ đến lấy hàng. Bạn sẽ nhận lại tiền mặt trực tiếp.</span>
+        </div>
+        <div class="flex justify-end">
+          <button
+            class="rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"
+            type="button"
+            @click="() => emit('update:visible', false)"
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+
+      <!-- Form tạo mới yêu cầu -->
       <div v-else-if="!hasExistingRequest" class="space-y-5">
+
+        <!-- CHỌN SẢN PHẨM -->
         <div class="space-y-3">
           <h3 class="text-base font-semibold text-gray-900">
             Chọn sản phẩm cần hoàn
@@ -330,6 +390,7 @@ const submitBankInfoForm = () => {
           </div>
         </div>
 
+        <!-- LÝ DO HOÀN -->
         <div>
           <label class="text-sm font-semibold text-gray-700">Lý do hoàn</label>
           <Textarea
@@ -341,6 +402,95 @@ const submitBankInfoForm = () => {
           />
         </div>
 
+        <!-- PHƯƠNG THỨC HOÀN TIỀN -->
+        <div class="space-y-3">
+          <h3 class="text-base font-semibold text-gray-900">
+            Phương thức nhận hoàn tiền
+          </h3>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <!-- Option: Bank Transfer -->
+            <label
+              :class="[
+                'flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-all',
+                refundMethod === 'bank_transfer'
+                  ? 'border-[#f47f20] bg-orange-50'
+                  : 'border-gray-100 hover:border-gray-200',
+              ]"
+            >
+              <input
+                type="radio"
+                class="mt-0.5 accent-[#f47f20]"
+                value="bank_transfer"
+                v-model="refundMethod"
+              />
+              <div>
+                <p class="text-sm font-semibold text-gray-800">🏦 Chuyển khoản ngân hàng</p>
+                <p class="mt-0.5 text-xs text-gray-500">Nhận tiền hoàn qua tài khoản ngân hàng</p>
+              </div>
+            </label>
+
+            <!-- Option: Cash on Pickup -->
+            <label
+              :class="[
+                'flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-all',
+                refundMethod === 'cash_on_pickup'
+                  ? 'border-[#f47f20] bg-orange-50'
+                  : 'border-gray-100 hover:border-gray-200',
+              ]"
+            >
+              <input
+                type="radio"
+                class="mt-0.5 accent-[#f47f20]"
+                value="cash_on_pickup"
+                v-model="refundMethod"
+              />
+              <div>
+                <p class="text-sm font-semibold text-gray-800">💵 Tiền mặt khi shipper đến lấy</p>
+                <p class="mt-0.5 text-xs text-gray-500">Nhận tiền mặt trực tiếp khi shipper đến lấy hàng hoàn trả</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- Ghi chú cho cash_on_pickup -->
+          <div
+            v-if="!isShowBankForm"
+            class="flex items-start gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700"
+          >
+            <span class="text-base mt-0.5">ℹ️</span>
+            <span>Shipper sẽ hoàn trả tiền mặt khi đến lấy sản phẩm hoàn trả. Vui lòng chuẩn bị sản phẩm và ở nhà để tiếp nhận shipper.</span>
+          </div>
+        </div>
+
+        <!-- THÔNG TIN NGÂN HÀNG (chỉ hiển thị nếu bank_transfer) -->
+        <div v-if="isShowBankForm" class="space-y-3">
+          <h3 class="text-base font-semibold text-gray-900">
+            Thông tin tài khoản ngân hàng <span class="text-red-500">*</span>
+          </h3>
+          <div class="grid gap-4 md:grid-cols-2">
+            <div class="md:col-span-2">
+              <label class="text-sm font-semibold text-gray-700">Ngân hàng</label>
+              <Dropdown
+                v-model="bankName"
+                :options="bankOptions"
+                optionLabel="label"
+                optionValue="value"
+                :loading="isBankLoading"
+                placeholder="Chọn ngân hàng"
+                class="mt-2 w-full"
+              />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-gray-700">Số tài khoản</label>
+              <InputText v-model="accountNumber" class="mt-2 w-full" placeholder="Nhập số tài khoản" />
+            </div>
+            <div>
+              <label class="text-sm font-semibold text-gray-700">Chủ tài khoản</label>
+              <InputText v-model="accountHolder" class="mt-2 w-full" placeholder="Nhập tên chủ tài khoản" />
+            </div>
+          </div>
+        </div>
+
+        <!-- MINH CHỨNG -->
         <div class="space-y-3">
           <label class="text-sm font-semibold text-gray-700">
             Minh chứng (bắt buộc ít nhất 1 ảnh)
@@ -408,6 +558,7 @@ const submitBankInfoForm = () => {
           </div>
         </div>
 
+        <!-- ACTIONS -->
         <div class="flex justify-end gap-3">
           <button
             class="rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"

@@ -9,6 +9,12 @@ export interface CreateRefundPayload {
   reason: string;
   images: string[];
   videos?: string[];
+  refundMethod: 'bank_transfer' | 'cash_on_pickup';
+  bankInfo?: {
+    bankName: string;
+    accountNumber: string;
+    accountHolder: string;
+  } | null;
 }
 
 export interface BankInfoPayload {
@@ -30,6 +36,7 @@ export interface RefundRequestData {
   status?: string;
   amount?: number;
   rejectReason?: string;
+  refundMethod?: 'bank_transfer' | 'cash_on_pickup';
   bankInfo?: {
     bankName?: string;
     accountNumber?: string;

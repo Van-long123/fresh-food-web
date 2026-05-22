@@ -177,7 +177,8 @@ export interface RefundRequestMock {
     accountNumber: string
     accountHolder: string
   } | null
-  status: 'pending' | 'approved_waiting_bank_info' | 'processing_refund' | 'completed' | 'rejected'
+  status: 'pending' | 'approved_waiting_bank_info' | 'approved_waiting_pickup' | 'processing_refund' | 'completed' | 'rejected'
+  refundMethod?: 'bank_transfer' | 'cash_on_pickup'
   rejectReason: string
   createdAt: string
   updatedAt: string | null

@@ -25,6 +25,7 @@ const request = computed(() =>
 // Dialog states
 const showApproveDialog = ref(false);
 const showConfirmTransferDialog = ref(false);
+const showConfirmPickupDialog = ref(false);
 const showRejectDialog = ref(false);
 const actionLoading = ref(false);
 
@@ -50,11 +51,18 @@ const formatCurrency = (amount: number) =>
 const handleApprove = async () => {
   actionLoading.value = true;
   await new Promise((resolve) => setTimeout(resolve, 700));
-  store.updateRefundStatus(request.value!.id, "approved_waiting_bank_info");
+  
+  const isCashOnPickup = request.value?.refundMethod === "cash_on_pickup";
+  const nextStatus = isCashOnPickup ? "approved_waiting_pickup" : "approved_waiting_bank_info";
+  
+  store.updateRefundStatus(request.value!.id, nextStatus);
+  
   toast.add({
     severity: "success",
     summary: "Đã duyệt yêu cầu",
-    detail: "Khách hàng sẽ được yêu cầu cung cấp thông tin ngân hàng.",
+    detail: isCashOnPickup
+      ? "Yêu cầu hoàn tiền mặt khi shipper tới lấy đã được duyệt."
+      : "Khách hàng sẽ được yêu cầu cung cấp thông tin ngân hàng.",
     life: 3000,
   });
   showApproveDialog.value = false;
@@ -72,6 +80,20 @@ const handleConfirmTransfer = async () => {
     life: 3000,
   });
   showConfirmTransferDialog.value = false;
+  actionLoading.value = false;
+};
+
+const handleConfirmPickup = async () => {
+  actionLoading.value = true;
+  await new Promise((resolve) => setTimeout(resolve, 700));
+  store.updateRefundStatus(request.value!.id, "completed");
+  toast.add({
+    severity: "success",
+    summary: "Đã xác nhận hoàn tiền mặt",
+    detail: "Đã hoàn thành thu hồi sản phẩm và hoàn tiền mặt cho khách hàng.",
+    life: 3000,
+  });
+  showConfirmPickupDialog.value = false;
   actionLoading.value = false;
 };
 
@@ -163,9 +185,18 @@ const openRejectDialog = () => {
             <i class="pi pi-wallet"></i>
             Xác nhận đã chuyển khoản
           </button>
-          <!-- Reject button (pending or approved_waiting_bank_info) -->
+          <!-- Confirm Pickup (when approved_waiting_pickup) -->
           <button
-            v-if="request.status === 'pending' || request.status === 'approved_waiting_bank_info'"
+            v-if="request.status === 'approved_waiting_pickup'"
+            @click="showConfirmPickupDialog = true"
+            class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+          >
+            <i class="pi pi-check-square"></i>
+            Xác nhận đã lấy hàng & hoàn tiền
+          </button>
+          <!-- Reject button (pending, approved_waiting_bank_info or approved_waiting_pickup) -->
+          <button
+            v-if="request.status === 'pending' || request.status === 'approved_waiting_bank_info' || request.status === 'approved_waiting_pickup'"
             @click="openRejectDialog"
             class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 dark:border-red-900 dark:bg-slate-900 dark:hover:bg-red-900/20"
           >
@@ -313,7 +344,7 @@ const openRejectDialog = () => {
             </dl>
           </section>
 
-          <!-- Bank Info -->
+          <!-- Bank Info / Refund Method Info -->
           <section
             class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
           >
@@ -321,8 +352,37 @@ const openRejectDialog = () => {
               <i class="pi pi-building-columns text-primary-500"></i>
               Thông tin nhận tiền
             </h2>
+            
+            <div class="mb-4 flex items-center justify-between text-sm">
+              <span class="text-slate-500">Phương thức:</span>
+              <span class="font-bold text-slate-900 dark:text-white">
+                {{ request.refundMethod === 'cash_on_pickup' ? '💵 Tiền mặt khi shipper lấy hàng' : '🏦 Chuyển khoản ngân hàng' }}
+              </span>
+            </div>
+
+            <!-- Nếu là cash_on_pickup -->
             <div
-              v-if="request.bankInfo"
+              v-if="request.refundMethod === 'cash_on_pickup'"
+              class="space-y-3 rounded-xl bg-orange-50 p-4 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/30"
+            >
+              <div class="flex items-center gap-2 text-orange-800 dark:text-orange-300">
+                <i class="pi pi-info-circle"></i>
+                <span class="text-xs font-semibold">Nhận tiền mặt tại chỗ</span>
+              </div>
+              <p class="text-xs text-orange-700 dark:text-orange-400">
+                Shipper sẽ mang tiền mặt và hoàn trả trực tiếp cho khách khi lấy hàng hoàn. Không cần thông tin ngân hàng.
+              </p>
+              <div class="border-t border-orange-200/60 pt-3 dark:border-orange-800/40">
+                <div class="flex items-center justify-between text-sm">
+                  <span class="text-slate-500">Số tiền cần hoàn trả:</span>
+                  <span class="text-base font-bold text-rose-600 dark:text-rose-400">{{ formatCurrency(request.amount) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nếu là bank_transfer và đã có thông tin ngân hàng -->
+            <div
+              v-else-if="request.bankInfo"
               class="space-y-3 rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60"
             >
               <div class="flex items-center justify-between">
@@ -344,6 +404,7 @@ const openRejectDialog = () => {
                 </div>
               </div>
             </div>
+            
             <div
               v-else
               class="flex flex-col items-center gap-2 py-6 text-center text-slate-400"
@@ -380,6 +441,19 @@ const openRejectDialog = () => {
       @confirm="handleConfirmTransfer"
       @cancel="showConfirmTransferDialog = false"
       @update:visible="(v) => !v && (showConfirmTransferDialog = false)"
+    />
+
+    <!-- Confirm Pickup Dialog -->
+    <ConfirmDialog
+      :visible="showConfirmPickupDialog"
+      title="Xác nhận đã lấy hàng & hoàn tiền"
+      message="Bạn xác nhận đã thu hồi lại sản phẩm và hoàn trả tiền mặt trực tiếp cho khách hàng? Thao tác này sẽ đánh dấu yêu cầu là Hoàn thành."
+      confirm-label="Xác nhận"
+      cancel-label="Hủy"
+      :loading="actionLoading"
+      @confirm="handleConfirmPickup"
+      @cancel="showConfirmPickupDialog = false"
+      @update:visible="(v) => !v && (showConfirmPickupDialog = false)"
     />
 
     <!-- Reject Dialog (with textarea form) -->
