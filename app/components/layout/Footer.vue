@@ -14,10 +14,10 @@
           <div
             class="bg-white/10 p-3 rounded-2xl backdrop-blur-sm shadow-xl inline-block mb-6 ring-1 ring-white/20"
           >
-            <!-- Sử dụng logo.png thực cho Footer -->
+            <!-- Logo động từ DB, fallback về logo tĩnh -->
             <img
-              src="@/assets/images/logo.png"
-              alt="SmartFood"
+              :src="logoSrc"
+              :alt="websiteDisplayName"
               class="h-10 w-auto object-contain drop-shadow-lg filter brightness-110"
             />
           </div>
@@ -142,7 +142,7 @@
             Liên Hệ Trực Tiếp
           </h3>
           <h4 class="font-black text-[#f47f20] text-[16px]">
-            CÔNG TY CỔ PHẦN SMART FOOD
+            {{ companyName }}
           </h4>
           <ul class="space-y-3 text-[13px] text-gray-400">
             <li class="flex gap-3">
@@ -166,8 +166,7 @@
                 ></path>
               </svg>
               <span>
-                123 Nguyễn Văn Linh, phường Nam Dương, Quận Hải Châu, Thành phố
-                Đà Nẵng, Việt Nam</span
+                {{ contactAddress }}</span
               >
             </li>
             <li class="flex gap-3">
@@ -205,9 +204,7 @@
               </svg>
               <span
                 >Tổng đài miễn phí:
-                <strong class="text-[#3b82f6] text-[15px]">{{
-                  CONTACT_INFO.HOTLINE
-                }}</strong>
+                <strong class="text-[#3b82f6] text-[15px]">{{ contactHotline }}</strong>
                 (7:00 - 21:00)</span
               >
             </li>
@@ -228,9 +225,9 @@
               <span
                 >Email:
                 <a
-                  :href="`mailto:${CONTACT_INFO.EMAIL}`"
+                  :href="`mailto:${contactEmail}`"
                   class="hover:text-white transition-colors"
-                  >{{ CONTACT_INFO.EMAIL }}</a
+                  >{{ contactEmail }}</a
                 ></span
               >
             </li>
@@ -379,7 +376,7 @@
             class="h-14 w-37 object-cover drop-shadow-md"
           />
           <div class="text-xs text-gray-500 font-medium">
-            Bản quyền © 2026<br />SmartFood. All Rights Reserved.
+            {{ copyrightText }}
           </div>
         </div>
       </div>
@@ -387,7 +384,33 @@
   </footer>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed } from "vue";
 import { ROUTES } from "~/constants/routes";
-import { CONTACT_INFO } from "~/constants/contact";
+import { useSettingsStore } from "~/stores/useSettingsStore";
+import fallbackLogo from "@/assets/images/logo.png";
+
+const settingsStore = useSettingsStore();
+
+// ── Settings (từ store — không gọi lại API) ──────────────────────
+const logoSrc = computed(() => {
+  const logo = settingsStore.logo;
+  return logo && logo.trim() !== ""
+    ? logo
+    : (fallbackLogo as unknown as string);
+});
+
+const websiteDisplayName = computed(() => settingsStore.websiteName);
+
+const companyName = computed(
+  () => `CÔNG TY CỔ PHẦN ${settingsStore.websiteName.toUpperCase()}`
+);
+
+const contactAddress = computed(() => settingsStore.address);
+
+const contactHotline = computed(() => settingsStore.phone);
+
+const contactEmail = computed(() => settingsStore.email);
+
+const copyrightText = computed(() => settingsStore.copyright);
 </script>

@@ -407,8 +407,7 @@
                       Địa chỉ văn phòng
                     </p>
                     <p class="text-[0.875rem] text-gray-700 m-0 font-medium">
-                      123 Nguyễn Văn Linh, phường Nam Dương, Quận Hải Châu,
-                      Thành phố Đà Nẵng, Việt Nam
+                      {{ contactAddress }}
                     </p>
                   </div>
                 </li>
@@ -440,7 +439,7 @@
                       class="text-[0.875rem] m-0 font-medium"
                       style="color: #f97316; font-weight: 700"
                     >
-                      {{ CONTACT_INFO.HOTLINE }}
+                      {{ hotline }}
                     </p>
                   </div>
                 </li>
@@ -451,7 +450,7 @@
                   <div>
                     <p class="text-xs font-semibold text-gray-400 m-0">Email</p>
                     <p class="text-[0.875rem] text-gray-700 m-0 font-medium">
-                      {{ CONTACT_INFO.EMAIL }}
+                      {{ contactEmail }}
                     </p>
                   </div>
                 </li>
@@ -530,8 +529,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
-import { CONTACT_INFO } from "~/constants/contact";
+import { ref, reactive, computed, onMounted } from "vue";
+import { useSettingsStore } from "~/stores/useSettingsStore";
+
+const settingsStore = useSettingsStore();
+const hotline = computed(() => settingsStore.phone);
+const contactEmail = computed(() => settingsStore.email);
+const contactAddress = computed(() => settingsStore.address);
 
 // ===== TYPES =====
 interface FormData {
@@ -686,21 +690,21 @@ const observeEl = (el: Element) => {
 
 // ===== CONTACT CHANNELS =====
 const channelActions: Record<string, () => void> = {
-  hotline: () => window.open(`tel:${CONTACT_INFO.HOTLINE}`),
+  hotline: () => window.open(`tel:${hotline.value}`),
   "facebook-chat": () =>
     window.open("https://www.facebook.com/pham.long.118027"),
-  email: () => window.open(`mailto:${CONTACT_INFO.EMAIL}`),
-  zalo: () => window.open(`https://zalo.me/${CONTACT_INFO.HOTLINE}`),
+  email: () => window.open(`mailto:${contactEmail.value}`),
+  zalo: () => window.open(`https://zalo.me/${hotline.value}`),
 };
 const handleChannelAction = (id: string) => channelActions[id]?.();
 
-const channels = [
+const channels = computed(() => [
   {
     id: "hotline",
     name: "Hotline",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>`,
     iconBg: "#FFF7ED",
-    detail: CONTACT_INFO.HOTLINE,
+    detail: hotline.value,
     meta: " 8h–22h hàng ngày",
     btnLabel: "Gọi ngay",
     btnStyle: "btn-primary",
@@ -723,7 +727,7 @@ const channels = [
     name: "Email",
     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>`,
     iconBg: "#FFF7ED",
-    detail: CONTACT_INFO.EMAIL,
+    detail: contactEmail.value,
     meta: "Phản hồi trong 2–4 giờ",
     btnLabel: "Gửi email",
     btnStyle: "btn-outline",
@@ -733,12 +737,12 @@ const channels = [
     name: "Zalo OA",
     icon: `<svg viewBox="0 0 48 48" fill="#0068FF" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="48" rx="12" fill="#0068FF"/><text x="50%" y="58%" text-anchor="middle" fill="white" font-size="20" font-weight="bold" font-family="Arial">Z</text></svg>`,
     iconBg: "#EFF6FF",
-    detail: CONTACT_INFO.HOTLINE,
+    detail: hotline.value,
     meta: "Nhắn tin qua Zalo",
     btnLabel: "Kết nối Zalo",
     btnStyle: "btn-zalo",
   },
-];
+]);
 
 // ===== FAQ DATA =====
 const faqTabs: FaqTab[] = [
@@ -751,7 +755,7 @@ const faqTabs: FaqTab[] = [
       },
       {
         q: "Tôi có thể đặt hàng số lượng lớn không?",
-        a: `Có! Đối với đơn hàng số lượng lớn (từ 50kg trở lên), vui lòng liên hệ hotline ${CONTACT_INFO.HOTLINE} để được hỗ trợ và nhận báo giá ưu đãi.`,
+        a: `Có! Đối với đơn hàng số lượng lớn (từ 50kg trở lên), vui lòng liên hệ hotline ${hotline.value} để được hỗ trợ và nhận báo giá ưu đãi.`,
       },
       {
         q: "Có thể đặt hàng trước không?",
@@ -784,7 +788,7 @@ const faqTabs: FaqTab[] = [
       // },
       {
         q: "Shipper không giao đúng giờ phải làm sao?",
-        a: `Vui lòng liên hệ hotline ${CONTACT_INFO.HOTLINE} ngay khi giao trễ quá 30 phút. Chúng tôi sẽ xử lý và bồi thường nếu lỗi từ phía chúng tôi.`,
+        a: `Vui lòng liên hệ hotline ${hotline.value} ngay khi giao trễ quá 30 phút. Chúng tôi sẽ xử lý và bồi thường nếu lỗi từ phía chúng tôi.`,
       },
       {
         q: "Giao hàng vào cuối tuần và ngày lễ không?",

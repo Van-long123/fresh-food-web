@@ -12,12 +12,10 @@
           :to="ROUTES.HOME"
           class="shrink-0 flex items-center h-10 w-auto hover:opacity-90 transition-opacity"
         >
-          <!-- Sử dụng logo.png trong thư mục public/images thay vì text -->
           <img
-            src="@/assets/images/logo.png"
-            alt="smartfood Logo"
+            :src="logoSrc"
+            :alt="websiteDisplayName"
             class="h-full w-auto object-contain"
-            fallback="SMARTFOOD"
           />
         </NuxtLink>
 
@@ -469,8 +467,8 @@
       <template #header>
         <div class="font-bold text-lg text-gray-800 flex items-center gap-2">
           <img
-            src="@/assets/images/logo.png"
-            alt="Logo"
+            :src="logoSrc"
+            :alt="websiteDisplayName"
             class="h-8 w-auto object-contain"
           />
         </div>
@@ -616,21 +614,34 @@
   </header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
 import { useCart } from "~/composables/cart/useCart";
 import { useAuthStore } from "~/stores/useAuthStore";
 import { useCheckout } from "~/composables/checkout/useCheckout";
+import { useSettingsStore } from "~/stores/useSettingsStore";
+import fallbackLogo from "@/assets/images/logo.png";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 const searchQuery = ref("");
 const isMobileMenuOpen = ref(false);
 const showCartPanel = ref(false);
 const visibleNotice = ref(false);
 const cartPanelRef = ref(null);
+
+// ── Client Settings (từ store — không gọi lại API) ───────────────
+const logoSrc = computed(() => {
+  const logo = settingsStore.logo;
+  return logo && logo.trim() !== ''
+    ? logo
+    : (fallbackLogo as unknown as string);
+});
+
+const websiteDisplayName = computed(() => settingsStore.websiteName);
 
 const headerDisplayName = computed(() => {
   return authStore.user?.fullname || authStore.user?.email || "Tài khoản";

@@ -555,12 +555,14 @@ const product = computed(() => ({
 const stock = computed(() => Number(detail.value?.stock || 0));
 
 const images = computed(() => {
+  const thumbnail = detail.value?.thumbnail;
   const rawImages = Array.isArray(detail.value?.images)
-    ? detail.value?.images.filter((item) => typeof item === "string")
+    ? detail.value.images.filter((item) => typeof item === "string")
     : [];
-  if (rawImages.length > 0) return rawImages;
-  if (detail.value?.thumbnail) return [detail.value.thumbnail];
-  return [];
+
+  return [thumbnail, ...rawImages].filter(
+    (item, index, list) => Boolean(item) && list.indexOf(item) === index,
+  );
 });
 
 const activeImage = ref("");

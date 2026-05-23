@@ -541,28 +541,16 @@ const detailSteps = [
 
 const payments = [
   {
-    icon: "💳",
-    title: "Visa / Mastercard",
-    badge: "Phổ biến nhất",
-    desc: "Thẻ tín dụng/ghi nợ quốc tế từ mọi ngân hàng Việt Nam có chip Visa hoặc Mastercard.",
+    icon: "💵",
+    title: "Thanh toán khi nhận hàng (COD)",
+    badge: "Phổ biến",
+    desc: "Thanh toán trực tiếp bằng tiền mặt khi đơn hàng được giao đến địa chỉ của bạn.",
   },
   {
-    icon: "🇺🇸",
-    title: "American Express",
-    badge: "Cao cấp",
-    desc: "Dành cho chủ thẻ Amex, thường áp dụng cho khách hàng quốc tế hoặc doanh nghiệp.",
-  },
-  {
-    icon: "🌐",
-    title: "JCB / Discover / Diners Club",
-    badge: "Quốc tế",
-    desc: "Hỗ trợ thêm các mạng thẻ quốc tế khác, phổ biến với khách từ Nhật Bản và châu Á.",
-  },
-  {
-    icon: "📱",
-    title: "Apple Pay / Google Pay",
-    badge: "Nhanh nhất",
-    desc: "Thanh toán không tiếp xúc qua ví số, bảo mật bằng Face ID hoặc vân tay.",
+    icon: "🏦",
+    title: "Chuyển khoản VietQR",
+    badge: "Nhanh chóng",
+    desc: "Quét mã VietQR để thanh toán nhanh chóng và an toàn thông qua PayOS.",
   },
 ];
 const deliveryTimeline = [

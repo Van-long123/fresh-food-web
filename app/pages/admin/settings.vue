@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref, watch, computed } from "vue";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import PageHeader from "~/components/admin/PageHeader.vue";
 import ImageUploader from "~/components/admin/ImageUploader.vue";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import { useToast } from "primevue/usetoast";
+import { useAdminSettingsQuery } from "~/queries/settings/useAdminSettingsQuery";
+import { useUpdateAdminSettings } from "~/mutations/settings/useUpdateAdminSettings";
+import type { AdminSettingsPayload } from "~/types/settings.type";
 
 definePageMeta({
   layout: "admin",
@@ -16,19 +18,46 @@ useHead({
   title: "Cài đặt hệ thống - Quản trị SmartFood",
 });
 
-const store = useAdminMockStore();
 const toast = useToast();
-const isSubmitting = ref(false);
 const errors = ref<Record<string, string>>({});
 
-const form = reactive({
-  websiteName: store.settings.websiteName,
-  logo: store.settings.logo,
-  phone: store.settings.phone,
-  email: store.settings.email,
-  address: store.settings.address,
-  copyright: store.settings.copyright,
+const { data: settingsData, isLoading } = useAdminSettingsQuery();
+
+const form = reactive<{
+  websiteName: string;
+  logo: string | File;
+  phone: string;
+  email: string;
+  address: string;
+  copyright: string;
+}>({
+  websiteName: "",
+  logo: "",
+  phone: "",
+  email: "",
+  address: "",
+  copyright: "",
 });
+
+// Sync form with fetched data once it arrives
+watch(
+  settingsData,
+  (data) => {
+    if (!data) return;
+    form.websiteName = data.websiteName ?? "";
+    form.logo = data.logo ?? "";
+    form.phone = data.phone ?? "";
+    form.email = data.email ?? "";
+    form.address = data.address ?? "";
+    form.copyright = data.copyright ?? "";
+  },
+  { immediate: true },
+);
+
+const { mutateAsync: updateSettings, isPending: isSubmitting } =
+  useUpdateAdminSettings();
+
+const isLogoFile = computed(() => form.logo instanceof File);
 
 const validateForm = () => {
   const errs: Record<string, string> = {};
@@ -56,34 +85,21 @@ const submitForm = async () => {
     return;
   }
 
-  isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
   try {
-    store.updateSettings({
-      websiteName: form.websiteName,
-      logo: form.logo,
-      phone: form.phone,
-      email: form.email,
-      address: form.address,
-      copyright: form.copyright,
-    });
-
+    await updateSettings({ ...form });
     toast.add({
       severity: "success",
       summary: "Đã lưu cài đặt",
       detail: "Đã cập nhật thành công cấu hình hệ thống.",
       life: 3000,
     });
-  } catch (error) {
+  } catch {
     toast.add({
       severity: "error",
       summary: "Lỗi",
       detail: "Không thể cập nhật cài đặt.",
       life: 3000,
     });
-  } finally {
-    isSubmitting.value = false;
   }
 };
 </script>
@@ -95,7 +111,17 @@ const submitForm = async () => {
       subtitle="Điều chỉnh cấu hình website, nhận diện thương hiệu, metadata và thông tin liên hệ doanh nghiệp."
     />
 
-    <div class="grid gap-6 lg:grid-cols-3">
+    <!-- Loading skeleton -->
+    <div v-if="isLoading" class="grid gap-6 lg:grid-cols-3 animate-pulse">
+      <div
+        class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 h-64"
+      />
+      <div
+        class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900 lg:col-span-2 h-64"
+      />
+    </div>
+
+    <div v-else class="grid gap-6 lg:grid-cols-3">
       <!-- Left: Logo Upload -->
       <div class="space-y-6">
         <section
@@ -110,6 +136,10 @@ const submitForm = async () => {
           <div>
             <ImageUploader v-model="form.logo" />
           </div>
+          <p v-if="isLogoFile" class="mt-2 text-xs text-blue-500">
+            <i class="pi pi-info-circle mr-1" />
+            Logo mới sẽ được tải lên khi bạn lưu cài đặt.
+          </p>
         </section>
       </div>
 
@@ -185,7 +215,7 @@ const submitForm = async () => {
                 class="rounded-full bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-50"
                 :disabled="isSubmitting"
               >
-                <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2"></i>
+                <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2" />
                 Lưu cài đặt
               </button>
             </div>

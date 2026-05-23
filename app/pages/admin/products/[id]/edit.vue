@@ -99,7 +99,7 @@ const averageRating = computed(() => {
   return (r.totalRating / r.numberOfRatings).toFixed(1);
 });
 
-// ─── Populate form khi data load xong ────────────────────────────────────────
+// ─── Populate form khi data load xong
 watchEffect(() => {
   if (product.value && !formInitialized.value) {
     const p = product.value;
@@ -136,7 +136,6 @@ watchEffect(() => {
   }
 });
 
-// ─── Watchers ─────────────────────────────────────────────────────────────────
 // Auto-slug từ title nếu user chưa chỉnh slug
 watch(
   () => form.title,
@@ -185,7 +184,6 @@ watch(
   },
 );
 
-// ─── Validation ───────────────────────────────────────────────────────────────
 const validateForm = () => {
   const errs: Record<string, string> = {};
   if (!form.title.trim()) errs.title = "Vui lòng nhập tên sản phẩm.";
@@ -201,7 +199,6 @@ const validateForm = () => {
   return Object.keys(errs).length === 0;
 };
 
-// ─── Submit ───────────────────────────────────────────────────────────────────
 const submitForm = () => {
   if (isError.value || !product.value) return;
   if (!validateForm()) {
@@ -215,7 +212,6 @@ const submitForm = () => {
   }
 
   const payload = buildUpdateProductPayload({ ...form });
-  console.log("🚀 ~ submitForm ~ payload:", payload);
 
   updateProduct(
     { id: productId.value, payload },

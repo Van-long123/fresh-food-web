@@ -355,7 +355,7 @@
               <li>
                 <strong>Bảo vệ thông tin:</strong> Nếu phát hiện dấu hiệu xâm
                 nhập trái phép, hãy đặt lại mật khẩu ngay và liên hệ SmartFood
-                qua hotline {{ CONTACT_INFO.HOTLINE }}.
+                qua hotline {{ settingsStore.phone }}.
               </li>
             </ul>
             <p>
@@ -606,7 +606,7 @@
               <li>
                 <strong>Liên hệ pháp lý:</strong> Mọi thông báo pháp lý gửi về:
                 Công ty TNHH SmartFood Việt Nam, 123 Nguyễn Văn Linh, Hải Châu,
-                Đà Nẵng. Email: {{ CONTACT_INFO.EMAIL }}.
+                Đà Nẵng. Email: {{ settingsStore.email }}.
               </li>
               <li>
                 <strong>Hiệu lực điều khoản:</strong> Nếu bất kỳ điều khoản nào
@@ -702,8 +702,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
-import { CONTACT_INFO } from "~/constants/contact";
+import { useSettingsStore } from "~/stores/useSettingsStore";
 
+const settingsStore = useSettingsStore();
 const router = useRouter();
 
 const sections = [

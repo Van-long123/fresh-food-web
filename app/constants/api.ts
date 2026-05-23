@@ -79,6 +79,9 @@ export const API_ENDPOINTS = {
     BY_ORDER: (orderId: string) => `/v1/client/refund-requests/order/${orderId}`,
     BANK_INFO: (id: string) => `/v1/client/refund-requests/${id}/bank-info`
   },
+  SETTINGS: {
+    GET: '/v1/client/settings'
+  },
   // ── Admin ────────────────────────────────────────────────────
   ADMIN: {
     PRODUCT: {
@@ -90,6 +93,10 @@ export const API_ENDPOINTS = {
     },
     CATEGORY: {
       LIST: '/v1/admin/categories'
+    },
+    SETTINGS: {
+      GET: '/v1/admin/settings',
+      UPDATE: '/v1/admin/settings'
     }
   }
 } as const
