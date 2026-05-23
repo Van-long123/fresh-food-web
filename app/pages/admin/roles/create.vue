@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { reactive, ref, computed } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import Checkbox from "primevue/checkbox";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
+import { useCreateAdminRole } from "~/mutations/role/useCreateAdminRole";
 import { useToast } from "primevue/usetoast";
 
 definePageMeta({
@@ -18,22 +18,22 @@ useHead({
 });
 
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
 
-const isSubmitting = ref(false);
+const { mutate: createRole, isPending: isSubmitting } = useCreateAdminRole();
 const errors = ref<Record<string, string>>({});
 
-const modules = [
-  "Bài viết",
-  "Sản phẩm",
-  "Danh mục",
-  "Đơn hàng",
-  "Người dùng",
-  "Mã giảm giá",
-  "Đánh giá",
-  "Thanh toán",
-  "Cài đặt",
+const moduleDefs = [
+  { key: "articles", label: "Bài viết" },
+  { key: "products", label: "Sản phẩm" },
+  { key: "categories", label: "Danh mục" },
+  { key: "orders", label: "Đơn hàng" },
+  { key: "users", label: "Người dùng" },
+  { key: "vouchers", label: "Mã giảm giá" },
+  { key: "refund_requests", label: "Yêu cầu hoàn tiền" },
+  { key: "reviews", label: "Đánh giá" },
+  { key: "payments", label: "Thanh toán" },
+  { key: "settings", label: "Cài đặt" },
 ];
 
 const permissions = ["view", "create", "edit", "delete"] as const;
@@ -42,56 +42,73 @@ type PermissionType = (typeof permissions)[number];
 // PermMatrix records which permissions are selected for each module
 const permMatrix = reactive<Record<string, PermissionType[]>>({});
 
-// Initialize matrix
-modules.forEach((mod) => {
-  permMatrix[mod] = [];
+moduleDefs.forEach((mod) => {
+  permMatrix[mod.key] = [];
 });
+
+const permissionLabels: Record<PermissionType, string> = {
+  view: "Xem",
+  create: "Tạo mới",
+  edit: "Chỉnh sửa",
+  delete: "Xóa",
+};
 
 const form = reactive({
   title: "",
   description: "",
 });
 
-const togglePermission = (moduleName: string, perm: PermissionType) => {
-  const current = permMatrix[moduleName] || [];
+const togglePermission = (moduleKey: string, perm: PermissionType) => {
+  const current = permMatrix[moduleKey] || [];
   if (current.includes(perm)) {
-    permMatrix[moduleName] = current.filter((p) => p !== perm);
+    permMatrix[moduleKey] = current.filter((p) => p !== perm);
   } else {
-    permMatrix[moduleName] = [...current, perm];
+    permMatrix[moduleKey] = [...current, perm];
   }
 };
 
-const toggleRow = (moduleName: string) => {
-  const current = permMatrix[moduleName] || [];
+const toggleRow = (moduleKey: string) => {
+  const current = permMatrix[moduleKey] || [];
   if (current.length === permissions.length) {
-    permMatrix[moduleName] = [];
+    permMatrix[moduleKey] = [];
   } else {
-    permMatrix[moduleName] = [...permissions];
+    permMatrix[moduleKey] = [...permissions];
   }
 };
 
 const toggleColumn = (perm: PermissionType) => {
-  const allChecked = modules.every((mod) =>
-    (permMatrix[mod] || []).includes(perm),
+  const allChecked = moduleDefs.every((mod) =>
+    (permMatrix[mod.key] || []).includes(perm),
   );
-  modules.forEach((mod) => {
-    const current = permMatrix[mod] || [];
+  moduleDefs.forEach((mod) => {
+    const current = permMatrix[mod.key] || [];
     if (allChecked) {
-      permMatrix[mod] = current.filter((p) => p !== perm);
+      permMatrix[mod.key] = current.filter((p) => p !== perm);
     } else if (!current.includes(perm)) {
-      permMatrix[mod] = [...current, perm];
+      permMatrix[mod.key] = [...current, perm];
     }
   });
 };
 
-const isRowChecked = (moduleName: string) => {
-  const current = permMatrix[moduleName] || [];
+const isRowChecked = (moduleKey: string) => {
+  const current = permMatrix[moduleKey] || [];
   return current.length === permissions.length;
 };
 
 const isColumnChecked = (perm: PermissionType) => {
-  return modules.every((mod) => (permMatrix[mod] || []).includes(perm));
+  return moduleDefs.every((mod) => (permMatrix[mod.key] || []).includes(perm));
 };
+
+const permissionPreview = computed(() => {
+  const preview: Record<string, string> = {};
+  moduleDefs.forEach((mod) => {
+    const current = permMatrix[mod.key] || [];
+    preview[mod.key] = current.length
+      ? current.map((p) => permissionLabels[p]).join(", ")
+      : "Chưa chọn quyền";
+  });
+  return preview;
+});
 
 const validateForm = () => {
   const errs: Record<string, string> = {};
@@ -103,7 +120,7 @@ const validateForm = () => {
   return Object.keys(errs).length === 0;
 };
 
-const submitForm = async () => {
+const submitForm = () => {
   if (!validateForm()) {
     toast.add({
       severity: "error",
@@ -114,44 +131,41 @@ const submitForm = async () => {
     return;
   }
 
-  isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
-  try {
-    // Flatten matrix of { Articles: ['view', 'create'] } -> ['articles.view', 'articles.create']
-    const flatPermissions: string[] = [];
-    modules.forEach((mod) => {
-      const lowerMod = mod.toLowerCase();
-      const perms = permMatrix[mod] || [];
-      perms.forEach((p) => {
-        flatPermissions.push(`${lowerMod}.${p}`);
-      });
+  const flatPermissions: string[] = [];
+  moduleDefs.forEach((mod) => {
+    const perms = permMatrix[mod.key] || [];
+    perms.forEach((p) => {
+      flatPermissions.push(`${mod.key}.${p}`);
     });
+  });
 
-    store.createRole({
+  createRole(
+    {
       title: form.title,
       description: form.description,
       permissions: flatPermissions,
-    });
-
-    toast.add({
-      severity: "success",
-      summary: "Đã tạo vai trò",
-      detail: `Đã tạo vai trò bảo mật '${form.title}'`,
-      life: 3000,
-    });
-
-    router.push(ROUTES.ADMIN.ROLES);
-  } catch (error) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail: "Không thể tạo vai trò bảo mật.",
-      life: 3000,
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+    },
+    {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã tạo vai trò",
+          detail: `Đã tạo vai trò bảo mật '${form.title}'`,
+          life: 3000,
+        });
+        router.push(ROUTES.ADMIN.ROLES);
+      },
+      onError: (error: any) => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail:
+            error?.response?.data?.message ?? "Không thể tạo vai trò bảo mật.",
+          life: 3000,
+        });
+      },
+    },
+  );
 };
 </script>
 
@@ -274,7 +288,9 @@ const submitForm = async () => {
                         :modelValue="isColumnChecked(perm)"
                         @update:modelValue="toggleColumn(perm)"
                       />
-                      <span class="capitalize">{{ perm === 'view' ? 'Xem' : perm === 'create' ? 'Tạo mới' : perm === 'edit' ? 'Chỉnh sửa' : 'Xóa' }}</span>
+                      <span class="capitalize">{{
+                        permissionLabels[perm]
+                      }}</span>
                     </label>
                   </th>
                   <th class="px-4 py-3 text-left">Chuyển toàn bộ</th>
@@ -282,29 +298,29 @@ const submitForm = async () => {
               </thead>
               <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                 <tr
-                  v-for="mod in modules"
-                  :key="mod"
+                  v-for="mod in moduleDefs"
+                  :key="mod.key"
                   class="transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
                 >
                   <td
                     class="px-4 py-3 font-semibold text-slate-900 dark:text-white"
                   >
-                    {{ mod }}
+                    {{ mod.label }}
                   </td>
                   <td v-for="perm in permissions" :key="perm" class="px-4 py-3">
                     <Checkbox
                       :binary="true"
-                      :modelValue="(permMatrix[mod] || []).includes(perm)"
-                      @update:modelValue="togglePermission(mod, perm)"
+                      :modelValue="(permMatrix[mod.key] || []).includes(perm)"
+                      @update:modelValue="togglePermission(mod.key, perm)"
                     />
                   </td>
                   <td class="px-4 py-3">
                     <button
                       type="button"
                       class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-655 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-                      @click="toggleRow(mod)"
+                      @click="toggleRow(mod.key)"
                     >
-                      {{ isRowChecked(mod) ? "Bỏ chọn" : "Chọn tất cả" }}
+                      {{ isRowChecked(mod.key) ? "Bỏ chọn" : "Chọn tất cả" }}
                     </button>
                   </td>
                 </tr>
@@ -333,20 +349,17 @@ const submitForm = async () => {
 
           <ul class="mt-5 space-y-3 text-sm text-slate-600 dark:text-slate-300">
             <li
-              v-for="mod in modules"
-              :key="mod"
+              v-for="mod in moduleDefs"
+              :key="mod.key"
               class="rounded-xl border border-slate-100 bg-slate-50/60 p-3 dark:border-slate-800 dark:bg-slate-800/40"
             >
               <div class="font-bold text-slate-900 dark:text-white">
-                {{ mod }}
+                {{ mod.label }}
               </div>
               <div
                 class="mt-1 text-xs text-slate-500 dark:text-slate-400 font-mono"
               >
-                {{
-                  (permMatrix[mod] || []).map(p => p === 'view' ? 'Xem' : p === 'create' ? 'Tạo mới' : p === 'edit' ? 'Chỉnh sửa' : 'Xóa').join(", ") ||
-                  "Chưa chọn quyền"
-                }}
+                {{ permissionPreview[mod.key] }}
               </div>
             </li>
           </ul>

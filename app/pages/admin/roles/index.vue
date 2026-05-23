@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import AppDataTable from "~/components/admin/DataTable.vue";
 import PageHeader from "~/components/admin/PageHeader.vue";
@@ -7,8 +7,11 @@ import SearchToolbar from "~/components/admin/SearchToolbar.vue";
 import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
+import { useAdminRolesQuery } from "~/queries/role/useAdminRolesQuery";
+import { useDeleteAdminRole } from "~/mutations/role/useDeleteAdminRole";
+import { useDeleteAdminRoles } from "~/mutations/role/useDeleteAdminRoles";
 import { useToast } from "primevue/usetoast";
+import type { AdminRole, AdminRoleQueryParams } from "~/types/role.type";
 
 definePageMeta({
   layout: "admin",
@@ -19,7 +22,6 @@ useHead({
   title: "Danh sách vai trò - Quản trị SmartFood",
 });
 
-const store = useAdminMockStore();
 const router = useRouter();
 const toast = useToast();
 
@@ -35,9 +37,8 @@ const perPage = ref(10);
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 
 // Delete targets
-const deleteTarget = ref<any | null>(null);
+const deleteTarget = ref<AdminRole | null>(null);
 const showDeleteDialog = ref(false);
-const deleteLoading = ref(false);
 
 const columns = [
   { key: "title", label: "Tên vai trò", sortable: true },
@@ -47,56 +48,45 @@ const columns = [
   { key: "actions", label: "Thao tác" },
 ];
 
-const getUsersCount = (roleId: string) => {
-  return store.users.filter((u) => u.roleId === roleId).length;
-};
+const queryParams = computed<AdminRoleQueryParams>(() => {
+  const params: AdminRoleQueryParams = {
+    page: page.value,
+    limit: perPage.value,
+  };
+  if (searchQuery.value) params.keyword = searchQuery.value;
+  if (sortState.value) {
+    params.sortField = sortState.value.key;
+    params.sortOrder = sortState.value.direction;
+  }
+  return params;
+});
+
+const { data, isLoading, isFetching } = useAdminRolesQuery(queryParams);
+const { mutate: deleteRole, isPending: isDeleting } = useDeleteAdminRole();
+const { mutate: deleteRoles, isPending: isBulkDeletingPending } =
+  useDeleteAdminRoles();
+
+const roles = computed(() =>
+  (data.value?.data ?? []).map((role) => ({
+    ...role,
+    permissionsCount: role.permissionsCount ?? role.permissions?.length ?? 0,
+  })),
+);
+const total = computed(() => data.value?.pagination?.total ?? 0);
+const deleteLoading = computed(
+  () => isDeleting.value || isBulkDeletingPending.value,
+);
+
+watch(searchQuery, () => {
+  page.value = 1;
+});
 
 const handleSortChange = (
   sort: { key: string; direction: "asc" | "desc" } | null,
 ) => {
   sortState.value = sort;
+  page.value = 1;
 };
-
-// Filtered and sorted roles
-const processedRoles = computed(() => {
-  let list = [...store.roles];
-
-  // Search filter
-  if (searchQuery.value) {
-    const keyword = searchQuery.value.toLowerCase();
-    list = list.filter(
-      (r) =>
-        r.title.toLowerCase().includes(keyword) ||
-        r.description.toLowerCase().includes(keyword),
-    );
-  }
-
-  // Sorting
-  if (sortState.value) {
-    const { key, direction } = sortState.value;
-    list.sort((a: any, b: any) => {
-      const valA = a[key];
-      const valB = b[key];
-
-      if (typeof valA === "string") {
-        return direction === "asc"
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      } else {
-        return direction === "asc" ? valA - valB : valB - valA;
-      }
-    });
-  }
-
-  return list;
-});
-
-const paginatedRoles = computed(() => {
-  const start = (page.value - 1) * perPage.value;
-  return processedRoles.value.slice(start, start + perPage.value);
-});
-
-const total = computed(() => processedRoles.value.length);
 
 const handleSelectionChange = (ids: Array<string | number>) => {
   selectedIds.value = ids.map((id) => String(id));
@@ -108,38 +98,60 @@ const handleBulkDelete = () => {
   showDeleteDialog.value = true;
 };
 
-const openDeleteDialog = (role: any) => {
+const openDeleteDialog = (role: AdminRole) => {
   deleteTarget.value = role;
   isBulkDeleting.value = false;
   showDeleteDialog.value = true;
 };
 
-const confirmDelete = async () => {
-  deleteLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
+const confirmDelete = () => {
   if (isBulkDeleting.value) {
-    store.bulkDeleteRoles(selectedIds.value);
-    toast.add({
-      severity: "success",
-      summary: "Đã xóa vai trò",
-      detail: `Đã xóa ${selectedIds.value.length} vai trò`,
-      life: 3000,
+    deleteRoles(selectedIds.value, {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã xóa vai trò",
+          detail: `Đã xóa ${selectedIds.value.length} vai trò`,
+          life: 3000,
+        });
+        selectedIds.value = [];
+        showDeleteDialog.value = false;
+      },
+      onError: (error: any) => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail:
+            error?.response?.data?.message ??
+            "Không thể xóa một hoặc nhiều vai trò.",
+          life: 3000,
+        });
+      },
     });
-    selectedIds.value = [];
   } else if (deleteTarget.value) {
-    store.deleteRole(deleteTarget.value.id);
-    toast.add({
-      severity: "success",
-      summary: "Đã xóa vai trò",
-      detail: `Đã xóa vai trò ${deleteTarget.value.title}`,
-      life: 3000,
+    const target = deleteTarget.value;
+    deleteRole(target._id, {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã xóa vai trò",
+          detail: `Đã xóa vai trò ${target.title}`,
+          life: 3000,
+        });
+        deleteTarget.value = null;
+        showDeleteDialog.value = false;
+      },
+      onError: (error: any) => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail:
+            error?.response?.data?.message ?? "Không thể xóa vai trò này.",
+          life: 3000,
+        });
+      },
     });
-    deleteTarget.value = null;
   }
-
-  showDeleteDialog.value = false;
-  deleteLoading.value = false;
 };
 
 const cancelDelete = () => {
@@ -170,6 +182,12 @@ const cancelDelete = () => {
           v-model="searchQuery"
           placeholder="Tìm theo tên vai trò..."
         />
+        <span
+          v-if="isFetching && !isLoading"
+          class="text-xs text-slate-400 flex items-center gap-1"
+        >
+          <i class="pi pi-spin pi-spinner text-xs"></i> Đang tải...
+        </span>
       </div>
 
       <!-- Bulk Actions -->
@@ -191,12 +209,13 @@ const cancelDelete = () => {
 
     <AppDataTable
       :columns="columns"
-      :data="paginatedRoles"
+      :data="roles"
       :total="total"
       v-model:page="page"
       v-model:perPage="perPage"
       :selectable="true"
       :sortable="true"
+      :loading="isLoading"
       @update:sort="handleSortChange"
       @selection-change="handleSelectionChange"
     >
@@ -220,7 +239,7 @@ const cancelDelete = () => {
         <span
           class="text-sm font-bold font-mono text-slate-800 dark:text-slate-200"
         >
-          {{ getUsersCount(row.id) }} người dùng
+          {{ row.usersCount ?? 0 }} người dùng
         </span>
       </template>
 
@@ -228,15 +247,15 @@ const cancelDelete = () => {
         <span
           class="text-xs font-bold font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded dark:bg-blue-950/20 dark:text-blue-400"
         >
-          {{ (row.permissions || []).length }} quyền
+          {{ row.permissionsCount ?? 0 }} quyền
         </span>
       </template>
 
       <template #cell-actions="{ row }">
         <ActionButtons
-          :edit-href="ROUTES.ADMIN.ROLE_EDIT(row.id)"
+          :edit-href="ROUTES.ADMIN.ROLE_EDIT(row._id)"
           @delete="openDeleteDialog(row)"
-          :show-delete="row.id !== 'role-1' && row.id !== 'role-2'"
+          :show-delete="!row.isSystem"
         />
       </template>
     </AppDataTable>

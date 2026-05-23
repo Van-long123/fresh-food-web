@@ -94,6 +94,14 @@ export const API_ENDPOINTS = {
     CATEGORY: {
       LIST: '/v1/admin/categories'
     },
+    ROLE: {
+      LIST: '/v1/admin/roles',
+      DETAIL: (id: string) => `/v1/admin/roles/${id}`,
+      CREATE: '/v1/admin/roles',
+      UPDATE: (id: string) => `/v1/admin/roles/${id}`,
+      DELETE: (id: string) => `/v1/admin/roles/${id}`,
+      DELETE_MANY: '/v1/admin/roles'
+    },
     SETTINGS: {
       GET: '/v1/admin/settings',
       UPDATE: '/v1/admin/settings'

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import Checkbox from "primevue/checkbox";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
+import { useAdminRoleDetailQuery } from "~/queries/role/useAdminRoleDetailQuery";
+import { useUpdateAdminRole } from "~/mutations/role/useUpdateAdminRole";
 import { useToast } from "primevue/usetoast";
 
 definePageMeta({
@@ -19,104 +20,136 @@ useHead({
 
 const route = useRoute();
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
 
-const roleId = route.params.id as string;
-const isSubmitting = ref(false);
-const errors = ref<Record<string, string>>({});
-const isNotFound = ref(false);
+const roleId = ref(route.params.id as string);
+const {
+  data: role,
+  isLoading,
+  isError,
+  error,
+} = useAdminRoleDetailQuery(roleId);
+const { mutate: updateRole, isPending: isSubmitting } = useUpdateAdminRole();
 
-const modules = [
-  "Bài viết",
-  "Sản phẩm",
-  "Danh mục",
-  "Đơn hàng",
-  "Người dùng",
-  "Mã giảm giá",
-  "Đánh giá",
-  "Thanh toán",
-  "Cài đặt",
+const errors = ref<Record<string, string>>({});
+
+const moduleDefs = [
+  { key: "articles", label: "Bài viết" },
+  { key: "products", label: "Sản phẩm" },
+  { key: "categories", label: "Danh mục" },
+  { key: "orders", label: "Đơn hàng" },
+  { key: "users", label: "Người dùng" },
+  { key: "vouchers", label: "Mã giảm giá" },
+  { key: "refund_requests", label: "Yêu cầu hoàn tiền" },
+  { key: "reviews", label: "Đánh giá" },
+  { key: "payments", label: "Thanh toán" },
+  { key: "settings", label: "Cài đặt" },
 ];
 
 const permissions = ["view", "create", "edit", "delete"] as const;
 type PermissionType = (typeof permissions)[number];
 
 const permMatrix = reactive<Record<string, PermissionType[]>>({});
-modules.forEach((mod) => {
-  permMatrix[mod] = [];
+moduleDefs.forEach((mod) => {
+  permMatrix[mod.key] = [];
 });
+
+const permissionLabels: Record<PermissionType, string> = {
+  view: "Xem",
+  create: "Tạo mới",
+  edit: "Chỉnh sửa",
+  delete: "Xóa",
+};
 
 const form = reactive({
   title: "",
   description: "",
 });
 
-const role = store.roles.find((r) => r.id === roleId);
-if (role) {
-  form.title = role.title;
-  form.description = role.description;
+const formInitialized = ref(false);
 
-  // Populate permMatrix from role.permissions e.g. ['articles.view', 'products.create']
-  role.permissions.forEach((pStr) => {
+const isNotFound = computed(
+  () => isError.value && (error.value as any)?.response?.status === 404,
+);
+
+watchEffect(() => {
+  if (!role.value || formInitialized.value) return;
+
+  form.title = role.value.title ?? "";
+  form.description = role.value.description ?? "";
+
+  moduleDefs.forEach((mod) => {
+    permMatrix[mod.key] = [];
+  });
+
+  (role.value.permissions || []).forEach((pStr) => {
     const parts = pStr.split(".");
     if (parts.length === 2) {
-      const modLower = parts[0];
+      const modKey = parts[0];
       const permAction = parts[1] as PermissionType;
-
-      // Find matching module case-insensitive
-      const matchingMod = modules.find((m) => m.toLowerCase() === modLower);
+      const matchingMod = moduleDefs.find((m) => m.key === modKey);
       if (matchingMod && permissions.includes(permAction)) {
-        if (!permMatrix[matchingMod].includes(permAction)) {
-          permMatrix[matchingMod].push(permAction);
+        if (!permMatrix[matchingMod.key].includes(permAction)) {
+          permMatrix[matchingMod.key].push(permAction);
         }
       }
     }
   });
-} else {
-  isNotFound.value = true;
-}
 
-const togglePermission = (moduleName: string, perm: PermissionType) => {
-  const current = permMatrix[moduleName] || [];
+  formInitialized.value = true;
+});
+
+const togglePermission = (moduleKey: string, perm: PermissionType) => {
+  const current = permMatrix[moduleKey] || [];
   if (current.includes(perm)) {
-    permMatrix[moduleName] = current.filter((p) => p !== perm);
+    permMatrix[moduleKey] = current.filter((p) => p !== perm);
   } else {
-    permMatrix[moduleName] = [...current, perm];
+    permMatrix[moduleKey] = [...current, perm];
   }
 };
 
-const toggleRow = (moduleName: string) => {
-  const current = permMatrix[moduleName] || [];
+const toggleRow = (moduleKey: string) => {
+  const current = permMatrix[moduleKey] || [];
   if (current.length === permissions.length) {
-    permMatrix[moduleName] = [];
+    permMatrix[moduleKey] = [];
   } else {
-    permMatrix[moduleName] = [...permissions];
+    permMatrix[moduleKey] = [...permissions];
   }
 };
 
 const toggleColumn = (perm: PermissionType) => {
-  const allChecked = modules.every((mod) =>
-    (permMatrix[mod] || []).includes(perm),
+  const allChecked = moduleDefs.every((mod) =>
+    (permMatrix[mod.key] || []).includes(perm),
   );
-  modules.forEach((mod) => {
-    const current = permMatrix[mod] || [];
+  moduleDefs.forEach((mod) => {
+    const current = permMatrix[mod.key] || [];
     if (allChecked) {
-      permMatrix[mod] = current.filter((p) => p !== perm);
+      permMatrix[mod.key] = current.filter((p) => p !== perm);
     } else if (!current.includes(perm)) {
-      permMatrix[mod] = [...current, perm];
+      permMatrix[mod.key] = [...current, perm];
     }
   });
 };
 
-const isRowChecked = (moduleName: string) => {
-  const current = permMatrix[moduleName] || [];
+const isRowChecked = (moduleKey: string) => {
+  const current = permMatrix[moduleKey] || [];
   return current.length === permissions.length;
 };
 
 const isColumnChecked = (perm: PermissionType) => {
-  return modules.every((mod) => (permMatrix[mod] || []).includes(perm));
+  return moduleDefs.every((mod) => (permMatrix[mod.key] || []).includes(perm));
 };
+
+const permissionPreview = computed(() => {
+  const preview: Record<string, string> = {};
+  moduleDefs.forEach((mod) => {
+    const current = permMatrix[mod.key] || [];
+    preview[mod.key] = current.length
+      ? current.map((p) => permissionLabels[p]).join(", ")
+      : "Chưa chọn quyền";
+  });
+  return preview;
+});
 
 const validateForm = () => {
   const errs: Record<string, string> = {};
@@ -128,8 +161,8 @@ const validateForm = () => {
   return Object.keys(errs).length === 0;
 };
 
-const submitForm = async () => {
-  if (isNotFound.value) return;
+const submitForm = () => {
+  if (isNotFound.value || !role.value) return;
   if (!validateForm()) {
     toast.add({
       severity: "error",
@@ -140,51 +173,63 @@ const submitForm = async () => {
     return;
   }
 
-  isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
-  try {
-    // Flatten matrix of { Articles: ['view', 'create'] } -> ['articles.view', 'articles.create']
-    const flatPermissions: string[] = [];
-    modules.forEach((mod) => {
-      const lowerMod = mod.toLowerCase();
-      const perms = permMatrix[mod] || [];
-      perms.forEach((p) => {
-        flatPermissions.push(`${lowerMod}.${p}`);
-      });
+  const flatPermissions: string[] = [];
+  moduleDefs.forEach((mod) => {
+    const perms = permMatrix[mod.key] || [];
+    perms.forEach((p) => {
+      flatPermissions.push(`${mod.key}.${p}`);
     });
+  });
 
-    store.updateRole(roleId, {
-      title: form.title,
-      description: form.description,
-      permissions: flatPermissions,
-    });
+  updateRole(
+    {
+      id: roleId.value,
+      payload: {
+        title: form.title,
+        description: form.description,
+        permissions: flatPermissions,
+      },
+    },
+    {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã cập nhật vai trò",
+          detail: `Đã cập nhật vai trò bảo mật '${form.title}'`,
+          life: 3000,
+        });
 
-    toast.add({
-      severity: "success",
-      summary: "Đã cập nhật vai trò",
-      detail: `Đã cập nhật vai trò bảo mật '${form.title}'`,
-      life: 3000,
-    });
-
-    router.push(ROUTES.ADMIN.ROLES);
-  } catch (error) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail: "Không thể cập nhật vai trò bảo mật.",
-      life: 3000,
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+        router.push(ROUTES.ADMIN.ROLES);
+      },
+      onError: (error: any) => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail:
+            error?.response?.data?.message ??
+            "Không thể cập nhật vai trò bảo mật.",
+          life: 3000,
+        });
+      },
+    },
+  );
 };
 </script>
 
 <template>
   <div class="px-4 pt-6 space-y-6">
     <div
-      v-if="isNotFound"
+      v-if="isLoading"
+      class="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+    >
+      <div class="flex items-center gap-2 text-slate-500">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Đang tải dữ liệu vai trò...</span>
+      </div>
+    </div>
+
+    <div
+      v-else-if="isNotFound"
       class="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-900 dark:bg-red-950/20"
     >
       <h2 class="text-lg font-semibold text-red-800 dark:text-red-300">
@@ -316,7 +361,9 @@ const submitForm = async () => {
                           :modelValue="isColumnChecked(perm)"
                           @update:modelValue="toggleColumn(perm)"
                         />
-                        <span class="capitalize">{{ perm === 'view' ? 'Xem' : perm === 'create' ? 'Tạo mới' : perm === 'edit' ? 'Chỉnh sửa' : 'Xóa' }}</span>
+                        <span class="capitalize">{{
+                          permissionLabels[perm]
+                        }}</span>
                       </label>
                     </th>
                     <th class="px-4 py-3 text-left">Chuyển toàn bộ</th>
@@ -324,14 +371,14 @@ const submitForm = async () => {
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                   <tr
-                    v-for="mod in modules"
-                    :key="mod"
+                    v-for="mod in moduleDefs"
+                    :key="mod.key"
                     class="transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
                   >
                     <td
                       class="px-4 py-3 font-semibold text-slate-900 dark:text-white"
                     >
-                      {{ mod }}
+                      {{ mod.label }}
                     </td>
                     <td
                       v-for="perm in permissions"
@@ -340,17 +387,17 @@ const submitForm = async () => {
                     >
                       <Checkbox
                         :binary="true"
-                        :modelValue="(permMatrix[mod] || []).includes(perm)"
-                        @update:modelValue="togglePermission(mod, perm)"
+                        :modelValue="(permMatrix[mod.key] || []).includes(perm)"
+                        @update:modelValue="togglePermission(mod.key, perm)"
                       />
                     </td>
                     <td class="px-4 py-3">
                       <button
                         type="button"
                         class="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-655 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-                        @click="toggleRow(mod)"
+                        @click="toggleRow(mod.key)"
                       >
-                        {{ isRowChecked(mod) ? "Bỏ chọn" : "Chọn tất cả" }}
+                        {{ isRowChecked(mod.key) ? "Bỏ chọn" : "Chọn tất cả" }}
                       </button>
                     </td>
                   </tr>
@@ -381,20 +428,17 @@ const submitForm = async () => {
               class="mt-5 space-y-3 text-sm text-slate-600 dark:text-slate-300"
             >
               <li
-                v-for="mod in modules"
-                :key="mod"
+                v-for="mod in moduleDefs"
+                :key="mod.key"
                 class="rounded-xl border border-slate-100 bg-slate-50/60 p-3 dark:border-slate-800 dark:bg-slate-800/40"
               >
                 <div class="font-bold text-slate-900 dark:text-white">
-                  {{ mod }}
+                  {{ mod.label }}
                 </div>
                 <div
                   class="mt-1 text-xs text-slate-500 dark:text-slate-400 font-mono"
                 >
-                  {{
-                    (permMatrix[mod] || []).map(p => p === 'view' ? 'Xem' : p === 'create' ? 'Tạo mới' : p === 'edit' ? 'Chỉnh sửa' : 'Xóa').join(", ") ||
-                    "Chưa chọn quyền"
-                  }}
+                  {{ permissionPreview[mod.key] }}
                 </div>
               </li>
             </ul>
