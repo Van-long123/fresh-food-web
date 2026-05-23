@@ -70,3 +70,27 @@ export const mapOrderStatus = (status: string): string => {
   }
   return map[status] || status
 }
+
+/**
+ * Tạo slug từ chuỗi tiếng Việt (mirror backend slugify logic)
+ */
+export const slugify = (val: string): string => {
+  if (!val) return ''
+  return String(val)
+    .normalize('NFKD')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'd')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
+
+/**
+ * Format giá VND
+ */
+export const formatVND = (amount: number): string => {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
+}

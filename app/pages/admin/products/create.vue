@@ -2,27 +2,38 @@
 import { computed, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import InputText from "primevue/inputtext";
-import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
 import Dropdown from "primevue/dropdown";
-import Checkbox from "primevue/checkbox";
+import MultiSelect from "primevue/multiselect";
 import ToggleSwitch from "primevue/toggleswitch";
 import ImageUploader from "~/components/admin/ImageUploader.vue";
 import RichTextEditor from "~/components/admin/RichTextEditor.vue";
 import { useToast } from "primevue/usetoast";
+import { useAdminCategoriesQuery } from "~/queries/product/useAdminCategoriesQuery";
+import { useCreateAdminProduct } from "~/mutations/product/useCreateProduct";
+import { buildCreateProductPayload } from "~/services/admin/product.service";
+import { slugify } from "~/utils/formatters";
 
 definePageMeta({
   layout: "admin",
   middleware: ["auth", "admin"],
 });
 
+useHead({
+  title: "Tạo sản phẩm - Quản trị SmartFood",
+});
+
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
 
-const isSubmitting = ref(false);
+// ─── TanStack Query ───────────────────────────────────────────────────────────
+const { data: categoriesData, isLoading: isCategoriesLoading } =
+  useAdminCategoriesQuery();
+const { mutate: createProduct, isPending: isSubmitting } =
+  useCreateAdminProduct();
+
+// ─── State ────────────────────────────────────────────────────────────────────
 const slugEdited = ref(false);
 const tagInput = ref("");
 
@@ -30,10 +41,10 @@ const form = reactive({
   title: "",
   slug: "",
   description: "",
-  thumbnail: "",
-  images: [] as string[],
+  thumbnail: "" as string | File,
+  images: [] as (string | File)[],
   stock: 10,
-  unit: "hộp" as any,
+  unit: "hộp" as string,
   price: 0,
   discountPercentage: 0,
   originalPrice: 0,
@@ -42,12 +53,14 @@ const form = reactive({
   isBestPrice: false,
   isOnlineExclusive: false,
   tags: [] as string[],
+  position: null as number | null,
   primary_category_id: "",
+  category_ids: [] as string[],
 });
 
 const errors = ref<Record<string, string>>({});
 
-// Available units from system schema
+// ─── Options ─────────────────────────────────────────────────────────────────
 const unitOptions = [
   { label: "Kilôgam (kg)", value: "kg" },
   { label: "Gam (g)", value: "g" },
@@ -65,25 +78,22 @@ const statusOptions = [
   { label: "Ngừng hoạt động", value: "inactive" },
 ];
 
-const categoryOptions = computed(() => {
-  return store.categories
-    .filter((c) => c.type === "product" && c.status === "active")
-    .map((c) => ({ label: c.title, value: c.id }));
-});
+// ─── Computed ─────────────────────────────────────────────────────────────────
+const categoryOptions = computed(() =>
+  (categoriesData.value ?? []).map((c) => ({ label: c.title, value: c._id })),
+);
 
+// ─── Watchers ─────────────────────────────────────────────────────────────────
+// Auto-slug từ title nếu user chưa chỉnh slug
 watch(
   () => form.title,
   (value) => {
     if (slugEdited.value) return;
-    form.slug = value
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]+/g, "")
-      .replace(/\s+/g, "-")
-      .trim();
+    form.slug = slugify(value);
   },
 );
 
-// Calculate original price or price automatically if discount changes
+// Auto-calculate originalPrice khi discount thay đổi
 watch(
   () => [form.price, form.discountPercentage],
   () => {
@@ -97,6 +107,7 @@ watch(
   },
 );
 
+// Parse tags từ tagInput
 watch(tagInput, (value) => {
   form.tags = value
     .split(",")
@@ -108,23 +119,34 @@ const markSlugEdited = () => {
   slugEdited.value = true;
 };
 
+// Đảm bảo primary_category_id luôn có trong category_ids
+watch(
+  () => form.primary_category_id,
+  (newPrimary) => {
+    if (newPrimary && !form.category_ids.includes(newPrimary)) {
+      form.category_ids = [newPrimary, ...form.category_ids];
+    }
+  },
+);
+
+// ─── Validation ───────────────────────────────────────────────────────────────
 const validateForm = () => {
   const errs: Record<string, string> = {};
   if (!form.title.trim()) errs.title = "Vui lòng nhập tên sản phẩm.";
   if (!form.slug.trim()) errs.slug = "Vui lòng nhập slug sản phẩm.";
   if (!form.primary_category_id)
-    errs.primary_category_id = "Vui lòng chọn danh mục.";
+    errs.primary_category_id = "Vui lòng chọn danh mục chính.";
   if (form.price <= 0) errs.price = "Giá phải lớn hơn 0 VND.";
-  if (form.originalPrice < form.price)
+  if (form.originalPrice > 0 && form.originalPrice < form.price)
     errs.originalPrice = "Giá gốc không được thấp hơn giá bán.";
   if (form.stock < 0) errs.stock = "Tồn kho không được âm.";
   if (!form.thumbnail) errs.thumbnail = "Vui lòng tải ảnh đại diện sản phẩm.";
-
   errors.value = errs;
   return Object.keys(errs).length === 0;
 };
 
-const submitForm = async () => {
+// ─── Submit ───────────────────────────────────────────────────────────────────
+const submitForm = () => {
   if (!validateForm()) {
     toast.add({
       severity: "error",
@@ -135,56 +157,34 @@ const submitForm = async () => {
     return;
   }
 
-  isSubmitting.value = true;
+  const payload = buildCreateProductPayload({ ...form });
 
-  // Simulate API submit delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  try {
-    store.createProduct({
-      title: form.title,
-      slug: form.slug,
-      description: form.description,
-      thumbnail: form.thumbnail,
-      images: form.images,
-      stock: form.stock,
-      unit: form.unit,
-      price: form.price,
-      discountPercentage: form.discountPercentage,
-      originalPrice: form.originalPrice,
-      status: form.status,
-      featured: form.featured,
-      isBestPrice: form.isBestPrice,
-      isOnlineExclusive: form.isOnlineExclusive,
-      tags: form.tags,
-      ratings: { totalRating: 5.0, numberOfRatings: 0 },
-      soldCount: 0,
-      primary_category_id: form.primary_category_id,
-    });
-
-    toast.add({
-      severity: "success",
-      summary: "Đã tạo sản phẩm",
-      detail: `Đã thêm ${form.title} vào danh mục sản phẩm.`,
-      life: 3000,
-    });
-
-    router.push(ROUTES.ADMIN.PRODUCTS);
-  } catch (error) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail: "Đã xảy ra lỗi khi lưu sản phẩm.",
-      life: 3000,
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+  createProduct(payload, {
+    onSuccess: (result) => {
+      toast.add({
+        severity: "success",
+        summary: "Đã tạo sản phẩm",
+        detail: `Đã thêm ${result.title} vào danh sách sản phẩm.`,
+        life: 3000,
+      });
+      router.push(ROUTES.ADMIN.PRODUCTS);
+    },
+    onError: (error: any) => {
+      toast.add({
+        severity: "error",
+        summary: "Lỗi tạo sản phẩm",
+        detail:
+          error?.response?.data?.message ?? "Đã xảy ra lỗi khi lưu sản phẩm.",
+        life: 4000,
+      });
+    },
+  });
 };
 </script>
 
 <template>
   <div class="px-4 pt-6 space-y-6">
+    <!-- Header -->
     <section
       class="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm shadow-slate-200/40 backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
     >
@@ -193,7 +193,7 @@ const submitForm = async () => {
           <p
             class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400"
           >
-            Danh mục
+            Quản trị
           </p>
           <h1
             class="mt-2 text-2xl font-semibold text-slate-900 dark:text-white"
@@ -218,21 +218,24 @@ const submitForm = async () => {
             :disabled="isSubmitting"
           >
             <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2"></i>
-            Lưu sản phẩm
+            {{ isSubmitting ? "Đang lưu..." : "Lưu sản phẩm" }}
           </button>
         </div>
       </div>
     </section>
 
     <div class="grid gap-6 lg:grid-cols-3">
+      <!-- Left column: main info -->
       <div class="space-y-6 lg:col-span-2">
+        <!-- Thông tin cơ bản -->
         <section
-          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             Thông tin cơ bản
           </h2>
           <div class="grid gap-4 mt-4 md:grid-cols-2">
+            <!-- Tên sản phẩm -->
             <div class="md:col-span-2">
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
@@ -241,40 +244,64 @@ const submitForm = async () => {
               <InputText
                 v-model="form.title"
                 class="mt-2 w-full"
-                placeholder="e.g. Bát Salad Cá Ngừ Đại Dương"
+                placeholder="Ví dụ: Bát Salad Cá Ngừ Đại Dương"
               />
               <p v-if="errors.title" class="mt-1 text-xs text-red-500">
                 {{ errors.title }}
               </p>
             </div>
 
-            <div>
+            <!-- Slug (auto-generated) -->
+            <div class="md:col-span-2">
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Slug *</label
               >
-              <InputText
-                v-model="form.slug"
-                class="mt-2 w-full"
-                @input="markSlugEdited"
-              />
+                Slug *
+                <span class="text-xs text-slate-400 font-normal ml-1"
+                  >(Tự động tạo từ tên, có thể chỉnh sửa)</span
+                >
+              </label>
+              <div class="relative mt-2">
+                <InputText
+                  v-model="form.slug"
+                  class="w-full font-mono text-sm"
+                  placeholder="vd: bat-salad-ca-ngu"
+                  @input="markSlugEdited"
+                />
+                <button
+                  v-if="slugEdited"
+                  type="button"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-primary-600"
+                  @click="
+                    () => {
+                      slugEdited = false;
+                      form.slug = slugify(form.title);
+                    }
+                  "
+                >
+                  Tự động
+                </button>
+              </div>
               <p v-if="errors.slug" class="mt-1 text-xs text-red-500">
                 {{ errors.slug }}
               </p>
             </div>
 
+            <!-- Danh mục chính -->
             <div>
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Danh mục *</label
+                >Danh mục chính *</label
               >
-              <Dropdown
+              <Select
                 v-model="form.primary_category_id"
                 :options="categoryOptions"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Chọn danh mục"
+                placeholder="Chọn danh mục chính"
                 class="mt-2 w-full"
+                :loading="isCategoriesLoading"
+                filter
               />
               <p
                 v-if="errors.primary_category_id"
@@ -284,12 +311,36 @@ const submitForm = async () => {
               </p>
             </div>
 
+            <!-- Danh mục phụ (MultiSelect) -->
+            <div>
+              <label
+                class="text-sm font-medium text-slate-700 dark:text-slate-200"
+              >
+                Danh mục phụ
+                <span class="text-xs text-slate-400 font-normal ml-1"
+                  >(chọn nhiều)</span
+                >
+              </label>
+              <MultiSelect
+                v-model="form.category_ids"
+                :options="categoryOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Chọn danh mục phụ"
+                class="mt-2 w-full"
+                :loading="isCategoriesLoading"
+                filter
+                display="chip"
+              />
+            </div>
+
+            <!-- Đơn vị bán -->
             <div>
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
                 >Đơn vị bán *</label
               >
-              <Dropdown
+              <Select
                 v-model="form.unit"
                 :options="unitOptions"
                 optionLabel="label"
@@ -298,22 +349,46 @@ const submitForm = async () => {
               />
             </div>
 
+            <!-- Tags -->
             <div>
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Thẻ (cách nhau bằng dấu phẩy)</label
               >
+                Thẻ
+                <span class="text-xs text-slate-400 font-normal ml-1"
+                  >(cách nhau bằng dấu phẩy)</span
+                >
+              </label>
               <InputText
                 v-model="tagInput"
                 class="mt-2 w-full"
                 placeholder="fresh, diet, organic"
               />
             </div>
+
+            <!-- Thứ tự hiển thị -->
+            <div>
+              <label
+                class="text-sm font-medium text-slate-700 dark:text-slate-200"
+              >
+                Thứ tự hiển thị (Position)
+                <span class="text-xs text-slate-400 font-normal ml-1"
+                  >(để trống = tự động)</span
+                >
+              </label>
+              <InputNumber
+                v-model="form.position"
+                :min="0"
+                class="mt-2 w-full"
+                placeholder="Để trống để tự động"
+              />
+            </div>
           </div>
         </section>
 
+        <!-- Giá bán -->
         <section
-          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             Giá bán
@@ -354,8 +429,12 @@ const submitForm = async () => {
             <div>
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Giá gốc</label
               >
+                Giá gốc
+                <span class="text-xs text-slate-400 font-normal ml-1"
+                  >(tự tính từ % giảm)</span
+                >
+              </label>
               <InputNumber
                 v-model="form.originalPrice"
                 mode="currency"
@@ -370,8 +449,9 @@ const submitForm = async () => {
           </div>
         </section>
 
+        <!-- Mô tả sản phẩm -->
         <section
-          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             Mô tả sản phẩm
@@ -385,9 +465,11 @@ const submitForm = async () => {
         </section>
       </div>
 
+      <!-- Right column: images + settings -->
       <div class="space-y-6">
+        <!-- Hình ảnh -->
         <section
-          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             Hình ảnh & Album *
@@ -396,26 +478,26 @@ const submitForm = async () => {
             <div>
               <span
                 class="text-xs font-semibold text-slate-400 block mb-2 uppercase"
-                >Ảnh đại diện sản phẩm *</span
+                >Ảnh đại diện *</span
               >
               <ImageUploader v-model="form.thumbnail" :multiple="false" />
               <p v-if="errors.thumbnail" class="mt-1 text-xs text-red-500">
                 {{ errors.thumbnail }}
               </p>
             </div>
-
             <div>
               <span
                 class="text-xs font-semibold text-slate-400 block mb-2 uppercase"
-                >Các hình ảnh bổ sung</span
+                >Hình ảnh bổ sung</span
               >
               <ImageUploader v-model="form.images" :multiple="true" />
             </div>
           </div>
         </section>
 
+        <!-- Kho hàng & Nhãn -->
         <section
-          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             Kho hàng & Nhãn hiển thị
@@ -433,57 +515,42 @@ const submitForm = async () => {
             </div>
 
             <div
+              v-for="item in [
+                {
+                  key: 'featured',
+                  label: 'Nổi bật',
+                  desc: 'Hiển thị sản phẩm này trên banner trang chủ.',
+                },
+                {
+                  key: 'isBestPrice',
+                  label: 'Giá tốt nhất',
+                  desc: 'Đánh dấu nhãn là ưu đãi tốt nhất.',
+                },
+                {
+                  key: 'isOnlineExclusive',
+                  label: 'Chỉ bán Online',
+                  desc: 'Chỉ áp dụng cho giao hàng trực tuyến.',
+                },
+              ]"
+              :key="item.key"
               class="flex items-center justify-between rounded-xl border border-slate-100 p-3 dark:border-slate-800"
             >
               <div>
                 <p
                   class="text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  Nổi bật
+                  {{ item.label }}
                 </p>
-                <p class="text-xs text-slate-400">
-                  Hiển thị sản phẩm này trên banner trang chủ.
-                </p>
+                <p class="text-xs text-slate-400">{{ item.desc }}</p>
               </div>
-              <ToggleSwitch v-model="form.featured" />
-            </div>
-
-            <div
-              class="flex items-center justify-between rounded-xl border border-slate-100 p-3 dark:border-slate-800"
-            >
-              <div>
-                <p
-                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >
-                  Giá tốt nhất
-                </p>
-                <p class="text-xs text-slate-400">
-                  Đánh dấu nhãn là ưu đãi tốt nhất.
-                </p>
-              </div>
-              <ToggleSwitch v-model="form.isBestPrice" />
-            </div>
-
-            <div
-              class="flex items-center justify-between rounded-xl border border-slate-100 p-3 dark:border-slate-800"
-            >
-              <div>
-                <p
-                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >
-                  Chỉ bán Online
-                </p>
-                <p class="text-xs text-slate-400">
-                  Chỉ áp dụng cho giao hàng trực tuyến.
-                </p>
-              </div>
-              <ToggleSwitch v-model="form.isOnlineExclusive" />
+              <ToggleSwitch v-model="(form as any)[item.key]" />
             </div>
           </div>
         </section>
 
+        <!-- Trạng thái -->
         <section
-          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
         >
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
             Trạng thái

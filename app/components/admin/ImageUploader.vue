@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onUnmounted } from "vue";
 
+/**
+ * modelValue có thể là:
+ * - single mode: string (URL từ server) | File (file mới) | ""
+ * - multiple mode: (string | File)[]
+ */
 const props = withDefaults(
   defineProps<{
-    modelValue: string | string[];
+    modelValue: string | File | (string | File)[];
     multiple?: boolean;
     maxSize?: number;
     accept?: string;
@@ -16,49 +21,67 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  "update:modelValue": [string | string[]];
+  "update:modelValue": [string | File | (string | File)[]];
 }>();
 
 const inputRef = ref<HTMLInputElement | null>(null);
 
-const previewList = computed(() => {
-  if (Array.isArray(props.modelValue)) return props.modelValue;
-  return props.modelValue ? [props.modelValue] : [];
+// Object URLs tạm để preview File objects
+// Track chúng để revoke khi không cần nữa
+const objectUrlMap = new WeakMap<File, string>();
+const trackedUrls = ref<string[]>([]);
+
+const getPreviewSrc = (item: string | File): string => {
+  if (typeof item === "string") return item;
+  if (objectUrlMap.has(item)) return objectUrlMap.get(item)!;
+  const url = URL.createObjectURL(item);
+  objectUrlMap.set(item, url);
+  trackedUrls.value.push(url);
+  return url;
+};
+
+onUnmounted(() => {
+  trackedUrls.value.forEach((url) => URL.revokeObjectURL(url));
 });
 
-const updateValue = (next: string[]) => {
+const previewList = computed((): (string | File)[] => {
+  if (Array.isArray(props.modelValue)) return props.modelValue;
+  return props.modelValue ? [props.modelValue as string | File] : [];
+});
+
+const updateValue = (next: (string | File)[]) => {
   if (props.multiple) {
     emit("update:modelValue", next);
   } else {
-    emit("update:modelValue", next[0] || "");
+    emit("update:modelValue", next[0] ?? "");
   }
 };
 
+// ─── Handle file input ────────────────────────────────────────────────────────
 const handleFiles = (files: FileList | null) => {
   if (!files) return;
-  const accepted: string[] = [];
+  const accepted: File[] = [];
 
   Array.from(files).forEach((file) => {
     const sizeMb = file.size / (1024 * 1024);
     if (sizeMb > props.maxSize) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        accepted.push(reader.result);
-        updateValue(
-          props.multiple
-            ? [...previewList.value, ...accepted]
-            : [reader.result],
-        );
-      }
-    };
-    reader.readAsDataURL(file);
+    accepted.push(file);
   });
+
+  if (!accepted.length) return;
+
+  if (props.multiple) {
+    updateValue([...previewList.value, ...accepted]);
+  } else {
+    updateValue([accepted[0]]);
+  }
 };
 
 const onInputChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   handleFiles(target.files);
+  // reset input để có thể chọn lại cùng file
+  target.value = "";
 };
 
 const removeImage = (index: number) => {
@@ -117,15 +140,21 @@ const onDragOver = (event: DragEvent) => {
       class="grid grid-cols-2 gap-3 sm:grid-cols-3"
     >
       <div
-        v-for="(src, index) in previewList"
-        :key="src"
+        v-for="(item, index) in previewList"
+        :key="typeof item === 'string' ? item : item.name + index"
         class="relative group"
       >
         <img
-          :src="src"
+          :src="getPreviewSrc(item)"
           alt="Xem trước"
           class="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
         />
+        <!-- Badge phân biệt file mới / ảnh cũ -->
+        <span
+          v-if="typeof item !== 'string'"
+          class="absolute bottom-1 left-1 rounded bg-blue-500/80 px-1 text-[10px] text-white leading-4"
+          >Mới</span
+        >
         <button
           type="button"
           class="absolute top-2 right-2 rounded-full bg-white/90 text-gray-700 text-xs px-2 py-1 shadow hover:bg-white"

@@ -5,7 +5,6 @@ import Column from "primevue/column";
 import Checkbox from "primevue/checkbox";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
-import Skeleton from "primevue/skeleton";
 
 export type DataTableColumn = {
   key: string;
@@ -123,16 +122,10 @@ const changePerPage = (event: Event) => {
   emit("update:perPage", value);
 };
 
-const toggleSort = (column: DataTableColumn) => {
-  if (!props.sortable || !column.sortable) return;
-  if (!sortState.value || sortState.value.key !== column.key) {
-    sortState.value = { key: column.key, direction: "asc" };
-  } else {
-    sortState.value = {
-      key: column.key,
-      direction: sortState.value.direction === "asc" ? "desc" : "asc",
-    };
-  }
+const onSort = (event: any) => {
+  if (!props.sortable) return;
+  const newDirection = event.sortOrder === 1 ? "asc" : "desc";
+  sortState.value = { key: event.sortField, direction: newDirection };
   emit("update:sort", sortState.value);
 };
 
@@ -197,11 +190,14 @@ defineSlots<{
 
     <PrimeDataTable
       :value="data"
-      :loading="loading"
       :striped-rows="true"
       :row-hover="true"
       responsive-layout="scroll"
       class="admin-table"
+      lazy
+      :sortField="sortState?.key"
+      :sortOrder="sortState?.direction === 'asc' ? 1 : -1"
+      @sort="onSort"
     >
       <Column v-if="selectable" header-style="width: 3rem">
         <template #header>
@@ -232,27 +228,7 @@ defineSlots<{
         :sortable="sortable && column.sortable"
       >
         <template #header>
-          <button
-            v-if="sortable && column.sortable"
-            type="button"
-            class="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500"
-            @click="toggleSort(column)"
-          >
-            <span>{{ column.label }}</span>
-            <i
-              v-if="sortState?.key === column.key"
-              class="pi"
-              :class="
-                sortState.direction === 'asc'
-                  ? 'pi-sort-amount-up-alt'
-                  : 'pi-sort-amount-down'
-              "
-            ></i>
-          </button>
-          <span
-            v-else
-            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-          >
+          <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
             {{ column.label }}
           </span>
         </template>
@@ -281,16 +257,39 @@ defineSlots<{
           </div>
         </div>
       </template>
-      <template #loading>
+      <!-- <template #loading>
         <div class="space-y-3 px-6 py-6">
           <div v-for="row in 5" :key="row" class="flex items-center gap-3">
             <Skeleton width="1.5rem" height="1.5rem" border-radius="6px" />
             <Skeleton class="flex-1" height="0.75rem" border-radius="6px" />
           </div>
         </div>
-      </template>
+      </template> -->
     </PrimeDataTable>
+    <!-- 
+    <template #header>: Tương đương với việc bạn đang tự định nghĩa giao diện cho ô tiêu đề <th> ở hàng trên cùng của cột đó.
+<template #body="slotProps">: Tương đương với việc định nghĩa giao diện cho tất cả các ô dữ liệu <td> thuộc cột đó ở các hàng bên dưới thân bảng (tbody).
+CODE MẪU TƯỢNG TRƯNG BÊN TRONG THƯ VIỆN PRIMEVUE (<PrimeDataTable>)
+<table>
+  <tbody>
+    Vòng lặp duyệt qua mảng dữ liệu `:value="data"` nằm ở đây! 
+    <tr v-for="(item, rowIndex) in value" :key="rowIndex">
+      
+       Với mỗi dòng, nó sẽ duyệt qua các thẻ <Column> mà chúng ta khai báo 
+      <td v-for="col in childrenColumns">
+        
+         Truyền phần tử hiện tại (item) và chỉ mục (rowIndex) vào slot tên là 'body' 
+        <slot name="body" :data="item" :index="rowIndex">
+           Giao diện mặc định nếu ta không viết template #body 
+          {{ item[col.field] }}
+        </slot>
+        
+      </td>
 
+    </tr>
+  </tbody>
+</table>
+-->
     <div
       class="flex flex-col gap-3 border-t border-slate-200/70 px-5 py-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between"
     >

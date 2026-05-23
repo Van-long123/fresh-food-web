@@ -78,5 +78,18 @@ export const API_ENDPOINTS = {
     CREATE: '/v1/client/refund-requests',
     BY_ORDER: (orderId: string) => `/v1/client/refund-requests/order/${orderId}`,
     BANK_INFO: (id: string) => `/v1/client/refund-requests/${id}/bank-info`
+  },
+  // ── Admin ────────────────────────────────────────────────────
+  ADMIN: {
+    PRODUCT: {
+      LIST: '/v1/admin/products',
+      DETAIL: (id: string) => `/v1/admin/products/${id}`,
+      CREATE: '/v1/admin/products',
+      UPDATE: (id: string) => `/v1/admin/products/${id}`,
+      DELETE: (id: string) => `/v1/admin/products/${id}`
+    },
+    CATEGORY: {
+      LIST: '/v1/admin/categories'
+    }
   }
 } as const

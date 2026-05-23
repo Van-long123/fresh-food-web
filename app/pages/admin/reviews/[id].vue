@@ -13,6 +13,10 @@ definePageMeta({
   middleware: ["auth", "admin"],
 });
 
+useHead({
+  title: "Chi tiết đánh giá - Quản trị SmartFood",
+});
+
 const route = useRoute();
 const router = useRouter();
 const store = useAdminMockStore();

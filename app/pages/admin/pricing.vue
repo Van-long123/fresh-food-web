@@ -3,6 +3,10 @@ definePageMeta({
   layout: "admin",
   middleware: ["auth", "admin"],
 });
+
+useHead({
+  title: "Quản lý bảng giá - Quản trị SmartFood",
+});
 </script>
 
 <template>

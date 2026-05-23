@@ -12,6 +12,10 @@ definePageMeta({
   middleware: ["auth", "admin"],
 });
 
+useHead({
+  title: "Cài đặt hệ thống - Quản trị SmartFood",
+});
+
 const store = useAdminMockStore();
 const toast = useToast();
 const isSubmitting = ref(false);

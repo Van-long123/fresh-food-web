@@ -139,3 +139,81 @@ export interface ProductRecommendationResponse {
   recommendations: ProductRecommendationItem[]
 }
 
+// ─── Admin Product Types ─────────────────────────────────────────────────────
+
+export interface AdminProduct {
+  _id: string
+  title: string
+  slug: string
+  description: string
+  thumbnail: string
+  images: string[]
+  stock: number
+  unit: string
+  price: number
+  discountPercentage: number
+  originalPrice: number
+  status: 'active' | 'inactive'
+  featured: boolean
+  isBestPrice: boolean
+  isOnlineExclusive: boolean
+  tags: string[]
+  ratings: { totalRating: number; numberOfRatings: number }
+  soldCount: number
+  position: number
+  primary_category_id: string | null
+  primary_category?: ProductCategoryInfo | null
+  categories?: ProductCategoryInfo[]
+  createdAt?: string
+  updatedAt?: string | null
+}
+
+export interface AdminProductListResponse {
+  data: AdminProduct[]
+  pagination: PaginationMeta
+}
+
+export interface AdminProductQueryParams {
+  page?: number
+  limit?: number
+  sortField?: string
+  sortOrder?: 'asc' | 'desc'
+  keyword?: string
+  status?: string
+  primary_category_id?: string
+  featured?: boolean | string
+}
+
+export interface AdminProductPayload {
+  title: string
+  slug?: string
+  description?: string
+  thumbnail?: string
+  images?: string[]
+  stock?: number
+  unit?: string
+  price: number
+  discountPercentage?: number
+  originalPrice?: number
+  status?: 'active' | 'inactive'
+  featured?: boolean
+  isBestPrice?: boolean
+  isOnlineExclusive?: boolean
+  tags?: string[]
+  position?: number
+  primary_category_id?: string | null
+  category_ids?: string[]
+}
+
+export interface AdminCategoryOption {
+  _id: string
+  title: string
+  slug: string
+  type: string
+  status: string
+}
+
+export interface AdminCategoryListResponse {
+  data: AdminCategoryOption[]
+  pagination: PaginationMeta
+}

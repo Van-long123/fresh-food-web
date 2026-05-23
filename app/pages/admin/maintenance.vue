@@ -4,6 +4,10 @@ definePageMeta({
   layout: false,
   middleware: ["auth", "admin"],
 });
+
+useHead({
+  title: "Bảo trì hệ thống - Quản trị SmartFood",
+});
 </script>
 
 <template>
