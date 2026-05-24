@@ -1,6 +1,7 @@
 import { computed, reactive, ref } from 'vue'
 import { usePasswordStrength } from '~/composables/auth/usePasswordStrength'
 import { useResetPasswordMutation } from '~/mutations/user/useResetPasswordMutation'
+import { useSetPasswordMutation } from '~/mutations/user/useSetPasswordMutation'
 import { useUpdateProfileMutation } from '~/mutations/user/useUpdateProfileMutation'
 import { PASSWORD_RULE_MESSAGE, isValidPassword } from '~/utils/authFormUtils'
 
@@ -18,9 +19,10 @@ interface ChangePasswordErrors {
 
 // const REDIRECT_SECONDS = 3
 
-export const useChangePassword = (mode: 'authenticated' | 'reset-link') => {
+export const useChangePassword = (mode: 'authenticated' | 'reset-link' | 'set-password') => {
   const updateProfileMutation = useUpdateProfileMutation()
   const resetPasswordMutation = useResetPasswordMutation()
+  const setPasswordMutation = useSetPasswordMutation()
 
   const form = reactive<ChangePasswordForm>({ current: '', newPwd: '', confirm: '' })
   const errors = reactive<ChangePasswordErrors>({ current: '', newPwd: '', confirm: '' })
@@ -126,10 +128,22 @@ export const useChangePassword = (mode: 'authenticated' | 'reset-link') => {
     })
   }
 
+  const submitSetPassword = async (token: string) => {
+    await setPasswordMutation.mutateAsync({
+      token,
+      newPassword: form.newPwd
+    })
+  }
+
   return {
     form,
     errors,
-    loading: computed(() => updateProfileMutation.isPending.value || resetPasswordMutation.isPending.value),
+    loading: computed(
+      () =>
+        updateProfileMutation.isPending.value ||
+        resetPasswordMutation.isPending.value ||
+        setPasswordMutation.isPending.value
+    ),
     isShaking,
     showSuccess,
     rules,
@@ -144,6 +158,7 @@ export const useChangePassword = (mode: 'authenticated' | 'reset-link') => {
     // startRedirect,
     clearRedirectTimer,
     submitAuthenticatedChange,
-    submitResetByToken
+    submitResetByToken,
+    submitSetPassword
   }
 }

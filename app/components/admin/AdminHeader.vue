@@ -229,16 +229,6 @@ const handleLogout = async () => {
                   @click="userPopover.hide()"
                 >
                   <i
-                    class="pi pi-cog text-slate-400 dark:text-slate-500 text-[0.85rem]"
-                  ></i>
-                  <span>Cài đặt tài khoản</span>
-                </NuxtLink>
-                <NuxtLink
-                  to="/admin/settings"
-                  class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition"
-                  @click="userPopover.hide()"
-                >
-                  <i
                     class="pi pi-key text-slate-400 dark:text-slate-500 text-[0.85rem]"
                   ></i>
                   <span>Đổi mật khẩu</span>

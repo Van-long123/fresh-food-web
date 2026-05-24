@@ -39,6 +39,16 @@ export const deleteAdminProductRequest = async (id: string): Promise<AdminProduc
   return response.data?.data || response.data
 }
 
+export const updateAdminProductBulkStatusRequest = async (payload: { product_ids: string[]; status: 'active' | 'inactive' }): Promise<{ updatedCount: number }> => {
+  const response = await getAuthorizedAxios().put(API_ENDPOINTS.ADMIN.PRODUCT.BULK_STATUS, payload)
+  return response.data
+}
+
+export const deleteAdminProductsBulkRequest = async (payload: { product_ids: string[] }): Promise<{ deletedCount: number }> => {
+  const response = await getAuthorizedAxios().delete(API_ENDPOINTS.ADMIN.PRODUCT.BULK_DELETE, { data: payload })
+  return response.data
+}
+
 export const getAdminCategoriesRequest = async (params?: any): Promise<AdminCategoryListResponse> => {
   const response = await getAuthorizedAxios().get(API_ENDPOINTS.ADMIN.CATEGORY.LIST, {
     params: { limit: 1000, ...params }

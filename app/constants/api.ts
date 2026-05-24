@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: '/v1/client/users/update',
     FORGOT_PASSWORD: '/v1/client/users/forgot-password',
     RESET_PASSWORD: '/v1/client/users/reset-password',
+    SET_PASSWORD: '/v1/client/users/set-password',
     // ── Social OAuth ──────────────────────────────────────────
     GOOGLE_LOGIN: '/v1/client/users/google',
     FACEBOOK_LOGIN: '/v1/client/users/facebook',
@@ -89,7 +90,9 @@ export const API_ENDPOINTS = {
       DETAIL: (id: string) => `/v1/admin/products/${id}`,
       CREATE: '/v1/admin/products',
       UPDATE: (id: string) => `/v1/admin/products/${id}`,
-      DELETE: (id: string) => `/v1/admin/products/${id}`
+      DELETE: (id: string) => `/v1/admin/products/${id}`,
+      BULK_STATUS: '/v1/admin/products/bulk-status',
+      BULK_DELETE: '/v1/admin/products/bulk'
     },
     CATEGORY: {
       LIST: '/v1/admin/categories'
@@ -105,6 +108,15 @@ export const API_ENDPOINTS = {
     SETTINGS: {
       GET: '/v1/admin/settings',
       UPDATE: '/v1/admin/settings'
+    },
+    USER: {
+      LIST: '/v1/admin/users',
+      DETAIL: (id: string) => `/v1/admin/users/${id}`,
+      CREATE: '/v1/admin/users',
+      UPDATE: (id: string) => `/v1/admin/users/${id}`,
+      DELETE: (id: string) => `/v1/admin/users/${id}`,
+      BULK_STATUS: '/v1/admin/users/bulk-status',
+      BULK_DELETE: '/v1/admin/users/bulk'
     }
   }
 } as const

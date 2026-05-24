@@ -4,6 +4,8 @@ import {
   createAdminProductRequest,
   updateAdminProductRequest,
   deleteAdminProductRequest,
+  updateAdminProductBulkStatusRequest,
+  deleteAdminProductsBulkRequest,
   getAdminCategoriesRequest
 } from '~/api/admin/productApi'
 import type {
@@ -29,6 +31,12 @@ export const adminProductService = {
 
   delete: (id: string): Promise<AdminProduct> =>
     deleteAdminProductRequest(id),
+
+  bulkUpdateStatus: (payload: { product_ids: string[]; status: 'active' | 'inactive' }): Promise<{ updatedCount: number }> =>
+    updateAdminProductBulkStatusRequest(payload),
+
+  bulkDelete: (payload: { product_ids: string[] }): Promise<{ deletedCount: number }> =>
+    deleteAdminProductsBulkRequest(payload),
 
   getCategories: (params?: any): Promise<AdminCategoryListResponse> =>
     getAdminCategoriesRequest(params)

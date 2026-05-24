@@ -4,6 +4,7 @@ import type {
   LoginPayload,
   RegisterPayload,
   ResetPasswordPayload,
+  SetPasswordPayload,
   UpdateProfilePayload,
   VerifyAccountPayload,
   VerifyOAuthPayload
@@ -50,6 +51,11 @@ export const forgotPasswordRequest = async (payload: ForgotPasswordPayload) => {
 
 export const resetPasswordRequest = async (payload: ResetPasswordPayload) => {
   const response = await getAuthorizedAxios().put(API_ENDPOINTS.AUTH.RESET_PASSWORD, payload)
+  return response.data
+}
+
+export const setPasswordRequest = async (payload: SetPasswordPayload) => {
+  const response = await getAuthorizedAxios().post(API_ENDPOINTS.AUTH.SET_PASSWORD, payload)
   return response.data
 }
 

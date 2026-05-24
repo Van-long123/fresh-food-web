@@ -51,6 +51,11 @@ export interface ResetPasswordPayload {
   newPassword: string
 }
 
+export interface SetPasswordPayload {
+  token: string
+  newPassword: string
+}
+
 export interface UpdateProfilePayload {
   displayName?: string
   phone?: string
@@ -63,6 +68,72 @@ export interface UpdateProfilePayload {
 }
 
 export type ForgotPasswordPageState = 'input' | 'success' | 'error'
+
+// ─── Admin User Types ─────────────────────────────────────────────────────
+export type AdminUserRole = 'admin' | 'client'
+
+export interface AdminUser {
+  _id: string
+  email: string
+  username?: string
+  displayName: string
+  phone?: string
+  avatar?: string
+  role: AdminUserRole
+  roleId?: string | null
+  address?: string
+  gender?: string
+  birthday?: string
+  isActive: boolean
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface AdminUserQueryParams {
+  page?: number
+  limit?: number
+  keyword?: string
+  role?: AdminUserRole
+  status?: 'active' | 'inactive'
+  sortField?: string
+  sortOrder?: 'asc' | 'desc'
+}
+
+export interface AdminUserListResponse {
+  data: AdminUser[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
+export interface AdminUserPayload {
+  displayName: string
+  email: string
+  phone: string
+  avatar?: string | File
+  role: AdminUserRole
+  roleId?: string | null
+  address?: string
+  gender?: string
+  birthday?: string
+  isActive?: boolean
+}
+
+export interface UserFormData {
+  displayName: string
+  email: string
+  phone: string
+  avatar?: string | File
+  role: 'admin' | 'client'
+  roleId?: string | null
+  address?: string
+  gender?: string
+  birthday?: string
+  isActive?: boolean
+}
 
 // OAuth / Social Login Types
 /** Các provider đăng nhập xã hội được hỗ trợ */

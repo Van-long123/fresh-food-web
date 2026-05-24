@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import Dropdown from "primevue/dropdown";
 import ToggleSwitch from "primevue/toggleswitch";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import ImageUploader from "~/components/admin/ImageUploader.vue";
 import { useToast } from "primevue/usetoast";
+import { useAdminRolesQuery } from "~/queries/role/useAdminRolesQuery";
+import { useCreateAdminUser } from "~/mutations/user/useCreateAdminUser";
+import { buildCreateAdminUserPayload } from "~/services/admin/user.service";
 
 definePageMeta({
   layout: "admin",
@@ -20,17 +22,23 @@ useHead({
 });
 
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
+const createUserMutation = useCreateAdminUser();
+const { data: rolesData } = useAdminRolesQuery({ page: 1, limit: 200 });
+const roles = computed(() => rolesData.value?.data || []);
 
 const isSubmitting = ref(false);
 const errors = ref<Record<string, string>>({});
 
-const roleOptions = computed(() => {
-  return store.roles.map((r) => ({
-    label: r.title,
-    value: r.id,
-    type: r.id === "role-1" ? "admin" : "client",
+const accountRoleOptions = [
+  { label: "Khách hàng", value: "client" },
+  { label: "Quản trị viên", value: "admin" },
+];
+
+const adminRoleOptions = computed(() => {
+  return roles.value.map((role) => ({
+    label: role.title,
+    value: role._id,
   }));
 });
 
@@ -39,15 +47,36 @@ const form = reactive({
   email: "",
   phone: "",
   avatar: "",
-  roleId: "role-2", // default client role
+  role: "client",
+  roleId: "",
   address: "",
   gender: "Nam",
   birthday: "1995-01-01",
-  isActive: true,
+  isActive: false,
 });
+
+watch(
+  [roles, () => form.role],
+  ([nextRoles, roleValue]) => {
+    if (roleValue !== "admin") {
+      form.roleId = "";
+      return;
+    }
+
+    if (!form.roleId && nextRoles.length) {
+      const firstRole = nextRoles.find((role) => role.isSystem) || nextRoles[0];
+      form.roleId = firstRole?._id || "";
+    }
+  },
+  { immediate: true },
+);
 
 const validateForm = () => {
   const errs: Record<string, string> = {};
+  if (!form.role) errs.role = "Vui lòng chọn loại tài khoản.";
+  if (form.role === "admin" && !form.roleId) {
+    errs.roleId = "Vui lòng chọn vai trò quản trị.";
+  }
   if (!form.displayName.trim()) errs.displayName = "Vui lòng nhập họ và tên.";
   if (!form.email.trim()) {
     errs.email = "Vui lòng nhập email.";
@@ -77,26 +106,21 @@ const submitForm = async () => {
   }
 
   isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
   try {
-    const selectedRoleObj = store.roles.find((r) => r.id === form.roleId);
-    const mappedRole = selectedRoleObj?.id === "role-1" ? "admin" : "client";
-
-    store.createUser({
+    const payload = buildCreateAdminUserPayload({
       displayName: form.displayName,
       email: form.email,
       phone: form.phone,
-      avatar:
-        form.avatar ||
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop",
-      role: mappedRole,
-      roleId: form.roleId,
+      avatar: form.avatar,
+      role: form.role as "admin" | "client",
+      roleId: form.role === "admin" ? form.roleId || null : null,
       address: form.address,
       gender: form.gender,
       birthday: form.birthday,
       isActive: form.isActive,
     });
+
+    await createUserMutation.mutateAsync(payload);
 
     toast.add({
       severity: "success",
@@ -106,11 +130,20 @@ const submitForm = async () => {
     });
 
     router.push(ROUTES.ADMIN.USERS);
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMessage =
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      typeof (error as { response?: { data?: { message?: string } } })
+        .response === "object"
+        ? (error as { response?: { data?: { message?: string } } }).response
+            ?.data?.message
+        : undefined;
     toast.add({
       severity: "error",
       summary: "Lỗi",
-      detail: "Không thể tạo người dùng.",
+      detail: errorMessage || "Không thể tạo người dùng.",
       life: 3000,
     });
   } finally {
@@ -143,15 +176,15 @@ const submitForm = async () => {
         <div class="flex items-center gap-2">
           <button
             class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
-            @click="router.back()"
             :disabled="isSubmitting"
+            @click="router.back()"
           >
             Hủy
           </button>
           <button
             class="rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-50"
-            @click="submitForm"
             :disabled="isSubmitting"
+            @click="submitForm"
           >
             <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2"></i>
             Lưu người dùng
@@ -232,8 +265,8 @@ const submitForm = async () => {
                 >Ngày sinh *</label
               >
               <input
-                type="date"
                 v-model="form.birthday"
+                type="date"
                 class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
               />
               <p v-if="errors.birthday" class="mt-1 text-xs text-red-500">
@@ -250,7 +283,7 @@ const submitForm = async () => {
                 v-model="form.address"
                 rows="2"
                 class="mt-2 w-full"
-                placeholder="Ví dụ: Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội"
+                placeholder="Ví dụ: 123 Nguyễn Văn Linh"
               />
             </div>
           </div>
@@ -266,15 +299,36 @@ const submitForm = async () => {
             <div>
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Gán vai trò hệ thống</label
+                >Loại tài khoản *</label
+              >
+              <Dropdown
+                v-model="form.role"
+                class="mt-2 w-full"
+                :options="accountRoleOptions"
+                option-label="label"
+                option-value="value"
+              />
+              <p v-if="errors.role" class="mt-1 text-xs text-red-500">
+                {{ errors.role }}
+              </p>
+            </div>
+
+            <div>
+              <label
+                class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                >Vai trò quản trị</label
               >
               <Dropdown
                 v-model="form.roleId"
                 class="mt-2 w-full"
-                :options="roleOptions"
-                optionLabel="label"
-                optionValue="value"
+                :options="adminRoleOptions"
+                option-label="label"
+                option-value="value"
+                :disabled="form.role !== 'admin'"
               />
+              <p v-if="errors.roleId" class="mt-1 text-xs text-red-500">
+                {{ errors.roleId }}
+              </p>
             </div>
 
             <div

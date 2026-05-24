@@ -10,7 +10,9 @@ import StatusBadge from "~/components/admin/StatusBadge.vue";
 import { ROUTES } from "~/constants/routes";
 import { useAdminProductsQuery } from "~/queries/product/useAdminProductsQuery";
 import { useDeleteAdminProduct } from "~/mutations/product/useDeleteProduct";
+import { useBulkDeleteAdminProduct } from "~/mutations/product/useBulkDeleteProduct";
 import { useUpdateAdminProduct } from "~/mutations/product/useUpdateProduct";
+import { useBulkUpdateAdminProductStatus } from "~/mutations/product/useBulkUpdateProductStatus";
 import { useToast } from "primevue/usetoast";
 import type { AdminProduct, AdminProductQueryParams } from "~/types/product.type";
 
@@ -57,7 +59,9 @@ const queryParams = computed<AdminProductQueryParams>(() => {
 // ─── TanStack Query ───────────────────────────────────────────────────────────
 const { data, isLoading, isFetching } = useAdminProductsQuery(queryParams);
 const { mutate: deleteProduct, isPending: isDeleting } = useDeleteAdminProduct();
+const { mutate: bulkDeleteProducts, isPending: isBulkDeletingPending } = useBulkDeleteAdminProduct();
 const { mutate: updateProduct } = useUpdateAdminProduct();
+const { mutate: bulkUpdateProductsStatus } = useBulkUpdateAdminProductStatus();
 
 // ─── Computed ─────────────────────────────────────────────────────────────────
 const products = computed(() => data.value?.data ?? []);
@@ -101,24 +105,30 @@ const handleBulkDelete = () => {
 
 const confirmDelete = () => {
   if (isBulkDeleting.value) {
-    // Bulk delete: xóa tuần tự
     const idsToDelete = [...selectedIds.value];
-    let completed = 0;
-    idsToDelete.forEach((id) => {
-      deleteProduct(id, {
+    bulkDeleteProducts(
+      { product_ids: idsToDelete },
+      {
         onSuccess: () => {
-          completed++;
-          if (completed === idsToDelete.length) {
-            toast.add({ severity: "success", summary: "Đã xóa sản phẩm", detail: `Đã xóa ${idsToDelete.length} sản phẩm`, life: 3000 });
-            selectedIds.value = [];
-            showDeleteDialog.value = false;
-          }
+          toast.add({
+            severity: "success",
+            summary: "Đã xóa sản phẩm",
+            detail: `Đã xóa ${idsToDelete.length} sản phẩm`,
+            life: 3000,
+          });
+          selectedIds.value = [];
+          showDeleteDialog.value = false;
         },
         onError: () => {
-          toast.add({ severity: "error", summary: "Lỗi", detail: "Không thể xóa một hoặc nhiều sản phẩm", life: 3000 });
-        }
-      });
-    });
+          toast.add({
+            severity: "error",
+            summary: "Lỗi",
+            detail: "Không thể xóa một hoặc nhiều sản phẩm",
+            life: 3000,
+          });
+        },
+      }
+    );
   } else if (deleteTarget.value) {
     const target = deleteTarget.value;
     deleteProduct(target._id, {
@@ -142,34 +152,28 @@ const cancelDelete = () => {
 
 const handleBulkStatusChange = (status: "active" | "inactive") => {
   const idsToUpdate = [...selectedIds.value];
-  let completed = 0;
-  idsToUpdate.forEach((id) => {
-    updateProduct(
-      { id, payload: { status } },
-      {
-        onSuccess: () => {
-          completed++;
-          if (completed === idsToUpdate.length) {
-            toast.add({
-              severity: "success",
-              summary: "Đã cập nhật trạng thái",
-              detail: `Đã cập nhật trạng thái cho ${idsToUpdate.length} sản phẩm`,
-              life: 3000,
-            });
-            selectedIds.value = [];
-          }
-        },
-        onError: () => {
-          toast.add({
-            severity: "error",
-            summary: "Lỗi",
-            detail: "Không thể cập nhật trạng thái một hoặc nhiều sản phẩm",
-            life: 3000,
-          });
-        },
-      }
-    );
-  });
+  bulkUpdateProductsStatus(
+    { product_ids: idsToUpdate, status },
+    {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã cập nhật trạng thái",
+          detail: `Đã cập nhật trạng thái cho ${idsToUpdate.length} sản phẩm`,
+          life: 3000,
+        });
+        selectedIds.value = [];
+      },
+      onError: () => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail: "Không thể cập nhật trạng thái một hoặc nhiều sản phẩm",
+          life: 3000,
+        });
+      },
+    }
+  );
 };
 </script>
 
@@ -367,7 +371,7 @@ const handleBulkStatusChange = (status: "active" | "inactive") => {
       "
       confirm-label="Xóa"
       cancel-label="Hủy"
-      :loading="isDeleting"
+      :loading="isBulkDeleting ? isBulkDeletingPending : isDeleting"
       danger
       @confirm="confirmDelete"
       @cancel="cancelDelete"

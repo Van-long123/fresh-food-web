@@ -5,6 +5,7 @@ import {
   refreshTokenRequest,
   registerRequest,
   resetPasswordRequest,
+  setPasswordRequest,
   updateProfileRequest,
   verifyAccountRequest,
   verifyOAuthRequest
@@ -14,6 +15,7 @@ import type {
   LoginPayload,
   RegisterPayload,
   ResetPasswordPayload,
+  SetPasswordPayload,
   UpdateProfilePayload,
   VerifyAccountPayload,
   VerifyOAuthPayload
@@ -28,5 +30,6 @@ export const userService = {
   updateProfile: (payload: UpdateProfilePayload | FormData) => updateProfileRequest(payload),
   forgotPassword: (payload: ForgotPasswordPayload) => forgotPasswordRequest(payload),
   resetPassword: (payload: ResetPasswordPayload) => resetPasswordRequest(payload),
+  setPassword: (payload: SetPasswordPayload) => setPasswordRequest(payload),
   verifyOAuth: (payload: VerifyOAuthPayload) => verifyOAuthRequest(payload)
 }

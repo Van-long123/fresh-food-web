@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import AppDataTable from "~/components/admin/DataTable.vue";
 import PageHeader from "~/components/admin/PageHeader.vue";
 import SearchToolbar from "~/components/admin/SearchToolbar.vue";
 import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
-import StatusBadge from "~/components/admin/StatusBadge.vue";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import { useToast } from "primevue/usetoast";
+import { useAdminUsersQuery } from "~/queries/user/useAdminUsersQuery";
+import { useAdminRolesQuery } from "~/queries/role/useAdminRolesQuery";
+import { useDeleteAdminUser } from "~/mutations/user/useDeleteAdminUser";
+import { useBulkDeleteAdminUsers } from "~/mutations/user/useBulkDeleteAdminUsers";
+import { useBulkUpdateAdminUserStatus } from "~/mutations/user/useBulkUpdateAdminUserStatus";
 
 definePageMeta({
   layout: "admin",
@@ -20,7 +23,6 @@ useHead({
   title: "Danh sách người dùng - Quản trị SmartFood",
 });
 
-const store = useAdminMockStore();
 const router = useRouter();
 const toast = useToast();
 
@@ -52,8 +54,11 @@ const columns = [
   { key: "actions", label: "Thao tác" },
 ];
 
+const { data: rolesData } = useAdminRolesQuery({ page: 1, limit: 200 });
+const roles = computed(() => rolesData.value?.data || []);
+
 const getRoleTitle = (roleId: string) => {
-  const role = store.roles.find((r) => r.id === roleId);
+  const role = roles.value.find((r) => r._id === roleId);
   return role ? role.title : "Khách hàng mặc định";
 };
 
@@ -63,71 +68,23 @@ const handleSortChange = (
   sortState.value = sort;
 };
 
-// Filtered and sorted users
-const processedUsers = computed(() => {
-  let list = [...store.users];
+const queryParams = computed(() => ({
+  page: page.value,
+  limit: perPage.value,
+  keyword: searchQuery.value || undefined,
+  role: roleFilter.value !== "all" ? roleFilter.value : undefined,
+  status: statusFilter.value !== "all" ? statusFilter.value : undefined,
+  sortField: sortState.value?.key,
+  sortOrder: sortState.value?.direction,
+}));
 
-  // Search filter
-  if (searchQuery.value) {
-    const keyword = searchQuery.value.toLowerCase();
-    list = list.filter(
-      (u) =>
-        u.displayName.toLowerCase().includes(keyword) ||
-        u.email.toLowerCase().includes(keyword) ||
-        u.phone.toLowerCase().includes(keyword) ||
-        u.address.toLowerCase().includes(keyword),
-    );
-  }
-
-  // Role filter
-  if (roleFilter.value !== "all") {
-    list = list.filter((u) => u.role === roleFilter.value);
-  }
-
-  // Status filter
-  if (statusFilter.value !== "all") {
-    const activeBool = statusFilter.value === "active";
-    list = list.filter((u) => u.isActive === activeBool);
-  }
-
-  // Sorting
-  if (sortState.value) {
-    const { key, direction } = sortState.value;
-    list.sort((a: any, b: any) => {
-      const valA = a[key];
-      const valB = b[key];
-
-      if (typeof valA === "string") {
-        return direction === "asc"
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      } else if (typeof valA === "boolean") {
-        return direction === "asc"
-          ? valA === valB
-            ? 0
-            : valA
-              ? 1
-              : -1
-          : valA === valB
-            ? 0
-            : valA
-              ? -1
-              : 1;
-      } else {
-        return direction === "asc" ? valA - valB : valB - valA;
-      }
-    });
-  }
-
-  return list;
+watch([searchQuery, roleFilter, statusFilter, perPage], () => {
+  page.value = 1;
 });
 
-const paginatedUsers = computed(() => {
-  const start = (page.value - 1) * perPage.value;
-  return processedUsers.value.slice(start, start + perPage.value);
-});
-
-const total = computed(() => processedUsers.value.length);
+const { data: usersData, isLoading } = useAdminUsersQuery(queryParams);
+const paginatedUsers = computed(() => usersData.value?.data || []);
+const total = computed(() => usersData.value?.pagination?.total || 0);
 
 const handleSelectionChange = (ids: Array<string | number>) => {
   selectedIds.value = ids.map((id) => String(id));
@@ -139,15 +96,32 @@ const handleBulkDelete = () => {
   showDeleteDialog.value = true;
 };
 
-const handleBulkStatusChange = (active: boolean) => {
-  store.bulkUpdateUserStatus(selectedIds.value, active);
-  selectedIds.value = [];
-  toast.add({
-    severity: "success",
-    summary: "Đã cập nhật trạng thái",
-    detail: `Đã cập nhật trạng thái cho người dùng đã chọn`,
-    life: 3000,
-  });
+const deleteUserMutation = useDeleteAdminUser();
+const bulkDeleteMutation = useBulkDeleteAdminUsers();
+const bulkStatusMutation = useBulkUpdateAdminUserStatus();
+
+const handleBulkStatusChange = async (active: boolean) => {
+  try {
+    await bulkStatusMutation.mutateAsync({
+      ids: selectedIds.value,
+      isActive: active,
+    });
+    selectedIds.value = [];
+    toast.add({
+      severity: "success",
+      summary: "Đã cập nhật trạng thái",
+      detail: "Đã cập nhật trạng thái cho người dùng đã chọn",
+      life: 3000,
+    });
+  } catch (error: any) {
+    toast.add({
+      severity: "error",
+      summary: "Lỗi",
+      detail:
+        error?.response?.data?.message || "Không thể cập nhật trạng thái.",
+      life: 3000,
+    });
+  }
 };
 
 const openDeleteDialog = (user: any) => {
@@ -160,24 +134,35 @@ const confirmDelete = async () => {
   deleteLoading.value = true;
   await new Promise((resolve) => setTimeout(resolve, 600));
 
-  if (isBulkDeleting.value) {
-    store.bulkDeleteUsers(selectedIds.value);
+  try {
+    if (isBulkDeleting.value) {
+      await bulkDeleteMutation.mutateAsync(selectedIds.value);
+      toast.add({
+        severity: "success",
+        summary: "Đã xóa người dùng",
+        detail: `Đã xóa ${selectedIds.value.length} người dùng`,
+        life: 3000,
+      });
+      selectedIds.value = [];
+    } else if (deleteTarget.value) {
+      await deleteUserMutation.mutateAsync(
+        deleteTarget.value._id || deleteTarget.value.id,
+      );
+      toast.add({
+        severity: "success",
+        summary: "Đã xóa người dùng",
+        detail: `Đã xóa người dùng ${deleteTarget.value.displayName}`,
+        life: 3000,
+      });
+      deleteTarget.value = null;
+    }
+  } catch (error: any) {
     toast.add({
-      severity: "success",
-      summary: "Đã xóa người dùng",
-      detail: `Đã xóa ${selectedIds.value.length} người dùng`,
+      severity: "error",
+      summary: "Lỗi",
+      detail: error?.response?.data?.message || "Không thể xóa người dùng.",
       life: 3000,
     });
-    selectedIds.value = [];
-  } else if (deleteTarget.value) {
-    store.deleteUser(deleteTarget.value.id);
-    toast.add({
-      severity: "success",
-      summary: "Đã xóa người dùng",
-      detail: `Đã xóa người dùng ${deleteTarget.value.displayName}`,
-      life: 3000,
-    });
-    deleteTarget.value = null;
   }
 
   showDeleteDialog.value = false;
@@ -280,6 +265,7 @@ const formatDate = (dateStr: string) => {
     <AppDataTable
       :columns="columns"
       :data="paginatedUsers"
+      :loading="isLoading"
       :total="total"
       v-model:page="page"
       v-model:perPage="perPage"
@@ -293,10 +279,7 @@ const formatDate = (dateStr: string) => {
 
       <template #cell-avatar="{ row }">
         <img
-          :src="
-            row.avatar ||
-            'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop'
-          "
+          :src="row.avatar || ''"
           alt="Avatar"
           class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
         />
@@ -337,7 +320,7 @@ const formatDate = (dateStr: string) => {
                 : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
             ]"
           >
-            {{ row.role === 'admin' ? 'Quản trị viên' : 'Khách hàng' }}
+            {{ row.role === "admin" ? "Quản trị viên" : "Khách hàng" }}
           </span>
           <p class="text-[10px] text-slate-400 mt-1">
             {{ getRoleTitle(row.roleId) }}
@@ -347,7 +330,16 @@ const formatDate = (dateStr: string) => {
 
       <template #cell-gender="{ row }">
         <div class="text-xs text-slate-655 dark:text-slate-400">
-          <p>Giới tính: {{ row.gender === 'male' ? 'Nam' : row.gender === 'female' ? 'Nữ' : (row.gender || "Chưa xác định") }}</p>
+          <p>
+            Giới tính:
+            {{
+              row.gender === "male"
+                ? "Nam"
+                : row.gender === "female"
+                  ? "Nữ"
+                  : row.gender || "Chưa xác định"
+            }}
+          </p>
           <p>Ngày sinh: {{ formatDate(row.birthday) }}</p>
         </div>
       </template>
@@ -371,7 +363,7 @@ const formatDate = (dateStr: string) => {
 
       <template #cell-actions="{ row }">
         <ActionButtons
-          :edit-href="ROUTES.ADMIN.USER_EDIT(row.id)"
+          :edit-href="ROUTES.ADMIN.USER_EDIT(row._id || row.id)"
           @delete="openDeleteDialog(row)"
           show-delete
         />
