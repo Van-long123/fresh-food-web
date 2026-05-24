@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/vue-query'
 import type { MaybeRef } from 'vue'
 import { unref } from 'vue'
-import { getProductsRequest } from '~/api/product.api'
+import { getProductsRequest } from '~/api/client/product.api'
 import type { ProductQueryParams, ProductListResponse } from '~/types/product.type'
 
 export const useProductsQuery = (params?: MaybeRef<ProductQueryParams>) => {

@@ -3,7 +3,7 @@ import {
   validateStockRequest, 
   createCodOrderRequest,
   createPayOSOrderRequest
-} from '~/api/checkout.api'
+} from '~/api/client/checkout.api'
 import type { 
   ShippingFeePayload, 
   StockValidationItem,

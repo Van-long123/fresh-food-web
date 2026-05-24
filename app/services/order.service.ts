@@ -3,7 +3,7 @@ import {
   getOrderDetailRequest,
   cancelOrderRequest,
   confirmOrderReceivedRequest,
-} from '~/api/order.api'
+} from '~/api/client/order.api'
 
 export const orderService = {
   getMyOrders: () => getMyOrdersRequest(),

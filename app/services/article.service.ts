@@ -1,4 +1,4 @@
-import { createArticleCommentRequest, getArticleDetailRequest, getArticleListRequest, getCategoryListRequest } from '~/api/article.api'
+import { createArticleCommentRequest, getArticleDetailRequest, getArticleListRequest, getCategoryListRequest } from '~/api/client/article.api'
 import type { CreateArticleCommentPayload, ArticleListQueryParams, CategoryListQueryParams } from '~/types/article.type'
 
 export const articleService = {

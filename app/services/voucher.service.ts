@@ -1,4 +1,4 @@
-import { getVoucherListRequest, validateVoucherRequest, type VoucherListQueryParams } from '~/api/voucher.api'
+import { getVoucherListRequest, validateVoucherRequest, type VoucherListQueryParams } from '~/api/client/voucher.api'
 import type { VoucherValidationItem } from '~/types/voucher'
 
 export const voucherService = {

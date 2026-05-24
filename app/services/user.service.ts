@@ -9,7 +9,7 @@ import {
   updateProfileRequest,
   verifyAccountRequest,
   verifyOAuthRequest
-} from '~/api/user.api'
+} from '~/api/client/user.api'
 import type {
   ForgotPasswordPayload,
   LoginPayload,

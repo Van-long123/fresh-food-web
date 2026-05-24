@@ -54,6 +54,7 @@ export const ROUTES = {
   // ── Admin ───────────────────────────────────────────────────
   ADMIN: {
     DASHBOARD: '/admin',
+    PROFILE: '/admin/profile',
     PRODUCTS: '/admin/products',
     PRODUCT_CREATE: '/admin/products/create',
     PRODUCT_EDIT: (id: string | number) => `/admin/products/${id}/edit`,

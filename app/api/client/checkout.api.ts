@@ -8,7 +8,7 @@ import type {
   CodCheckoutPayload,
   PayOSCheckoutPayload,
   PayOSCheckoutResponse
-} from '../types/checkout.type'
+} from '~/types/checkout.type'
 
 export const getShippingFeeRequest = async (payload: ShippingFeePayload): Promise<ShippingFeeResponse> => {
   const response = await getAuthorizedAxios().post(API_ENDPOINTS.CHECKOUT.SHIPPING_FEE, payload)

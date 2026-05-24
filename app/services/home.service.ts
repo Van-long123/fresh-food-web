@@ -3,7 +3,7 @@ import {
   getCampaignProductsRequest
   // getHomeBlogsRequest,
   // getHomeCategoryProductsRequest
-} from '~/api/home.api'
+} from '~/api/client/home.api'
 import type {
   HomeAggregateQueryParams,
   // HomeBlogsQueryParams,

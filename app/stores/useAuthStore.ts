@@ -12,6 +12,11 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = u
   }
 
+  /**
+   * Ghi đè toàn bộ thông tin User (Reset lại state).
+   * Thường dùng khi Đăng nhập hoặc Khôi phục phiên bản đầy đủ từ API.
+   * Yêu cầu truyền vào một object chứa đầy đủ các trường dữ liệu.
+   */
   function setUserFromApi(u: ApiAuthUser) {
     setUser({
       id: u._id,
@@ -25,6 +30,29 @@ export const useAuthStore = defineStore('auth', () => {
       gender: u.gender,
       verified: u.verified
     })
+  }
+
+  /**
+   * Cập nhật một phần thông tin User (Vá dữ liệu).
+   * Chỉ cập nhật những trường mà API có trả về, CÁC TRƯỜNG CŨ SẼ ĐƯỢC GIỮ NGUYÊN.
+   * Dùng khi gọi các API update nhỏ lẻ (ví dụ chỉ đổi mỗi ảnh đại diện, hoặc mỗi tên).
+   */
+  function patchUserFromApi(u: Partial<ApiAuthUser> & { _id?: string }) {
+    if (!user.value) return
+
+    user.value = {
+      ...user.value,
+      ...(u._id ? { id: u._id } : {}),
+      ...(u.displayName !== undefined ? { fullname: u.displayName } : {}),
+      ...(u.phone !== undefined ? { phone: u.phone } : {}),
+      ...(u.role !== undefined ? { role: u.role } : {}),
+      ...(u.email !== undefined ? { email: u.email } : {}),
+      ...(u.address !== undefined ? { address: u.address } : {}),
+      ...(u.avatar !== undefined ? { avatar: u.avatar } : {}),
+      ...(u.birthday !== undefined ? { birthday: u.birthday } : {}),
+      ...(u.gender !== undefined ? { gender: u.gender } : {}),
+      ...(u.verified !== undefined ? { verified: u.verified } : {})
+    }
   }
 
   function setVouchers(v: Voucher[]) {
@@ -42,6 +70,7 @@ export const useAuthStore = defineStore('auth', () => {
     isLoggedIn,
     setUser,
     setUserFromApi,
+    patchUserFromApi,
     setVouchers,
     logout,
   }

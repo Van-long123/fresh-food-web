@@ -6,7 +6,7 @@ import {
   removeCartItemsRequest,
   updateCartItemRequest,
   validateCartRequest
-} from '~/api/cart.api'
+} from '~/api/client/cart.api'
 import type { CartRequestItem } from '~/types/cart.type'
 
 export const cartService = {

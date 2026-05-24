@@ -109,6 +109,10 @@ export const API_ENDPOINTS = {
       GET: '/v1/admin/settings',
       UPDATE: '/v1/admin/settings'
     },
+    PROFILE: {
+      UPDATE: '/v1/admin/profile',
+      CHANGE_PASSWORD: '/v1/admin/profile/password'
+    },
     USER: {
       LIST: '/v1/admin/users',
       DETAIL: (id: string) => `/v1/admin/users/${id}`,

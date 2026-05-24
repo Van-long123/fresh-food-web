@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/vue-query'
-import { getHomeAggregateRequest } from '~/api/home.api'
+import { getHomeAggregateRequest } from '~/api/client/home.api'
 import { HOME_DEFAULTS, HOME_QUERY_KEYS } from '~/constants/home'
 import { homeService } from '~/services/home.service'
 import type { HomeAggregateQueryParams } from '~/types/home.type'

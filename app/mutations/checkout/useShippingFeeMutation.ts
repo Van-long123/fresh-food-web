@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/vue-query'
 import { checkoutService } from '~/services/checkout.service'
-// import { getShippingFeeRequest } from '~/api/checkout.api'
+// import { getShippingFeeRequest } from '~/api/client/checkout.api'
 import type { ShippingFeePayload } from '~/types/checkout.type'
 
 export const useShippingFeeMutation = () => {

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/vue-query'
-import { getCartRequest } from '~/api/cart.api'
+import { getCartRequest } from '~/api/client/cart.api'
 
 export const cartKeys = {
   all: ['cart'] as const,

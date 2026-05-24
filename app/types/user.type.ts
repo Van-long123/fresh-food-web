@@ -67,6 +67,20 @@ export interface UpdateProfilePayload {
   new_password?: string
 }
 
+export interface AdminProfilePayload {
+  displayName?: string
+  phone?: string
+  avatar?: string | File
+  birthday?: string
+  address?: string
+  gender?: string
+}
+
+export interface ChangePasswordPayload {
+  oldPassword: string
+  newPassword: string
+}
+
 export type ForgotPasswordPageState = 'input' | 'success' | 'error'
 
 // ─── Admin User Types ─────────────────────────────────────────────────────

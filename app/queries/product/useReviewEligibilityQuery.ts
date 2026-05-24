@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { checkReviewEligibilityRequest } from '~/api/product.api'
+import { checkReviewEligibilityRequest } from '~/api/client/product.api'
 
 export const reviewEligibilityKeys = {
   all: ['review-eligibility'] as const,

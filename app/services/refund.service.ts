@@ -3,7 +3,7 @@ import {
   getRefundRequestByOrder,
   submitRefundBankInfo,
   uploadRefundEvidenceRequest,
-} from "~/api/refund.api";
+} from "~/api/client/refund.api";
 import type { BankInfoPayload, CreateRefundPayload } from "~/types/refund.type";
 
 export const refundService = {

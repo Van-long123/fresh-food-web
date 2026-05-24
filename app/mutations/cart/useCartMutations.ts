@@ -6,7 +6,7 @@ import {
   removeCartItemsRequest,
   updateCartItemRequest,
   validateCartRequest
-} from '~/api/cart.api'
+} from '~/api/client/cart.api'
 import { cartKeys } from '~/queries/cart/useCartQuery'
 import type { CartRequestItem } from '~/types/cart.type'
 import { useCartStore } from '~/stores/useCartStore'

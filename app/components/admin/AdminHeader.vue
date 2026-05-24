@@ -16,13 +16,6 @@ const isLoggingOut = ref(false);
 const userName = computed(() => authStore.user?.fullname || "Quản trị viên");
 const userEmail = computed(() => authStore.user?.email || "admin@smartfood.vn");
 const userAvatar = computed(() => authStore.user?.avatar);
-
-watch(
-  () => authStore.user?.avatar,
-  (val) => {
-    console.log("🚀 ~ val:", val);
-  },
-);
 const userRole = computed(() =>
   authStore.user?.role === "admin" ? "Quản trị viên" : "Quản trị viên",
 );
@@ -214,7 +207,7 @@ const handleLogout = async () => {
               <!-- Menu Actions -->
               <div class="p-1 space-y-0.5">
                 <NuxtLink
-                  to="/admin/settings"
+                  :to="ROUTES.ADMIN.PROFILE"
                   class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition"
                   @click="userPopover.hide()"
                 >
@@ -224,7 +217,7 @@ const handleLogout = async () => {
                   <span>Hồ sơ</span>
                 </NuxtLink>
                 <NuxtLink
-                  to="/admin/settings"
+                  :to="`${ROUTES.ADMIN.PROFILE}?tab=security`"
                   class="flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 dark:text-slate-250 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition"
                   @click="userPopover.hide()"
                 >

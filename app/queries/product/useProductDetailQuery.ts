@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { getProductDetailRequest } from '~/api/product.api'
+import { getProductDetailRequest } from '~/api/client/product.api'
 
 export const productDetailKeys = {
   all: ['product-detail'] as const,

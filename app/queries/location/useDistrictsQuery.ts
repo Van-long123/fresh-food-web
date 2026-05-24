@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/vue-query'
-import { getDistrictsRequest } from '~/api/location.api'
+import { getDistrictsRequest } from '~/api/client/location.api'
 import type { Ref } from 'vue'
 
 export const useDistrictsQuery = (provinceIdValue: Ref<number | null>) => {

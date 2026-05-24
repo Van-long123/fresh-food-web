@@ -82,7 +82,6 @@ export const useSocialAuth = () => {
       try {
         await syncAfterLogin()
       } catch (err) {
-      console.log("🚀 ~ handleSubmit ~ err:", err)
 
         toast.add({
         severity: 'error',

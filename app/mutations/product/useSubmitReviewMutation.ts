@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import type { Ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
-import { submitProductReviewRequest } from '~/api/product.api'
+import { submitProductReviewRequest } from '~/api/client/product.api'
 import { productDetailKeys } from '~/queries/product/useProductDetailQuery'
 import { reviewEligibilityKeys } from '~/queries/product/useReviewEligibilityQuery'
 import type { SubmitReviewPayload } from '~/types/product.type'

@@ -3,7 +3,7 @@ import {
   createAddressRequest,
   updateAddressRequest,
   deleteAddressRequest
-} from '~/api/address.api'
+} from '~/api/client/address.api'
 import { addressKeys } from '~/queries/address/useAddressQueries'
 
 export const useCreateAddressMutation = () => {

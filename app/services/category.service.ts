@@ -1,4 +1,4 @@
-import { getCategoryProductsRequest } from '~/api/category.api'
+import { getCategoryProductsRequest } from '~/api/client/category.api'
 import type {
   CategoryProductsApiResponse,
   CategoryProductsQueryParams

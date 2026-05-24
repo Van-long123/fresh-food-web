@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { getProductRecommendationsRequest } from '~/api/product.api'
+import { getProductRecommendationsRequest } from '~/api/client/product.api'
 import type { HomeProduct } from '~/types/home.type'
 import type { ProductRecommendationItem } from '~/types/product.type'
 

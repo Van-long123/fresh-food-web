@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/vue-query'
-import { getProvincesRequest } from '~/api/location.api'
+import { getProvincesRequest } from '~/api/client/location.api'
 
 export const useProvincesQuery = () => {
   return useQuery({
