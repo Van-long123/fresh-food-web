@@ -275,6 +275,7 @@ const formatDate = (dateStr: string) => {
       v-model:perPage="perPage"
       :selectable="true"
       :sortable="true"
+      :sort="sortState"
       @update:sort="handleSortChange"
       @selection-change="handleSelectionChange"
     >

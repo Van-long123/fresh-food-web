@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { reactive, ref, computed } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
+import { useToast } from "primevue/usetoast";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
 import Dropdown from "primevue/dropdown";
 import ToggleSwitch from "primevue/toggleswitch";
 import ImageUploader from "~/components/admin/ImageUploader.vue";
-import { useToast } from "primevue/usetoast";
+import { ROUTES } from "~/constants/routes";
+import { slugify } from "~/utils/formatters";
+import { useAdminCategoriesQuery } from "~/queries/category/useAdminCategoriesQuery";
+import { useAdminCategoryDetailQuery } from "~/queries/category/useAdminCategoryDetailQuery";
+import { useUpdateAdminCategory } from "~/mutations/category/useUpdateAdminCategory";
+import { buildUpdateCategoryPayload } from "~/services/admin/category.service";
+import type { CategoryFormData } from "~/types/category.type";
 
 definePageMeta({
   layout: "admin",
@@ -22,25 +27,25 @@ useHead({
 
 const route = useRoute();
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
 
-const categoryId = route.params.id as string;
+const categoryId = ref(route.params.id as string);
+const slugEdited = ref(false);
+const formInitialized = ref(false);
 const isSubmitting = ref(false);
-const isNotFound = ref(false);
 
-const form = reactive({
+const form = reactive<CategoryFormData>({
   title: "",
   slug: "",
-  type: "product" as "product" | "article",
+  type: "product",
   description: "",
   thumbnail: "",
   bannerImage: "",
   badgeText: "",
-  status: "active" as "active" | "inactive",
+  status: "active",
   featured: false,
-  position: 1,
-  parent_id: null as string | null,
+  position: null,
+  parent_id: null,
 });
 
 const errors = ref<Record<string, string>>({});
@@ -50,51 +55,101 @@ const typeOptions = [
   { label: "Bài viết / tin tức", value: "article" },
 ];
 
+const statusOptions = [
+  { label: "Hoạt động", value: "active" },
+  { label: "Ngừng hoạt động", value: "inactive" },
+];
+
+const categoryQueryParams = computed(() => ({
+  limit: 1000,
+  typeFilter: form.type,
+  statusFilter: "active",
+  sortField: "position",
+  sortOrder: "asc" as const,
+}));
+
+const {
+  data: categoryDetail,
+  isLoading,
+  isError,
+} = useAdminCategoryDetailQuery(categoryId);
+const { data: categoriesData, isLoading: isCategoriesLoading } =
+  useAdminCategoriesQuery(categoryQueryParams);
+const { mutate: updateCategory } = useUpdateAdminCategory();
+
 const parentOptions = computed(() => {
-  const list = store.categories
+  const categories = categoriesData.value?.data ?? [];
+  const list = categories
     .filter(
-      (c) =>
-        c.status === "active" &&
-        c.parent_id === null &&
-        c.type === form.type &&
-        c.id !== categoryId,
+      (category) =>
+        category.status === "active" &&
+        category.parent_id === null &&
+        category._id !== categoryId.value &&
+        category.type === form.type,
     )
-    .map((c) => ({ label: c.title, value: c.id }));
+    .map((category) => ({ label: category.title, value: category._id }));
+
   return [{ label: "Không có danh mục cha (gốc)", value: null }, ...list];
 });
 
-const category = store.categories.find((c) => c.id === categoryId);
-if (category) {
-  Object.assign(form, {
-    title: category.title,
-    slug: category.slug,
-    type: category.type,
-    description: category.description,
-    thumbnail: category.thumbnail,
-    bannerImage: category.bannerImage,
-    badgeText: category.badgeText,
-    status: category.status,
-    featured: category.featured,
-    position: category.position,
-    parent_id: category.parent_id,
-  });
-} else {
-  isNotFound.value = true;
-}
+watch(
+  () => categoryDetail.value,
+  (value) => {
+    if (!value || formInitialized.value) return;
 
-const validateForm = () => {
-  const errs: Record<string, string> = {};
-  if (!form.title.trim()) errs.title = "Vui lòng nhập tên danh mục.";
-  if (!form.slug.trim()) errs.slug = "Vui lòng nhập slug danh mục.";
-  if (form.position < 0) errs.position = "Vị trí phải là số dương.";
-  if (!form.thumbnail) errs.thumbnail = "Vui lòng tải ảnh đại diện danh mục.";
+    Object.assign(form, {
+      title: value.title ?? "",
+      slug: value.slug ?? "",
+      type: value.type ?? "product",
+      description: value.description ?? "",
+      thumbnail: value.thumbnail ?? "",
+      bannerImage: value.bannerImage ?? "",
+      badgeText: value.badgeText ?? "",
+      status: value.status ?? "active",
+      featured: value.featured ?? false,
+      position: value.position ?? null,
+      parent_id: value.parent_id ? String(value.parent_id) : null,
+    });
 
-  errors.value = errs;
-  return Object.keys(errs).length === 0;
+    formInitialized.value = true;
+  },
+  { immediate: true },
+);
+
+watch(
+  () => form.title,
+  (value) => {
+    if (slugEdited.value) return;
+    form.slug = slugify(value);
+  },
+);
+
+watch(
+  () => form.type,
+  () => {
+    form.parent_id = null;
+  },
+);
+
+const markSlugEdited = () => {
+  slugEdited.value = true;
 };
 
-const submitForm = async () => {
-  if (isNotFound.value) return;
+const validateForm = () => {
+  const nextErrors: Record<string, string> = {};
+
+  if (!form.title.trim()) nextErrors.title = "Vui lòng nhập tên danh mục.";
+  if (!form.slug.trim()) nextErrors.slug = "Vui lòng nhập slug danh mục.";
+  if (form.position !== null && form.position < 0)
+    nextErrors.position = "Vị trí phải là số dương.";
+  if (!form.thumbnail)
+    nextErrors.thumbnail = "Vui lòng tải ảnh đại diện danh mục.";
+
+  errors.value = nextErrors;
+  return Object.keys(nextErrors).length === 0;
+};
+
+const submitForm = () => {
   if (!validateForm()) {
     toast.add({
       severity: "error",
@@ -106,54 +161,47 @@ const submitForm = async () => {
   }
 
   isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
-  try {
-    store.updateCategory(categoryId, {
-      title: form.title,
-      slug: form.slug,
-      type: form.type,
-      description: form.description,
-      thumbnail: form.thumbnail,
-      bannerImage: form.bannerImage,
-      badgeText: form.badgeText,
-      status: form.status,
-      featured: form.featured,
-      position: form.position,
-      parent_id: form.parent_id,
-    });
-
-    toast.add({
-      severity: "success",
-      summary: "Đã cập nhật danh mục",
-      detail: `Đã cập nhật danh mục ${form.title}.`,
-      life: 3000,
-    });
-
-    router.push(ROUTES.ADMIN.CATEGORIES);
-  } catch (error) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail: "Không thể cập nhật danh mục.",
-      life: 3000,
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+  updateCategory(
+    {
+      id: categoryId.value,
+      payload: buildUpdateCategoryPayload(form),
+    },
+    {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã cập nhật danh mục",
+          detail: `Đã cập nhật danh mục ${form.title}.`,
+          life: 3000,
+        });
+        router.push(ROUTES.ADMIN.CATEGORIES);
+      },
+      onError: () => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail: "Không thể cập nhật danh mục.",
+          life: 3000,
+        });
+      },
+      onSettled: () => {
+        isSubmitting.value = false;
+      },
+    },
+  );
 };
 </script>
 
 <template>
   <div class="px-4 pt-6 space-y-6">
     <div
-      v-if="isNotFound"
+      v-if="isError"
       class="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-900 dark:bg-red-950/20"
     >
       <h2 class="text-lg font-semibold text-red-800 dark:text-red-300">
         Không tìm thấy danh mục
       </h2>
-      <p class="text-sm text-red-600 dark:text-red-400 mt-2">
+      <p class="mt-2 text-sm text-red-600 dark:text-red-400">
         Danh mục bạn đang chỉnh sửa không tồn tại hoặc đã bị xóa.
       </p>
       <button
@@ -212,7 +260,7 @@ const submitForm = async () => {
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
               Thông tin danh mục
             </h2>
-            <div class="grid gap-4 mt-4 md:grid-cols-2">
+            <div class="mt-4 grid gap-4 md:grid-cols-2">
               <div class="md:col-span-2">
                 <label
                   class="text-sm font-medium text-slate-700 dark:text-slate-200"
@@ -229,7 +277,11 @@ const submitForm = async () => {
                   class="text-sm font-medium text-slate-700 dark:text-slate-200"
                   >Slug *</label
                 >
-                <InputText v-model="form.slug" class="mt-2 w-full" />
+                <InputText
+                  v-model="form.slug"
+                  class="mt-2 w-full"
+                  @input="markSlugEdited"
+                />
                 <p v-if="errors.slug" class="mt-1 text-xs text-red-500">
                   {{ errors.slug }}
                 </p>
@@ -259,7 +311,22 @@ const submitForm = async () => {
                   :options="parentOptions"
                   option-label="label"
                   option-value="value"
+                  class="mt-2 w-full"
+                  :loading="isCategoriesLoading"
                   placeholder="Chọn danh mục cha"
+                />
+              </div>
+
+              <div>
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                  >Trạng thái</label
+                >
+                <Dropdown
+                  v-model="form.status"
+                  :options="statusOptions"
+                  option-label="label"
+                  option-value="value"
                   class="mt-2 w-full"
                 />
               </div>
@@ -267,9 +334,33 @@ const submitForm = async () => {
               <div>
                 <label
                   class="text-sm font-medium text-slate-700 dark:text-slate-200"
+                >
+                  Vị trí hiển thị
+                  <span class="text-xs text-slate-400 font-normal ml-1"
+                    >(để trống = tự động)</span
+                  >
+                </label>
+                <InputNumber
+                  v-model="form.position"
+                  class="mt-2 w-full"
+                  :min="0"
+                  placeholder="Để trống để tự động"
+                />
+                <p v-if="errors.position" class="mt-1 text-xs text-red-500">
+                  {{ errors.position }}
+                </p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label
+                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
                   >Nhãn hiển thị</label
                 >
-                <InputText v-model="form.badgeText" class="mt-2 w-full" />
+                <InputText
+                  v-model="form.badgeText"
+                  class="mt-2 w-full"
+                  placeholder="Bestseller, New, ..."
+                />
               </div>
 
               <div class="md:col-span-2">
@@ -279,8 +370,9 @@ const submitForm = async () => {
                 >
                 <Textarea
                   v-model="form.description"
-                  rows="4"
+                  rows="5"
                   class="mt-2 w-full"
+                  placeholder="Mô tả ngắn cho danh mục..."
                 />
               </div>
             </div>
@@ -292,24 +384,27 @@ const submitForm = async () => {
             class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
           >
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-              Tài nguyên hình ảnh
+              Ảnh danh mục
             </h2>
-            <div class="mt-4 space-y-4">
+            <div class="mt-4 space-y-5">
               <div>
-                <span
-                  class="text-xs font-semibold text-slate-400 block mb-2 uppercase"
-                  >Ảnh đại diện danh mục *</span
+                <p
+                  class="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
+                  Thumbnail *
+                </p>
                 <ImageUploader v-model="form.thumbnail" />
                 <p v-if="errors.thumbnail" class="mt-1 text-xs text-red-500">
                   {{ errors.thumbnail }}
                 </p>
               </div>
+
               <div>
-                <span
-                  class="text-xs font-semibold text-slate-400 block mb-2 uppercase"
-                  >Banner đầu trang danh mục</span
+                <p
+                  class="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
+                  Banner Image
+                </p>
                 <ImageUploader v-model="form.bannerImage" />
               </div>
             </div>
@@ -319,57 +414,22 @@ const submitForm = async () => {
             class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
           >
             <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-              Quy tắc hiển thị danh mục
+              Thiết lập nhanh
             </h2>
-            <div class="grid gap-4 mt-4">
+            <div
+              class="mt-4 flex items-center justify-between rounded-xl border border-slate-200/70 px-4 py-3 dark:border-slate-700"
+            >
               <div>
-                <label
-                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                  >Vị trí / trọng số sắp xếp *</label
+                <p
+                  class="text-sm font-medium text-slate-800 dark:text-slate-100"
                 >
-                <InputNumber
-                  v-model="form.position"
-                  :min="1"
-                  class="mt-2 w-full"
-                />
-                <p v-if="errors.position" class="mt-1 text-xs text-red-500">
-                  {{ errors.position }}
+                  Danh mục nổi bật
+                </p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  Hiển thị ở các khối gợi ý
                 </p>
               </div>
-
-              <div
-                class="flex items-center justify-between rounded-xl border border-slate-100 p-3 dark:border-slate-800"
-              >
-                <div>
-                  <p
-                    class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                  >
-                    Nổi bật
-                  </p>
-                  <p class="text-xs text-slate-400">
-                    Ghim lên mục gợi ý trang chủ.
-                  </p>
-                </div>
-                <ToggleSwitch v-model="form.featured" />
-              </div>
-
-              <div>
-                <label
-                  class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                  >Trạng thái</label
-                >
-                <Dropdown
-                  v-model="form.status"
-                  class="mt-2 w-full"
-                  :options="[
-                    { label: 'Hoạt động', value: 'active' },
-                    { label: 'Ngừng hoạt động', value: 'inactive' }
-                  ]"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Chọn trạng thái"
-                />
-              </div>
+              <ToggleSwitch v-model="form.featured" />
             </div>
           </section>
         </div>

@@ -2,7 +2,7 @@
 import { computed } from "vue";
 const props = defineProps<{
   status: string;
-  type?: "order" | "payment" | "user" | "product" | "voucher" | "review" | "refund";
+  type?: "order" | "payment" | "user" | "product" | "voucher" | "review" | "refund" | "category";
 }>();
 
 const statusMap: Record<string, Record<string, string>> = {
@@ -65,6 +65,11 @@ const statusMap: Record<string, Record<string, string>> = {
     completed:
       "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
     rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  },
+  category: {
+    active:
+      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+    inactive: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
   },
 };
 

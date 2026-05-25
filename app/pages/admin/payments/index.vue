@@ -229,6 +229,7 @@ const confirmRefund = async () => {
       v-model:perPage="perPage"
       :selectable="false"
       :sortable="true"
+      :sort="sortState"
       @update:sort="handleSortChange"
     >
       <template #title>Nhật ký giao dịch</template>

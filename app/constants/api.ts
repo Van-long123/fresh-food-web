@@ -95,7 +95,13 @@ export const API_ENDPOINTS = {
       BULK_DELETE: '/v1/admin/products/bulk'
     },
     CATEGORY: {
-      LIST: '/v1/admin/categories'
+      LIST: '/v1/admin/categories',
+      DETAIL: (id: string) => `/v1/admin/categories/${id}`,
+      CREATE: '/v1/admin/categories',
+      UPDATE: (id: string) => `/v1/admin/categories/${id}`,
+      DELETE: (id: string) => `/v1/admin/categories/${id}`,
+      BULK_STATUS: '/v1/admin/categories/bulk-status',
+      BULK_DELETE: '/v1/admin/categories/bulk'
     },
     ROLE: {
       LIST: '/v1/admin/roles',

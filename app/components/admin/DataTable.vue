@@ -25,6 +25,7 @@ const props = withDefaults(
     searchable?: boolean;
     selectable?: boolean;
     sortable?: boolean;
+    sort?: { key: string; direction: "asc" | "desc" } | null;
   }>(),
   {
     loading: false,
@@ -34,6 +35,7 @@ const props = withDefaults(
     searchable: false,
     selectable: false,
     sortable: false,
+    sort: null,
   },
 );
 
@@ -47,7 +49,17 @@ const emit = defineEmits<{
 
 const searchQuery = ref("");
 const selectedIds = ref<Array<string | number>>([]);
-const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
+const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(
+  props.sort
+);
+
+watch(
+  () => props.sort,
+  (newVal) => {
+    sortState.value = newVal;
+  },
+  { deep: true }
+);
 
 const totalPages = computed(() => {
   const perPageValue = Math.max(1, props.perPage);
@@ -228,7 +240,9 @@ defineSlots<{
         :sortable="sortable && column.sortable"
       >
         <template #header>
-          <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span
+            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+          >
             {{ column.label }}
           </span>
         </template>
