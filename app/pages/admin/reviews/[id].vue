@@ -5,8 +5,9 @@ import PageHeader from "~/components/admin/PageHeader.vue";
 import StatusBadge from "~/components/admin/StatusBadge.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import { useToast } from "primevue/usetoast";
+import { useAdminReviewDetailQuery } from "~/queries/review/useAdminReviewDetailQuery";
+import { useUpdateAdminReviewStatus } from "~/mutations/review/useUpdateAdminReviewStatus";
 
 definePageMeta({
   layout: "admin",
@@ -19,33 +20,25 @@ useHead({
 
 const route = useRoute();
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
-
-const review = computed(() =>
-  store.reviews.find((r) => r.id === route.params.id),
+const reviewId = computed(() =>
+  route.params.id ? String(route.params.id) : null,
 );
+
+const { data: reviewData, isLoading } = useAdminReviewDetailQuery(reviewId);
+const review = computed(() => reviewData.value ?? null);
 
 // Approve / Reject dialogs
 const showApproveDialog = ref(false);
 const showRejectDialog = ref(false);
-const actionLoading = ref(false);
+const { mutateAsync: updateStatus, isPending } = useUpdateAdminReviewStatus();
+const actionLoading = computed(() => isPending.value);
 
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleString("vi-VN", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+
 
 const handleApprove = async () => {
-  actionLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  store.updateReviewStatus(review.value!.id, "approved");
+  if (!review.value) return;
+  await updateStatus({ id: review.value.id, payload: { status: "approved" } });
   toast.add({
     severity: "success",
     summary: "Đã duyệt đánh giá",
@@ -53,13 +46,11 @@ const handleApprove = async () => {
     life: 3000,
   });
   showApproveDialog.value = false;
-  actionLoading.value = false;
 };
 
 const handleReject = async () => {
-  actionLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-  store.updateReviewStatus(review.value!.id, "rejected");
+  if (!review.value) return;
+  await updateStatus({ id: review.value.id, payload: { status: "rejected" } });
   toast.add({
     severity: "warn",
     summary: "Đã từ chối đánh giá",
@@ -67,11 +58,11 @@ const handleReject = async () => {
     life: 3000,
   });
   showRejectDialog.value = false;
-  actionLoading.value = false;
 };
 
 const handleReset = async () => {
-  store.updateReviewStatus(review.value!.id, "pending");
+  if (!review.value) return;
+  await updateStatus({ id: review.value.id, payload: { status: "pending" } });
   toast.add({
     severity: "info",
     summary: "Đặt lại trạng thái",
@@ -89,19 +80,27 @@ const handleReset = async () => {
       show-back-button
     />
 
+    <!-- Loading state -->
+    <div
+      v-if="isLoading"
+      class="flex justify-center items-center p-20"
+    >
+      <i class="pi pi-spin pi-spinner text-4xl text-primary-500"></i>
+    </div>
+
     <!-- Not found -->
     <div
-      v-if="!review"
+      v-else-if="!review"
       class="flex flex-col items-center gap-4 rounded-2xl border border-slate-200 bg-white p-12 text-slate-500 dark:border-slate-700 dark:bg-slate-900"
     >
       <i class="pi pi-inbox text-4xl text-slate-300"></i>
       <p>Không tìm thấy đánh giá.</p>
-      <button
-        @click="router.push(ROUTES.ADMIN.REVIEWS)"
+      <NuxtLink
+        :to="ROUTES.ADMIN.REVIEWS"
         class="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
       >
         Quay lại danh sách
-      </button>
+      </NuxtLink>
     </div>
 
     <template v-else>
@@ -111,7 +110,9 @@ const handleReset = async () => {
       >
         <div class="flex items-center gap-3">
           <StatusBadge :status="review.status" type="review" />
-          <span class="text-sm text-slate-500">{{ formatDate(review.createdAt) }}</span>
+          <span class="text-sm text-slate-500">{{
+            formatDateTime(review.createdAt, 'long')
+          }}</span>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <button
@@ -151,8 +152,12 @@ const handleReset = async () => {
           >
             <div class="flex items-start justify-between mb-4">
               <div>
-                <p class="text-lg font-semibold text-slate-900 dark:text-white">{{ review.customerName }}</p>
-                <p class="text-sm text-slate-500 dark:text-slate-400">{{ review.userId }}</p>
+                <p class="text-lg font-semibold text-slate-900 dark:text-white">
+                  {{ review.customerName }}
+                </p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  {{ review.userId }}
+                </p>
               </div>
               <!-- Stars -->
               <div class="flex items-center gap-1">
@@ -160,18 +165,24 @@ const handleReset = async () => {
                   v-for="s in 5"
                   :key="s"
                   class="pi pi-star-fill text-xl"
-                  :class="s <= review.rating ? 'text-amber-400' : 'text-slate-200 dark:text-slate-700'"
+                  :class="
+                    s <= review.rating
+                      ? 'text-amber-400'
+                      : 'text-slate-200 dark:text-slate-700'
+                  "
                 ></i>
-                <span class="ml-2 text-xl font-bold text-slate-700 dark:text-slate-200">
+                <span
+                  class="ml-2 text-xl font-bold text-slate-700 dark:text-slate-200"
+                >
                   {{ review.rating }}/5
                 </span>
               </div>
             </div>
-            <div
-              class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60"
-            >
-              <p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                {{ review.comment || 'Khách hàng không để lại bình luận.' }}
+            <div class="rounded-xl bg-slate-50 p-4 dark:bg-slate-800/60">
+              <p
+                class="text-sm leading-relaxed text-slate-700 dark:text-slate-300 whitespace-pre-wrap"
+              >
+                {{ review.comment || "Khách hàng không để lại bình luận." }}
               </p>
             </div>
           </section>
@@ -181,7 +192,9 @@ const handleReset = async () => {
             v-if="review.images.length"
             class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
           >
-            <h2 class="mb-4 text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2
+              class="mb-4 text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2"
+            >
               <i class="pi pi-images text-primary-500"></i>
               Hình ảnh đính kèm ({{ review.images.length }})
             </h2>
@@ -209,18 +222,26 @@ const handleReset = async () => {
           <section
             class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
           >
-            <h2 class="mb-4 text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2
+              class="mb-4 text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2"
+            >
               <i class="pi pi-box text-primary-500"></i>
               Sản phẩm được đánh giá
             </h2>
             <dl class="space-y-3 text-sm">
               <div>
                 <dt class="text-slate-500 mb-0.5">Tên sản phẩm</dt>
-                <dd class="font-semibold text-slate-900 dark:text-white">{{ review.productName }}</dd>
+                <dd class="font-semibold text-slate-900 dark:text-white">
+                  {{ review.productName }}
+                </dd>
               </div>
               <div>
                 <dt class="text-slate-500 mb-0.5">Product ID</dt>
-                <dd class="font-mono text-xs text-slate-600 dark:text-slate-300">{{ review.productId }}</dd>
+                <dd
+                  class="font-mono text-xs text-slate-600 dark:text-slate-300"
+                >
+                  {{ review.productId }}
+                </dd>
               </div>
             </dl>
           </section>
@@ -229,7 +250,9 @@ const handleReset = async () => {
           <section
             class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
           >
-            <h2 class="mb-4 text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+            <h2
+              class="mb-4 text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2"
+            >
               <i class="pi pi-history text-primary-500"></i>
               Thông tin duyệt
             </h2>
@@ -240,17 +263,29 @@ const handleReset = async () => {
               </div>
               <div class="flex justify-between">
                 <dt class="text-slate-500">Ngày đánh giá</dt>
-                <dd class="text-slate-700 dark:text-slate-300 text-right text-xs">{{ formatDate(review.createdAt) }}</dd>
+                <dd
+                  class="text-slate-700 dark:text-slate-300 text-right text-xs"
+                >
+                  {{ formatDateTime(review.createdAt, 'long') }}
+                </dd>
               </div>
               <div v-if="review.updatedAt" class="flex justify-between">
                 <dt class="text-slate-500">Lần cập nhật</dt>
-                <dd class="text-slate-700 dark:text-slate-300 text-right text-xs">{{ formatDate(review.updatedAt) }}</dd>
+                <dd
+                  class="text-slate-700 dark:text-slate-300 text-right text-xs"
+                >
+                  {{ formatDateTime(review.updatedAt, 'long') }}
+                </dd>
               </div>
             </dl>
 
             <!-- Quick status update -->
-            <div class="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800">
-              <p class="text-xs font-semibold text-slate-500 uppercase mb-2">Cập nhật nhanh</p>
+            <div
+              class="mt-4 border-t border-slate-100 pt-4 dark:border-slate-800"
+            >
+              <p class="text-xs font-semibold text-slate-500 uppercase mb-2">
+                Cập nhật nhanh
+              </p>
               <div class="flex flex-col gap-2">
                 <button
                   @click="handleApprove"

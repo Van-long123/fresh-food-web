@@ -334,7 +334,15 @@
                       {{ reviewEligibilityMessage }}
                     </p>
                   </div>
-                  <div class="review-chip">Đã đánh giá</div>
+                  <div 
+                    class="review-chip"
+                    :class="{
+                      'rejected': existingReview.status === 'rejected',
+                      'pending': existingReview.status === 'pending'
+                    }"
+                  >
+                    {{ existingReview.status === 'rejected' ? 'Từ chối' : existingReview.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt' }}
+                  </div>
                 </div>
                 <div class="mt-3">
                   <Rating
@@ -346,6 +354,12 @@
                   <p class="mt-2 text-sm text-gray-700">
                     {{ reviewComment || "Bạn chưa để lại nhận xét." }}
                   </p>
+                  <div v-if="existingReview.status === 'rejected' || existingReview.status === 'pending'" 
+                       class="mt-3 rounded-lg p-3 text-sm" 
+                       :class="existingReview.status === 'rejected' ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-yellow-50 text-yellow-700 border border-yellow-100'">
+                    <span class="font-semibold">{{ existingReview.status === 'rejected' ? 'Lý do từ chối:' : 'Lưu ý:' }}</span>
+                    {{ existingReview.rejectReason || 'Đang chờ quản trị viên xem xét.' }}
+                  </div>
                 </div>
               </div>
 
@@ -475,8 +489,6 @@
         />
       </div>
     </Teleport>
-
-    >
   </div>
 </template>
 
@@ -968,6 +980,14 @@ watch(
   font-size: 12px;
   font-weight: 700;
   padding: 6px 12px;
+}
+.review-chip.rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+.review-chip.pending {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
 }
 
 .review-rating {

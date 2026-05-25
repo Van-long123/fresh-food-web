@@ -210,7 +210,7 @@ const handleBulkStatusChange = (status: "active" | "inactive") => {
   <div class="px-4 pt-6 space-y-6">
     <PageHeader
       title="Sản phẩm"
-      subtitle="Quản lý danh mục, đơn vị tính và tồn kho sản phẩm hữu cơ."
+      subtitle="Quản lý danh mục, đơn vị tính và tồn kho sản phẩm."
       :primary-action="{
         label: 'Thêm sản phẩm',
         icon: 'pi pi-plus',

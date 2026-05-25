@@ -127,6 +127,11 @@ export const API_ENDPOINTS = {
       DELETE: (id: string) => `/v1/admin/users/${id}`,
       BULK_STATUS: '/v1/admin/users/bulk-status',
       BULK_DELETE: '/v1/admin/users/bulk'
+    },
+    REVIEW: {
+      LIST: '/v1/admin/reviews',
+      DETAIL: (id: string) => `/v1/admin/reviews/${id}`,
+      UPDATE_STATUS: (id: string) => `/v1/admin/reviews/${id}/status`
     }
   }
 } as const

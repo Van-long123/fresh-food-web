@@ -14,6 +14,22 @@ export const formatDate = (dateStr: string | null) => {
 };
 
 /**
+ * Định dạng ngày giờ chi tiết
+ * @param dateStr Chuỗi ngày giờ
+ * @param style 'short' (vd: 25/05/2026 15:30) hoặc 'long' (vd: 25 tháng 5, 2026 15:30)
+ */
+export const formatDateTime = (dateStr: string | Date | null | undefined, style: 'short' | 'long' = 'short') => {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleString("vi-VN", {
+    year: "numeric",
+    month: style === 'long' ? "long" : "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+/**
  * Định dạng số lượng lớn sang kiểu rút gọn (VD: 4500 -> 4.5k+)
  */
 export const formatCount = (num: number | undefined) => {
