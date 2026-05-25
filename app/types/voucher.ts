@@ -53,3 +53,56 @@ export interface MappedCoupon {
   amount: number
   endDate: Date | null
 }
+
+export interface AdminVoucherQueryParams {
+  page?: number
+  perPage?: number
+  sortField?: string
+  sortOrder?: 'asc' | 'desc'
+  keyword?: string
+  status?: 'active' | 'inactive' | 'expired'
+  type?: CouponType
+}
+
+export interface AdminVoucherFormValues {
+  code: string
+  name: string
+  description: string
+  type: CouponType
+  discountValue: number
+  maxDiscountAmount: number | null
+  minOrderValue: number
+  applyFor: VoucherScope
+  applyForIds: string[]
+  startDate: string
+  endDate: string
+  status: 'active' | 'inactive' | 'expired'
+  quantity: number
+  usageLimitPerUser: number
+  isFeatured: boolean
+}
+
+export interface AdminVoucher extends AdminVoucherFormValues {
+  _id: string
+  usedCount: number
+  deleted?: boolean
+  createdAt?: string
+  updatedAt?: string | null
+  deletedAt?: string | null
+}
+
+export interface AdminVoucherListResponse {
+  data: AdminVoucher[]
+  pagination: PaginationMeta
+}
+
+export type AdminVoucherPayload = AdminVoucherFormValues
+
+export interface AdminVoucherBulkStatusPayload {
+  voucher_ids: string[]
+  status: 'active' | 'inactive'
+}
+
+export interface AdminVoucherBulkDeletePayload {
+  voucher_ids: string[]
+}

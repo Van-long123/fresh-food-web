@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
 import Dropdown from "primevue/dropdown";
+import MultiSelect from "primevue/multiselect";
 import ToggleSwitch from "primevue/toggleswitch";
 import { useToast } from "primevue/usetoast";
+import { useAdminCategoriesQuery } from "~/queries/product/useAdminCategoriesQuery";
+import { useCreateAdminVoucher } from "~/mutations/voucher/useCreateAdminVoucher";
+import type { AdminVoucherFormValues } from "~/types/voucher";
 
 definePageMeta({
   layout: "admin",
@@ -20,12 +23,18 @@ useHead({
 });
 
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
 
-const isSubmitting = ref(false);
-const applyIdsInput = ref("");
 const errors = ref<Record<string, string>>({});
+const { mutate: createVoucher, isPending: isSubmitting } =
+  useCreateAdminVoucher();
+
+const { data: categoriesData, isLoading: isCategoriesLoading } =
+  useAdminCategoriesQuery();
+
+const categoryOptions = computed(() =>
+  (categoriesData.value ?? []).map((c) => ({ label: c.title, value: c._id })),
+);
 
 const statusOptions = [
   { label: "Hoạt động", value: "active" },
@@ -33,30 +42,25 @@ const statusOptions = [
   { label: "Hết hạn", value: "expired" },
 ];
 
-const form = reactive({
+const form = reactive<AdminVoucherFormValues>({
   code: "",
   name: "",
   description: "",
-  type: "percent" as "money" | "percent" | "freeship" | "product",
+  type: "percent",
   discountValue: 10,
   maxDiscountAmount: 0,
   minOrderValue: 0,
-  applyFor: "all" as "all" | "category" | "product",
+  applyFor: "all",
   applyForIds: [] as string[],
   startDate: new Date().toISOString().split("T")[0],
   endDate: new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
-  status: "active" as "active" | "inactive" | "expired",
+  status: "active",
   quantity: 100,
   usageLimitPerUser: 1,
   isFeatured: false,
 });
 
-watch(applyIdsInput, (value) => {
-  form.applyForIds = value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-});
+// applyIdsInput watcher removed
 
 watch(
   () => form.code,
@@ -65,8 +69,13 @@ watch(
   },
 );
 
+// Kết hợp Random với Timestamp (Thời gian thực)
 const generateCode = () => {
-  form.code = `SF${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  // Lấy 5 ký tự cuối của Timestamp hiện tại (chuyển sang hệ cơ số 36 để rút gọn)
+  const timePart = Date.now().toString(36).slice(-5).toUpperCase();
+  // Random thêm 3 ký tự nữa
+  const randomPart = Math.random().toString(36).substring(2, 5).toUpperCase();
+  form.code = `SF${timePart}${randomPart}`;
 };
 
 const validateForm = () => {
@@ -98,47 +107,29 @@ const submitForm = async () => {
     return;
   }
 
-  isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
+  const payload: AdminVoucherFormValues = { ...form };
 
-  try {
-    store.createVoucher({
-      code: form.code,
-      name: form.name,
-      description: form.description,
-      type: form.type,
-      discountValue: form.discountValue,
-      maxDiscountAmount: form.maxDiscountAmount,
-      minOrderValue: form.minOrderValue,
-      applyFor: form.applyFor,
-      applyForIds: form.applyForIds,
-      startDate: form.startDate,
-      endDate: form.endDate,
-      status: form.status,
-      quantity: form.quantity,
-      usedCount: 0,
-      usageLimitPerUser: form.usageLimitPerUser,
-      isFeatured: form.isFeatured,
-    });
-
-    toast.add({
-      severity: "success",
-      summary: "Đã tạo mã giảm giá",
-      detail: `Đã tạo mã giảm giá ${form.code}.`,
-      life: 3000,
-    });
-
-    router.push(ROUTES.ADMIN.VOUCHERS);
-  } catch (error) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail: "Đã xảy ra lỗi khi tạo mã giảm giá.",
-      life: 3000,
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+  createVoucher(payload, {
+    onSuccess: (result) => {
+      toast.add({
+        severity: "success",
+        summary: "Đã tạo mã giảm giá",
+        detail: `Đã tạo mã giảm giá ${result?.code || form.code}.`,
+        life: 3000,
+      });
+      router.push(ROUTES.ADMIN.VOUCHERS);
+    },
+    onError: (error: any) => {
+      toast.add({
+        severity: "error",
+        summary: "Lỗi",
+        detail:
+          error?.response?.data?.message ??
+          "Đã xảy ra lỗi khi tạo mã giảm giá.",
+        life: 3000,
+      });
+    },
+  });
 };
 </script>
 
@@ -265,7 +256,7 @@ const submitForm = async () => {
                   { label: 'Phần trăm (%)', value: 'percent' },
                   { label: 'Số tiền cố định (VND)', value: 'money' },
                   { label: 'Miễn phí vận chuyển', value: 'freeship' },
-                  { label: 'Giảm cho sản phẩm cụ thể', value: 'product' },
+                  // { label: 'Giảm cho sản phẩm cụ thể', value: 'product' },
                 ]"
                 option-label="label"
                 option-value="value"
@@ -278,9 +269,21 @@ const submitForm = async () => {
                 >Giá trị giảm *</label
               >
               <InputNumber
+                v-if="form.type === 'percent'"
                 v-model="form.discountValue"
+                :min="0"
+                :max="100"
                 class="mt-2 w-full"
-                :min="1"
+                placeholder="0"
+                suffix="%"
+              />
+              <InputNumber
+                v-else
+                v-model="form.discountValue"
+                mode="currency"
+                currency="VND"
+                locale="vi-VN"
+                class="mt-2 w-full"
               />
               <p v-if="errors.discountValue" class="mt-1 text-xs text-red-500">
                 {{ errors.discountValue }}
@@ -294,6 +297,9 @@ const submitForm = async () => {
               >
               <InputNumber
                 v-model="form.maxDiscountAmount"
+                mode="currency"
+                currency="VND"
+                locale="vi-VN"
                 class="mt-2 w-full"
                 placeholder="0 (Không giới hạn)"
               />
@@ -306,6 +312,9 @@ const submitForm = async () => {
               >
               <InputNumber
                 v-model="form.minOrderValue"
+                mode="currency"
+                currency="VND"
+                locale="vi-VN"
                 class="mt-2 w-full"
                 placeholder="0 (Không yêu cầu)"
               />
@@ -399,22 +408,28 @@ const submitForm = async () => {
                 :options="[
                   { label: 'Tất cả sản phẩm', value: 'all' },
                   { label: 'Chỉ danh mục cụ thể', value: 'category' },
-                  { label: 'Chỉ sản phẩm được chọn', value: 'product' },
+                  // { label: 'Chỉ sản phẩm được chọn', value: 'product' },
                 ]"
                 optionLabel="label"
                 optionValue="value"
               />
             </div>
 
-            <div v-if="form.applyFor !== 'all'">
+            <div v-if="form.applyFor === 'category'">
               <label
                 class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                >Mã đối tượng áp dụng (cách nhau bằng dấu phẩy)</label
+                >Danh mục áp dụng</label
               >
-              <InputText
-                v-model="applyIdsInput"
+              <MultiSelect
+                v-model="form.applyForIds"
+                :options="categoryOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Chọn danh mục áp dụng"
                 class="mt-2 w-full"
-                placeholder="Ví dụ: prod-1, cat-2"
+                :loading="isCategoriesLoading"
+                filter
+                display="chip"
               />
             </div>
 

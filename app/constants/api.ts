@@ -132,6 +132,15 @@ export const API_ENDPOINTS = {
       LIST: '/v1/admin/reviews',
       DETAIL: (id: string) => `/v1/admin/reviews/${id}`,
       UPDATE_STATUS: (id: string) => `/v1/admin/reviews/${id}/status`
+    },
+    VOUCHER: {
+      LIST: '/v1/admin/vouchers',
+      DETAIL: (id: string) => `/v1/admin/vouchers/${id}`,
+      CREATE: '/v1/admin/vouchers',
+      UPDATE: (id: string) => `/v1/admin/vouchers/${id}`,
+      DELETE: (id: string) => `/v1/admin/vouchers/${id}`,
+      BULK_STATUS: '/v1/admin/vouchers/bulk-status',
+      BULK_DELETE: '/v1/admin/vouchers/bulk'
     }
   }
 } as const

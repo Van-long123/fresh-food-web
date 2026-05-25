@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, computed, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
 import Dropdown from "primevue/dropdown";
+import MultiSelect from "primevue/multiselect";
 import ToggleSwitch from "primevue/toggleswitch";
 import { useToast } from "primevue/usetoast";
+import { useAdminCategoriesQuery } from "~/queries/product/useAdminCategoriesQuery";
+import { useAdminVoucherDetailQuery } from "~/queries/voucher/useAdminVoucherDetailQuery";
+import { useUpdateAdminVoucher } from "~/mutations/voucher/useUpdateAdminVoucher";
+import { adminVoucherService } from "~/services/admin/voucher.service";
+import type { AdminVoucherFormValues } from "~/types/voucher";
 
 definePageMeta({
   layout: "admin",
@@ -21,14 +26,26 @@ useHead({
 
 const route = useRoute();
 const router = useRouter();
-const store = useAdminMockStore();
 const toast = useToast();
 
 const voucherId = route.params.id as string;
-const isSubmitting = ref(false);
-const applyIdsInput = ref("");
 const errors = ref<Record<string, string>>({});
-const isNotFound = ref(false);
+const formInitialized = ref(false);
+
+const {
+  data: voucher,
+  isLoading,
+  isError,
+} = useAdminVoucherDetailQuery(ref(voucherId));
+const { mutate: updateVoucher, isPending: isSubmitting } =
+  useUpdateAdminVoucher();
+
+const { data: categoriesData, isLoading: isCategoriesLoading } =
+  useAdminCategoriesQuery();
+
+const categoryOptions = computed(() =>
+  (categoriesData.value ?? []).map((c) => ({ label: c.title, value: c._id })),
+);
 
 const statusOptions = [
   { label: "Hoạt động", value: "active" },
@@ -36,55 +53,29 @@ const statusOptions = [
   { label: "Hết hạn", value: "expired" },
 ];
 
-const form = reactive({
+const form = reactive<AdminVoucherFormValues>({
   code: "",
   name: "",
   description: "",
-  type: "percent" as "money" | "percent" | "freeship" | "product",
+  type: "percent",
   discountValue: 0,
   maxDiscountAmount: 0,
   minOrderValue: 0,
-  applyFor: "all" as "all" | "category" | "product",
+  applyFor: "all",
   applyForIds: [] as string[],
   startDate: "",
   endDate: "",
-  status: "active" as "active" | "inactive" | "expired",
+  status: "active",
   quantity: 100,
-  usedCount: 0,
   usageLimitPerUser: 1,
   isFeatured: false,
 });
 
-const voucher = store.vouchers.find((v) => v.id === voucherId);
-if (voucher) {
-  Object.assign(form, {
-    code: voucher.code,
-    name: voucher.name,
-    description: voucher.description,
-    type: voucher.type,
-    discountValue: voucher.discountValue,
-    maxDiscountAmount: voucher.maxDiscountAmount || 0,
-    minOrderValue: voucher.minOrderValue || 0,
-    applyFor: voucher.applyFor,
-    applyForIds: voucher.applyForIds || [],
-    startDate: voucher.startDate,
-    endDate: voucher.endDate,
-    status: voucher.status,
-    quantity: voucher.quantity,
-    usedCount: voucher.usedCount || 0,
-    usageLimitPerUser: voucher.usageLimitPerUser,
-    isFeatured: voucher.isFeatured,
-  });
-  applyIdsInput.value = (voucher.applyForIds || []).join(", ");
-} else {
-  isNotFound.value = true;
-}
-
-watch(applyIdsInput, (value) => {
-  form.applyForIds = value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+watchEffect(() => {
+  if (voucher.value && !formInitialized.value) {
+    Object.assign(form, adminVoucherService.mapToForm(voucher.value));
+    formInitialized.value = true;
+  }
 });
 
 watch(
@@ -93,6 +84,8 @@ watch(
     form.code = val.toUpperCase().replace(/[^A-Z0-9]/g, "");
   },
 );
+
+const isNotFound = computed(() => isError.value);
 
 const validateForm = () => {
   const errs: Record<string, string> = {};
@@ -124,46 +117,35 @@ const submitForm = async () => {
     return;
   }
 
-  isSubmitting.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
+  const payload: AdminVoucherFormValues = { ...form };
 
-  try {
-    store.updateVoucher(voucherId, {
-      code: form.code,
-      name: form.name,
-      description: form.description,
-      type: form.type,
-      discountValue: form.discountValue,
-      maxDiscountAmount: form.maxDiscountAmount,
-      minOrderValue: form.minOrderValue,
-      applyFor: form.applyFor,
-      applyForIds: form.applyForIds,
-      startDate: form.startDate,
-      endDate: form.endDate,
-      status: form.status,
-      quantity: form.quantity,
-      usageLimitPerUser: form.usageLimitPerUser,
-      isFeatured: form.isFeatured,
-    });
+  updateVoucher(
+    { id: voucherId, payload },
+    {
+      onSuccess: (result) => {
+        console.log("🚀 ~ submitForm ~ result:", result);
+        toast.add({
+          severity: "success",
+          summary: "Đã cập nhật mã giảm giá",
+          detail: `Đã cập nhật mã giảm giá ${result?.code || form.code}.`,
+          life: 3000,
+        });
 
-    toast.add({
-      severity: "success",
-      summary: "Đã cập nhật mã giảm giá",
-      detail: `Đã cập nhật mã giảm giá ${form.code}.`,
-      life: 3000,
-    });
-
-    router.push(ROUTES.ADMIN.VOUCHERS);
-  } catch (error) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail: "Đã xảy ra lỗi khi cập nhật mã giảm giá.",
-      life: 3000,
-    });
-  } finally {
-    isSubmitting.value = false;
-  }
+        // Delay việc chuyển trang để người dùng kịp nhìn thấy toast
+        // router.push(ROUTES.ADMIN.VOUCHERS);
+      },
+      onError: (error: any) => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail:
+            error?.response?.data?.message ??
+            "Đã xảy ra lỗi khi cập nhật mã giảm giá.",
+          life: 3000,
+        });
+      },
+    },
+  );
 };
 </script>
 
@@ -211,14 +193,14 @@ const submitForm = async () => {
             <button
               class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
               @click="router.back()"
-              :disabled="isSubmitting"
+              :disabled="isSubmitting || isLoading"
             >
               Hủy
             </button>
             <button
               class="rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:opacity-50"
               @click="submitForm"
-              :disabled="isSubmitting"
+              :disabled="isSubmitting || isLoading"
             >
               <i v-if="isSubmitting" class="pi pi-spin pi-spinner mr-2"></i>
               Lưu thay đổi
@@ -294,7 +276,7 @@ const submitForm = async () => {
                     { label: 'Phần trăm (%)', value: 'percent' },
                     { label: 'Số tiền cố định (VND)', value: 'money' },
                     { label: 'Miễn phí vận chuyển', value: 'freeship' },
-                    { label: 'Giảm cho sản phẩm cụ thể', value: 'product' },
+                    // { label: 'Giảm cho sản phẩm cụ thể', value: 'product' },
                   ]"
                   option-label="label"
                   option-value="value"
@@ -307,9 +289,21 @@ const submitForm = async () => {
                   >Giá trị giảm *</label
                 >
                 <InputNumber
+                  v-if="form.type === 'percent'"
                   v-model="form.discountValue"
+                  :min="0"
+                  :max="100"
                   class="mt-2 w-full"
-                  :min="1"
+                  placeholder="0"
+                  suffix="%"
+                />
+                <InputNumber
+                  v-else
+                  v-model="form.discountValue"
+                  mode="currency"
+                  currency="VND"
+                  locale="vi-VN"
+                  class="mt-2 w-full"
                 />
                 <p
                   v-if="errors.discountValue"
@@ -326,7 +320,11 @@ const submitForm = async () => {
                 >
                 <InputNumber
                   v-model="form.maxDiscountAmount"
+                  mode="currency"
+                  currency="VND"
+                  locale="vi-VN"
                   class="mt-2 w-full"
+                  placeholder="0 (Không giới hạn)"
                 />
               </div>
 
@@ -335,7 +333,14 @@ const submitForm = async () => {
                   class="text-sm font-medium text-slate-700 dark:text-slate-200"
                   >Giá trị đơn hàng tối thiểu (VND)</label
                 >
-                <InputNumber v-model="form.minOrderValue" class="mt-2 w-full" />
+                <InputNumber
+                  v-model="form.minOrderValue"
+                  mode="currency"
+                  currency="VND"
+                  locale="vi-VN"
+                  class="mt-2 w-full"
+                  placeholder="0 (Không yêu cầu)"
+                />
               </div>
             </div>
           </section>
@@ -426,19 +431,29 @@ const submitForm = async () => {
                   :options="[
                     { label: 'Tất cả sản phẩm', value: 'all' },
                     { label: 'Chỉ danh mục cụ thể', value: 'category' },
-                    { label: 'Chỉ sản phẩm được chọn', value: 'product' },
+                    // { label: 'Chỉ sản phẩm được chọn', value: 'product' },
                   ]"
                   optionLabel="label"
                   optionValue="value"
                 />
               </div>
 
-              <div v-if="form.applyFor !== 'all'">
+              <div v-if="form.applyFor === 'category'">
                 <label
                   class="text-sm font-medium text-slate-700 dark:text-slate-200"
-                  >Mã đối tượng áp dụng (cách nhau bằng dấu phẩy)</label
+                  >Danh mục áp dụng</label
                 >
-                <InputText v-model="applyIdsInput" class="mt-2 w-full" />
+                <MultiSelect
+                  v-model="form.applyForIds"
+                  :options="categoryOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Chọn danh mục áp dụng"
+                  class="mt-2 w-full"
+                  :loading="isCategoriesLoading"
+                  filter
+                  display="chip"
+                />
               </div>
 
               <div>

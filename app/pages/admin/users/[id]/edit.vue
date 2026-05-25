@@ -164,7 +164,7 @@ const submitForm = async () => {
       life: 3000,
     });
 
-    router.push(ROUTES.ADMIN.USERS);
+    // router.push(ROUTES.ADMIN.USERS);
   } catch (error: unknown) {
     const errorMessage =
       typeof error === "object" &&

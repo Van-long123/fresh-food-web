@@ -158,7 +158,7 @@ const submitForm = async () => {
       life: 3000,
     });
 
-    router.push(ROUTES.ADMIN.ARTICLES);
+    // router.push(ROUTES.ADMIN.ARTICLES);
   } catch (error) {
     toast.add({
       severity: "error",

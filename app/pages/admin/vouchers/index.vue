@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import AppDataTable from "~/components/admin/DataTable.vue";
 import PageHeader from "~/components/admin/PageHeader.vue";
@@ -8,7 +8,12 @@ import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import StatusBadge from "~/components/admin/StatusBadge.vue";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
+import { formatDate } from "~/utils/formatters";
+import { useAdminVouchersQuery } from "~/queries/voucher/useAdminVouchersQuery";
+import { useDeleteAdminVoucher } from "~/mutations/voucher/useDeleteAdminVoucher";
+import { useBulkDeleteAdminVoucher } from "~/mutations/voucher/useBulkDeleteAdminVoucher";
+import { useBulkUpdateAdminVoucherStatus } from "~/mutations/voucher/useBulkUpdateAdminVoucherStatus";
+import type { AdminVoucher, AdminVoucherQueryParams } from "~/types/voucher";
 import { useToast } from "primevue/usetoast";
 
 definePageMeta({
@@ -20,7 +25,6 @@ useHead({
   title: "Danh sách mã giảm giá - Quản trị SmartFood",
 });
 
-const store = useAdminMockStore();
 const router = useRouter();
 const toast = useToast();
 
@@ -28,7 +32,6 @@ const searchQuery = ref("");
 const statusFilter = ref<string>("all");
 const typeFilter = ref<string>("all");
 const selectedIds = ref<string[]>([]);
-const isBulkDeleting = ref(false);
 
 // Pagination
 const page = ref(1);
@@ -38,13 +41,12 @@ const perPage = ref(10);
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 
 // Delete targets
-const deleteTarget = ref<any | null>(null);
+const deleteTarget = ref<AdminVoucher | null>(null);
 const showDeleteDialog = ref(false);
-const deleteLoading = ref(false);
 
 const columns = [
-  { key: "code", label: "Mã khuyến mãi", sortable: true },
-  { key: "name", label: "Thông tin chiến dịch", sortable: true },
+  { key: "code", label: "Mã khuyến mãi" },
+  { key: "name", label: "Thông tin chiến dịch" },
   { key: "type", label: "Loại", sortable: true },
   { key: "discountValue", label: "Giảm giá", sortable: true },
   { key: "minOrderValue", label: "Điều kiện" },
@@ -54,123 +56,149 @@ const columns = [
   { key: "actions", label: "Thao tác" },
 ];
 
+const queryParams = computed<AdminVoucherQueryParams>(() => {
+  const params: AdminVoucherQueryParams = {
+    page: page.value,
+    perPage: perPage.value,
+  };
+
+  if (searchQuery.value.trim()) params.keyword = searchQuery.value.trim();
+  if (statusFilter.value !== "all") params.status = statusFilter.value as any;
+  if (typeFilter.value !== "all") params.type = typeFilter.value as any;
+  if (sortState.value) {
+    params.sortField = sortState.value.key;
+    params.sortOrder = sortState.value.direction;
+  }
+
+  return params;
+});
+
+const { data, isLoading, isFetching } = useAdminVouchersQuery(queryParams);
+const { mutate: deleteVoucher, isPending: isDeleting } =
+  useDeleteAdminVoucher();
+const { mutate: bulkDeleteVouchers, isPending: isBulkDeletingPending } =
+  useBulkDeleteAdminVoucher();
+const { mutate: bulkUpdateVoucherStatus, isPending: isBulkUpdatingPending } =
+  useBulkUpdateAdminVoucherStatus();
+
 const handleSortChange = (
   sort: { key: string; direction: "asc" | "desc" } | null,
 ) => {
   sortState.value = sort;
 };
 
-// Filtered and sorted vouchers
-const processedVouchers = computed(() => {
-  let list = [...store.vouchers];
-
-  // Search filter
-  if (searchQuery.value) {
-    const keyword = searchQuery.value.toLowerCase();
-    list = list.filter(
-      (v) =>
-        v.code.toLowerCase().includes(keyword) ||
-        v.name.toLowerCase().includes(keyword) ||
-        v.description.toLowerCase().includes(keyword),
-    );
-  }
-
-  // Status filter
-  if (statusFilter.value !== "all") {
-    list = list.filter((v) => v.status === statusFilter.value);
-  }
-
-  // Type filter
-  if (typeFilter.value !== "all") {
-    list = list.filter((v) => v.type === typeFilter.value);
-  }
-
-  // Sorting
-  if (sortState.value) {
-    const { key, direction } = sortState.value;
-    list.sort((a: any, b: any) => {
-      const valA = a[key];
-      const valB = b[key];
-
-      if (typeof valA === "string") {
-        return direction === "asc"
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      } else {
-        return direction === "asc" ? valA - valB : valB - valA;
-      }
-    });
-  }
-
-  return list;
-});
-
 const paginatedVouchers = computed(() => {
-  const start = (page.value - 1) * perPage.value;
-  return processedVouchers.value.slice(start, start + perPage.value);
+  return data.value?.data ?? [];
 });
 
-const total = computed(() => processedVouchers.value.length);
+const total = computed(() => data.value?.pagination?.total ?? 0);
 
 const handleSelectionChange = (ids: Array<string | number>) => {
   selectedIds.value = ids.map((id) => String(id));
 };
 
+watch([searchQuery, statusFilter, typeFilter], () => {
+  page.value = 1;
+  selectedIds.value = [];
+});
+
 // Bulk operations
 const handleBulkDelete = () => {
-  isBulkDeleting.value = true;
+  if (!selectedIds.value.length) return;
+  deleteTarget.value = null;
   showDeleteDialog.value = true;
 };
 
-const handleBulkStatusChange = (status: any) => {
-  store.bulkUpdateVoucherStatus(selectedIds.value, status);
-  selectedIds.value = [];
-  toast.add({
-    severity: "success",
-    summary: "Updated Status",
-    detail: "Successfully updated status for selected vouchers",
-    life: 3000,
-  });
+const handleBulkStatusChange = (status: "active" | "inactive") => {
+  if (!selectedIds.value.length) return;
+
+  const voucherIds = [...selectedIds.value];
+  bulkUpdateVoucherStatus(
+    { voucher_ids: voucherIds, status },
+    {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã cập nhật trạng thái",
+          detail: `Đã cập nhật trạng thái cho ${voucherIds.length} mã giảm giá`,
+          life: 3000,
+        });
+        selectedIds.value = [];
+      },
+      onError: () => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail: "Không thể cập nhật một hoặc nhiều mã giảm giá",
+          life: 3000,
+        });
+      },
+    },
+  );
 };
 
-const openDeleteDialog = (voucher: any) => {
+const openDeleteDialog = (voucher: AdminVoucher) => {
   deleteTarget.value = voucher;
-  isBulkDeleting.value = false;
   showDeleteDialog.value = true;
 };
 
-const confirmDelete = async () => {
-  deleteLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
-  if (isBulkDeleting.value) {
-    store.bulkDeleteVouchers(selectedIds.value);
-    toast.add({
-      severity: "success",
-      summary: "Deleted Vouchers",
-      detail: `Successfully deleted ${selectedIds.value.length} vouchers`,
-      life: 3000,
-    });
-    selectedIds.value = [];
-  } else if (deleteTarget.value) {
-    store.deleteVoucher(deleteTarget.value.id);
-    toast.add({
-      severity: "success",
-      summary: "Deleted Voucher",
-      detail: `Successfully deleted code ${deleteTarget.value.code}`,
-      life: 3000,
-    });
-    deleteTarget.value = null;
+const confirmDelete = () => {
+  if (selectedIds.value.length && !deleteTarget.value) {
+    const voucherIds = [...selectedIds.value];
+    bulkDeleteVouchers(
+      { voucher_ids: voucherIds },
+      {
+        onSuccess: () => {
+          toast.add({
+            severity: "success",
+            summary: "Đã xóa mã giảm giá",
+            detail: `Đã xóa ${voucherIds.length} mã giảm giá`,
+            life: 3000,
+          });
+          selectedIds.value = [];
+          showDeleteDialog.value = false;
+        },
+        onError: () => {
+          toast.add({
+            severity: "error",
+            summary: "Lỗi",
+            detail: "Không thể xóa một hoặc nhiều mã giảm giá",
+            life: 3000,
+          });
+        },
+      },
+    );
+    return;
   }
 
-  showDeleteDialog.value = false;
-  deleteLoading.value = false;
+  if (!deleteTarget.value) return;
+
+  const target = deleteTarget.value;
+  deleteVoucher(target._id, {
+    onSuccess: () => {
+      toast.add({
+        severity: "success",
+        summary: "Đã xóa mã giảm giá",
+        detail: `Đã xóa mã giảm giá ${target.code}`,
+        life: 3000,
+      });
+      deleteTarget.value = null;
+      showDeleteDialog.value = false;
+    },
+    onError: () => {
+      toast.add({
+        severity: "error",
+        summary: "Lỗi",
+        detail: "Không thể xóa mã giảm giá này",
+        life: 3000,
+      });
+    },
+  });
 };
 
 const cancelDelete = () => {
   showDeleteDialog.value = false;
   deleteTarget.value = null;
-  isBulkDeleting.value = false;
 };
 </script>
 
@@ -180,7 +208,7 @@ const cancelDelete = () => {
       title="Mã giảm giá & ưu đãi"
       subtitle="Cấu hình mã coupon, giảm giá theo số lượng và ưu đãi chiến dịch."
       :primary-action="{
-        label: 'Add voucher',
+        label: 'Thêm voucher',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.VOUCHER_CREATE),
       }"
@@ -261,6 +289,7 @@ const cancelDelete = () => {
       :columns="columns"
       :data="paginatedVouchers"
       :total="total"
+      :loading="isLoading || isFetching"
       v-model:page="page"
       v-model:perPage="perPage"
       :selectable="true"
@@ -305,7 +334,13 @@ const cancelDelete = () => {
 
       <template #cell-type="{ value }">
         <span class="text-xs font-semibold font-mono">
-          {{ value === 'percent' ? 'Phần trăm' : 'Số tiền cố định' }}
+          {{
+            value === "percent"
+              ? "Phần trăm"
+              : value === "freeship"
+                ? "Miễn phí vận chuyển"
+                : "Số tiền cố định"
+          }}
         </span>
       </template>
 
@@ -314,7 +349,7 @@ const cancelDelete = () => {
           {{
             row.type === "percent"
               ? `${row.discountValue}%`
-              : `${Number(row.discountValue).toLocaleString()} VND`
+              : `${Number(row.discountValue).toLocaleString("vi-VN")} VND`
           }}
         </span>
       </template>
@@ -359,8 +394,8 @@ const cancelDelete = () => {
 
       <template #cell-duration="{ row }">
         <div class="text-xs text-slate-500 space-y-0.5 font-mono">
-          <p>Từ: {{ row.startDate }}</p>
-          <p>Đến: {{ row.endDate }}</p>
+          <p>Từ: {{ formatDate(row.startDate) }}</p>
+          <p>Đến: {{ formatDate(row.endDate) }}</p>
         </div>
       </template>
 
@@ -370,7 +405,7 @@ const cancelDelete = () => {
 
       <template #cell-actions="{ row }">
         <ActionButtons
-          :edit-href="ROUTES.ADMIN.VOUCHER_EDIT(row.id)"
+          :edit-href="ROUTES.ADMIN.VOUCHER_EDIT(row._id)"
           @delete="openDeleteDialog(row)"
           show-delete
         />
@@ -380,15 +415,19 @@ const cancelDelete = () => {
     <!-- Delete Confirmation Dialog -->
     <ConfirmDialog
       :visible="showDeleteDialog"
-      :title="isBulkDeleting ? 'Xóa các khuyến mãi đã chọn' : 'Xóa mã khuyến mãi'"
+      :title="
+        selectedIds.length && !deleteTarget
+          ? 'Xóa các khuyến mãi đã chọn'
+          : 'Xóa mã khuyến mãi'
+      "
       :message="
-        isBulkDeleting
+        selectedIds.length && !deleteTarget
           ? `Bạn có chắc chắn muốn xóa ${selectedIds.length} mã khuyến mãi đã chọn? Hành động này không thể hoàn tác.`
           : `Bạn có chắc chắn muốn xóa mã khuyến mãi '${deleteTarget?.code}'? Hành động này không thể hoàn tác.`
       "
       confirm-label="Xóa"
       cancel-label="Hủy"
-      :loading="deleteLoading"
+      :loading="isDeleting || isBulkDeletingPending || isBulkUpdatingPending"
       danger
       @confirm="confirmDelete"
       @cancel="cancelDelete"
