@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import AppDataTable from "~/components/admin/DataTable.vue";
 import PageHeader from "~/components/admin/PageHeader.vue";
 import SearchToolbar from "~/components/admin/SearchToolbar.vue";
 import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
-import StatusBadge from "~/components/admin/StatusBadge.vue";
 import { ROUTES } from "~/constants/routes";
-import { useAdminMockStore } from "~/stores/useAdminMockStore";
 import { useToast } from "primevue/usetoast";
+import { useAdminArticlesQuery } from "~/queries/article/useAdminArticlesQuery";
+import { useAdminArticleCategoriesQuery } from "~/queries/article/useAdminArticleCategoriesQuery";
+import { useDeleteAdminArticle } from "~/mutations/article/useDeleteAdminArticle";
+import { useBulkDeleteAdminArticle } from "~/mutations/article/useBulkDeleteAdminArticle";
+import { useBulkUpdateAdminArticleStatus } from "~/mutations/article/useBulkUpdateAdminArticleStatus";
+import type { AdminArticleQueryParams, Article } from "~/types/article.type";
 
 definePageMeta({
   layout: "admin",
@@ -20,7 +24,6 @@ useHead({
   title: "Danh sách bài viết - Quản trị SmartFood",
 });
 
-const store = useAdminMockStore();
 const router = useRouter();
 const toast = useToast();
 
@@ -29,22 +32,19 @@ const statusFilter = ref<string>("all");
 const categoryFilter = ref<string>("all");
 const selectedIds = ref<string[]>([]);
 const isBulkDeleting = ref(false);
-
-// Pagination
 const page = ref(1);
 const perPage = ref(10);
+const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>({
+  key: "publishedAt",
+  direction: "desc",
+});
 
-// Sorting
-const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
-
-// Delete targets
-const deleteTarget = ref<any | null>(null);
+const deleteTarget = ref<Article | null>(null);
 const showDeleteDialog = ref(false);
-const deleteLoading = ref(false);
 
 const columns = [
   { key: "thumbnail", label: "Ảnh bìa" },
-  { key: "title", label: "Chi tiết bài viết", sortable: true },
+  { key: "title", label: "Chi tiết bài viết" },
   { key: "category", label: "Danh mục" },
   { key: "authorName", label: "Tác giả", sortable: true },
   { key: "views", label: "Lượt xem", sortable: true },
@@ -54,73 +54,57 @@ const columns = [
   { key: "actions", label: "Thao tác" },
 ];
 
+const queryParams = computed<AdminArticleQueryParams>(() => {
+  const params: AdminArticleQueryParams = {
+    page: page.value,
+    limit: perPage.value,
+  };
+  if (searchQuery.value) params.keyword = searchQuery.value;
+  if (statusFilter.value !== "all") params.status = statusFilter.value as any;
+  if (categoryFilter.value !== "all")
+    params.primary_category_id = categoryFilter.value;
+  if (sortState.value) {
+    params.sortField = sortState.value.key;
+    params.sortOrder = sortState.value.direction;
+  }
+  return params;
+});
+
+const { data, isLoading, isFetching } = useAdminArticlesQuery(queryParams);
+const { data: categoriesData } = useAdminArticleCategoriesQuery();
+const { mutate: deleteArticle, isPending: isDeleting } =
+  useDeleteAdminArticle();
+const { mutate: bulkDeleteArticles, isPending: isBulkDeletingPending } =
+  useBulkDeleteAdminArticle();
+const { mutate: bulkUpdateStatus } = useBulkUpdateAdminArticleStatus();
+
+const articles = computed(() => data.value?.data ?? []);
+const total = computed(() => data.value?.pagination?.total ?? 0);
+const articleCategories = computed(() => categoriesData.value ?? []);
+
 const getCategoryTitle = (catId: string) => {
-  const cat = store.categories.find((c) => c.id === catId);
+  const cat = articleCategories.value.find(
+    (c: any) => c._id?.toString() === catId,
+  );
   return cat ? cat.title : "Chưa phân loại";
 };
 
-const articleCategories = computed(() => {
-  return store.categories.filter((c) => c.type === "article");
+watch([searchQuery, statusFilter, categoryFilter], () => {
+  page.value = 1;
 });
 
 const handleSortChange = (
   sort: { key: string; direction: "asc" | "desc" } | null,
 ) => {
-  sortState.value = sort;
+  if (
+    sortState.value?.key === sort?.key &&
+    sortState.value?.direction === sort?.direction
+  ) {
+    return;
+  }
+  sortState.value = sort || { key: "publishedAt", direction: "desc" };
+  page.value = 1;
 };
-
-// Filtered and sorted articles
-const processedArticles = computed(() => {
-  let list = [...store.articles];
-
-  // Search filter
-  if (searchQuery.value) {
-    const keyword = searchQuery.value.toLowerCase();
-    list = list.filter(
-      (a) =>
-        a.title.toLowerCase().includes(keyword) ||
-        a.slug.toLowerCase().includes(keyword) ||
-        a.authorName.toLowerCase().includes(keyword) ||
-        a.tags.some((t) => t.toLowerCase().includes(keyword)),
-    );
-  }
-
-  // Status filter
-  if (statusFilter.value !== "all") {
-    list = list.filter((a) => a.status === statusFilter.value);
-  }
-
-  // Category filter
-  if (categoryFilter.value !== "all") {
-    list = list.filter((a) => a.primary_category_id === categoryFilter.value);
-  }
-
-  // Sorting
-  if (sortState.value) {
-    const { key, direction } = sortState.value;
-    list.sort((a: any, b: any) => {
-      const valA = a[key];
-      const valB = b[key];
-
-      if (typeof valA === "string") {
-        return direction === "asc"
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      } else {
-        return direction === "asc" ? valA - valB : valB - valA;
-      }
-    });
-  }
-
-  return list;
-});
-
-const paginatedArticles = computed(() => {
-  const start = (page.value - 1) * perPage.value;
-  return processedArticles.value.slice(start, start + perPage.value);
-});
-
-const total = computed(() => processedArticles.value.length);
 
 const handleSelectionChange = (ids: Array<string | number>) => {
   selectedIds.value = ids.map((id) => String(id));
@@ -132,15 +116,30 @@ const handleBulkDelete = () => {
   showDeleteDialog.value = true;
 };
 
-const handleBulkStatusChange = (status: any) => {
-  store.bulkUpdateArticleStatus(selectedIds.value, status);
-  selectedIds.value = [];
-  toast.add({
-    severity: "success",
-    summary: "Đã cập nhật trạng thái",
-    detail: "Đã cập nhật trạng thái cho các bài viết đã chọn",
-    life: 3000,
-  });
+const handleBulkStatusChange = (status: "active" | "draft" | "inactive") => {
+  const idsToUpdate = [...selectedIds.value];
+  bulkUpdateStatus(
+    { article_ids: idsToUpdate, status },
+    {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã cập nhật trạng thái",
+          detail: `Đã cập nhật trạng thái cho ${idsToUpdate.length} bài viết`,
+          life: 3000,
+        });
+        selectedIds.value = [];
+      },
+      onError: () => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail: "Không thể cập nhật trạng thái cho các bài viết đã chọn",
+          life: 3000,
+        });
+      },
+    },
+  );
 };
 
 const openDeleteDialog = (article: any) => {
@@ -149,32 +148,55 @@ const openDeleteDialog = (article: any) => {
   showDeleteDialog.value = true;
 };
 
-const confirmDelete = async () => {
-  deleteLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
+const confirmDelete = () => {
   if (isBulkDeleting.value) {
-    store.bulkDeleteArticles(selectedIds.value);
-    toast.add({
-      severity: "success",
-      summary: "Đã xóa bài viết",
-      detail: `Đã xóa ${selectedIds.value.length} bài viết`,
-      life: 3000,
-    });
-    selectedIds.value = [];
+    const idsToDelete = [...selectedIds.value];
+    bulkDeleteArticles(
+      { article_ids: idsToDelete },
+      {
+        onSuccess: () => {
+          toast.add({
+            severity: "success",
+            summary: "Đã xóa bài viết",
+            detail: `Đã xóa ${idsToDelete.length} bài viết`,
+            life: 3000,
+          });
+          selectedIds.value = [];
+          showDeleteDialog.value = false;
+        },
+        onError: () => {
+          toast.add({
+            severity: "error",
+            summary: "Lỗi",
+            detail: "Không thể xóa một hoặc nhiều bài viết",
+            life: 3000,
+          });
+        },
+      },
+    );
   } else if (deleteTarget.value) {
-    store.deleteArticle(deleteTarget.value.id);
-    toast.add({
-      severity: "success",
-      summary: "Đã xóa bài viết",
-      detail: `Đã xóa bài viết ${deleteTarget.value.title}`,
-      life: 3000,
+    const target = deleteTarget.value;
+    deleteArticle(target._id, {
+      onSuccess: () => {
+        toast.add({
+          severity: "success",
+          summary: "Đã xóa bài viết",
+          detail: `Đã xóa bài viết ${target.title}`,
+          life: 3000,
+        });
+        deleteTarget.value = null;
+        showDeleteDialog.value = false;
+      },
+      onError: () => {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail: "Không thể xóa bài viết này",
+          life: 3000,
+        });
+      },
     });
-    deleteTarget.value = null;
   }
-
-  showDeleteDialog.value = false;
-  deleteLoading.value = false;
 };
 
 const cancelDelete = () => {
@@ -183,7 +205,8 @@ const cancelDelete = () => {
   isBulkDeleting.value = false;
 };
 
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr?: string | null) => {
+  if (!dateStr) return "-";
   const d = new Date(dateStr);
   return d.toLocaleDateString("vi-VN");
 };
@@ -217,7 +240,7 @@ const formatDate = (dateStr: string) => {
             class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
           >
             <option value="all">Tất cả danh mục</option>
-            <option v-for="c in articleCategories" :key="c.id" :value="c.id">
+            <option v-for="c in articleCategories" :key="c._id" :value="c._id">
               {{ c.title }}
             </option>
           </select>
@@ -260,6 +283,12 @@ const formatDate = (dateStr: string) => {
           Chuyển nháp
         </button>
         <button
+          @click="handleBulkStatusChange('inactive')"
+          class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
+        >
+          Ngừng hoạt động
+        </button>
+        <button
           @click="handleBulkDelete"
           class="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
         >
@@ -270,11 +299,13 @@ const formatDate = (dateStr: string) => {
 
     <AppDataTable
       :columns="columns"
-      :data="paginatedArticles"
+      :data="articles"
       :total="total"
       v-model:page="page"
       v-model:perPage="perPage"
+      :loading="isLoading || isFetching"
       :selectable="true"
+      :selection="selectedIds"
       :sortable="true"
       :sort="sortState"
       @update:sort="handleSortChange"
@@ -313,7 +344,7 @@ const formatDate = (dateStr: string) => {
           }}</span>
           <div class="flex gap-1 mt-1">
             <span
-              v-for="t in row.tags"
+              v-for="t in row.tags || []"
               :key="t"
               class="text-[10px] bg-slate-100 text-slate-655 px-1.5 py-0.5 rounded dark:bg-slate-800 dark:text-slate-400"
             >
@@ -373,7 +404,13 @@ const formatDate = (dateStr: string) => {
               : '',
           ]"
         >
-          {{ value === 'active' ? 'Đã xuất bản' : value === 'draft' ? 'Bản nháp' : 'Ngừng hoạt động' }}
+          {{
+            value === "active"
+              ? "Đã xuất bản"
+              : value === "draft"
+                ? "Bản nháp"
+                : "Ngừng hoạt động"
+          }}
         </span>
       </template>
 
@@ -385,7 +422,7 @@ const formatDate = (dateStr: string) => {
 
       <template #cell-actions="{ row }">
         <ActionButtons
-          :edit-href="ROUTES.ADMIN.ARTICLE_EDIT(row.id)"
+          :edit-href="ROUTES.ADMIN.ARTICLE_EDIT(row._id)"
           @delete="openDeleteDialog(row)"
           show-delete
         />
@@ -403,7 +440,7 @@ const formatDate = (dateStr: string) => {
       "
       confirm-label="Xóa"
       cancel-label="Hủy"
-      :loading="deleteLoading"
+      :loading="isBulkDeleting ? isBulkDeletingPending : isDeleting"
       danger
       @confirm="confirmDelete"
       @cancel="cancelDelete"

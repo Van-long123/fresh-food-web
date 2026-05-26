@@ -47,6 +47,9 @@ import Aura from '@primevue/themes/aura';
     plugins: [
       tailwindcss(),
     ],
+    optimizeDeps: {
+      include: ['lodash', '@tinymce/tinymce-vue', 'dayjs'],
+    },
   },
 
   css: ['~/assets/css/main.css', 'primeicons/primeicons.css']

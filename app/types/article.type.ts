@@ -66,7 +66,10 @@ export interface ArticleListQueryParams {
   featured?: boolean
   primary_category_id?: string
   keyword?: string
+  status?: 'active' | 'draft' | 'inactive'
 }
+
+export type AdminArticleQueryParams = ArticleListQueryParams;
 
 export interface CategoryListQueryParams {
   page?: number
@@ -112,6 +115,24 @@ export interface ArticleDetailResponse extends Article {
   } | null
   relatedArticles?: ArticleDetailRelatedItem[]
   popularArticles?: ArticleDetailPopularItem[]
+}
+
+export interface AdminArticlePayload {
+  title: string
+  slug?: string
+  shortDescription?: string
+  content?: string
+  thumbnail?: string
+  authorName?: string
+  readTime?: number
+  views?: number
+  publishedAt?: string | null
+  status?: 'active' | 'draft' | 'inactive'
+  featured?: boolean
+  position?: number | null
+  primary_category_id?: string | null
+  category_ids?: string[]
+  tags?: string[]
 }
 
 export interface CreateArticleCommentPayload {

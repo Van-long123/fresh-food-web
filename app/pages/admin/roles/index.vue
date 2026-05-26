@@ -214,6 +214,7 @@ const cancelDelete = () => {
       v-model:page="page"
       v-model:perPage="perPage"
       :selectable="true"
+      :selection="selectedIds"
       :sortable="true"
       :sort="sortState"
       :loading="isLoading"

@@ -52,6 +52,7 @@ export interface ProductReview {
   comment: string
   images: string[]
   status: string
+  rejectReason?: string | null
   createdAt: string
   updatedAt?: string | null
   user?: ProductReviewUser

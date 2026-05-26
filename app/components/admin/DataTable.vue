@@ -26,6 +26,7 @@ const props = withDefaults(
     selectable?: boolean;
     sortable?: boolean;
     sort?: { key: string; direction: "asc" | "desc" } | null;
+    selection?: Array<string | number>;
   }>(),
   {
     loading: false,
@@ -36,6 +37,7 @@ const props = withDefaults(
     selectable: false,
     sortable: false,
     sort: null,
+    selection: () => [],
   },
 );
 
@@ -51,6 +53,16 @@ const searchQuery = ref("");
 const selectedIds = ref<Array<string | number>>([]);
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(
   props.sort
+);
+
+watch(
+  () => props.selection,
+  (newVal) => {
+    if (newVal) {
+      selectedIds.value = newVal;
+    }
+  },
+  { deep: true, immediate: true }
 );
 
 watch(

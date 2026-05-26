@@ -78,7 +78,7 @@
                     ? 'border-[#f47f20]'
                     : 'border-transparent'
                 "
-                @click="activeImage = img"
+                @click="activeImage = img || ''"
               >
                 <img
                   :src="img"
@@ -234,9 +234,8 @@
             <div
               class="prose max-w-none text-gray-700"
               :class="{ 'max-h-75 overflow-hidden': !expandDescription }"
-            >
-              <p>{{ descriptionText }}</p>
-            </div>
+              v-html="descriptionText"
+            ></div>
             <button
               class="mt-3 text-sm font-semibold text-[#f47f20]"
               @click="expandDescription = !expandDescription"
@@ -334,14 +333,20 @@
                       {{ reviewEligibilityMessage }}
                     </p>
                   </div>
-                  <div 
+                  <div
                     class="review-chip"
                     :class="{
-                      'rejected': existingReview.status === 'rejected',
-                      'pending': existingReview.status === 'pending'
+                      rejected: existingReview.status === 'rejected',
+                      pending: existingReview.status === 'pending',
                     }"
                   >
-                    {{ existingReview.status === 'rejected' ? 'Từ chối' : existingReview.status === 'pending' ? 'Chờ duyệt' : 'Đã duyệt' }}
+                    {{
+                      existingReview.status === "rejected"
+                        ? "Từ chối"
+                        : existingReview.status === "pending"
+                          ? "Chờ duyệt"
+                          : "Đã duyệt"
+                    }}
                   </div>
                 </div>
                 <div class="mt-3">
@@ -354,11 +359,27 @@
                   <p class="mt-2 text-sm text-gray-700">
                     {{ reviewComment || "Bạn chưa để lại nhận xét." }}
                   </p>
-                  <div v-if="existingReview.status === 'rejected' || existingReview.status === 'pending'" 
-                       class="mt-3 rounded-lg p-3 text-sm" 
-                       :class="existingReview.status === 'rejected' ? 'bg-red-50 text-red-700 border border-red-100' : 'bg-yellow-50 text-yellow-700 border border-yellow-100'">
-                    <span class="font-semibold">{{ existingReview.status === 'rejected' ? 'Lý do từ chối:' : 'Lưu ý:' }}</span>
-                    {{ existingReview.rejectReason || 'Đang chờ quản trị viên xem xét.' }}
+                  <div
+                    v-if="
+                      existingReview.status === 'rejected' ||
+                      existingReview.status === 'pending'
+                    "
+                    class="mt-3 rounded-lg p-3 text-sm"
+                    :class="
+                      existingReview.status === 'rejected'
+                        ? 'bg-red-50 text-red-700 border border-red-100'
+                        : 'bg-yellow-50 text-yellow-700 border border-yellow-100'
+                    "
+                  >
+                    <span class="font-semibold">{{
+                      existingReview.status === "rejected"
+                        ? "Lý do từ chối:"
+                        : "Lưu ý:"
+                    }}</span>
+                    {{
+                      existingReview.rejectReason ||
+                      "Đang chờ quản trị viên xem xét."
+                    }}
                   </div>
                 </div>
               </div>

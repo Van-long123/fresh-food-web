@@ -80,11 +80,23 @@ export const API_ENDPOINTS = {
     BY_ORDER: (orderId: string) => `/v1/client/refund-requests/order/${orderId}`,
     BANK_INFO: (id: string) => `/v1/client/refund-requests/${id}/bank-info`
   },
+  UPLOAD: {
+    EDITOR_IMAGE: '/v1/upload/editor-image'
+  },
   SETTINGS: {
     GET: '/v1/client/settings'
   },
   // ── Admin ────────────────────────────────────────────────────
   ADMIN: {
+    ARTICLE: {
+      LIST: '/v1/admin/articles',
+      DETAIL: (id: string) => `/v1/admin/articles/${id}`,
+      CREATE: '/v1/admin/articles',
+      UPDATE: (id: string) => `/v1/admin/articles/${id}`,
+      DELETE: (id: string) => `/v1/admin/articles/${id}`,
+      BULK_STATUS: '/v1/admin/articles/bulk-status',
+      BULK_DELETE: '/v1/admin/articles/bulk'
+    },
     PRODUCT: {
       LIST: '/v1/admin/products',
       DETAIL: (id: string) => `/v1/admin/products/${id}`,
