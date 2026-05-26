@@ -96,9 +96,12 @@ export const useOrderDetail = (orderId: string) => {
     }
   });
 
-  const paymentMeta = computed(
-    () => PAYMENT_STATUS_MAP[payment.value.status] || PAYMENT_STATUS_MAP.pending,
-  );
+  const paymentMeta = computed(() => {
+    if (order.value.status === 'delivered' && payment.value.paymentMethod === 'COD' && payment.value.status === 'pending') {
+      return { label: "Chờ xác nhận thanh toán", color: "bg-yellow-100 text-yellow-700" };
+    }
+    return PAYMENT_STATUS_MAP[payment.value.status] || PAYMENT_STATUS_MAP.pending;
+  });
   const paymentStatusClass = computed(() => paymentMeta.value.color);
   
   const paymentMethodMeta = computed(

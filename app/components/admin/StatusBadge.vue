@@ -11,13 +11,14 @@ const statusMap: Record<string, Record<string, string>> = {
       "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
     confirmed:
       "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-    preparing:
+    processing:
       "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
     shipping:
       "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
     delivered:
       "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
     cancelled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+    returned: "bg-slate-100 text-slate-700 dark:bg-slate-700/60 dark:text-slate-300",
   },
   payment: {
     pending:
@@ -81,27 +82,51 @@ const badgeClass = computed(() => {
   );
 });
 
-const labelMap: Record<string, string> = {
-  pending: "Chờ xử lý",
-  confirmed: "Đã xác nhận",
-  preparing: "Đang chuẩn bị",
-  shipping: "Đang giao hàng",
-  delivered: "Đã giao",
-  cancelled: "Đã hủy",
-  paid: "Đã thanh toán",
-  completed: "Hoàn thành",
-  failed: "Thanh toán thất bại",
-  refunded: "Đã hoàn tiền",
-  active: "Hoạt động",
-  inactive: "Ngừng hoạt động",
-  banned: "Bị khóa",
-  draft: "Bản nháp",
-  out_of_stock: "Hết hàng",
-  approved: "Đã duyệt",
-  rejected: "Từ chối",
-  expired: "Hết hạn",
-  approved_waiting_pickup: "Chờ lấy hàng & hoàn tiền",
-  processing_refund: "Đang xử lý hoàn tiền",
+const labelMap: Record<string, Record<string, string> | string> = {
+  order: {
+    pending: "Chờ xử lý",
+    confirmed: "Đã xác nhận",
+    processing: "Đang xử lý",
+    shipping: "Đang giao hàng",
+    delivered: "Đã giao",
+    cancelled: "Đã hủy",
+    returned: "Đã trả hàng",
+  },
+  payment: {
+    pending: "Chờ thanh toán",
+    completed: "Hoàn thành",
+    cancelled: "Đã hủy",
+  },
+  refund: {
+    pending: "Chờ duyệt",
+    approved_waiting_pickup: "Chờ lấy hàng & hoàn tiền",
+    processing_refund: "Đang xử lý hoàn tiền",
+    completed: "Hoàn thành",
+    rejected: "Từ chối",
+  },
+  default: {
+    pending: "Chờ xử lý",
+    confirmed: "Đã xác nhận",
+    processing: "Đang xử lý",
+    shipping: "Đang giao hàng",
+    delivered: "Đã giao",
+    cancelled: "Đã hủy",
+    returned: "Đã trả hàng",
+    paid: "Đã thanh toán",
+    completed: "Hoàn thành",
+    failed: "Thanh toán thất bại",
+    refunded: "Đã hoàn tiền",
+    active: "Hoạt động",
+    inactive: "Ngừng hoạt động",
+    banned: "Bị khóa",
+    draft: "Bản nháp",
+    out_of_stock: "Hết hàng",
+    approved: "Đã duyệt",
+    rejected: "Từ chối",
+    expired: "Hết hạn",
+    approved_waiting_pickup: "Chờ lấy hàng & hoàn tiền",
+    processing_refund: "Đang xử lý hoàn tiền",
+  },
 };
 </script>
 
@@ -110,6 +135,8 @@ const labelMap: Record<string, string> = {
     class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full"
     :class="badgeClass"
   >
-    {{ labelMap[status] || status.replace(/_/g, " ") }}
+    {{ (labelMap[props.type || 'default'] as Record<string, string>)?.[status]
+      || (labelMap['default'] as Record<string, string>)?.[status]
+      || status.replace(/_/g, ' ') }}
   </span>
 </template>

@@ -40,7 +40,12 @@ export const useCancelOrderMutation = (orderId: string) => {
 }
 
 export const useConfirmReceivedMutation = (orderId: string) => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => orderService.confirmReceived(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['order-detail', orderId] })
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] })
+    }
   })
 }
