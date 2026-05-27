@@ -10,6 +10,8 @@ import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import StatusBadge from "~/components/admin/StatusBadge.vue";
 import { ROUTES } from "~/constants/routes";
+import { PERMISSIONS } from "~/constants/permissions";
+import { usePermissions } from "~/composables/auth/usePermissions";
 import { useAdminCategoriesQuery } from "~/queries/category/useAdminCategoriesQuery";
 import { useDeleteAdminCategory } from "~/mutations/category/useDeleteAdminCategory";
 import { useBulkDeleteAdminCategory } from "~/mutations/category/useBulkDeleteAdminCategory";
@@ -30,6 +32,7 @@ useHead({
 
 const router = useRouter();
 const toast = useToast();
+const { hasPermission } = usePermissions();
 
 const searchQuery = ref("");
 const statusFilter = ref<string>("all");
@@ -196,6 +199,7 @@ const cancelDelete = () => {
         label: 'Thêm danh mục',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.CATEGORY_CREATE),
+        permission: PERMISSIONS.CATEGORIES.CREATE
       }"
     />
 
@@ -240,6 +244,7 @@ const cancelDelete = () => {
           >{{ selectedIds.length }} đã chọn</span
         >
         <button
+          v-if="hasPermission(PERMISSIONS.CATEGORIES.EDIT)"
           type="button"
           class="rounded bg-white border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
           :disabled="isBulkUpdatingStatus"
@@ -248,6 +253,7 @@ const cancelDelete = () => {
           Kích hoạt
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.CATEGORIES.EDIT)"
           type="button"
           class="rounded bg-white border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
           :disabled="isBulkUpdatingStatus"
@@ -256,6 +262,7 @@ const cancelDelete = () => {
           Ngừng kích hoạt
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.CATEGORIES.DELETE)"
           type="button"
           class="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-50"
           :disabled="isBulkDeleting"
@@ -318,6 +325,8 @@ const cancelDelete = () => {
       <template #cell-actions="{ row }">
         <ActionButtons
           :edit-href="ROUTES.ADMIN.CATEGORY_EDIT(row._id)"
+          :edit-permission="PERMISSIONS.CATEGORIES.EDIT"
+          :delete-permission="PERMISSIONS.CATEGORIES.DELETE"
           @delete="openDeleteDialog(row)"
           :disabled="isDeleting"
         />

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { usePermissions } from "~/composables/auth/usePermissions";
+
 interface Props {
   title: string;
   subtitle?: string;
@@ -9,16 +12,18 @@ interface Props {
     icon?: string;
     onClick: () => void;
     loading?: boolean;
+    permission?: string | string[];
   };
   secondaryAction?: {
     label: string;
     icon?: string;
     onClick: () => void;
     loading?: boolean;
+    permission?: string | string[];
   };
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   showBackButton: false,
   subtitle: undefined,
   breadcrumb: undefined,
@@ -27,6 +32,19 @@ withDefaults(defineProps<Props>(), {
 });
 
 const router = useRouter();
+const { hasPermission } = usePermissions();
+
+const canPrimaryAction = computed(() => {
+  if (!props.primaryAction) return false;
+  if (!props.primaryAction.permission) return true;
+  return hasPermission(props.primaryAction.permission);
+});
+
+const canSecondaryAction = computed(() => {
+  if (!props.secondaryAction) return false;
+  if (!props.secondaryAction.permission) return true;
+  return hasPermission(props.secondaryAction.permission);
+});
 </script>
 
 <template>
@@ -62,7 +80,7 @@ const router = useRouter();
           Quay lại
         </button>
         <button
-          v-if="secondaryAction"
+          v-if="secondaryAction && canSecondaryAction"
           type="button"
           :disabled="secondaryAction.loading"
           class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
@@ -72,7 +90,7 @@ const router = useRouter();
           {{ secondaryAction.label }}
         </button>
         <button
-          v-if="primaryAction"
+          v-if="primaryAction && canPrimaryAction"
           type="button"
           :disabled="primaryAction.loading"
           class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-700 disabled:opacity-50"

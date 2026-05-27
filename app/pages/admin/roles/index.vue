@@ -7,6 +7,8 @@ import SearchToolbar from "~/components/admin/SearchToolbar.vue";
 import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import { ROUTES } from "~/constants/routes";
+import { PERMISSIONS } from "~/constants/permissions";
+import { usePermissions } from "~/composables/auth/usePermissions";
 import { useAdminRolesQuery } from "~/queries/role/useAdminRolesQuery";
 import { useDeleteAdminRole } from "~/mutations/role/useDeleteAdminRole";
 import { useDeleteAdminRoles } from "~/mutations/role/useDeleteAdminRoles";
@@ -24,6 +26,7 @@ useHead({
 
 const router = useRouter();
 const toast = useToast();
+const { hasPermission } = usePermissions();
 
 const searchQuery = ref("");
 const selectedIds = ref<string[]>([]);
@@ -170,6 +173,7 @@ const cancelDelete = () => {
         label: 'Tạo vai trò',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.ROLE_CREATE),
+        permission: PERMISSIONS.ROLES.CREATE
       }"
     />
 
@@ -199,6 +203,7 @@ const cancelDelete = () => {
           >{{ selectedIds.length }} đã chọn</span
         >
         <button
+          v-if="hasPermission(PERMISSIONS.ROLES.DELETE)"
           @click="handleBulkDelete"
           class="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
         >
@@ -256,6 +261,8 @@ const cancelDelete = () => {
       <template #cell-actions="{ row }">
         <ActionButtons
           :edit-href="ROUTES.ADMIN.ROLE_EDIT(row._id)"
+          :edit-permission="PERMISSIONS.ROLES.EDIT"
+          :delete-permission="PERMISSIONS.ROLES.DELETE"
           @delete="openDeleteDialog(row)"
           :show-delete="!row.isSystem"
         />

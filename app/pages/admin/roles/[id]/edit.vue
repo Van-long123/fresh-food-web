@@ -34,6 +34,7 @@ const { mutate: updateRole, isPending: isSubmitting } = useUpdateAdminRole();
 const errors = ref<Record<string, string>>({});
 
 const moduleDefs = [
+  { key: "dashboard", label: "Tổng quan" },
   { key: "articles", label: "Bài viết" },
   { key: "products", label: "Sản phẩm" },
   { key: "categories", label: "Danh mục" },
@@ -48,6 +49,21 @@ const moduleDefs = [
 
 const permissions = ["view", "create", "edit", "delete"] as const;
 type PermissionType = (typeof permissions)[number];
+
+/**
+ * Kiểm tra xem một quyền cụ thể (ví dụ: tạo, sửa, xóa) có được phép áp dụng cho module hay không.
+ * Riêng module "dashboard" chỉ cho phép quyền "view", các module khác cho phép đầy đủ quyền.
+ */
+const isPermAllowed = (moduleKey: string, perm: PermissionType) => {
+  return moduleKey !== "dashboard" || perm === "view";
+};
+
+/**
+ * Lấy danh sách các quyền hợp lệ của một module (đã lọc bỏ các quyền không được phép qua isPermAllowed).
+ */
+const getEnabledPermissions = (moduleKey: string) => {
+  return permissions.filter((perm) => isPermAllowed(moduleKey, perm));
+};
 
 const permMatrix = reactive<Record<string, PermissionType[]>>({});
 moduleDefs.forEach((mod) => {
@@ -100,6 +116,8 @@ watchEffect(() => {
 });
 
 const togglePermission = (moduleKey: string, perm: PermissionType) => {
+  if (!isPermAllowed(moduleKey, perm)) return;
+
   const current = permMatrix[moduleKey] || [];
   if (current.includes(perm)) {
     permMatrix[moduleKey] = current.filter((p) => p !== perm);
@@ -109,19 +127,21 @@ const togglePermission = (moduleKey: string, perm: PermissionType) => {
 };
 
 const toggleRow = (moduleKey: string) => {
+  const enabledPerms = getEnabledPermissions(moduleKey);
   const current = permMatrix[moduleKey] || [];
-  if (current.length === permissions.length) {
+  if (current.length === enabledPerms.length) {
     permMatrix[moduleKey] = [];
   } else {
-    permMatrix[moduleKey] = [...permissions];
+    permMatrix[moduleKey] = [...enabledPerms];
   }
 };
 
 const toggleColumn = (perm: PermissionType) => {
-  const allChecked = moduleDefs.every((mod) =>
+  const modules = moduleDefs.filter((mod) => isPermAllowed(mod.key, perm));
+  const allChecked = modules.every((mod) =>
     (permMatrix[mod.key] || []).includes(perm),
   );
-  moduleDefs.forEach((mod) => {
+  modules.forEach((mod) => {
     const current = permMatrix[mod.key] || [];
     if (allChecked) {
       permMatrix[mod.key] = current.filter((p) => p !== perm);
@@ -132,12 +152,14 @@ const toggleColumn = (perm: PermissionType) => {
 };
 
 const isRowChecked = (moduleKey: string) => {
+  const enabledPerms = getEnabledPermissions(moduleKey);
   const current = permMatrix[moduleKey] || [];
-  return current.length === permissions.length;
+  return enabledPerms.length > 0 && current.length === enabledPerms.length;
 };
 
 const isColumnChecked = (perm: PermissionType) => {
-  return moduleDefs.every((mod) => (permMatrix[mod.key] || []).includes(perm));
+  const modules = moduleDefs.filter((mod) => isPermAllowed(mod.key, perm));
+  return modules.every((mod) => (permMatrix[mod.key] || []).includes(perm));
 };
 
 const permissionPreview = computed(() => {
@@ -175,7 +197,9 @@ const submitForm = () => {
 
   const flatPermissions: string[] = [];
   moduleDefs.forEach((mod) => {
-    const perms = permMatrix[mod.key] || [];
+    const perms = (permMatrix[mod.key] || []).filter((p) =>
+      isPermAllowed(mod.key, p),
+    );
     perms.forEach((p) => {
       flatPermissions.push(`${mod.key}.${p}`);
     });
@@ -388,6 +412,7 @@ const submitForm = () => {
                       <Checkbox
                         :binary="true"
                         :modelValue="(permMatrix[mod.key] || []).includes(perm)"
+                        :disabled="!isPermAllowed(mod.key, perm)"
                         @update:modelValue="togglePermission(mod.key, perm)"
                       />
                     </td>

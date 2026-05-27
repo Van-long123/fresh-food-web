@@ -7,6 +7,8 @@ import SearchToolbar from "~/components/admin/SearchToolbar.vue";
 import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import { ROUTES } from "~/constants/routes";
+import { PERMISSIONS } from "~/constants/permissions";
+import { usePermissions } from "~/composables/auth/usePermissions";
 import { useToast } from "primevue/usetoast";
 import { useAdminUsersQuery } from "~/queries/user/useAdminUsersQuery";
 import { useAdminRolesQuery } from "~/queries/role/useAdminRolesQuery";
@@ -25,6 +27,7 @@ useHead({
 
 const router = useRouter();
 const toast = useToast();
+const { hasPermission } = usePermissions();
 
 const searchQuery = ref("");
 const roleFilter = ref<string>("all");
@@ -191,6 +194,7 @@ const formatDate = (dateStr: string) => {
         label: 'Thêm người dùng',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.USER_CREATE),
+        permission: PERMISSIONS.USERS.CREATE
       }"
     />
 
@@ -242,18 +246,21 @@ const formatDate = (dateStr: string) => {
           >{{ selectedIds.length }} đã chọn</span
         >
         <button
+          v-if="hasPermission(PERMISSIONS.USERS.EDIT)"
           @click="handleBulkStatusChange(true)"
           class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
         >
           Kích hoạt
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.USERS.EDIT)"
           @click="handleBulkStatusChange(false)"
           class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
         >
           Tạm khóa
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.USERS.DELETE)"
           @click="handleBulkDelete"
           class="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
         >
@@ -366,6 +373,8 @@ const formatDate = (dateStr: string) => {
       <template #cell-actions="{ row }">
         <ActionButtons
           :edit-href="ROUTES.ADMIN.USER_EDIT(row._id || row.id)"
+          :edit-permission="PERMISSIONS.USERS.EDIT"
+          :delete-permission="PERMISSIONS.USERS.DELETE"
           @delete="openDeleteDialog(row)"
           show-delete
         />

@@ -88,6 +88,9 @@ export const API_ENDPOINTS = {
   },
   // Admin
   ADMIN: {
+    AUTH: {
+      ME: '/v1/admin/auth/me'
+    },
     DASHBOARD: {
       OVERVIEW: '/v1/admin/dashboard/overview',
       EXPORT: '/v1/admin/dashboard/export'

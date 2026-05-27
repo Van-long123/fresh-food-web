@@ -8,6 +8,8 @@ import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import StatusBadge from "~/components/admin/StatusBadge.vue";
 import { ROUTES } from "~/constants/routes";
+import { PERMISSIONS } from "~/constants/permissions";
+import { usePermissions } from "~/composables/auth/usePermissions";
 import { formatDate } from "~/utils/formatters";
 import { useAdminVouchersQuery } from "~/queries/voucher/useAdminVouchersQuery";
 import { useDeleteAdminVoucher } from "~/mutations/voucher/useDeleteAdminVoucher";
@@ -27,6 +29,7 @@ useHead({
 
 const router = useRouter();
 const toast = useToast();
+const { hasPermission } = usePermissions();
 
 const searchQuery = ref("");
 const statusFilter = ref<string>("all");
@@ -211,6 +214,7 @@ const cancelDelete = () => {
         label: 'Thêm voucher',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.VOUCHER_CREATE),
+        permission: PERMISSIONS.VOUCHERS.CREATE
       }"
     />
 
@@ -265,18 +269,21 @@ const cancelDelete = () => {
           >{{ selectedIds.length }} đã chọn</span
         >
         <button
+          v-if="hasPermission(PERMISSIONS.VOUCHERS.EDIT)"
           @click="handleBulkStatusChange('active')"
           class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
         >
           Kích hoạt
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.VOUCHERS.EDIT)"
           @click="handleBulkStatusChange('inactive')"
           class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
         >
           Ngừng kích hoạt
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.VOUCHERS.DELETE)"
           @click="handleBulkDelete"
           class="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
         >
@@ -407,6 +414,8 @@ const cancelDelete = () => {
       <template #cell-actions="{ row }">
         <ActionButtons
           :edit-href="ROUTES.ADMIN.VOUCHER_EDIT(row._id)"
+          :edit-permission="PERMISSIONS.VOUCHERS.EDIT"
+          :delete-permission="PERMISSIONS.VOUCHERS.DELETE"
           @delete="openDeleteDialog(row)"
           show-delete
         />

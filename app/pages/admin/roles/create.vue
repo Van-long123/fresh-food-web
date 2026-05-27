@@ -24,6 +24,7 @@ const { mutate: createRole, isPending: isSubmitting } = useCreateAdminRole();
 const errors = ref<Record<string, string>>({});
 
 const moduleDefs = [
+  { key: "dashboard", label: "Tổng quan" },
   { key: "articles", label: "Bài viết" },
   { key: "products", label: "Sản phẩm" },
   { key: "categories", label: "Danh mục" },
@@ -38,6 +39,22 @@ const moduleDefs = [
 
 const permissions = ["view", "create", "edit", "delete"] as const;
 type PermissionType = (typeof permissions)[number];
+const HIGH_LEVEL_MODULE_KEYS = ["users", "roles", "settings"];
+
+/**
+ * Kiểm tra xem một quyền cụ thể (ví dụ: tạo, sửa, xóa) có được phép áp dụng cho module hay không.
+ * Riêng module "dashboard" chỉ cho phép quyền "view", các module khác cho phép đầy đủ quyền.
+ */
+const isPermAllowed = (moduleKey: string, perm: PermissionType) => {
+  return moduleKey !== "dashboard" || perm === "view";
+};
+
+/**
+ * Lấy danh sách các quyền hợp lệ của một module (đã lọc bỏ các quyền không được phép qua isPermAllowed).
+ */
+const getEnabledPermissions = (moduleKey: string) => {
+  return permissions.filter((perm) => isPermAllowed(moduleKey, perm));
+};
 
 // PermMatrix records which permissions are selected for each module
 const permMatrix = reactive<Record<string, PermissionType[]>>({});
@@ -58,29 +75,64 @@ const form = reactive({
   description: "",
 });
 
+/**
+ * Kiểm tra xem vai trò đang tạo có sở hữu bất kỳ quyền quản trị cấp cao nào hay không.
+ * Quản trị cấp cao bao gồm các phân hệ: "người dùng" (users), "vai trò" (roles), "cài đặt" (settings).
+ */
+const hasHighLevelManagementPermissions = computed(() => {
+  return HIGH_LEVEL_MODULE_KEYS.some((moduleKey) => {
+    return (permMatrix[moduleKey] || []).length > 0;
+  });
+});
+
+/**
+ * Tự động đồng bộ hóa quyền xem Dashboard (dashboard.view).
+ * Nếu vai trò có ít nhất một quyền quản trị cấp cao, hệ thống sẽ tự động gán quyền xem Dashboard
+ * để đảm bảo admin này có thể đăng nhập vào được trang Dashboard chính.
+ * Ngược lại, nếu không có quyền cấp cao nào, quyền xem Dashboard sẽ được đưa về rỗng.
+ */
+const syncDashboardViewByRoleLevel = () => {
+  if (hasHighLevelManagementPermissions.value) {
+    if (!(permMatrix.dashboard || []).includes("view")) {
+      permMatrix.dashboard = ["view"];
+    }
+    return;
+  }
+
+  permMatrix.dashboard = [];
+};
+
 const togglePermission = (moduleKey: string, perm: PermissionType) => {
+  if (!isPermAllowed(moduleKey, perm)) return;
+
   const current = permMatrix[moduleKey] || [];
   if (current.includes(perm)) {
     permMatrix[moduleKey] = current.filter((p) => p !== perm);
   } else {
     permMatrix[moduleKey] = [...current, perm];
   }
+
+  syncDashboardViewByRoleLevel();
 };
 
 const toggleRow = (moduleKey: string) => {
+  const enabledPerms = getEnabledPermissions(moduleKey);
   const current = permMatrix[moduleKey] || [];
-  if (current.length === permissions.length) {
+  if (current.length === enabledPerms.length) {
     permMatrix[moduleKey] = [];
   } else {
-    permMatrix[moduleKey] = [...permissions];
+    permMatrix[moduleKey] = [...enabledPerms];
   }
+
+  syncDashboardViewByRoleLevel();
 };
 
 const toggleColumn = (perm: PermissionType) => {
-  const allChecked = moduleDefs.every((mod) =>
+  const modules = moduleDefs.filter((mod) => isPermAllowed(mod.key, perm));
+  const allChecked = modules.every((mod) =>
     (permMatrix[mod.key] || []).includes(perm),
   );
-  moduleDefs.forEach((mod) => {
+  modules.forEach((mod) => {
     const current = permMatrix[mod.key] || [];
     if (allChecked) {
       permMatrix[mod.key] = current.filter((p) => p !== perm);
@@ -88,15 +140,19 @@ const toggleColumn = (perm: PermissionType) => {
       permMatrix[mod.key] = [...current, perm];
     }
   });
+
+  syncDashboardViewByRoleLevel();
 };
 
 const isRowChecked = (moduleKey: string) => {
+  const enabledPerms = getEnabledPermissions(moduleKey);
   const current = permMatrix[moduleKey] || [];
-  return current.length === permissions.length;
+  return enabledPerms.length > 0 && current.length === enabledPerms.length;
 };
 
 const isColumnChecked = (perm: PermissionType) => {
-  return moduleDefs.every((mod) => (permMatrix[mod.key] || []).includes(perm));
+  const modules = moduleDefs.filter((mod) => isPermAllowed(mod.key, perm));
+  return modules.every((mod) => (permMatrix[mod.key] || []).includes(perm));
 };
 
 const permissionPreview = computed(() => {
@@ -132,8 +188,12 @@ const submitForm = () => {
   }
 
   const flatPermissions: string[] = [];
+  syncDashboardViewByRoleLevel();
+
   moduleDefs.forEach((mod) => {
-    const perms = permMatrix[mod.key] || [];
+    const perms = (permMatrix[mod.key] || []).filter((p) =>
+      isPermAllowed(mod.key, p),
+    );
     perms.forEach((p) => {
       flatPermissions.push(`${mod.key}.${p}`);
     });
@@ -311,6 +371,7 @@ const submitForm = () => {
                     <Checkbox
                       :binary="true"
                       :modelValue="(permMatrix[mod.key] || []).includes(perm)"
+                      :disabled="!isPermAllowed(mod.key, perm)"
                       @update:modelValue="togglePermission(mod.key, perm)"
                     />
                   </td>

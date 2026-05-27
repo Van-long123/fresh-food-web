@@ -8,6 +8,8 @@ import ActionButtons from "~/components/admin/ActionButtons.vue";
 import ConfirmDialog from "~/components/admin/ConfirmDialog.vue";
 import StatusBadge from "~/components/admin/StatusBadge.vue";
 import { ROUTES } from "~/constants/routes";
+import { PERMISSIONS } from "~/constants/permissions";
+import { usePermissions } from "~/composables/auth/usePermissions";
 import { useAdminProductsQuery } from "~/queries/product/useAdminProductsQuery";
 import { useDeleteAdminProduct } from "~/mutations/product/useDeleteProduct";
 import { useBulkDeleteAdminProduct } from "~/mutations/product/useBulkDeleteProduct";
@@ -30,6 +32,7 @@ useHead({
 
 const router = useRouter();
 const toast = useToast();
+const { hasPermission } = usePermissions();
 
 // State
 const searchQuery = ref("");
@@ -215,6 +218,7 @@ const handleBulkStatusChange = (status: "active" | "inactive") => {
         label: 'Thêm sản phẩm',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.PRODUCT_CREATE),
+        permission: PERMISSIONS.PRODUCTS.CREATE
       }"
     />
 
@@ -257,18 +261,21 @@ const handleBulkStatusChange = (status: "active" | "inactive") => {
           {{ selectedIds.length }} đã chọn
         </span>
         <button
+          v-if="hasPermission(PERMISSIONS.PRODUCTS.EDIT)"
           @click="handleBulkStatusChange('active')"
           class="rounded bg-white border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
         >
           Kích hoạt
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.PRODUCTS.EDIT)"
           @click="handleBulkStatusChange('inactive')"
           class="rounded bg-white border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
         >
           Ngừng kích hoạt
         </button>
         <button
+          v-if="hasPermission(PERMISSIONS.PRODUCTS.DELETE)"
           @click="handleBulkDelete"
           class="rounded bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700"
         >
@@ -436,6 +443,8 @@ const handleBulkStatusChange = (status: "active" | "inactive") => {
       <template #cell-actions="{ row }">
         <ActionButtons
           :edit-href="ROUTES.ADMIN.PRODUCT_EDIT(row._id)"
+          :edit-permission="PERMISSIONS.PRODUCTS.EDIT"
+          :delete-permission="PERMISSIONS.PRODUCTS.DELETE"
           @delete="openDeleteDialog(row)"
           show-delete
         />
