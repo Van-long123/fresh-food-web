@@ -31,7 +31,7 @@ const toast = useToast();
 
 const productId = ref(route.params.id as string);
 
-// ─── TanStack Query ───────────────────────────────────────────────────────────
+// TanStack Query
 const {
   data: product,
   isLoading,
@@ -42,7 +42,7 @@ const { data: categoriesData, isLoading: isCategoriesLoading } =
 const { mutate: updateProduct, isPending: isSubmitting } =
   useUpdateAdminProduct();
 
-// ─── Form state ───────────────────────────────────────────────────────────────
+// Form state
 const slugEdited = ref(false);
 const tagInput = ref("");
 const formInitialized = ref(false);
@@ -70,7 +70,7 @@ const form = reactive({
 
 const errors = ref<Record<string, string>>({});
 
-// ─── Options ─────────────────────────────────────────────────────────────────
+// Options
 const unitOptions = [
   { label: "Kilôgam (kg)", value: "kg" },
   { label: "Gam (g)", value: "g" },
@@ -88,7 +88,7 @@ const statusOptions = [
   { label: "Ngừng hoạt động", value: "inactive" },
 ];
 
-// ─── Computed ─────────────────────────────────────────────────────────────────
+// Computed
 const categoryOptions = computed(() =>
   (categoriesData.value ?? []).map((c) => ({ label: c.title, value: c._id })),
 );
@@ -99,7 +99,7 @@ const averageRating = computed(() => {
   return (r.totalRating / r.numberOfRatings).toFixed(1);
 });
 
-// ─── Populate form khi data load xong
+// Populate form khi data load xong
 watchEffect(() => {
   if (product.value && !formInitialized.value) {
     const p = product.value;

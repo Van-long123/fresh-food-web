@@ -4,8 +4,7 @@ import { computed, ref, onUnmounted } from "vue";
 /**
  * modelValue có thể là:
  * - single mode: string (URL từ server) | File (file mới) | ""
- * - multiple mode: (string | File)[]
- */
+ * - multiple mode: (string | File)[] */
 const props = withDefaults(
   defineProps<{
     modelValue: string | File | (string | File)[];
@@ -57,7 +56,7 @@ const updateValue = (next: (string | File)[]) => {
   }
 };
 
-// ─── Handle file input ────────────────────────────────────────────────────────
+// Handle file input
 const handleFiles = (files: FileList | null) => {
   if (!files) return;
   const accepted: File[] = [];

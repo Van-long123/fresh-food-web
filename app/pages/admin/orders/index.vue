@@ -28,7 +28,7 @@ useHead({ title: "Danh sách đơn hàng - Quản trị SmartFood" });
 const router = useRouter();
 const toast = useToast();
 
-// ── Filter state
+// Filter state
 const searchQuery = ref("");
 const statusFilter = ref<string>("all");
 const page = ref(1);
@@ -36,11 +36,11 @@ const perPage = ref(10);
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 const selectedIds = ref<string[]>([]);
 
-// ── Inline status editing
+// Inline status editing
 const editingStatusId = ref<string | null>(null);
 const editingStatusValue = ref<string>("");
 
-// ── Query params (reactive, drives refetch)
+// Query params (reactive, drives refetch)
 const queryParams = computed<AdminOrderQueryParams>(() => ({
   page: page.value,
   perPage: perPage.value,
@@ -53,7 +53,7 @@ const queryParams = computed<AdminOrderQueryParams>(() => ({
   sortOrder: sortState.value?.direction || "desc",
 }));
 
-// ── Data fetching
+// Data fetching
 const {
   data: ordersData,
   isLoading,
@@ -68,13 +68,13 @@ watch([searchQuery, statusFilter], () => {
   page.value = 1;
 });
 
-// ── Mutations
+// Mutations
 const { mutate: updateStatus, isPending: isUpdatingStatus } =
   useUpdateAdminOrderStatus();
 const { mutate: bulkUpdateStatus, isPending: isBulkUpdatingStatus } =
   useBulkUpdateAdminOrderStatus();
 
-// ── Table columns
+// Table columns
 const columns = [
   { key: "orderCode", label: "Mã đơn", sortable: true },
   { key: "customer", label: "Khách hàng" },
@@ -85,7 +85,7 @@ const columns = [
   { key: "actions", label: "Thao tác" },
 ];
 
-// ── Computed helpers (no logic in template)
+// Computed helpers (no logic in template)
 const getNextStatuses = (currentStatus: string) => {
   const allowed = NEXT_STATUS_VALUES[currentStatus as OrderStatus] ?? [];
   return ORDER_STATUSES.filter((s) => allowed.includes(s.value));
@@ -103,14 +103,14 @@ const getMethodClass = (method: string) => {
   return "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-700 dark:text-slate-300";
 };
 
-// ── Sort
+// Sort
 const handleSortChange = (
   sort: { key: string; direction: "asc" | "desc" } | null,
 ) => {
   sortState.value = sort;
 };
 
-// ── Selection
+// Selection
 const handleSelectionChange = (ids: Array<string | number>) => {
   selectedIds.value = ids.map((id) => String(id));
 };
@@ -149,7 +149,7 @@ const handleBulkStatusChange = (status: OrderStatus) => {
   );
 };
 
-// ── Inline status edit
+// Inline status edit
 const startEditStatus = (row: any) => {
   editingStatusId.value = row._id;
   editingStatusValue.value = row.status;

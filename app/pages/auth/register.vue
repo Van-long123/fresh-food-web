@@ -676,9 +676,7 @@ const {
   width: 100%;
 }
 
-/* ========================================
-   STEP SLIDE TRANSITIONS
-   ======================================== */
+/* STEP SLIDE TRANSITIONS */
 .slide-forward-enter-active,
 .slide-forward-leave-active,
 .slide-back-enter-active,

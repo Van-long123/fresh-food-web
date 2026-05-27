@@ -6,8 +6,7 @@ import type { ProductRecommendationItem } from '~/types/product.type'
 
 /**
  * Maps a raw recommendation item from the Python microservice
- * into the HomeProduct shape used by <ProductCard />.
- */
+ * into the HomeProduct shape used by <ProductCard />. */
 const mapRecommendationToHomeProduct = (item: ProductRecommendationItem): HomeProduct => ({
   id: item._id,
   slug: item.slug || '',
@@ -28,8 +27,7 @@ const mapRecommendationToHomeProduct = (item: ProductRecommendationItem): HomePr
  *
  * Usage in [slug].vue:
  *   const { recommendations, isLoadingRecommendations } =
- *     useProductRecommendations(productId, { limit: 8 })
- */
+ *     useProductRecommendations(productId, { limit: 8 }) */
 export const useProductRecommendations = (
   productId: Ref<string>,
   options?: { limit?: number; categoryBoost?: boolean }

@@ -2,7 +2,7 @@
   <section
     class="bg-white rounded border border-gray-100 mb-10 overflow-hidden shadow-sm"
   >
-    <!-- ── Header ── -->
+    <!-- Header -->
     <div
       class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
     >
@@ -46,7 +46,7 @@
       Chưa có bài viết nổi bật.
     </div>
 
-    <!-- ── Body: 2 cột ── -->
+    <!-- Body: 2 cột -->
     <div v-else class="flex flex-col lg:flex-row gap-0">
       <!-- LEFT: Ảnh lớn + info -->
       <article

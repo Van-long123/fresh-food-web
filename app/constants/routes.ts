@@ -1,7 +1,7 @@
 export const ROUTES = {
   HOME: '/',
 
-  // ── Authentication ──────────────────────────────────────────
+  // Authentication
   AUTH: {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
@@ -10,7 +10,7 @@ export const ROUTES = {
     LOGIN_SUCCESS: '/auth/login-success',
   },
 
-  // ── Main navigation ─────────────────────────────────────────
+  // Main navigation
   SUPPORT: '/support',
   NEWS: '/news',
   NEWS_DETAIL: (slug?: string) => `/news/${slug || ''}`,
@@ -24,34 +24,34 @@ export const ROUTES = {
   SHOPPING_GUIDE: '/shopping-guide',
   REGISTRATION_GUIDE: '/registration-guide',
 
-  // ── Company ──────────────────────────────────────────────────
+  // Company
   STORES: '/stores',
   RECRUITMENT: '/recruitment',
   ONELIFE_APP: '/onelife-app',
   ONELIFE_CARD: '/onelife-card',
 
-  // ── User account ─────────────────────────────────────────────
+  // User account
   PROFILE: '/profile',
   ORDERS: '/orders',
   VOUCHERS: '/vouchers',
   SEARCH: '/search',
 
-  // ── Catalog ──────────────────────────────────────────────────
+  // Catalog
   CATEGORY: (slug: string) => `/category/${slug}`,
   CAMPAIGN: (slug: string) => `/campaign/${slug}`,
   PRODUCT_DETAIL: (slug: string) => `/product/${slug}`,
 
-  // ── Cart ─────────────────────────────────────────────────────
+  // Cart
   CART: '/cart',
 
-  // ── Order ────────────────────────────────────────────────────
+  // Order
   ORDER: {
     CART_INFO: '/order/cart-info',
     CHECKOUT: '/order/checkout',
     INFO: '/order/info',
   },
 
-  // ── Admin ───────────────────────────────────────────────────
+  // Admin
   ADMIN: {
     DASHBOARD: '/admin',
     PROFILE: '/admin/profile',
@@ -85,7 +85,7 @@ export const ROUTES = {
     MAINTENANCE: '/admin/maintenance',
   },
 
-  // ── Others ───────────────────────────────────────────────────
+  // Others
   ERROR_404: '/404',
 } as const
 

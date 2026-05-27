@@ -101,16 +101,16 @@ export const useChangePassword = (mode: 'authenticated' | 'reset-link' | 'set-pa
   }
 
   // const startRedirect = (onDone: () => void) => {
-  //   clearRedirectTimer()
-  //   redirectCountdown.value = REDIRECT_SECONDS
+  // clearRedirectTimer()
+  // redirectCountdown.value = REDIRECT_SECONDS
 
-  //   redirectTimer = setInterval(() => {
-  //     redirectCountdown.value -= 1
-  //     if (redirectCountdown.value <= 0) {
-  //       clearRedirectTimer()
-  //       onDone()
-  //     }
-  //   }, 1000)
+  // redirectTimer = setInterval(() => {
+  // redirectCountdown.value -= 1
+  // if (redirectCountdown.value <= 0) {
+  // clearRedirectTimer()
+  // onDone()
+  // }
+  // }, 1000)
   // }
 
   const submitAuthenticatedChange = async () => {

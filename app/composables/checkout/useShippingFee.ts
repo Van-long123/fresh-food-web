@@ -10,8 +10,7 @@ import type { ShippingFeePayload, ShippingFeeResponse } from '../../types/checko
  *  - shippingFee: số tiền phí ship (computed)
  *  - isFetchingShippingFee: đang call API
  *  - shippingFeeData: toàn bộ response
- *  - fetchShippingFee: gọi thủ công nếu cần (ví dụ sau khi edit địa chỉ)
- */
+ *  - fetchShippingFee: gọi thủ công nếu cần (ví dụ sau khi edit địa chỉ) */
 export const useShippingFee = (
   selectedAddressId: Ref<string | null>,
   cartProducts?: Ref<Array<{ _id?: string; id?: string | number; title?: string; name?: string; quantity: number }>>

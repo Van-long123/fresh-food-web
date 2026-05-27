@@ -27,13 +27,13 @@ useHead({
 const router = useRouter();
 const toast = useToast();
 
-// ─── TanStack Query ───────────────────────────────────────────────────────────
+// TanStack Query
 const { data: categoriesData, isLoading: isCategoriesLoading } =
   useAdminCategoriesQuery();
 const { mutate: createProduct, isPending: isSubmitting } =
   useCreateAdminProduct();
 
-// ─── State ────────────────────────────────────────────────────────────────────
+// State
 const slugEdited = ref(false);
 const tagInput = ref("");
 
@@ -60,7 +60,7 @@ const form = reactive({
 
 const errors = ref<Record<string, string>>({});
 
-// ─── Options ─────────────────────────────────────────────────────────────────
+// Options
 const unitOptions = [
   { label: "Kilôgam (kg)", value: "kg" },
   { label: "Gam (g)", value: "g" },
@@ -78,12 +78,12 @@ const statusOptions = [
   { label: "Ngừng hoạt động", value: "inactive" },
 ];
 
-// ─── Computed ─────────────────────────────────────────────────────────────────
+// Computed
 const categoryOptions = computed(() =>
   (categoriesData.value ?? []).map((c) => ({ label: c.title, value: c._id })),
 );
 
-// ─── Watchers ─────────────────────────────────────────────────────────────────
+// Watchers
 // Auto-slug từ title nếu user chưa chỉnh slug
 watch(
   () => form.title,
@@ -129,7 +129,7 @@ watch(
   },
 );
 
-// ─── Validation ───────────────────────────────────────────────────────────────
+// Validation
 const validateForm = () => {
   const errs: Record<string, string> = {};
   if (!form.title.trim()) errs.title = "Vui lòng nhập tên sản phẩm.";
@@ -145,7 +145,7 @@ const validateForm = () => {
   return Object.keys(errs).length === 0;
 };
 
-// ─── Submit ───────────────────────────────────────────────────────────────────
+// Submit
 const submitForm = () => {
   if (!validateForm()) {
     toast.add({

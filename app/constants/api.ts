@@ -9,7 +9,7 @@ export const API_ENDPOINTS = {
     FORGOT_PASSWORD: '/v1/client/users/forgot-password',
     RESET_PASSWORD: '/v1/client/users/reset-password',
     SET_PASSWORD: '/v1/client/users/set-password',
-    // ── Social OAuth ──────────────────────────────────────────
+    // Social OAuth
     GOOGLE_LOGIN: '/v1/client/users/google',
     FACEBOOK_LOGIN: '/v1/client/users/facebook',
     VERIFY_OAUTH: '/v1/client/users/verify-oauth'
@@ -86,7 +86,7 @@ export const API_ENDPOINTS = {
   SETTINGS: {
     GET: '/v1/client/settings'
   },
-  // ── Admin ────────────────────────────────────────────────────
+  // Admin
   ADMIN: {
     DASHBOARD: {
       OVERVIEW: '/v1/admin/dashboard/overview',

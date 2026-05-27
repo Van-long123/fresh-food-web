@@ -614,7 +614,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ── Scroll reveal ────────────────────────────────────── */
+/* Scroll reveal */
 .reveal {
   opacity: 0;
   transform: translateY(28px);
@@ -627,7 +627,7 @@ onMounted(() => {
   transform: none;
 }
 
-/* ── HERO ──────────────────────────────────────────────── */
+/* HERO */
 .hero {
   position: relative;
   height: 380px;
@@ -679,7 +679,7 @@ onMounted(() => {
   max-width: 520px;
 }
 
-/* ── STORY ─────────────────────────────────────────────── */
+/* STORY */
 .story-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -687,7 +687,7 @@ onMounted(() => {
   align-items: center;
 }
 
-/* ── BUTTONS ───────────────────────────────────────────── */
+/* BUTTONS */
 .btn-primary-au {
   background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
@@ -724,7 +724,7 @@ onMounted(() => {
   color: white;
 }
 
-/* ── MISSION ───────────────────────────────────────────── */
+/* MISSION */
 .mission-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -761,7 +761,7 @@ onMounted(() => {
   text-align: center;
 }
 
-/* ── TIMELINE ──────────────────────────────────────────── */
+/* TIMELINE */
 .timeline {
   position: relative;
   max-width: 800px;
@@ -848,7 +848,7 @@ onMounted(() => {
   transform: scale(1.02);
 }
 
-/* ── TEAM ──────────────────────────────────────────────── */
+/* TEAM */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -900,7 +900,7 @@ onMounted(() => {
   opacity: 1;
 }
 
-/* ── CERTS ─────────────────────────────────────────────── */
+/* CERTS */
 .cert-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -924,7 +924,7 @@ onMounted(() => {
   transform: translateY(-4px);
 }
 
-/* ── PARTNER MARQUEE ───────────────────────────────────── */
+/* PARTNER MARQUEE */
 .marquee-track {
   display: flex;
   gap: 1.5rem;
@@ -968,7 +968,7 @@ onMounted(() => {
   border-color: #fed7aa;
 }
 
-/* ── RESPONSIVE ────────────────────────────────────────── */
+/* RESPONSIVE */
 @media (max-width: 1024px) {
   .team-grid {
     grid-template-columns: repeat(2, 1fr);

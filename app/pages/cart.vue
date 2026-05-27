@@ -593,12 +593,12 @@ const hasSelectedOutOfStock = computed(() =>
 );
 
 // const {
-//   appliedVoucher,
-//   voucherDiscount,
-//   voucherBreakdown,
-//   isApplying,
-//   applyVoucher: mutateVoucher,
-//   removeVoucher,
+// appliedVoucher,
+// voucherDiscount,
+// voucherBreakdown,
+// isApplying,
+// applyVoucher: mutateVoucher,
+// removeVoucher,
 // } = useApplyVoucher();
 
 // const voucherInput = ref("");
@@ -631,20 +631,20 @@ const subtotal = computed(() =>
   ),
 );
 // const grandTotal = computed(() =>
-//   Math.max(0, subtotal.value - voucherDiscount.value),
+// Math.max(0, subtotal.value - voucherDiscount.value),
 // );
 const format = (n: number) => n.toLocaleString("vi-VN");
 // const itemDiscountMap = computed<Record<string, number>>(
-//   () => voucherBreakdown.value || {},
+// () => voucherBreakdown.value || {},
 // );
 
 // const buildVoucherPayloadItems = () =>
-//   selectedItems.value.map((item) => ({
-//     productId: item.productId,
-//     categoryId: item.categoryId,
-//     quantity: item.quantity,
-//     price: item.price,
-//   }));
+// selectedItems.value.map((item) => ({
+// productId: item.productId,
+// categoryId: item.categoryId,
+// quantity: item.quantity,
+// price: item.price,
+// }));
 
 const toggleAll = (e: Event) => {
   const t = e.target as HTMLInputElement;
@@ -688,25 +688,25 @@ const changeQty = async (id: string, delta: number) => {
 };
 
 // watch([subtotal, selectedItemsSignature], ([newTotal]) => {
-//   if (appliedVoucher.value && newTotal < appliedVoucher.value.minOrderValue) {
-//     // Auto-remove silently when order value drops.
-//     // The user will see the price change and the total pulse animation.
-//     removeVoucher({ silent: true });
-//   } else if (appliedVoucher.value) {
-//     // Recalculate scope-based discounts whenever cart composition changes.
-//     handleApplyVoucher({ silent: true });
-//   }
+// if (appliedVoucher.value && newTotal < appliedVoucher.value.minOrderValue) {
+// // Auto-remove silently when order value drops.
+// // The user will see the price change and the total pulse animation.
+// removeVoucher({ silent: true });
+// } else if (appliedVoucher.value) {
+// // Recalculate scope-based discounts whenever cart composition changes.
+// handleApplyVoucher({ silent: true });
+// }
 // });
 
 // const handleApplyVoucher = (options: { silent?: boolean } = {}) => {
-//   const code = (appliedVoucher.value?.code || voucherInput.value)
-//     .trim()
-//     .toUpperCase();
-//   if (!code) return;
-//   mutateVoucher(
-//     { code, orderValue: subtotal.value, items: buildVoucherPayloadItems() },
-//     options,
-//   );
+// const code = (appliedVoucher.value?.code || voucherInput.value)
+// .trim()
+// .toUpperCase();
+// if (!code) return;
+// mutateVoucher(
+// { code, orderValue: subtotal.value, items: buildVoucherPayloadItems() },
+// options,
+// );
 // };
 
 const checkoutNow = async () => {

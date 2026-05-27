@@ -42,7 +42,7 @@ export const adminProductService = {
     getAdminCategoriesRequest(params)
 }
 
-// ─── Shared types ─────────────────────────────────────────────────────────────
+// Shared types
 
 interface ProductFormData {
   title: string
@@ -66,8 +66,7 @@ interface ProductFormData {
 }
 
 /**
- * Append một giá trị scalar vào FormData (bỏ qua null / undefined)
- */
+ * Append một giá trị scalar vào FormData (bỏ qua null / undefined) */
 const appendField = (fd: FormData, key: string, value: unknown) => {
   if (value === null || value === undefined) return
   fd.append(key, String(value))
@@ -76,8 +75,7 @@ const appendField = (fd: FormData, key: string, value: unknown) => {
 /**
  * Build FormData cho Create Product API (multipart/form-data)
  * - File object → append với field name `thumbnail` / `images`
- * - String URL  → append bình thường (server bỏ qua nếu file được upload)
- */
+ * - String URL  → append bình thường (server bỏ qua nếu file được upload) */
 export const buildCreateProductPayload = (form: ProductFormData): FormData => {
   const fd = new FormData()
 
@@ -127,8 +125,7 @@ export const buildCreateProductPayload = (form: ProductFormData): FormData => {
 /**
  * Build FormData cho Update Product API (multipart/form-data)
  * - File objects mới → field `thumbnail` / `images` (multer xử lý)
- * - String URL cũ   → field `images_url[]` (server giữ nguyên)
- */
+ * - String URL cũ   → field `images_url[]` (server giữ nguyên) */
 export const buildUpdateProductPayload = (form: ProductFormData): FormData => {
   const fd = new FormData()
 

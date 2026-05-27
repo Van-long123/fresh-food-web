@@ -29,10 +29,10 @@ useHead({
   title: "Tổng quan - Quản trị SmartFood",
 });
 
-// ── Query ─────────────────────────────────────────────────────
+// Query
 const { data: overview, isLoading } = useDashboardOverviewQuery();
 
-// ── Router & Toast
+// Router & Toast
 const router = useRouter();
 const toast = useToast();
 
@@ -81,7 +81,7 @@ const handleExport = async () => {
   }
 };
 
-// ── Constants
+// Constants
 const TOP_PRODUCT_CHART_COLORS = [
   "#1d4ed8",
   "#2563eb",
@@ -119,7 +119,7 @@ const productColumns = [
   { key: "stock", label: "Tồn kho" },
 ];
 
-// ── Computed: Stats cards ─────────────────────────────────────
+// Computed: Stats cards
 const statsCards = computed(() => {
   const s = overview.value?.stats;
   if (!s) return [];
@@ -155,7 +155,7 @@ const statsCards = computed(() => {
   ];
 });
 
-// ── Computed: Revenue Chart
+// Computed: Revenue Chart
 const revenueChartData = computed(() => {
   const raw = overview.value?.revenueChart ?? Array(12).fill(0);
   const { labels, data } = mapRevenueChartData(raw);
@@ -174,7 +174,7 @@ const revenueChartData = computed(() => {
   };
 });
 
-// ── Computed: Orders Chart
+// Computed: Orders Chart
 const ordersChartData = computed(() => {
   const raw = overview.value?.ordersChart ?? [];
   const { labels, data } = mapOrdersChartData(raw);
@@ -191,17 +191,17 @@ const ordersChartData = computed(() => {
   };
 });
 
-// ── Computed: Top Products Chart ──────────────────────────────
+// Computed: Top Products Chart
 const topProductChartData = computed(() => {
   const products = overview.value?.topProducts ?? [];
   return mapTopProductChartData(products, TOP_PRODUCT_CHART_COLORS);
 });
 
-// ── Computed: Tables ──────────────────────────────────────────
+// Computed: Tables
 const recentOrders = computed(() => overview.value?.recentOrders ?? []);
 const topProducts = computed(() => overview.value?.topProducts ?? []);
 
-// ── Computed: Formatted recent orders for DataTable ───────────
+// Computed: Formatted recent orders for DataTable
 const recentOrdersForTable = computed(() =>
   recentOrders.value.map((o) => ({
     ...o,
@@ -214,7 +214,7 @@ const recentOrdersForTable = computed(() =>
   })),
 );
 
-// ── Computed: Formatted top products for DataTable ────────────
+// Computed: Formatted top products for DataTable
 const topProductsForTable = computed(() =>
   topProducts.value.map((p) => ({
     ...p,
@@ -222,7 +222,7 @@ const topProductsForTable = computed(() =>
   })),
 );
 
-// ── Chart Options ─────────────────────────────────────────────
+// Chart Options
 const baseChartOptions = {
   maintainAspectRatio: false,
   plugins: {

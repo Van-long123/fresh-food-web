@@ -9,13 +9,13 @@ export interface HomeAggregateQueryParams {
 }
 
 // export interface HomeSectionProductsQueryParams {
-//   slug: string
-//   limit?: number
+// slug: string
+// limit?: number
 // }
 
 // export interface HomeBlogsQueryParams {
-//   limit?: number
-//   featured?: boolean
+// limit?: number
+// featured?: boolean
 // }
 
 export interface HomeProduct {
@@ -130,11 +130,11 @@ export interface HomeAggregateApiResponse {
 }
 
 // export interface HomeCategoryProductsApiResponse {
-//   slug?: string
-//   products?: unknown[]
+// slug?: string
+// products?: unknown[]
 // }
 
 // export interface HomeBlogsApiResponse {
-//   posts?: HomeBlogApi[]
-//   blogs?: HomeBlogApi[]
+// posts?: HomeBlogApi[]
+// blogs?: HomeBlogApi[]
 // }

@@ -35,7 +35,7 @@ export interface SelectedCartItem {
   price: number
   originalPrice?: number | null
   quantity: number
-  slug: string
+  slug?: string
   stock: number
   categoryId?: string | null
 }

@@ -13,8 +13,7 @@ export interface ResolvedBreadcrumb {
 
 /**
  * Route pattern mappings to Vietnamese display terms.
- * Supports dynamic placeholder params such as :id.
- */
+ * Supports dynamic placeholder params such as :id. */
 export const BREADCRUMB_CONFIG: BreadcrumbConfig = {
   "/admin": { label: "Tổng quan", to: "/admin" },
   "/admin/products": { label: "Sản phẩm", to: "/admin/products" },
@@ -46,8 +45,7 @@ export const BREADCRUMB_CONFIG: BreadcrumbConfig = {
 
 /**
  * Matches a concrete path segment-by-segment against a pattern mapping (like /admin/products/:id/edit).
- * Extract matched parameters if the patterns match.
- */
+ * Extract matched parameters if the patterns match. */
 export function matchPathPattern(
   path: string,
   pattern: string,
@@ -62,8 +60,8 @@ export function matchPathPattern(
   const params: Record<string, string> = {};
 
   for (let i = 0; i < patternParts.length; i++) {
-    const patternPart = patternParts[i];
-    const pathPart = pathParts[i];
+    const patternPart = patternParts[i]!
+    const pathPart = pathParts[i]!
 
     if (patternPart.startsWith(":")) {
       const paramName = patternPart.slice(1);
@@ -77,8 +75,7 @@ export function matchPathPattern(
 }
 
 /**
- * Resolves the full breadcrumb sequence for a given route path and its params.
- */
+ * Resolves the full breadcrumb sequence for a given route path and its params. */
 export function resolveBreadcrumbs(
   currentPath: string,
   currentParams: Record<string, string | string[]>,
@@ -130,9 +127,9 @@ export function resolveBreadcrumbs(
         ...resolvedParams,
         ...Object.keys(currentParams).reduce(
           (acc, key) => {
-            const val = currentParams[key];
-            acc[key] = Array.isArray(val) ? val[0] : val;
-            return acc;
+            const val = currentParams[key]!
+            acc[key] = Array.isArray(val) ? val[0]! : val
+            return acc
           },
           {} as Record<string, string>,
         ),

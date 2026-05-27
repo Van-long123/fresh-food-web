@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-// ── TypeScript Interfaces ──────────────────────────────────────────────────
+// TypeScript Interfaces
 
 import type {
   OrderProduct,
@@ -35,7 +35,7 @@ export const useOrderStore = defineStore('order', () => {
   const checkoutData = ref<CheckoutData | null>(null)
 
   // function setCartDetail(detail: CartDetail) {
-  //   cartDetail.value = detail
+  // cartDetail.value = detail
   // }
 
   function setProduct(p: Product) {

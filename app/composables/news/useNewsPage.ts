@@ -121,25 +121,25 @@ export const useNewsPage = () => {
   // let observer: IntersectionObserver | null = null;
 
   // const bindCardObserver = async () => {
-  //   await nextTick();
+  // await nextTick();
 
-  //   const cards = document.querySelectorAll(".news-card");
-  //   cards.forEach((card) => card.classList.remove("in-view"));
+  // const cards = document.querySelectorAll(".news-card");
+  // cards.forEach((card) => card.classList.remove("in-view"));
 
-  //   observer?.disconnect();
-  //   observer = new IntersectionObserver(
-  //     (entries) => {
-  //       entries.forEach((entry) => {
-  //         if (!entry.isIntersecting) return;
-  //         const index = Number((entry.target as HTMLElement).dataset.index || 0);
-  //         (entry.target as HTMLElement).style.animationDelay = `${(index % pageSize) * 90}ms`;
-  //         entry.target.classList.add("in-view");
-  //       });
-  //     },
-  //     { threshold: 0.18 },
-  //   );
+  // observer?.disconnect();
+  // observer = new IntersectionObserver(
+  // (entries) => {
+  // entries.forEach((entry) => {
+  // if (!entry.isIntersecting) return;
+  // const index = Number((entry.target as HTMLElement).dataset.index || 0);
+  // (entry.target as HTMLElement).style.animationDelay = `${(index % pageSize) * 90}ms`;
+  // entry.target.classList.add("in-view");
+  // });
+  // },
+  // { threshold: 0.18 },
+  // );
 
-  //   cards.forEach((card) => observer?.observe(card));
+  // cards.forEach((card) => observer?.observe(card));
   // };
 
   // --- Watchers ---
@@ -148,19 +148,19 @@ export const useNewsPage = () => {
   });
 
   // watch([pagedArticles, loading], () => {
-  //   if (loading.value) return;
-  //   bindCardObserver();
+  // if (loading.value) return;
+  // bindCardObserver();
   // });
 
   // // --- Lifecycle ---
   // onMounted(() => {
-  //   if (!loading.value) {
-  //     bindCardObserver();
-  //   }
+  // if (!loading.value) {
+  // bindCardObserver();
+  // }
   // });
 
   // onUnmounted(() => {
-  //   observer?.disconnect();
+  // observer?.disconnect();
   // });
 
   return {

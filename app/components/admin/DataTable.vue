@@ -294,8 +294,7 @@ defineSlots<{
         </div>
       </template> -->
     </PrimeDataTable>
-    <!-- 
-    <template #header>: Tương đương với việc bạn đang tự định nghĩa giao diện cho ô tiêu đề <th> ở hàng trên cùng của cột đó.
+    <!-- <template #header>: Tương đương với việc bạn đang tự định nghĩa giao diện cho ô tiêu đề <th> ở hàng trên cùng của cột đó.
 <template #body="slotProps">: Tương đương với việc định nghĩa giao diện cho tất cả các ô dữ liệu <td> thuộc cột đó ở các hàng bên dưới thân bảng (tbody).
 CODE MẪU TƯỢNG TRƯNG BÊN TRONG THƯ VIỆN PRIMEVUE (<PrimeDataTable>)
 <table>
@@ -316,8 +315,7 @@ CODE MẪU TƯỢNG TRƯNG BÊN TRONG THƯ VIỆN PRIMEVUE (<PrimeDataTable>)
 
     </tr>
   </tbody>
-</table>
--->
+</table> -->
     <div
       v-if="!hidePagination"
       class="flex flex-col gap-3 border-t border-slate-200/70 px-5 py-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between"

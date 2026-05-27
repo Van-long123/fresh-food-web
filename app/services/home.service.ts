@@ -14,6 +14,6 @@ export const homeService = {
   getAggregate: (params: HomeAggregateQueryParams) => getHomeAggregateRequest(params),
   getCampaignProducts: (slug: string, params: any) => getCampaignProductsRequest(slug, params),
   // getCategoryProducts: (params: HomeSectionProductsQueryParams) =>
-  //   getHomeCategoryProductsRequest(params),
+  // getHomeCategoryProductsRequest(params),
   // getBlogs: (params: HomeBlogsQueryParams) => getHomeBlogsRequest(params)
 }

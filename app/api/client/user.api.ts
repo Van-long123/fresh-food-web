@@ -61,8 +61,7 @@ export const setPasswordRequest = async (payload: SetPasswordPayload) => {
 
 /**
  * Gọi sau khi OAuth provider redirect về login-success
- * BE đã set Cookie, FE chỉ cần lấy thông tin user để cập nhật store
- */
+ * BE đã set Cookie, FE chỉ cần lấy thông tin user để cập nhật store */
 export const verifyOAuthRequest = async (payload: VerifyOAuthPayload) => {
   const response = await getAuthorizedAxios().post(API_ENDPOINTS.AUTH.VERIFY_OAUTH, payload)
   return response.data

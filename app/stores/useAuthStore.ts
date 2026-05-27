@@ -15,8 +15,7 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Ghi đè toàn bộ thông tin User (Reset lại state).
    * Thường dùng khi Đăng nhập hoặc Khôi phục phiên bản đầy đủ từ API.
-   * Yêu cầu truyền vào một object chứa đầy đủ các trường dữ liệu.
-   */
+   * Yêu cầu truyền vào một object chứa đầy đủ các trường dữ liệu. */
   function setUserFromApi(u: ApiAuthUser) {
     setUser({
       id: u._id,
@@ -35,8 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
   /**
    * Cập nhật một phần thông tin User (Vá dữ liệu).
    * Chỉ cập nhật những trường mà API có trả về, CÁC TRƯỜNG CŨ SẼ ĐƯỢC GIỮ NGUYÊN.
-   * Dùng khi gọi các API update nhỏ lẻ (ví dụ chỉ đổi mỗi ảnh đại diện, hoặc mỗi tên).
-   */
+   * Dùng khi gọi các API update nhỏ lẻ (ví dụ chỉ đổi mỗi ảnh đại diện, hoặc mỗi tên). */
   function patchUserFromApi(u: Partial<ApiAuthUser> & { _id?: string }) {
     if (!user.value) return
 

@@ -43,10 +43,10 @@ export const useCategoryProducts = (slug: MaybeRef<string>) => {
   const currentSlug = computed(() => normalizeSlug(unref(slug)))
 
   // const hasMore = computed(() => {
-  //   const page = pagination.value.page
-  //   const totalPages = pagination.value.totalPages
-  //   if (!totalPages) return false
-  //   return page < totalPages
+  // const page = pagination.value.page
+  // const totalPages = pagination.value.totalPages
+  // if (!totalPages) return false
+  // return page < totalPages
   // })
 
   const normalizePriceRange = () => {
@@ -156,46 +156,46 @@ export const useCategoryProducts = (slug: MaybeRef<string>) => {
   }
 
   // const fetchNextPage = async (): Promise<void> => {
-  //   if (isLoading.value || isLoadingMore.value) return
-  //   if (!hasMore.value) return
+  // if (isLoading.value || isLoadingMore.value) return
+  // if (!hasMore.value) return
 
-  //   const slugValue = currentSlug.value
-  //   if (!slugValue) return
+  // const slugValue = currentSlug.value
+  // if (!slugValue) return
 
-  //   const baseParams = buildBaseParams()
-  //   const signature = JSON.stringify({ slug: slugValue, ...baseParams })
+  // const baseParams = buildBaseParams()
+  // const signature = JSON.stringify({ slug: slugValue, ...baseParams })
 
-  //   // Nếu filter/sort/price đã thay đổi trong lúc scroll, bỏ qua fetchMore.
-  //   if (signature !== lastQuerySignature) return
+  // // Nếu filter/sort/price đã thay đổi trong lúc scroll, bỏ qua fetchMore.
+  // if (signature !== lastQuerySignature) return
 
-  //   isLoadingMore.value = true
+  // isLoadingMore.value = true
 
-  //   const nextPage = pagination.value.page + 1
+  // const nextPage = pagination.value.page + 1
 
-  //   try {
-  //     const response = await categoryService.getProducts(slugValue, {
-  //       ...baseParams,
-  //       page: nextPage
-  //     })
+  // try {
+  // const response = await categoryService.getProducts(slugValue, {
+  // ...baseParams,
+  // page: nextPage
+  // })
 
-  //     // Nếu query signature đổi trong lúc đợi API, không append.
-  //     const updatedSignature = JSON.stringify({ slug: slugValue, ...buildBaseParams() })
-  //     if (updatedSignature !== lastQuerySignature) return
+  // // Nếu query signature đổi trong lúc đợi API, không append.
+  // const updatedSignature = JSON.stringify({ slug: slugValue, ...buildBaseParams() })
+  // if (updatedSignature !== lastQuerySignature) return
 
-  //     const nextProducts = Array.isArray(response.products) ? response.products : []
-  //     products.value = [...products.value, ...nextProducts]
-  //     pagination.value = response.pagination
+  // const nextProducts = Array.isArray(response.products) ? response.products : []
+  // products.value = [...products.value, ...nextProducts]
+  // pagination.value = response.pagination
 
-  //     // Không reset range khi load-more.
-  //     priceStats.value = {
-  //       minPrice: Number(response.priceStats?.minPrice || priceStats.value.minPrice),
-  //       maxPrice: Number(response.priceStats?.maxPrice || priceStats.value.maxPrice)
-  //     }
-  //   } catch {
-  //     // Load more lỗi thì im lặng (toast đã hiển thị từ authorizedAxios)
-  //   } finally {
-  //     isLoadingMore.value = false
-  //   }
+  // // Không reset range khi load-more.
+  // priceStats.value = {
+  // minPrice: Number(response.priceStats?.minPrice || priceStats.value.minPrice),
+  // maxPrice: Number(response.priceStats?.maxPrice || priceStats.value.maxPrice)
+  // }
+  // } catch {
+  // // Load more lỗi thì im lặng (toast đã hiển thị từ authorizedAxios)
+  // } finally {
+  // isLoadingMore.value = false
+  // }
   // }
 
   const resetFilters = () => {

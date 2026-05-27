@@ -38,7 +38,7 @@ watch(
     >
       <div class="flex flex-1 flex-col overflow-y-auto pb-4 pt-5">
         <div class="flex-1 space-y-6 bg-transparent px-4">
-          <!-- ── Section: Main ── -->
+          <!-- Section: Main -->
           <div class="space-y-1.5">
             <span
               class="px-3 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block"
@@ -69,7 +69,7 @@ watch(
             </ul>
           </div>
 
-          <!-- ── Section: Business ── -->
+          <!-- Section: Business -->
           <div class="space-y-1.5">
             <span
               class="px-3 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block"
@@ -222,7 +222,7 @@ watch(
             </ul>
           </div>
 
-          <!-- ── Section: Content & Feedback ── -->
+          <!-- Section: Content & Feedback -->
           <div class="space-y-1.5">
             <span
               class="px-3 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block"
@@ -295,7 +295,7 @@ watch(
             </ul>
           </div>
 
-          <!-- ── Section: Administration ── -->
+          <!-- Section: Administration -->
           <div class="space-y-1.5">
             <span
               class="px-3 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block"

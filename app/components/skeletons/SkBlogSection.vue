@@ -2,7 +2,7 @@
   <section
     class="bg-white rounded border border-gray-100 mb-10 overflow-hidden shadow-sm"
   >
-    <!-- ── Header ── -->
+    <!-- Header -->
     <div
       class="flex items-center justify-between px-5 py-4 border-b border-gray-100"
     >
@@ -10,7 +10,7 @@
       <Skeleton width="70px" height="16px" />
     </div>
 
-    <!-- ── Body: 2 columns ── -->
+    <!-- Body: 2 columns -->
     <div class="flex flex-col lg:flex-row gap-0">
       <!-- LEFT: Primary post skeleton -->
       <article

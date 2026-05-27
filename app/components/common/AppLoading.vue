@@ -1,5 +1,5 @@
 <template>
-  <!-- ── VARIANT: FULLPAGE ─────────────────────────────────────── -->
+  <!-- VARIANT: FULLPAGE -->
   <div v-if="variant === 'fullpage'" class="loading-fullpage">
     <!-- Layer 1: Background leaf decorations 4 góc -->
     <div class="leaf leaf-tl" aria-hidden="true">
@@ -126,7 +126,7 @@
     </div>
   </div>
 
-  <!-- ── VARIANT: OVERLAY ───────────────────────────────────────── -->
+  <!-- VARIANT: OVERLAY -->
   <div
     v-else-if="variant === 'overlay'"
     class="loading-overlay"
@@ -178,7 +178,7 @@
     </div>
   </div>
 
-  <!-- ── VARIANT: INLINE ────────────────────────────────────────── -->
+  <!-- VARIANT: INLINE -->
   <div v-else-if="variant === 'inline'" class="loading-inline">
     <!-- 3 chấm bounce nhỏ hơn -->
     <div class="inline-dots" aria-label="Đang tải...">
@@ -189,7 +189,7 @@
     <span class="inline-text">{{ props.message || "Đang tải thêm..." }}</span>
   </div>
 
-  <!-- ── VARIANT: BUTTON ────────────────────────────────────────── -->
+  <!-- VARIANT: BUTTON -->
   <span
     v-else-if="variant === 'button'"
     class="loading-btn"
@@ -229,7 +229,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-// ── Props ──────────────────────────────────────────────────────────────────────
+// Props
 const props = withDefaults(
   defineProps<{
     variant: "fullpage" | "overlay" | "inline" | "button";
@@ -241,7 +241,7 @@ const props = withDefaults(
   },
 );
 
-// ── Messages xoay vòng (chỉ dùng cho fullpage) ────────────────────────────────
+// Messages xoay vòng (chỉ dùng cho fullpage)
 const messages = [
   "Đang tải sản phẩm tươi ngon...",
   "Chuẩn bị kho hàng cho bạn...",
@@ -259,13 +259,13 @@ let msgInterval: ReturnType<typeof setInterval> | null = null;
 let phaseTimer: ReturnType<typeof setTimeout> | null = null;
 let tipTimer: ReturnType<typeof setTimeout> | null = null;
 
-// ── Computed ───────────────────────────────────────────────────────────────────
+// Computed
 const hasProgress = computed(
   () => props.progress !== undefined && props.progress !== null,
 );
 const displayMessage = computed(() => props.message || currentMessage.value);
 
-// ── Lifecycle ──────────────────────────────────────────────────────────────────
+// Lifecycle
 onMounted(() => {
   if (props.variant !== "fullpage") return;
 

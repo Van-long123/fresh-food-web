@@ -2,8 +2,7 @@ import { getAdminSettingsRequest, updateAdminSettingsRequest } from '~/api/admin
 import type { AdminSettings, AdminSettingsPayload } from '~/types/settings.type'
 
 /**
- * Build FormData when logo is a File object, otherwise send plain JSON payload.
- */
+ * Build FormData when logo is a File object, otherwise send plain JSON payload. */
 const buildSettingsPayload = (payload: AdminSettingsPayload): FormData | AdminSettingsPayload => {
   if (payload.logo instanceof File) {
     const fd = new FormData()

@@ -1,6 +1,6 @@
 <template>
   <nav v-if="totalPages > 1" class="pagination-wrap" aria-label="Pagination">
-    <!-- ── DESKTOP ── -->
+    <!-- DESKTOP -->
     <div class="desktop-pagination">
       <!-- Prev button -->
       <button
@@ -63,7 +63,7 @@
       </button>
     </div>
 
-    <!-- ── MOBILE ── -->
+    <!-- MOBILE -->
     <div class="mobile-pagination">
       <button
         type="button"
@@ -202,12 +202,12 @@ const goTo = (page: number) => {
 </script>
 
 <style scoped>
-/* ── Container ── */
+/* Container */
 .pagination-wrap {
   padding: 24px 0 8px;
 }
 
-/* ── Desktop ── */
+/* Desktop */
 .desktop-pagination {
   display: none;
   align-items: center;
@@ -221,7 +221,7 @@ const goTo = (page: number) => {
   }
 }
 
-/* ── Nav buttons (Trước / Tiếp) ── */
+/* Nav buttons (Trước / Tiếp) */
 .nav-btn {
   display: inline-flex;
   align-items: center;
@@ -252,7 +252,7 @@ const goTo = (page: number) => {
   pointer-events: none;
 }
 
-/* ── Page buttons ── */
+/* Page buttons */
 .page-btn {
   display: inline-flex;
   align-items: center;
@@ -285,7 +285,7 @@ const goTo = (page: number) => {
   transform: scale(1.05);
 }
 
-/* ── Ellipsis ── */
+/* Ellipsis */
 .ellipsis {
   display: inline-flex;
   align-items: center;
@@ -299,7 +299,7 @@ const goTo = (page: number) => {
   letter-spacing: 2px;
 }
 
-/* ── Mobile ── */
+/* Mobile */
 .mobile-pagination {
   display: flex;
   align-items: center;
@@ -361,7 +361,7 @@ const goTo = (page: number) => {
   background: #fff3e8;
 }
 
-/* ── Info line ── */
+/* Info line */
 .pagination-info {
   text-align: center;
   font-size: 12px;

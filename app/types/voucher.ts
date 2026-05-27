@@ -1,3 +1,5 @@
+import type { PaginationMeta } from './category.type'
+
 export type SortKey = 'best' | 'latest' | 'expiring'
 
 export type CouponType = 'freeship' | 'percent' | 'money' | 'product'

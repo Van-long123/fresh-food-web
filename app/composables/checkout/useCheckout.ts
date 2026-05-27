@@ -81,8 +81,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
 
   /**
    * Kiểm tra xác thực người dùng
-   * Nếu chưa login: hiển thị Toast + redirect với query params
-   */
+   * Nếu chưa login: hiển thị Toast + redirect với query params */
   const validateAuthentication = () => {
     if (!authStore.isLoggedIn) {
       toast.add({
@@ -101,8 +100,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
   }
 
   /**
-   * Gọi API kiểm tra tồn kho từ backend
-   */
+   * Gọi API kiểm tra tồn kho từ backend */
   const validateStockOnBackend = async (items: StockValidationItem[]): Promise<ValidationResponse> => {
     try {
       return await validateStockMutation.mutateAsync(items)
@@ -117,8 +115,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
    * Xử lý kết quả kiểm tra tồn kho
    * Trường hợp 1: Tất cả valid → tiếp tục checkout
    * Trường hợp 2: Có items clamped → tự động cập nhật số lượng, hiển thị thông báo
-   * Trường hợp 3: Có items out of stock → bỏ tích, hiển thị thông báo
-   */
+   * Trường hợp 3: Có items out of stock → bỏ tích, hiển thị thông báo */
   const handleValidationResult = async (
     validation: ValidationResponse,
     selectedItems: SelectedCartItem[],
@@ -209,8 +206,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
    * 1. Kiểm tra xác thực
    * 2. Gọi API validate stock
    * 3. Xử lý kết quả
-   * 4. Nếu thành công → redirect checkout, nếu không → giữ lại trang cart
-   */
+   * 4. Nếu thành công → redirect checkout, nếu không → giữ lại trang cart */
   const proceedToCheckout = async (
     selectedItems: SelectedCartItem[],
     checkoutPayload: CheckoutPayload,
@@ -352,8 +348,7 @@ export const useCheckout = (options: { selectedAddressId?: Ref<string | null> } 
 
   /**
    * [Premium UX] Tự động đồng bộ lại số tiền giảm khi phí vận chuyển thay đổi.
-   * Kới được: người dùng đổi địa chỉ nhận hàng và đang có voucher freeship hoạt động.
-   */
+   * Kới được: người dùng đổi địa chỉ nhận hàng và đang có voucher freeship hoạt động. */
   watch(
     () => shippingFee.value,
     async (newFee, oldFee) => {

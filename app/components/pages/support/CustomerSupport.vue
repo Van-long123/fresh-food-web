@@ -106,9 +106,7 @@
       </div>
     </section>
 
-    <!-- ========================================================
-         SECTION 3 — FAQ
-         ======================================================== -->
+    <!-- SECTION 3 — FAQ -->
     <section class="py-12 bg-white">
       <div class="max-w-[1200px] mx-auto px-5">
         <div ref="faqHeaderRef" class="mb-6 reveal">
@@ -502,9 +500,7 @@
       </div>
     </section>
 
-    <!-- ========================================================
-         SECTION 5 — THỐNG KÊ TIN TƯỞNG
-         ======================================================== -->
+    <!-- SECTION 5 — THỐNG KÊ TIN TƯỞNG -->
     <section ref="statsRef" class="py-12 bg-orange-50">
       <div class="max-w-[1200px] mx-auto px-5">
         <div class="stats-grid">
@@ -537,7 +533,7 @@ const hotline = computed(() => settingsStore.phone);
 const contactEmail = computed(() => settingsStore.email);
 const contactAddress = computed(() => settingsStore.address);
 
-// ===== TYPES =====
+// TYPES
 interface FormData {
   type: string;
   name: string;
@@ -563,7 +559,7 @@ interface Stat {
   suffix: string;
 }
 
-// ===== REFS =====
+// REFS
 const activeTab = ref(0);
 const submitting = ref(false);
 const submitSuccess = ref(false);
@@ -572,7 +568,7 @@ const uploadedFiles = ref<{ name: string }[]>([]);
 const statsRef = ref<HTMLElement | null>(null);
 const statsStarted = ref(false);
 
-// ===== FORM =====
+// FORM
 const form = reactive<FormData>({
   type: "",
   name: "",
@@ -644,7 +640,7 @@ const handleSubmit = async () => {
   uploadedFiles.value = [];
 };
 
-// ===== FILE UPLOAD =====
+// FILE UPLOAD
 const triggerFileInput = () => fileInputRef.value?.click();
 const handleFileChange = (e: Event) => {
   const files = (e.target as HTMLInputElement).files;
@@ -668,7 +664,7 @@ const removeFile = (name: string) => {
   uploadedFiles.value = uploadedFiles.value.filter((f) => f.name !== name);
 };
 
-// ===== SCROLL REVEAL =====
+// SCROLL REVEAL
 const setRef = (el: any, _key: string) => {
   if (el) observeEl(el);
 };
@@ -688,7 +684,7 @@ const observeEl = (el: Element) => {
   obs.observe(el);
 };
 
-// ===== CONTACT CHANNELS =====
+// CONTACT CHANNELS
 const channelActions: Record<string, () => void> = {
   hotline: () => window.open(`tel:${hotline.value}`),
   "facebook-chat": () =>
@@ -744,7 +740,7 @@ const channels = computed(() => [
   },
 ]);
 
-// ===== FAQ DATA =====
+// FAQ DATA
 const faqTabs: FaqTab[] = [
   {
     label: "🛒 Đặt hàng",
@@ -783,8 +779,8 @@ const faqTabs: FaqTab[] = [
         a: "Miễn phí giao hàng cho đơn từ 200.000đ trong nội thành. Đơn dưới 200.000đ phí 15.000đ.",
       },
       // {
-      //   q: "Tôi có thể theo dõi đơn hàng không?",
-      //   a: 'Có! Sau khi đặt hàng, bạn nhận được link theo dõi qua SMS và email. Vào "Đơn hàng" → "Theo dõi đơn".',
+      // q: "Tôi có thể theo dõi đơn hàng không?",
+      // a: 'Có! Sau khi đặt hàng, bạn nhận được link theo dõi qua SMS và email. Vào "Đơn hàng" → "Theo dõi đơn".',
       // },
       {
         q: "Shipper không giao đúng giờ phải làm sao?",
@@ -816,8 +812,8 @@ const faqTabs: FaqTab[] = [
         a: "Mỗi đơn hàng áp dụng tối đa 1 mã voucher. Một số chương trình khuyến mãi tự động có thể kết hợp được, xem điều kiện từng chương trình.",
       },
       // {
-      //   q: "Hóa đơn điện tử lấy ở đâu?",
-      //   a: 'Sau khi đặt hàng thành công, hóa đơn điện tử gửi qua email trong vòng 24 giờ. Có thể yêu cầu lại qua mục "Đơn hàng" → "Xuất hóa đơn".',
+      // q: "Hóa đơn điện tử lấy ở đâu?",
+      // a: 'Sau khi đặt hàng thành công, hóa đơn điện tử gửi qua email trong vòng 24 giờ. Có thể yêu cầu lại qua mục "Đơn hàng" → "Xuất hóa đơn".',
       // },
     ],
   },
@@ -848,7 +844,7 @@ const faqTabs: FaqTab[] = [
   },
 ];
 
-// ===== STATS =====
+// STATS
 const stats = reactive<Stat[]>([
   {
     icon: "👥",
@@ -891,7 +887,7 @@ const countUp = (stat: Stat) => {
   }, step);
 };
 
-// ===== LIFECYCLE =====
+// LIFECYCLE
 onMounted(() => {
   // Scroll reveal for all .reveal elements
   document.querySelectorAll(".reveal").forEach((el) => observeEl(el));
@@ -911,7 +907,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* ── Reveal animation ───────────────────────────────── */
+/* Reveal animation */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
@@ -924,7 +920,7 @@ onMounted(() => {
   transform: none;
 }
 
-/* ── SECTION 1 — HERO ───────────────────────────────── */
+/* SECTION 1 — HERO */
 .hero-banner {
   position: relative;
   height: 200px;
@@ -979,7 +975,7 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-/* ── SECTION 2 — CONTACT CARDS ──────────────────────── */
+/* SECTION 2 — CONTACT CARDS */
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1012,7 +1008,7 @@ onMounted(() => {
   height: 2rem;
 }
 
-/* ── SECTION 3 — FAQ ────────────────────────────────── */
+/* SECTION 3 — FAQ */
 .faq-tabs {
   margin-top: 1rem;
 }
@@ -1052,7 +1048,7 @@ onMounted(() => {
   color: #ea580c;
 }
 
-/* ── SECTION 4 — FORM ───────────────────────────────── */
+/* SECTION 4 — FORM */
 .form-grid {
   display: grid;
   /* grid-template-columns: 1fr 1fr;
@@ -1237,7 +1233,7 @@ onMounted(() => {
   transition: background 0.2s;
 }
 
-/* ── SECTION 5 — STATS ──────────────────────────────── */
+/* SECTION 5 — STATS */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1257,7 +1253,7 @@ onMounted(() => {
   }
 }
 
-/* ── RESPONSIVE ─────────────────────────────────────── */
+/* RESPONSIVE */
 @media (max-width: 1024px) {
   .contact-grid {
     grid-template-columns: repeat(2, 1fr);

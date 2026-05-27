@@ -11,8 +11,7 @@ export const clientSettingsKeys = {
 
 /**
  * Hook lấy cấu hình website công khai (không yêu cầu đăng nhập).
- * staleTime = 10 phút để tránh gọi lại API quá nhiều trong một phiên làm việc.
- */
+ * staleTime = 10 phút để tránh gọi lại API quá nhiều trong một phiên làm việc. */
 export const useClientSettingsQuery = () => {
   return useQuery({
     queryKey: clientSettingsKeys.detail(),

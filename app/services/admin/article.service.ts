@@ -44,7 +44,7 @@ export const adminArticleService = {
   bulkDelete: (payload: { article_ids: string[] }): Promise<{ deletedCount: number }> =>
     deleteAdminArticlesBulkRequest(payload),
 
-  getCategories: (params?: any): Promise<CategoryListResponse> =>
+  getCategories: (params?: any): Promise<any> =>
     getAdminCategoriesRequest(params),
 };
 

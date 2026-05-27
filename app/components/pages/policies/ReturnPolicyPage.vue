@@ -398,9 +398,9 @@ const specialCases = [
       "Các mặt hàng đặt riêng sẽ được hỗ trợ đổi trả theo biên bản xác nhận trước khi đặt.",
   },
   // {
-  //   title: "Combo/Set sản phẩm",
-  //   content:
-  //     "Nếu combo có sản phẩm lỗi, SmartFood xử lý đổi từng phần hoặc đổi trọn bộ tùy tình trạng hàng.",
+  // title: "Combo/Set sản phẩm",
+  // content:
+  // "Nếu combo có sản phẩm lỗi, SmartFood xử lý đổi từng phần hoặc đổi trọn bộ tùy tình trạng hàng.",
   // },
   {
     title: "Sản phẩm khuyến mãi / flash sale",

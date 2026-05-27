@@ -1,8 +1,7 @@
 import type { CouponType } from '~/types/voucher'
 
 /**
- * Định dạng chuỗi ngày tháng sang kiểu vi-VN (VD: 25 thg 4, 2024)
- */
+ * Định dạng chuỗi ngày tháng sang kiểu vi-VN (VD: 25 thg 4, 2024) */
 export const formatDate = (dateStr: string | null) => {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -15,9 +14,8 @@ export const formatDate = (dateStr: string | null) => {
 
 /**
  * Định dạng ngày giờ chi tiết
- * @param dateStr Chuỗi ngày giờ
- * @param style 'short' (vd: 25/05/2026 15:30) hoặc 'long' (vd: 25 tháng 5, 2026 15:30)
- */
+ * dateStr Chuỗi ngày giờ
+ * style 'short' (vd: 25/05/2026 15:30) hoặc 'long' (vd: 25 tháng 5, 2026 15:30) */
 export const formatDateTime = (dateStr: string | Date | null | undefined, style: 'short' | 'long' = 'short') => {
   if (!dateStr) return "—";
   return new Date(dateStr).toLocaleString("vi-VN", {
@@ -30,8 +28,7 @@ export const formatDateTime = (dateStr: string | Date | null | undefined, style:
 };
 
 /**
- * Định dạng số lượng lớn sang kiểu rút gọn (VD: 4500 -> 4.5k+)
- */
+ * Định dạng số lượng lớn sang kiểu rút gọn (VD: 4500 -> 4.5k+) */
 export const formatCount = (num: number | undefined) => {
   if (num === undefined) return "0";
   if (num >= 1000) return (num / 1000).toFixed(1) + "k+";
@@ -39,16 +36,14 @@ export const formatCount = (num: number | undefined) => {
 };
 
 /**
- * Định dạng ngày hết hạn (25/04/2024)
- */
+ * Định dạng ngày hết hạn (25/04/2024) */
 export const formatExpireDate = (date: string | Date | null): string => {
   if (!date) return 'N/A'
   return new Date(date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
 /**
- * Tính số ngày còn lại của voucher
- */
+ * Tính số ngày còn lại của voucher */
 export const formatExpireText = (endDate: string | Date | null): string => {
   if (!endDate) return ''
   const end = new Date(endDate)
@@ -61,8 +56,7 @@ export const formatExpireText = (endDate: string | Date | null): string => {
 }
 
 /**
- * Tạo nhãn hiển thị giá trị giảm giá
- */
+ * Tạo nhãn hiển thị giá trị giảm giá */
 export const buildValueLabel = (type: CouponType, discountValue: number): string => {
   if (type === 'percent') return `GIẢM ${discountValue}%`
   if (type === 'freeship') {
@@ -72,8 +66,7 @@ export const buildValueLabel = (type: CouponType, discountValue: number): string
 }
 
 /**
- * Ánh xạ trạng thái đơn hàng sang tiếng Việt
- */
+ * Ánh xạ trạng thái đơn hàng sang tiếng Việt */
 export const mapOrderStatus = (status: string): string => {
   const map: Record<string, string> = {
     pending: "Chờ xác nhận",
@@ -88,8 +81,7 @@ export const mapOrderStatus = (status: string): string => {
 }
 
 /**
- * Tạo slug từ chuỗi tiếng Việt (mirror backend slugify logic)
- */
+ * Tạo slug từ chuỗi tiếng Việt (mirror backend slugify logic) */
 export const slugify = (val: string): string => {
   if (!val) return ''
   return String(val)
@@ -105,8 +97,7 @@ export const slugify = (val: string): string => {
 }
 
 /**
- * Format giá VND
- */
+ * Format giá VND */
 export const formatVND = (amount: number): string => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
 }

@@ -35,7 +35,7 @@ export const CONFETTI_SHAPES = Array.from({ length: 24 }).map((_, idx) => ({
   color: (['#ffffff', '#fde047', '#86efac'] as const)[idx % 3]
 }))
 
-// ─── Mappers (pure functions — utils-like) ─────────────────────────────────────
+// Mappers (pure functions — utils-like)
 
 const TYPE_LABEL_MAP: Record<CouponType, string> = {
   money: 'GIẢM TIỀN',
@@ -98,7 +98,7 @@ const mapVoucher = (v: any): MappedCoupon => {
 export const useVouchersPage = () => {
   const { data: vouchersData, isPending: isLoading } = useVoucherListQuery()
 
-  // ── Reactive UI state ──
+  // Reactive UI state
   const activeTab = ref<FilterTabKey>('all')
   const searchText = ref('')
   const sortKey = ref<SortKey>('best')
@@ -107,7 +107,7 @@ export const useVouchersPage = () => {
   const openedNotes = ref(new Set<number>([0]))
   const progressVisible = ref(true)
 
-  // ── Mapped data ──
+  // Mapped data
   const allCoupons = computed<MappedCoupon[]>(() =>
     (vouchersData.value?.data || []).map(mapVoucher)
   )

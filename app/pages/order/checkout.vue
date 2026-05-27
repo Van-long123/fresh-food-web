@@ -31,7 +31,7 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- ── LEFT COLUMN (7/12) ──────────────────────────────── -->
+          <!-- LEFT COLUMN (7/12) -->
           <div class="lg:col-span-7 flex flex-col gap-5">
             <!-- Section 1: Thông tin giao hàng (Addresses) -->
             <div
@@ -327,7 +327,7 @@
             </Card>
           </div>
 
-          <!-- ── RIGHT COLUMN (5/12) ──────────────────────────────── -->
+          <!-- RIGHT COLUMN (5/12) -->
           <div class="lg:col-span-5 flex flex-col gap-5">
             <!-- Section 1: Giỏ hàng -->
             <Card class="shadow-sm border border-gray-100">
@@ -793,7 +793,7 @@ const {
   paymentSteps,
 } = useCheckout({ selectedAddressId: localSelectedAddressId });
 
-// ── Checkout Data from Store ──────────────────────────────────────────────────
+// Checkout Data from Store
 const checkoutData = computed(() => orderStore.checkoutData);
 
 // If no data is passed (e.g., user reloaded page), redirect back to cart

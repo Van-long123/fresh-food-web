@@ -114,7 +114,7 @@ export interface ProductDetailResponse {
   reviews?: ProductReview[]
 }
 
-// ─── Recommendation API (Python microservice → Node.js → Frontend) ────────────
+// Recommendation API (Python microservice → Node.js → Frontend)
 
 export interface ProductRecommendationItem {
   _id: string
@@ -140,7 +140,7 @@ export interface ProductRecommendationResponse {
   recommendations: ProductRecommendationItem[]
 }
 
-// ─── Admin Product Types ─────────────────────────────────────────────────────
+// Admin Product Types
 
 export interface AdminProduct {
   _id: string

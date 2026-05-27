@@ -118,7 +118,7 @@
          LAYOUT CHÍNH — 2 CỘT
          ══════════════════════════════════════════════════ -->
     <div class="main-layout">
-      <!-- ─── SIDEBAR (30%) ──────────────────────────── -->
+      <!-- SIDEBAR (30%) -->
       <aside class="sidebar">
         <div
           class="bg-white border-[1.5px] border-gray-200 rounded-[1.25rem] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden"
@@ -200,7 +200,7 @@
         </div>
       </aside>
 
-      <!-- ─── NỘI DUNG (70%) ─────────────────────────── -->
+      <!-- NỘI DUNG (70%) -->
       <main class="flex flex-col gap-0">
         <!-- §1 Giới thiệu & Định nghĩa -->
         <section
@@ -802,7 +802,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* ── Scroll reveal ────────────────────────────────────── */
+/* Scroll reveal */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
@@ -815,7 +815,7 @@ onUnmounted(() => {
   transform: none;
 }
 
-/* ── HERO BANNER ────────────────────────────────────────── */
+/* HERO BANNER */
 .hero-banner {
   position: relative;
   height: 180px;
@@ -856,7 +856,7 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-/* ── MOBILE NAV ─────────────────────────────────────────── */
+/* MOBILE NAV */
 .mobile-nav {
   display: none;
   align-items: center;
@@ -866,7 +866,7 @@ onUnmounted(() => {
   padding: 0 1.25rem;
 }
 
-/* ── MAIN LAYOUT ────────────────────────────────────────── */
+/* MAIN LAYOUT */
 .main-layout {
   max-width: 1200px;
   margin: 0 auto;
@@ -877,7 +877,7 @@ onUnmounted(() => {
   align-items: start;
 }
 
-/* ── SIDEBAR ─────────────────────────────────────────────── */
+/* SIDEBAR */
 .sidebar {
   position: sticky;
   top: 5.5rem;
@@ -917,7 +917,7 @@ onUnmounted(() => {
   color: #ea580c;
 }
 
-/* ── SUPPORT BUTTON ─────────────────────────────────────── */
+/* SUPPORT BUTTON */
 .btn-support {
   background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;
@@ -938,7 +938,7 @@ onUnmounted(() => {
   box-shadow: 0 6px 18px rgba(249, 115, 22, 0.45);
 }
 
-/* ── TERM SECTION ────────────────────────────────────────── */
+/* TERM SECTION */
 .term-section {
   padding: 2.5rem 0;
   border-bottom: 1px solid #f3f4f6;
@@ -1025,7 +1025,7 @@ onUnmounted(() => {
   margin: 0 !important;
 }
 
-/* ── CTA BUTTONS ─────────────────────────────────────────── */
+/* CTA BUTTONS */
 .btn-agree {
   background: linear-gradient(135deg, #f97316, #ea580c);
   color: white;

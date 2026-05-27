@@ -17,17 +17,17 @@ export const getHomeAggregateRequest = async (
 }
 
 // export const getHomeCategoryProductsRequest = async (
-//   params: HomeSectionProductsQueryParams
+// params: HomeSectionProductsQueryParams
 // ): Promise<HomeCategoryProductsApiResponse> => {
-//   const response = await getAuthorizedAxios().get(API_ENDPOINTS.HOME.CATEGORY_PRODUCTS, { params })
-//   return response.data
+// const response = await getAuthorizedAxios().get(API_ENDPOINTS.HOME.CATEGORY_PRODUCTS, { params })
+// return response.data
 // }
 
 // export const getHomeBlogsRequest = async (
-//   params: HomeBlogsQueryParams
+// params: HomeBlogsQueryParams
 // ): Promise<HomeBlogsApiResponse> => {
-//   const response = await getAuthorizedAxios().get(API_ENDPOINTS.HOME.BLOGS, { params })
-//   return response.data
+// const response = await getAuthorizedAxios().get(API_ENDPOINTS.HOME.BLOGS, { params })
+// return response.data
 // }
 
 export const getCampaignProductsRequest = async (

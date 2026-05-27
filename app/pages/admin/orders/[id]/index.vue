@@ -17,7 +17,7 @@ const toast = useToast();
 
 const orderId = computed(() => route.params.id as string);
 
-// ── Data fetching
+// Data fetching
 const { data: order, isLoading, isError } = useAdminOrderDetailQuery(orderId);
 
 useHead({
@@ -28,26 +28,26 @@ useHead({
   ),
 });
 
-// ── Mutation
+// Mutation
 const { mutate: updateStatus, isPending: isUpdatingStatus } =
   useUpdateAdminOrderStatus();
 
-// ── Local state
+// Local state
 const statusValue = ref<string>("");
 const statusNote = ref<string>("");
 
-// ── Computed: next available statuses
+// Computed: next available statuses
 const nextStatuses = computed(
   () => NEXT_STATUS_MAP[order.value?.status as OrderStatus] ?? [],
 );
 
-// ── Computed: order items
+// Computed: order items
 const orderItems = computed(() => order.value?.items ?? []);
 
-// ── Computed: payment info
+// Computed: payment info
 const payment = computed(() => order.value?.payment ?? null);
 
-// ── Computed: timeline steps
+// Computed: timeline steps
 const STATUS_ORDER: OrderStatus[] = [
   "pending",
   "confirmed",
@@ -128,7 +128,7 @@ const timelineSteps = computed(() => {
   }));
 });
 
-// ── Computed: financial summary
+// Computed: financial summary
 const subtotal = computed(() => {
   if (!order.value) return 0;
   return (
@@ -138,19 +138,19 @@ const subtotal = computed(() => {
   );
 });
 
-// ── Computed: payment method class
+// Computed: payment method class
 const paymentMethodClass = computed(() =>
   payment.value?.paymentMethod === "PayOS"
     ? "bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300"
     : "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300",
 );
 
-// ── Computed: customer avatar initial
+// Computed: customer avatar initial
 const customerInitial = computed(
   () => order.value?.userInfo?.fullname?.charAt(0)?.toUpperCase() ?? "?",
 );
 
-// ── Actions
+// Actions
 const submitStatus = () => {
   if (!order.value || !statusValue.value) return;
 

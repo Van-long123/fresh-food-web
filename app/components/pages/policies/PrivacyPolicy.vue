@@ -112,7 +112,7 @@
          MAIN 2-COLUMN LAYOUT
     ══════════════════════════════════════════════════════ -->
     <div class="max-w-[1200px] mx-auto px-6 csb-main-layout reveal">
-      <!-- ── SIDEBAR ── -->
+      <!-- SIDEBAR -->
       <aside class="w-[260px] shrink-0">
         <div class="csb-sidebar-sticky">
           <!-- Table of contents -->
@@ -163,7 +163,7 @@
         </div>
       </aside>
 
-      <!-- ── MAIN CONTENT ── -->
+      <!-- MAIN CONTENT -->
       <article class="flex-1 min-w-0">
         <!-- SECTION 1: Thông tin thu thập -->
         <section
@@ -468,7 +468,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { ROUTES } from "~/constants/routes";
 
-// ─── Reactive state ─────────────────────────────
+// Reactive state
 const activeSection = ref("info-collection");
 const readingProgress = ref(0);
 const formSubmitted = ref(false);
@@ -481,7 +481,7 @@ const contactForm = ref({
   message: "",
 });
 
-// ─── Mock data ──────────────────────────────────
+// Mock data
 const trustBadges = [
   // { icon: "🔒", text: "SSL 256-bit" },
   { icon: "🛡️", text: "Không bán dữ liệu" },
@@ -696,7 +696,7 @@ const contactOptions = [
   { label: "Câu hỏi về chính sách", value: "policy_question" },
 ];
 
-// ─── Methods ────────────────────────────────────
+// Methods
 const scrollToSection = (id: string) => {
   const el = document.getElementById(id);
   if (!el) return;
@@ -717,7 +717,7 @@ const handleContactSubmit = async () => {
   }, 5000);
 };
 
-// ─── Scroll spy + reading progress ──────────────
+// Scroll spy + reading progress
 let observer: IntersectionObserver | null = null;
 
 const updateProgress = () => {
@@ -765,7 +765,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* ── Scroll reveal ────────────────────────────────────── */
+/* Scroll reveal */
 .reveal {
   opacity: 0;
   transform: translateY(28px);
@@ -778,7 +778,7 @@ onUnmounted(() => {
   transform: none;
 }
 
-/* ── HERO ─────────────────────────────────────────────── */
+/* HERO */
 .csb-hero {
   position: relative;
   background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
@@ -812,7 +812,7 @@ onUnmounted(() => {
   }
 }
 
-/* ── SIDEBAR ──────────────────────────────────────────── */
+/* SIDEBAR */
 .csb-main-layout {
   display: flex;
   gap: 32px;
@@ -865,7 +865,7 @@ onUnmounted(() => {
   color: #16a34a;
 }
 
-/* ── SECTIONS ─────────────────────────────────────────── */
+/* SECTIONS */
 .csb-section {
   padding: 48px 0;
   border-bottom: 1px solid #f3f4f6;
@@ -874,7 +874,7 @@ onUnmounted(() => {
   border-bottom: none;
 }
 
-/* ── INFO CARDS ───────────────────────────────────────── */
+/* INFO CARDS */
 .csb-info-card {
   border: 1.5px solid #e5e7eb;
   border-radius: 16px;
@@ -896,7 +896,7 @@ onUnmounted(() => {
   border-top: 3px solid #f97316;
 }
 
-/* ── SHARE CARD ─────────────────────────────────────────── */
+/* SHARE CARD */
 .csb-share-card {
   padding: 20px;
   background: white;
@@ -911,7 +911,7 @@ onUnmounted(() => {
   border-color: #bbf7d0;
 }
 
-/* ── RIGHTS CARD ────────────────────────────────────────── */
+/* RIGHTS CARD */
 .csb-right-card {
   display: flex;
   flex-direction: column;
@@ -931,7 +931,7 @@ onUnmounted(() => {
   transform: translateY(-2px);
 }
 
-/* ── LEGAL BADGES ─────────────────────────────────────── */
+/* LEGAL BADGES */
 .csb-legal--contract {
   background: #dcfce7;
   color: #166534;

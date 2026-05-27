@@ -120,30 +120,30 @@ const {
 
 /* Category badges for the scroll strip */
 // const relatedCategories = [
-//   {
-//     name: "Trái cây Việt Nam",
-//     icon: "https://images.unsplash.com/photo-1609780447631-05b93e5a88ea?auto=format&fit=crop&w=160&q=80",
-//   },
-//   {
-//     name: "Trái cây nhập khẩu",
-//     icon: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=160&q=80",
-//   },
-//   {
-//     name: "Trái cây cắt sẵn",
-//     icon: "https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?auto=format&fit=crop&w=160&q=80",
-//   },
-//   {
-//     name: "Đào, mận, hồng, ổi",
-//     icon: "https://images.unsplash.com/photo-1595124231685-c255698ddce5?auto=format&fit=crop&w=160&q=80",
-//   },
-//   {
-//     name: "Đào, mận, hồng",
-//     icon: "https://images.unsplash.com/photo-1563252722-97e42f3dbe0e?auto=format&fit=crop&w=160&q=80",
-//   },
-//   {
-//     name: "Trái cây nhiệt đới",
-//     icon: "https://images.unsplash.com/photo-1490885578174-acda8905c2c6?auto=format&fit=crop&w=160&q=80",
-//   },
+// {
+// name: "Trái cây Việt Nam",
+// icon: "https://images.unsplash.com/photo-1609780447631-05b93e5a88ea?auto=format&fit=crop&w=160&q=80",
+// },
+// {
+// name: "Trái cây nhập khẩu",
+// icon: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=160&q=80",
+// },
+// {
+// name: "Trái cây cắt sẵn",
+// icon: "https://images.unsplash.com/photo-1478145046317-39f10e56b5e9?auto=format&fit=crop&w=160&q=80",
+// },
+// {
+// name: "Đào, mận, hồng, ổi",
+// icon: "https://images.unsplash.com/photo-1595124231685-c255698ddce5?auto=format&fit=crop&w=160&q=80",
+// },
+// {
+// name: "Đào, mận, hồng",
+// icon: "https://images.unsplash.com/photo-1563252722-97e42f3dbe0e?auto=format&fit=crop&w=160&q=80",
+// },
+// {
+// name: "Trái cây nhiệt đới",
+// icon: "https://images.unsplash.com/photo-1490885578174-acda8905c2c6?auto=format&fit=crop&w=160&q=80",
+// },
 // ];
 </script>
 

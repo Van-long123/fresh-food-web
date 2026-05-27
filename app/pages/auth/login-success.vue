@@ -175,7 +175,7 @@ const handleRetry = async () => {
   await router.replace(ROUTES.AUTH.LOGIN);
 };
 
-// ── Lifecycle — gọi function từ composable tại đây (đúng theo rule) ──
+// Lifecycle — gọi function từ composable tại đây (đúng theo rule)
 onMounted(async () => {
   const userId = (route.query.userId as string) || null;
 

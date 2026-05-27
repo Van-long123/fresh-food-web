@@ -45,7 +45,7 @@ const editorInit = computed(() => ({
           // Đây là chức năng của Axios. Trong lúc đang đẩy file lên mạng, nó sẽ liên tục gọi hàm onUploadProgress
           onUploadProgress: (event) => {
             if (!event.total) return;
-            //  vẽ thanh loading báo cho người dùng biết.
+            // vẽ thanh loading báo cho người dùng biết.
             progress(Math.round((event.loaded / event.total) * 100));
           },
         })
@@ -60,7 +60,7 @@ const editorInit = computed(() => ({
           resolve(location);
         })
         .catch((error) => {
-          //  TinyMCE sẽ hủy thao tác chèn ảnh và báo lỗi trên giao diện.
+          // TinyMCE sẽ hủy thao tác chèn ảnh và báo lỗi trên giao diện.
           reject(error);
         });
     }),

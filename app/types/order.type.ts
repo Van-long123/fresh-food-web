@@ -1,4 +1,4 @@
-//  CLIENT-SIDE TYPES
+// CLIENT-SIDE TYPES
 export interface OrderProduct {
   id: string | number
   title: string
@@ -97,8 +97,8 @@ export interface MyOrder {
   }>
 }
 
-//  ADMIN-SIDE TYPES
-// ── Order Statuses 
+// ADMIN-SIDE TYPES
+// Order Statuses 
 export type OrderStatus =
   | 'pending'
   | 'confirmed'
@@ -108,16 +108,15 @@ export type OrderStatus =
   | 'cancelled'
   | 'returned'
 
-// ── Payment Statuses 
+// Payment Statuses 
 export type PaymentStatus = 'pending' | 'completed' | 'cancelled'
 
-// ── Payment Methods ──
+// Payment Methods
 export type PaymentMethod = 'COD' | 'PayOS'
 
 /**
  * Luồng chuyển trạng thái hợp lệ (dùng trong cả list inline-edit & detail page).
- * Key → mảng các bước tiếp theo có thể chọn (label + value).
- */
+ * Key → mảng các bước tiếp theo có thể chọn (label + value). */
 export const NEXT_STATUS_MAP: Record<OrderStatus, Array<{ value: OrderStatus; label: string }>> = {
   pending: [
     { value: 'confirmed', label: '✅ Xác nhận đơn' },
@@ -138,8 +137,7 @@ export const NEXT_STATUS_MAP: Record<OrderStatus, Array<{ value: OrderStatus; la
 }
 
 /**
- * Dạng rút gọn: chỉ giá trị string — dùng cho filter trong danh sách (inline-edit select).
- */
+ * Dạng rút gọn: chỉ giá trị string — dùng cho filter trong danh sách (inline-edit select). */
 export const NEXT_STATUS_VALUES: Record<OrderStatus, OrderStatus[]> = {
   pending: ['confirmed', 'cancelled'],
   confirmed: ['processing', 'cancelled'],
@@ -161,7 +159,7 @@ export const ORDER_STATUSES: Array<{ value: OrderStatus; label: string }> = [
   { value: 'returned', label: 'Đã trả hàng' },
 ]
 
-// ── Data Shapes 
+// Data Shapes 
 
 /** Item trong đơn hàng — dùng trong admin order detail */
 export interface OrderItem {
@@ -211,7 +209,7 @@ export interface AdminOrder {
   items?: OrderItem[]
 }
 
-// ── Query Params 
+// Query Params 
 
 export interface AdminOrderQueryParams {
   page?: number
@@ -232,7 +230,7 @@ export interface AdminPaymentQueryParams {
   sortOrder?: 'asc' | 'desc'
 }
 
-// ── API Responses 
+// API Responses 
 
 export interface PaginationMeta {
   page: number

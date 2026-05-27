@@ -8,8 +8,7 @@ export const dashboardKeys = {
 
 /**
  * Query hook lấy toàn bộ dữ liệu Dashboard Overview trong một request.
- * KHÔNG sử dụng lifecycle hooks ở đây — chỉ dùng ở file .vue.
- */
+ * KHÔNG sử dụng lifecycle hooks ở đây — chỉ dùng ở file .vue. */
 export const useDashboardOverviewQuery = () => {
   return useQuery({
     queryKey: dashboardKeys.overview(),

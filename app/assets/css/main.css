@@ -30,7 +30,7 @@ body {
     @apply cursor-pointer;
   }
 }
-/* ── Toast reset ── */
+/* Toast reset */
 .p-toast {
   z-index: 9999 !important;
   backdrop-filter: none !important;
@@ -55,7 +55,7 @@ body {
   display: none !important;
 }
 
-/* ── Toast card ── */
+/* Toast card */
 .toast-card {
   position: relative;
   display: flex;
@@ -85,7 +85,7 @@ body {
   }
 }
 
-/* ── Accent bar (left) ── */
+/* Accent bar (left) */
 .toast-accent {
   position: absolute;
   left: 0;
@@ -95,7 +95,7 @@ body {
   border-radius: 0 3px 3px 0;
 }
 
-/* ── Icon ── */
+/* Icon */
 .toast-icon {
   display: flex;
   align-items: center;
@@ -107,7 +107,7 @@ body {
   margin-top: 1px;
 }
 
-/* ── Content ── */
+/* Content */
 .toast-body {
   flex: 1;
   min-width: 0;
@@ -128,7 +128,7 @@ body {
   line-height: 1.5;
 }
 
-/* ── Close button ── */
+/* Close button */
 .toast-close {
   display: flex;
   align-items: center;
@@ -149,7 +149,7 @@ body {
   color: #475569;
 }
 
-/* ── Progress bar ── */
+/* Progress bar */
 .toast-progress {
   position: absolute;
   bottom: 0;
@@ -165,7 +165,7 @@ body {
   to   { width: 0%; }
 }
 
-/* ── Severity themes ── */
+/* Severity themes */
 .toast-card[data-severity="success"] .toast-accent  { background: #10b981; }
 .toast-card[data-severity="success"] .toast-icon    { background: #ecfdf5; color: #10b981; }
 .toast-card[data-severity="success"] .toast-progress { background: #10b981; }

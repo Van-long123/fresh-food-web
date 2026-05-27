@@ -154,7 +154,7 @@ onMounted(() => {
   const handleAfterPrint = () => {
     // Optional: automatically go back after printing
     // setTimeout(() => {
-    //   router.back();
+    // router.back();
     // }, 1000);
   };
 

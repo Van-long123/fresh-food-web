@@ -27,7 +27,7 @@ useHead({ title: "Danh sách thanh toán - Quản trị SmartFood" });
 const router = useRouter();
 const toast = useToast();
 
-// ── Filter state
+// Filter state
 const searchQuery = ref("");
 const statusFilter = ref<AdminPaymentQueryParams["status"] | "all">("all");
 const methodFilter = ref<AdminPaymentQueryParams["paymentMethod"] | "all">(
@@ -37,11 +37,11 @@ const page = ref(1);
 const perPage = ref(10);
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 
-// ── COD confirm dialog
+// COD confirm dialog
 const codTarget = ref<AdminPayment | null>(null);
 const showCodDialog = ref(false);
 
-// ── Query params (reactive)
+// Query params (reactive)
 const queryParams = computed<AdminPaymentQueryParams>(() => ({
   page: page.value,
   perPage: perPage.value,
@@ -71,7 +71,7 @@ const tablePayments = computed<Record<string, unknown>[]>(
 );
 const total = computed(() => paymentsData.value?.pagination?.total ?? 0);
 
-// ── Stats
+// Stats
 const stats = computed(() => ({
   pending: statsData.value?.pending ?? 0,
   completed: statsData.value?.completed ?? 0,
@@ -84,11 +84,11 @@ watch([searchQuery, statusFilter, methodFilter], () => {
   page.value = 1;
 });
 
-// ── Mutations
+// Mutations
 const { mutate: confirmCod, isPending: isCodLoading } =
   useConfirmAdminCodPayment();
 
-// ── Table columns
+// Table columns
 const columns = [
   { key: "_id", label: "Mã thanh toán", sortable: true },
   { key: "orderId", label: "Mã đơn hàng" },
@@ -101,7 +101,7 @@ const columns = [
   { key: "actions", label: "Thao tác" },
 ];
 
-// ── Computed helpers
+// Computed helpers
 const getOrderCode = (row: AdminPayment): string => {
   const order = row.order;
   if (!order) return "N/A";
@@ -126,14 +126,14 @@ const getMethodClass = (method: string): string =>
     ? "bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300"
     : "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300";
 
-// ── Sort
+// Sort
 const handleSortChange = (
   sort: { key: string; direction: "asc" | "desc" } | null,
 ) => {
   sortState.value = sort;
 };
 
-// ── COD confirm
+// COD confirm
 const openCodConfirm = (payment: AdminPayment) => {
   codTarget.value = payment;
   showCodDialog.value = true;

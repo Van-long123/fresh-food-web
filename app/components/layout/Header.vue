@@ -633,7 +633,7 @@ const showCartPanel = ref(false);
 const visibleNotice = ref(false);
 const cartPanelRef = ref(null);
 
-// ── Client Settings (từ store — không gọi lại API) ───────────────
+// Client Settings (từ store — không gọi lại API)
 const logoSrc = computed(() => {
   const logo = settingsStore.logo;
   return logo && logo.trim() !== ''
@@ -703,27 +703,27 @@ const handleSearch = () => {
 };
 
 // const handleHeaderCheckout = async () => {
-//   if (cartItems.value.length === 0) return;
+// if (cartItems.value.length === 0) return;
 
-//   const checkoutPayload = {
-//     products: cartItems.value.map((item) => ({
-//       id: item.id,
-//       title: item.name,
-//       thumbnail: item.image || "",
-//       quantity: item.quantity,
-//       priceNew: item.price,
-//       totalPrice: item.price * item.quantity,
-//       categoryId: item.categoryId || null,
-//     })),
-//     voucherCode: undefined,
-//     discountVoucher: 0,
-//     shippingFee: 0,
-//     subtotal: totalAmount.value,
-//     grandTotal: totalAmount.value,
-//   };
+// const checkoutPayload = {
+// products: cartItems.value.map((item) => ({
+// id: item.id,
+// title: item.name,
+// thumbnail: item.image || "",
+// quantity: item.quantity,
+// priceNew: item.price,
+// totalPrice: item.price * item.quantity,
+// categoryId: item.categoryId || null,
+// })),
+// voucherCode: undefined,
+// discountVoucher: 0,
+// shippingFee: 0,
+// subtotal: totalAmount.value,
+// grandTotal: totalAmount.value,
+// };
 
-//   await proceedToCheckout(cartItems.value, checkoutPayload);
-//   showCartPanel.value = false;
+// await proceedToCheckout(cartItems.value, checkoutPayload);
+// showCartPanel.value = false;
 // };
 
 const handleClickOutside = (event) => {

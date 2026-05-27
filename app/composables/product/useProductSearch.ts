@@ -66,8 +66,8 @@ export const useProductSearch = () => {
   const pagination = computed(() => formattedData.value.pagination)
 
   // const toggleCategory = (name: string) => {
-  //   selectedCategory.value = selectedCategory.value === name ? '' : name
-  //   currentPage.value = 1
+  // selectedCategory.value = selectedCategory.value === name ? '' : name
+  // currentPage.value = 1
   // }
 
   const scrollToTop = () => {

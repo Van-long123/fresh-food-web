@@ -124,12 +124,12 @@ const slides = ref([
     description: "Táo, Nho, Cherry nhập khẩu trực tiếp, đảm bảo độ tươi ngon.",
   },
   // {
-  //   image: banner1,
-  //   description:
-  //     "Voucher giảm sâu kết hợp combo giá tốt - Mua sắm thả ga cuối tuần!",
+  // image: banner1,
+  // description:
+  // "Voucher giảm sâu kết hợp combo giá tốt - Mua sắm thả ga cuối tuần!",
   // },
   // {
-  //   image: banner2,
+  // image: banner2,
   // },
 ]);
 

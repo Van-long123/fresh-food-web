@@ -57,6 +57,7 @@ export const useCartStore = defineStore('cart', () => {
     key: 'smartfood-cart',
     pick: ['cartItems', 'savedAt'],
     // Chạy trước khi load data từ localStorage vào store
+    // @ts-expect-error - pinia-plugin-persistedstate types might not include beforeRestore
     beforeRestore: () => {
       if (typeof window === 'undefined') return true
       const authData = localStorage.getItem('smartfood-auth')
@@ -72,9 +73,9 @@ export const useCartStore = defineStore('cart', () => {
     },
     // override cách Pinia lưu data
     storage: {
-      getItem: (key) => (typeof window !== 'undefined' ? localStorage.getItem(key) : null),
-      removeItem: (key) => (typeof window !== 'undefined' ? localStorage.removeItem(key) : undefined),
-      setItem: (key, value) => {
+      getItem: (key: string) => (typeof window !== 'undefined' ? localStorage.getItem(key) : null),
+      removeItem: (key: string) => (typeof window !== 'undefined' ? localStorage.removeItem(key) : undefined),
+      setItem: (key: string, value: string) => {
         if (typeof window === 'undefined') return
         const authData = localStorage.getItem('smartfood-auth')
         let isGuest = true
@@ -83,7 +84,7 @@ export const useCartStore = defineStore('cart', () => {
             const parsed = JSON.parse(authData)
             if (parsed.user) isGuest = false
           } catch (e) {
-            //
+            // ignore error
           }
         }
 

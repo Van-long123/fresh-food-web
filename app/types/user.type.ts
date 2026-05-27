@@ -83,7 +83,7 @@ export interface ChangePasswordPayload {
 
 export type ForgotPasswordPageState = 'input' | 'success' | 'error'
 
-// ─── Admin User Types ─────────────────────────────────────────────────────
+// Admin User Types
 export type AdminUserRole = 'admin' | 'client'
 
 export interface AdminUser {

@@ -7,8 +7,7 @@ const adminCategoryKeys = {
 
 /**
  * Lấy danh sách categories cho dropdown/multiselect trong form product.
- * Chỉ lấy categories type=product và status=active.
- */
+ * Chỉ lấy categories type=product và status=active. */
 export const useAdminCategoriesQuery = () => {
   return useQuery({
     queryKey: adminCategoryKeys.all,

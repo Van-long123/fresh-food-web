@@ -392,7 +392,7 @@ import fallbackLogo from "@/assets/images/logo.png";
 
 const settingsStore = useSettingsStore();
 
-// ── Settings (từ store — không gọi lại API) ──────────────────────
+// Settings (từ store — không gọi lại API)
 const logoSrc = computed(() => {
   const logo = settingsStore.logo;
   return logo && logo.trim() !== ""

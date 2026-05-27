@@ -37,8 +37,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   /**
    * Lấy settings từ API. Chỉ gọi một lần (nếu chưa load).
-   * Có thể gọi force=true để refresh.
-   */
+   * Có thể gọi force=true để refresh. */
   async function fetchSettings(force = false) {
     if (isLoaded.value && !force) return
     if (isLoading.value) return

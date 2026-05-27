@@ -31,7 +31,7 @@ useHead({
 const router = useRouter();
 const toast = useToast();
 
-// ─── State ────────────────────────────────────────────────────────────────────
+// State
 const searchQuery = ref("");
 const statusFilter = ref<string>("all");
 const page = ref(1);
@@ -47,7 +47,7 @@ const deleteTarget = ref<AdminProduct | null>(null);
 const showDeleteDialog = ref(false);
 const isBulkDeleting = ref(false);
 
-// ─── Query Params (reactive) ──────────────────────────────────────────────────
+// Query Params (reactive)
 const queryParams = computed<AdminProductQueryParams>(() => {
   const params: AdminProductQueryParams = {
     page: page.value,
@@ -62,7 +62,7 @@ const queryParams = computed<AdminProductQueryParams>(() => {
   return params;
 });
 
-// ─── TanStack Query ───────────────────────────────────────────────────────────
+// TanStack Query
 const { data, isLoading, isFetching } = useAdminProductsQuery(queryParams);
 const { mutate: deleteProduct, isPending: isDeleting } =
   useDeleteAdminProduct();
@@ -71,7 +71,7 @@ const { mutate: bulkDeleteProducts, isPending: isBulkDeletingPending } =
 const { mutate: updateProduct } = useUpdateAdminProduct();
 const { mutate: bulkUpdateProductsStatus } = useBulkUpdateAdminProductStatus();
 
-// ─── Computed ─────────────────────────────────────────────────────────────────
+// Computed
 const products = computed(() => data.value?.data ?? []);
 const total = computed(() => data.value?.pagination?.total ?? 0);
 
@@ -88,7 +88,7 @@ const columns = [
   { key: "actions", label: "Thao tác" },
 ];
 
-// ─── Handlers ─────────────────────────────────────────────────────────────────
+// Handlers
 // Reset page về 1 khi search/filter thay đổi
 watch([searchQuery, statusFilter], () => {
   page.value = 1;

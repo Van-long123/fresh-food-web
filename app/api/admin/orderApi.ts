@@ -10,7 +10,7 @@ import type {
   AdminPaymentStats,
 } from '~/types/order.type'
 
-// ── Orders ────────────────────────────────────────────────────
+// Orders 
 
 export const getAdminOrdersRequest = async (
   params?: AdminOrderQueryParams,
@@ -41,7 +41,7 @@ export const bulkUpdateAdminOrderStatusRequest = async (
   return response.data?.data || response.data
 }
 
-// ── Payments ──────────────────────────────────────────────────
+// Payments
 
 export const getAdminPaymentsRequest = async (
   params?: AdminPaymentQueryParams,

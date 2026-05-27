@@ -3,8 +3,7 @@ import * as XLSX from 'xlsx'
 /**
  * Xuất dữ liệu ra file Excel với nhiều sheet
  * sheetsData Object chứa data cho từng sheet: { [sheetName]: any[] }
- * fileName Tên file xuất ra (chưa kèm .xlsx)
- */
+ * fileName Tên file xuất ra (chưa kèm .xlsx) */
 export const exportToExcel = (
   sheetsData: Record<string, any[]>,
   fileName: string = 'export_data'
