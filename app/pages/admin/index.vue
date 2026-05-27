@@ -1,7 +1,24 @@
 <script setup lang="ts">
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useToast } from "primevue/usetoast";
 import Chart from "primevue/chart";
 import Tag from "primevue/tag";
+import Skeleton from "primevue/skeleton";
 import DataTable from "~/components/admin/DataTable.vue";
+import { useDashboardOverviewQuery } from "~/queries/dashboard/useDashboardOverviewQuery";
+import {
+  mapOrdersChartData,
+  mapRevenueChartData,
+  mapTopProductChartData,
+  formatRevenue,
+  formatStatRevenue,
+  formatStatNumber,
+} from "~/utils/dashboardMappers";
+import { mapOrderStatus } from "~/utils/formatters";
+import { ROUTES } from "~/constants/routes";
+import { adminDashboardService } from "~/services/admin/dashboard.service";
+import { exportToExcel } from "~/utils/excelExport";
 
 definePageMeta({
   layout: "admin",
@@ -12,205 +29,200 @@ useHead({
   title: "Tổng quan - Quản trị SmartFood",
 });
 
-const stats = [
-  {
-    title: "Tổng sản phẩm",
-    value: "1.248",
-    trend: 4.2,
-    trendLabel: "so với tháng trước",
-    icon: "pi pi-box",
-  },
-  {
-    title: "Tổng đơn hàng",
-    value: "2.483",
-    trend: 12.4,
-    trendLabel: "so với tháng trước",
-    icon: "pi pi-shopping-bag",
-  },
-  {
-    title: "Tổng doanh thu",
-    value: "2.130.000.000đ",
-    trend: 8.2,
-    trendLabel: "so với tháng trước",
-    icon: "pi pi-wallet",
-  },
-  {
-    title: "Tổng khách hàng",
-    value: "892",
-    trend: 6.1,
-    trendLabel: "so với tháng trước",
-    icon: "pi pi-users",
-  },
+// ── Query ─────────────────────────────────────────────────────
+const { data: overview, isLoading } = useDashboardOverviewQuery();
+
+// ── Router & Toast
+const router = useRouter();
+const toast = useToast();
+
+const isExporting = ref(false);
+const handleExport = async () => {
+  if (isExporting.value) return;
+  isExporting.value = true;
+  toast.add({
+    severity: "info",
+    summary: "Đang xuất báo cáo",
+    detail: "Vui lòng chờ trong giây lát...",
+    life: 3000,
+  });
+
+  try {
+    const data = await adminDashboardService.exportData();
+    // Map backend data to correct sheet names
+    const sheets = {
+      "Doanh Thu": data.revenueSheet,
+      "Đơn Hàng": data.ordersSheet,
+      "Sản Phẩm": data.productsSheet,
+      "Hoàn Tiền": data.refundsSheet,
+    };
+
+    exportToExcel(
+      sheets,
+      `SmartFood_Dashboard_${new Date().toISOString().slice(0, 10)}`,
+    );
+
+    toast.add({
+      severity: "success",
+      summary: "Thành công",
+      detail: "Đã xuất báo cáo Excel.",
+      life: 3000,
+    });
+  } catch (error) {
+    toast.add({
+      severity: "error",
+      summary: "Lỗi",
+      detail: "Không thể xuất báo cáo. Vui lòng thử lại.",
+      life: 3000,
+    });
+    console.error("Export error:", error);
+  } finally {
+    isExporting.value = false;
+  }
+};
+
+// ── Constants
+const TOP_PRODUCT_CHART_COLORS = [
+  "#1d4ed8",
+  "#2563eb",
+  "#3b82f6",
+  "#60a5fa",
+  "#93c5fd",
+  "#a5f3fc",
+  "#c7d2fe",
 ];
 
-const recentOrders = [
-  {
-    id: "#ORD-1042",
-    customer: "Nguyễn Văn An",
-    total: "3.200.000đ",
-    status: "confirmed",
-    date: "06/05/2026",
-  },
-  {
-    id: "#ORD-1041",
-    customer: "Trần Minh Thu",
-    total: "1.600.000đ",
-    status: "preparing",
-    date: "06/05/2026",
-  },
-  {
-    id: "#ORD-1040",
-    customer: "Lê Quang Huy",
-    total: "5.300.000đ",
-    status: "shipping",
-    date: "05/05/2026",
-  },
-  {
-    id: "#ORD-1039",
-    customer: "Phạm Anh Đào",
-    total: "1.100.000đ",
-    status: "delivered",
-    date: "05/05/2026",
-  },
-  {
-    id: "#ORD-1038",
-    customer: "Võ Minh Khoa",
-    total: "2.400.000đ",
-    status: "pending",
-    date: "04/05/2026",
-  },
-];
-
-const topProducts = [
-  {
-    id: 1,
-    product: "Tô cá hồi hữu cơ",
-    category: "Suất ăn",
-    sold: 312,
-    revenue: "156.200.000đ",
-    stock: 64,
-    image: "https://flowbite.com/docs/images/products/apple-watch.png",
-  },
-  {
-    id: 2,
-    product: "Salad bơ tươi",
-    category: "Đồ ăn lành mạnh",
-    sold: 285,
-    revenue: "123.000.000đ",
-    stock: 42,
-    image: "https://flowbite.com/docs/images/products/apple-watch.png",
-  },
-  {
-    id: 3,
-    product: "Bít tết bò cao cấp",
-    category: "Suất ăn sẵn",
-    sold: 244,
-    revenue: "177.600.000đ",
-    stock: 28,
-    image: "https://flowbite.com/docs/images/products/apple-watch.png",
-  },
-  {
-    id: 4,
-    product: "Set bento thuần chay",
-    category: "Suất ăn",
-    sold: 198,
-    revenue: "93.500.000đ",
-    stock: 91,
-    image: "https://flowbite.com/docs/images/products/apple-watch.png",
-  },
-  {
-    id: 5,
-    product: "Hộp granola lành mạnh",
-    category: "Ăn vặt",
-    sold: 176,
-    revenue: "72.250.000đ",
-    stock: 120,
-    image: "https://flowbite.com/docs/images/products/apple-watch.png",
-  },
-];
+const statusSeverity: Record<string, string> = {
+  pending: "warning",
+  confirmed: "info",
+  processing: "warn",
+  shipping: "help",
+  delivered: "success",
+  cancelled: "danger",
+  returned: "secondary",
+};
 
 const orderColumns = [
-  { key: "id", label: "Mã đơn" },
-  { key: "customer", label: "Khách hàng" },
-  { key: "total", label: "Tổng tiền" },
+  { key: "orderCode", label: "Mã đơn" },
+  { key: "customerName", label: "Khách hàng" },
+  { key: "totalPrice", label: "Tổng tiền" },
   { key: "status", label: "Trạng thái" },
-  { key: "date", label: "Ngày" },
+  { key: "createdAt", label: "Ngày" },
   { key: "actions", label: "Thao tác" },
 ];
 
 const productColumns = [
   { key: "product", label: "Sản phẩm" },
   { key: "category", label: "Danh mục" },
-  { key: "sold", label: "Đã bán" },
+  { key: "soldCount", label: "Đã bán" },
   { key: "revenue", label: "Doanh thu" },
   { key: "stock", label: "Tồn kho" },
 ];
 
-const statusSeverity: Record<string, string> = {
-  pending: "warning",
-  confirmed: "info",
-  preparing: "warn",
-  shipping: "help",
-  delivered: "success",
-};
-
-const revenueChartData = {
-  labels: [
-    "Tháng 1",
-    "Tháng 2",
-    "Tháng 3",
-    "Tháng 4",
-    "Tháng 5",
-    "Tháng 6",
-    "Tháng 7",
-    "Tháng 8",
-    "Tháng 9",
-    "Tháng 10",
-    "Tháng 11",
-    "Tháng 12",
-  ],
-  datasets: [
+// ── Computed: Stats cards ─────────────────────────────────────
+const statsCards = computed(() => {
+  const s = overview.value?.stats;
+  if (!s) return [];
+  return [
     {
-      label: "Doanh thu",
-      data: [12, 18, 22, 19, 25, 32, 35, 30, 28, 36, 40, 45],
-      borderColor: "#2563eb",
-      backgroundColor: "rgba(37, 99, 235, 0.12)",
-      tension: 0.35,
-      fill: true,
+      title: "Tổng sản phẩm",
+      value: formatStatNumber(s.totalProducts),
+      trend: s.growth.products,
+      trendLabel: "so với tháng trước",
+      icon: "pi pi-box",
     },
-  ],
-};
-
-const ordersChartData = {
-  labels: ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"],
-  datasets: [
     {
-      label: "Đơn hàng",
-      data: [120, 190, 170, 220, 260, 210, 240],
-      backgroundColor: "rgba(16, 185, 129, 0.6)",
-      borderRadius: 12,
+      title: "Tổng đơn hàng",
+      value: formatStatNumber(s.totalOrders),
+      trend: s.growth.orders,
+      trendLabel: "so với tháng trước",
+      icon: "pi pi-shopping-bag",
     },
-  ],
-};
-
-const topProductChartColors = [
-  "#1d4ed8",
-  "#2563eb",
-  "#3b82f6",
-  "#60a5fa",
-  "#93c5fd",
-];
-
-const topProductChartData = {
-  labels: topProducts.map((item) => item.product),
-  datasets: [
     {
-      data: topProducts.map((item) => item.sold),
-      backgroundColor: topProductChartColors,
+      title: "Tổng doanh thu",
+      value: formatStatRevenue(s.totalRevenue),
+      trend: s.growth.revenue,
+      trendLabel: "so với tháng trước",
+      icon: "pi pi-wallet",
     },
-  ],
-};
+    {
+      title: "Tổng khách hàng",
+      value: formatStatNumber(s.totalCustomers),
+      trend: s.growth.customers,
+      trendLabel: "so với tháng trước",
+      icon: "pi pi-users",
+    },
+  ];
+});
 
+// ── Computed: Revenue Chart
+const revenueChartData = computed(() => {
+  const raw = overview.value?.revenueChart ?? Array(12).fill(0);
+  const { labels, data } = mapRevenueChartData(raw);
+  return {
+    labels,
+    datasets: [
+      {
+        label: "Doanh thu (triệu đ)",
+        data,
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37, 99, 235, 0.12)",
+        tension: 0.35,
+        fill: true,
+      },
+    ],
+  };
+});
+
+// ── Computed: Orders Chart
+const ordersChartData = computed(() => {
+  const raw = overview.value?.ordersChart ?? [];
+  const { labels, data } = mapOrdersChartData(raw);
+  return {
+    labels,
+    datasets: [
+      {
+        label: "Đơn hàng",
+        data,
+        backgroundColor: "rgba(16, 185, 129, 0.6)",
+        borderRadius: 12,
+      },
+    ],
+  };
+});
+
+// ── Computed: Top Products Chart ──────────────────────────────
+const topProductChartData = computed(() => {
+  const products = overview.value?.topProducts ?? [];
+  return mapTopProductChartData(products, TOP_PRODUCT_CHART_COLORS);
+});
+
+// ── Computed: Tables ──────────────────────────────────────────
+const recentOrders = computed(() => overview.value?.recentOrders ?? []);
+const topProducts = computed(() => overview.value?.topProducts ?? []);
+
+// ── Computed: Formatted recent orders for DataTable ───────────
+const recentOrdersForTable = computed(() =>
+  recentOrders.value.map((o) => ({
+    ...o,
+    formattedTotal: `${(o.totalPrice || 0).toLocaleString("vi-VN")}đ`,
+    formattedDate: new Date(o.createdAt).toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }),
+  })),
+);
+
+// ── Computed: Formatted top products for DataTable ────────────
+const topProductsForTable = computed(() =>
+  topProducts.value.map((p) => ({
+    ...p,
+    formattedRevenue: formatRevenue(p.revenue),
+  })),
+);
+
+// ── Chart Options ─────────────────────────────────────────────
 const baseChartOptions = {
   maintainAspectRatio: false,
   plugins: {
@@ -228,9 +240,7 @@ const baseChartOptions = {
 const topProductChartOptions = {
   maintainAspectRatio: false,
   plugins: {
-    legend: {
-      display: false,
-    },
+    legend: { display: false },
   },
   cutout: "55%",
 };
@@ -238,6 +248,7 @@ const topProductChartOptions = {
 
 <template>
   <div class="px-4 pt-6 space-y-6">
+    <!-- Header -->
     <section
       class="rounded-2xl border border-slate-200/70 bg-white/90 p-6 shadow-sm shadow-slate-200/40 backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/80"
     >
@@ -261,29 +272,52 @@ const topProductChartOptions = {
         </div>
         <div class="flex items-center gap-3">
           <button
-            class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
+            class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="isExporting"
+            @click="handleExport"
           >
-            Xuất báo cáo
+            <i
+              class="pi mr-1.5 text-xs"
+              :class="isExporting ? 'pi-spinner pi-spin' : 'pi-download'"
+            ></i>
+            {{ isExporting ? "Đang xuất..." : "Xuất báo cáo" }}
           </button>
         </div>
       </div>
     </section>
 
+    <!-- Stats Cards -->
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <StatCard
-        v-for="stat in stats"
-        :key="stat.title"
-        :title="stat.title"
-        :value="stat.value"
-        :trend="stat.trend"
-        :trend-label="stat.trendLabel"
-      >
-        <template #icon>
-          <i :class="stat.icon" class="text-xl"></i>
-        </template>
-      </StatCard>
+      <!-- Skeleton loading -->
+      <template v-if="isLoading">
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+        >
+          <Skeleton height="1.5rem" width="60%" class="mb-3" />
+          <Skeleton height="2.5rem" width="80%" class="mb-2" />
+          <Skeleton height="1rem" width="50%" />
+        </div>
+      </template>
+
+      <template v-else>
+        <StatCard
+          v-for="stat in statsCards"
+          :key="stat.title"
+          :title="stat.title"
+          :value="stat.value"
+          :trend="stat.trend"
+          :trend-label="stat.trendLabel"
+        >
+          <template #icon>
+            <i :class="stat.icon" class="text-xl"></i>
+          </template>
+        </StatCard>
+      </template>
     </div>
 
+    <!-- Revenue & Orders Charts -->
     <div class="grid gap-4 xl:grid-cols-3">
       <section
         class="xl:col-span-2 rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
@@ -297,18 +331,24 @@ const topProductChartOptions = {
               Hiệu suất doanh thu trong 12 tháng gần nhất.
             </p>
           </div>
-          <button class="text-sm font-medium text-primary-600 hover:underline">
+          <button
+            class="text-sm font-medium text-primary-600 hover:underline"
+            @click="router.push(ROUTES.ADMIN.PAYMENTS)"
+          >
             Xem báo cáo
           </button>
         </div>
         <div class="mt-6 h-72">
+          <Skeleton v-if="isLoading" height="100%" />
           <Chart
+            v-else
             type="line"
             :data="revenueChartData"
             :options="baseChartOptions"
           />
         </div>
       </section>
+
       <section
         class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
       >
@@ -321,12 +361,17 @@ const topProductChartOptions = {
               Số đơn trong 7 ngày gần nhất.
             </p>
           </div>
-          <button class="text-sm font-medium text-primary-600 hover:underline">
+          <button
+            class="text-sm font-medium text-primary-600 hover:underline"
+            @click="router.push(ROUTES.ADMIN.ORDERS)"
+          >
             Xem xét
           </button>
         </div>
         <div class="mt-6 h-72">
+          <Skeleton v-if="isLoading" height="100%" />
           <Chart
+            v-else
             type="bar"
             :data="ordersChartData"
             :options="baseChartOptions"
@@ -335,6 +380,7 @@ const topProductChartOptions = {
       </section>
     </div>
 
+    <!-- Top Products Chart & Quick Actions -->
     <div class="grid gap-4 xl:grid-cols-3">
       <section
         class="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
@@ -348,43 +394,64 @@ const topProductChartOptions = {
               Phân bổ theo sản lượng bán.
             </p>
           </div>
-          <button class="text-sm font-medium text-primary-600 hover:underline">
+          <button
+            class="text-sm font-medium text-primary-600 hover:underline"
+            @click="router.push(ROUTES.ADMIN.PRODUCTS)"
+          >
             Quản lý
           </button>
         </div>
+
         <div class="mt-6 flex flex-col items-center justify-center">
-          <div class="h-44 w-44">
-            <Chart
-              type="doughnut"
-              :data="topProductChartData"
-              :options="topProductChartOptions"
-              style="
-                display: block;
-                box-sizing: border-box;
-                height: 180px;
-                width: 206px;
-              "
+          <!-- Skeleton -->
+          <template v-if="isLoading">
+            <Skeleton
+              shape="circle"
+              width="11rem"
+              height="11rem"
+              class="mb-4"
             />
-          </div>
-          <div
-            class="mt-6 grid grid-cols-2 gap-x-4 gap-y-2 w-full border-t border-slate-100 dark:border-slate-800 pt-4"
-          >
-            <div
-              v-for="(item, index) in topProducts"
-              :key="item.id"
-              class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400"
-            >
-              <span
-                class="h-2.5 w-2.5 rounded-full shrink-0"
-                :style="{ backgroundColor: topProductChartColors[index] }"
-              ></span>
-              <span class="truncate" :title="item.product">{{
-                item.product
-              }}</span>
+            <div class="grid grid-cols-2 gap-2 w-full mt-2">
+              <Skeleton v-for="n in 6" :key="n" height="1rem" />
             </div>
-          </div>
+          </template>
+
+          <template v-else>
+            <div class="h-44 w-44">
+              <Chart
+                type="doughnut"
+                :data="topProductChartData"
+                :options="topProductChartOptions"
+                style="
+                  display: block;
+                  box-sizing: border-box;
+                  height: 180px;
+                  width: 206px;
+                "
+              />
+            </div>
+            <div
+              class="mt-6 grid grid-cols-2 gap-x-4 gap-y-2 w-full border-t border-slate-100 dark:border-slate-800 pt-4"
+            >
+              <div
+                v-for="(item, index) in topProducts"
+                :key="item._id"
+                class="flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400"
+              >
+                <span
+                  class="h-2.5 w-2.5 rounded-full shrink-0"
+                  :style="{ backgroundColor: TOP_PRODUCT_CHART_COLORS[index] }"
+                />
+                <span class="truncate" :title="item.title">{{
+                  item.title
+                }}</span>
+              </div>
+            </div>
+          </template>
         </div>
       </section>
+
+      <!-- Quick Actions -->
       <section
         class="xl:col-span-2 rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-900"
       >
@@ -399,7 +466,8 @@ const topProductChartOptions = {
           </div>
         </div>
         <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <button
+          <NuxtLink
+            :to="ROUTES.ADMIN.PRODUCT_CREATE"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -408,8 +476,9 @@ const topProductChartOptions = {
               <i class="pi pi-plus"></i>
             </span>
             Tạo sản phẩm
-          </button>
-          <button
+          </NuxtLink>
+          <NuxtLink
+            :to="ROUTES.ADMIN.VOUCHER_CREATE"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -418,8 +487,9 @@ const topProductChartOptions = {
               <i class="pi pi-ticket"></i>
             </span>
             Phát hành mã giảm giá
-          </button>
-          <button
+          </NuxtLink>
+          <NuxtLink
+            :to="ROUTES.ADMIN.USER_CREATE"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -428,8 +498,9 @@ const topProductChartOptions = {
               <i class="pi pi-user-plus"></i>
             </span>
             Thêm khách hàng
-          </button>
-          <button
+          </NuxtLink>
+          <NuxtLink
+            :to="ROUTES.ADMIN.PAYMENTS"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -438,8 +509,9 @@ const topProductChartOptions = {
               <i class="pi pi-chart-line"></i>
             </span>
             Xem phân tích
-          </button>
-          <button
+          </NuxtLink>
+          <NuxtLink
+            :to="ROUTES.ADMIN.ORDERS"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -448,8 +520,9 @@ const topProductChartOptions = {
               <i class="pi pi-shopping-cart"></i>
             </span>
             Quản lý đơn hàng
-          </button>
-          <button
+          </NuxtLink>
+          <NuxtLink
+            :to="ROUTES.ADMIN.REFUND_REQUESTS"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -458,8 +531,9 @@ const topProductChartOptions = {
               <i class="pi pi-undo"></i>
             </span>
             Yêu cầu hoàn tiền
-          </button>
-          <button
+          </NuxtLink>
+          <NuxtLink
+            :to="ROUTES.ADMIN.ARTICLE_CREATE"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -468,8 +542,9 @@ const topProductChartOptions = {
               <i class="pi pi-pencil"></i>
             </span>
             Viết bài mới
-          </button>
-          <button
+          </NuxtLink>
+          <NuxtLink
+            :to="ROUTES.ADMIN.REVIEWS"
             class="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 text-left text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
           >
             <span
@@ -478,84 +553,108 @@ const topProductChartOptions = {
               <i class="pi pi-star"></i>
             </span>
             Đánh giá & Phản hồi
-          </button>
+          </NuxtLink>
         </div>
       </section>
     </div>
 
+    <!-- Recent Orders & Top Products Tables -->
     <div class="grid gap-4 xl:grid-cols-2">
+      <!-- Đơn hàng gần đây -->
       <DataTable
         :columns="orderColumns"
-        :data="recentOrders"
-        :total="recentOrders.length"
+        :data="recentOrdersForTable"
+        :total="recentOrdersForTable.length"
         :page="1"
         :per-page="5"
+        hide-pagination
       >
         <template #title>Đơn hàng gần đây</template>
         <template #subtitle
           >Theo dõi các đơn mới nhất và trạng thái xử lý.</template
         >
+        <template #toolbar>
+          <NuxtLink
+            :to="ROUTES.ADMIN.ORDERS"
+            class="text-xs font-medium text-primary-600 hover:underline whitespace-nowrap"
+          >
+            Xem tất cả →
+          </NuxtLink>
+        </template>
+        <template #cell-totalPrice="{ row }">
+          {{ row.formattedTotal }}
+        </template>
+
+        <template #cell-createdAt="{ row }">
+          {{ row.formattedDate }}
+        </template>
+
         <template #cell-status="{ value }">
           <Tag
-            :value="
-              value === 'pending'
-                ? 'Chờ xử lý'
-                : value === 'confirmed'
-                  ? 'Đã xác nhận'
-                  : value === 'preparing'
-                    ? 'Đang chế biến'
-                    : value === 'shipping'
-                      ? 'Đang giao hàng'
-                      : value === 'delivered'
-                        ? 'Đã giao'
-                        : value
-            "
+            :value="mapOrderStatus(value)"
             :severity="statusSeverity[value] || 'secondary'"
           />
         </template>
-        <template #cell-actions>
+
+        <template #cell-actions="{ row }">
           <div class="flex items-center gap-2">
             <button
               class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500"
+              :title="'Xem chi tiết đơn hàng'"
+              @click="row && router.push(ROUTES.ADMIN.ORDER_DETAIL(row._id))"
             >
               <i class="pi pi-eye text-xs"></i>
             </button>
-            <button
+            <NuxtLink
+              :to="ROUTES.ADMIN.ORDERS"
               class="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500"
+              title="Xem tất cả đơn hàng"
             >
               <i class="pi pi-ellipsis-h text-xs"></i>
-            </button>
+            </NuxtLink>
           </div>
         </template>
       </DataTable>
 
+      <!-- Sản phẩm nổi bật -->
       <DataTable
         :columns="productColumns"
-        :data="topProducts"
-        :total="topProducts.length"
+        :data="topProductsForTable"
+        :total="topProductsForTable.length"
         :page="1"
-        :per-page="5"
+        :per-page="7"
+        hide-pagination
       >
         <template #title>Sản phẩm nổi bật</template>
-        <template #subtitle
-          >Những sản phẩm có hiệu suất tốt nhất tuần này.</template
-        >
+        <template #subtitle>Những sản phẩm có hiệu suất tốt nhất.</template>
+        <template #toolbar>
+          <NuxtLink
+            :to="ROUTES.ADMIN.PRODUCTS"
+            class="text-xs font-medium text-primary-600 hover:underline whitespace-nowrap"
+          >
+            Xem tất cả →
+          </NuxtLink>
+        </template>
         <template #cell-product="{ row }">
           <div class="flex items-center gap-3">
             <img
-              :src="row.image"
-              alt="Sản phẩm"
+              :src="row.thumbnail || 'https://via.placeholder.com/40'"
+              :alt="row.title"
               class="h-10 w-10 rounded-xl object-cover"
             />
             <div>
               <p class="font-medium text-slate-900 dark:text-white">
-                {{ row.product }}
+                {{ row.title }}
               </p>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
-                SKU: {{ row.id }}
-              </p>
+              <!-- <p class="text-xs text-slate-500 dark:text-slate-400">
+                SKU: {{ row._id?.slice(-6)?.toUpperCase() }}
+              </p> -->
             </div>
           </div>
+        </template>
+
+        <template #cell-revenue="{ row }">
+          {{ row.formattedRevenue }}
         </template>
       </DataTable>
     </div>

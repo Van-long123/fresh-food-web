@@ -113,7 +113,7 @@ const handleLogout = async () => {
         </div>
 
         <div class="flex flex-1 items-center justify-end gap-3">
-          <div class="hidden w-full max-w-md lg:block">
+          <!-- <div class="hidden w-full max-w-md lg:block">
             <div class="relative w-full">
               <i
                 class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10"
@@ -125,7 +125,7 @@ const handleLogout = async () => {
                 class="w-full pl-10!"
               />
             </div>
-          </div>
+          </div> -->
 
           <!-- <button
             type="button"

@@ -27,6 +27,7 @@ const props = withDefaults(
     sortable?: boolean;
     sort?: { key: string; direction: "asc" | "desc" } | null;
     selection?: Array<string | number>;
+    hidePagination?: boolean;
   }>(),
   {
     loading: false,
@@ -38,6 +39,7 @@ const props = withDefaults(
     sortable: false,
     sort: null,
     selection: () => [],
+    hidePagination: false,
   },
 );
 
@@ -317,6 +319,7 @@ CODE MẪU TƯỢNG TRƯNG BÊN TRONG THƯ VIỆN PRIMEVUE (<PrimeDataTable>)
 </table>
 -->
     <div
+      v-if="!hidePagination"
       class="flex flex-col gap-3 border-t border-slate-200/70 px-5 py-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between"
     >
       <p class="text-sm text-slate-500 dark:text-slate-300">

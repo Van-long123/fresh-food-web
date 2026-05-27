@@ -88,6 +88,10 @@ export const API_ENDPOINTS = {
   },
   // ── Admin ────────────────────────────────────────────────────
   ADMIN: {
+    DASHBOARD: {
+      OVERVIEW: '/v1/admin/dashboard/overview',
+      EXPORT: '/v1/admin/dashboard/export'
+    },
     ARTICLE: {
       LIST: '/v1/admin/articles',
       DETAIL: (id: string) => `/v1/admin/articles/${id}`,
