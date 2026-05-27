@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useToast } from "primevue/usetoast";
 import { refundService } from "~/services/refund.service";
-import type { BankInfoPayload, CreateRefundPayload } from "~/types/refund.type";
+import type { BankInfoPayload } from "~/types/refund.type";
 import { refundKeys } from "~/queries/refund/useRefundQuery";
 
 export const useCreateRefundMutation = (orderId: string) => {
@@ -9,7 +9,7 @@ export const useCreateRefundMutation = (orderId: string) => {
   const toast = useToast();
 
   return useMutation({
-    mutationFn: (payload: CreateRefundPayload) => refundService.createRefund(payload),
+    mutationFn: (payload: FormData) => refundService.createRefund(payload),
     onSuccess: () => {
       toast.add({
         severity: "success",

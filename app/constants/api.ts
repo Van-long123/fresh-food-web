@@ -164,6 +164,13 @@ export const API_ENDPOINTS = {
       LIST: '/v1/admin/payments',
       STATS: '/v1/admin/payments/stats',
       CONFIRM_COD: (id: string) => `/v1/admin/payments/${id}/confirm-cod`,
+    },
+    REFUND: {
+      LIST: '/v1/admin/refund-requests',
+      DETAIL: (id: string) => `/v1/admin/refund-requests/${id}`,
+      APPROVE: (id: string) => `/v1/admin/refund-requests/${id}/approve`,
+      REJECT: (id: string) => `/v1/admin/refund-requests/${id}/reject`,
+      COMPLETE: (id: string) => `/v1/admin/refund-requests/${id}/complete`,
     }
   }
 } as const

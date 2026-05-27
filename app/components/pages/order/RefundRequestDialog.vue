@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import Dialog from "primevue/dialog";
 import Textarea from "primevue/textarea";
 import InputNumber from "primevue/inputnumber";
 import InputText from "primevue/inputtext";
 import Dropdown from "primevue/dropdown";
 import FileUpload from "primevue/fileupload";
-import { useToast } from "primevue/usetoast";
-import { refundService } from "~/services/refund.service";
-import {
-  useCreateRefundMutation,
-} from "~/mutations/refund/useRefundMutations";
+import { useCreateRefundMutation } from "~/mutations/refund/useRefundMutations";
 
 import type { OrderItem, RefundRequestData } from "~/types/refund.type";
 
@@ -24,15 +20,17 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{ "update:visible": [boolean] }>();
 
-const toast = useToast();
+type EvidenceFileItem = {
+  file: File;
+  previewUrl: string;
+  type: "image" | "video";
+};
 
 const selectedMap = ref<Record<string, { checked: boolean; quantity: number }>>(
   {},
 );
 const reason = ref("");
-const uploadedImages = ref<string[]>([]);
-const uploadedVideos = ref<string[]>([]);
-const isUploadingEvidence = ref(false);
+const evidenceFiles = ref<EvidenceFileItem[]>([]);
 
 // --- Refund Method ---
 const refundMethod = ref<"bank_transfer" | "cash_on_pickup">("bank_transfer");
@@ -46,14 +44,18 @@ const { mutate: createRefund, isPending: isCreating } = useCreateRefundMutation(
   props.orderId,
 );
 
-const { data: bankData, pending: isBankLoading } = useFetch<{ data: any[] }>(
-  "https://api.vietqr.io/v2/banks",
-  { server: false },
-);
+type VietQrBank = {
+  shortName: string;
+  name: string;
+};
+
+const { data: bankData, pending: isBankLoading } = useFetch<{
+  data: VietQrBank[];
+}>("https://api.vietqr.io/v2/banks", { server: false });
 
 const bankOptions = computed(() => {
   const banks = bankData.value?.data || [];
-  return banks.map((bank: any) => ({
+  return banks.map((bank: VietQrBank) => ({
     label: `${bank.shortName} - ${bank.name}`,
     value: bank.name,
   }));
@@ -85,12 +87,23 @@ const selectedItems = computed(() => {
     }));
 });
 
+const uploadedImages = computed(() =>
+  evidenceFiles.value
+    .filter((item) => item.type === "image")
+    .map((item) => item.previewUrl),
+);
+
+const uploadedVideos = computed(() =>
+  evidenceFiles.value
+    .filter((item) => item.type === "video")
+    .map((item) => item.previewUrl),
+);
+
 const canSubmitRequest = computed(() => {
   const baseValid =
     selectedItems.value.length > 0 &&
     reason.value.trim().length > 0 &&
-    uploadedImages.value.length > 0 &&
-    !isUploadingEvidence.value &&
+    evidenceFiles.value.length > 0 &&
     !isRejected.value;
 
   if (refundMethod.value === "bank_transfer") {
@@ -104,14 +117,6 @@ const canSubmitRequest = computed(() => {
   return baseValid;
 });
 
-const canSubmitBankInfo = computed(() => {
-  return (
-    bankName.value.trim() &&
-    accountNumber.value.trim() &&
-    accountHolder.value.trim()
-  );
-});
-
 //Xóa sạch dữ liệu trên form (bỏ chọn sản phẩm, xóa lý do, xóa các link ảnh đã upload).
 const resetForm = () => {
   selectedMap.value = props.items.reduce(
@@ -122,8 +127,8 @@ const resetForm = () => {
     {} as Record<string, { checked: boolean; quantity: number }>,
   );
   reason.value = "";
-  uploadedImages.value = [];
-  uploadedVideos.value = [];
+  evidenceFiles.value.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+  evidenceFiles.value = [];
   refundMethod.value = "bank_transfer";
   bankName.value = "";
   accountNumber.value = "";
@@ -148,76 +153,81 @@ watch(
   },
 );
 
-const onSelectEvidence = async (event: any) => {
-  try {
-    isUploadingEvidence.value = true;
-    const files: File[] = event.files || [];
-    if (!files.length) return;
+const onSelectEvidence = async (event: { files?: File[] }) => {
+  const files = event.files || [];
+  if (!files.length) return;
 
-    const formData = new FormData();
-    files.forEach((file) => formData.append("evidence", file));
+  const nextFiles: EvidenceFileItem[] = files.map((file) => {
+    const type = file.type.startsWith("video/") ? "video" : "image";
+    return {
+      file,
+      type,
+      previewUrl: URL.createObjectURL(file),
+    };
+  });
 
-    const result = await refundService.uploadEvidence(formData);
-    uploadedImages.value = [...uploadedImages.value, ...(result.images || [])];
-    uploadedVideos.value = [...uploadedVideos.value, ...(result.videos || [])];
-  } catch (error: any) {
-    toast.add({
-      severity: "error",
-      summary: "Lỗi",
-      detail: error?.response?.data?.message || "Không thể tải minh chứng",
-      life: 3000,
-    });
-  } finally {
-    isUploadingEvidence.value = false;
-  }
+  evidenceFiles.value = [...evidenceFiles.value, ...nextFiles];
 };
 
-const removeEvidence = (type: "image" | "video", url: string) => {
-  if (type === "image") {
-    uploadedImages.value = uploadedImages.value.filter((item) => item !== url);
-  } else {
-    uploadedVideos.value = uploadedVideos.value.filter((item) => item !== url);
+const removeEvidence = (_type: "image" | "video", url: string) => {
+  const target = evidenceFiles.value.find((item) => item.previewUrl === url);
+  if (target) {
+    URL.revokeObjectURL(target.previewUrl);
   }
+  evidenceFiles.value = evidenceFiles.value.filter(
+    (item) => item.previewUrl !== url,
+  );
 };
 
 const submitRefundRequest = () => {
   if (!canSubmitRequest.value) return;
 
-  const payload: any = {
-    orderId: props.orderId,
-    items: selectedItems.value,
-    reason: reason.value.trim(),
-    images: uploadedImages.value,
-    videos: uploadedVideos.value,
-    refundMethod: refundMethod.value,
-  };
+  const payload = new FormData();
+  payload.append("orderId", props.orderId);
+  payload.append("items", JSON.stringify(selectedItems.value));
+  payload.append("reason", reason.value.trim());
+  payload.append("refundMethod", refundMethod.value);
+  payload.append("images", JSON.stringify([]));
+  payload.append("videos", JSON.stringify([]));
 
-  // Chỉ gửi bankInfo nếu người dùng chọn bank_transfer
   if (refundMethod.value === "bank_transfer") {
-    payload.bankInfo = {
-      bankName: bankName.value.trim(),
-      accountNumber: accountNumber.value.trim(),
-      accountHolder: accountHolder.value.trim(),
-    };
+    payload.append(
+      "bankInfo",
+      JSON.stringify({
+        bankName: bankName.value.trim(),
+        accountNumber: accountNumber.value.trim(),
+        accountHolder: accountHolder.value.trim(),
+      }),
+    );
   }
+
+  evidenceFiles.value.forEach((item) => {
+    payload.append("evidence", item.file);
+  });
 
   createRefund(payload, {
     onSuccess: () => {
+      evidenceFiles.value.forEach((item) =>
+        URL.revokeObjectURL(item.previewUrl),
+      );
+      evidenceFiles.value = [];
       emit("update:visible", false);
     },
   });
 };
 
-
+onBeforeUnmount(() => {
+  evidenceFiles.value.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+});
 </script>
 
 <template>
   <Dialog
     :visible="visible"
-    @update:visible="(v) => emit('update:visible', v)"
     modal
     header="Trả hàng / Hoàn tiền"
     class="w-full max-w-3xl"
+    @update:visible="(v) => emit('update:visible', v)"
   >
     <div class="space-y-5">
       <div
@@ -235,18 +245,21 @@ const submitRefundRequest = () => {
         {{ refundRequest?.rejectReason || "Không có lý do được cung cấp" }}
       </div>
 
-      <!-- Trạng thái: Chờ shipper đến lấy hàng (cash on pickup) -->
       <div v-else-if="isWaitingPickup" class="space-y-4">
         <div
           class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
         >
-          ✅ Yêu cầu đã được duyệt. Shipper sẽ liên hệ để đến lấy hàng và hoàn trả tiền mặt cho bạn.
+          ✅ Yêu cầu đã được duyệt. Shipper sẽ liên hệ để đến lấy hàng và hoàn
+          trả tiền mặt cho bạn.
         </div>
         <div
           class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700 flex items-start gap-2"
         >
           <span class="text-base mt-0.5">📦</span>
-          <span>Vui lòng chuẩn bị sản phẩm cần hoàn trả và tiếp nhận shipper khi họ đến lấy hàng. Bạn sẽ nhận lại tiền mặt trực tiếp.</span>
+          <span
+            >Vui lòng chuẩn bị sản phẩm cần hoàn trả và tiếp nhận shipper khi họ
+            đến lấy hàng. Bạn sẽ nhận lại tiền mặt trực tiếp.</span
+          >
         </div>
         <div class="flex justify-end">
           <button
@@ -259,10 +272,7 @@ const submitRefundRequest = () => {
         </div>
       </div>
 
-      <!-- Form tạo mới yêu cầu -->
       <div v-else-if="!hasExistingRequest" class="space-y-5">
-
-        <!-- CHỌN SẢN PHẨM -->
         <div class="space-y-3">
           <h3 class="text-base font-semibold text-gray-900">
             Chọn sản phẩm cần hoàn
@@ -275,9 +285,9 @@ const submitRefundRequest = () => {
             >
               <label class="flex items-center gap-3">
                 <input
+                  v-model="selectedMap[item.productId]!.checked"
                   type="checkbox"
                   class="h-4 w-4 accent-[#f47f20]"
-                  v-model="selectedMap[item.productId]!.checked"
                   :disabled="isRejected"
                 />
                 <img
@@ -304,15 +314,14 @@ const submitRefundRequest = () => {
                     !selectedMap[item.productId]!.checked || isRejected
                   "
                   class="w-24"
-                  inputClass="w-full"
-                  showButtons
+                  input-class="w-full"
+                  show-buttons
                 />
               </div>
             </div>
           </div>
         </div>
 
-        <!-- LÝ DO HOÀN -->
         <div>
           <label class="text-sm font-semibold text-gray-700">Lý do hoàn</label>
           <Textarea
@@ -324,13 +333,11 @@ const submitRefundRequest = () => {
           />
         </div>
 
-        <!-- PHƯƠNG THỨC HOÀN TIỀN -->
         <div class="space-y-3">
           <h3 class="text-base font-semibold text-gray-900">
             Phương thức nhận hoàn tiền
           </h3>
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <!-- Option: Bank Transfer -->
             <label
               :class="[
                 'flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-all',
@@ -340,18 +347,21 @@ const submitRefundRequest = () => {
               ]"
             >
               <input
-                type="radio"
-                class="mt-0.5 accent-[#f47f20]"
-                value="bank_transfer"
                 v-model="refundMethod"
+                type="radio"
+                value="bank_transfer"
+                class="mt-0.5 accent-[#f47f20]"
               />
               <div>
-                <p class="text-sm font-semibold text-gray-800">🏦 Chuyển khoản ngân hàng</p>
-                <p class="mt-0.5 text-xs text-gray-500">Nhận tiền hoàn qua tài khoản ngân hàng</p>
+                <p class="text-sm font-semibold text-gray-800">
+                  🏦 Chuyển khoản ngân hàng
+                </p>
+                <p class="mt-0.5 text-xs text-gray-500">
+                  Nhận tiền hoàn qua tài khoản ngân hàng
+                </p>
               </div>
             </label>
 
-            <!-- Option: Cash on Pickup -->
             <label
               :class="[
                 'flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-all',
@@ -361,84 +371,93 @@ const submitRefundRequest = () => {
               ]"
             >
               <input
-                type="radio"
-                class="mt-0.5 accent-[#f47f20]"
-                value="cash_on_pickup"
                 v-model="refundMethod"
+                type="radio"
+                value="cash_on_pickup"
+                class="mt-0.5 accent-[#f47f20]"
               />
               <div>
-                <p class="text-sm font-semibold text-gray-800">💵 Tiền mặt khi shipper đến lấy</p>
-                <p class="mt-0.5 text-xs text-gray-500">Nhận tiền mặt trực tiếp khi shipper đến lấy hàng hoàn trả</p>
+                <p class="text-sm font-semibold text-gray-800">
+                  💵 Tiền mặt khi shipper đến lấy
+                </p>
+                <p class="mt-0.5 text-xs text-gray-500">
+                  Nhận tiền mặt trực tiếp khi shipper đến lấy hàng hoàn trả
+                </p>
               </div>
             </label>
           </div>
 
-          <!-- Ghi chú cho cash_on_pickup -->
           <div
             v-if="!isShowBankForm"
             class="flex items-start gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700"
           >
             <span class="text-base mt-0.5">ℹ️</span>
-            <span>Shipper sẽ hoàn trả tiền mặt khi đến lấy sản phẩm hoàn trả. Vui lòng chuẩn bị sản phẩm và ở nhà để tiếp nhận shipper.</span>
+            <span
+              >Shipper sẽ hoàn trả tiền mặt khi đến lấy sản phẩm hoàn trả. Vui
+              lòng chuẩn bị sản phẩm và ở nhà để tiếp nhận shipper.</span
+            >
           </div>
         </div>
 
-        <!-- THÔNG TIN NGÂN HÀNG (chỉ hiển thị nếu bank_transfer) -->
         <div v-if="isShowBankForm" class="space-y-3">
           <h3 class="text-base font-semibold text-gray-900">
             Thông tin tài khoản ngân hàng <span class="text-red-500">*</span>
           </h3>
           <div class="grid gap-4 md:grid-cols-2">
             <div class="md:col-span-2">
-              <label class="text-sm font-semibold text-gray-700">Ngân hàng</label>
+              <label class="text-sm font-semibold text-gray-700"
+                >Ngân hàng</label
+              >
               <Dropdown
                 v-model="bankName"
                 :options="bankOptions"
-                optionLabel="label"
-                optionValue="value"
+                option-label="label"
+                option-value="value"
                 :loading="isBankLoading"
                 placeholder="Chọn ngân hàng"
                 class="mt-2 w-full"
               />
             </div>
             <div>
-              <label class="text-sm font-semibold text-gray-700">Số tài khoản</label>
-              <InputText v-model="accountNumber" class="mt-2 w-full" placeholder="Nhập số tài khoản" />
+              <label class="text-sm font-semibold text-gray-700"
+                >Số tài khoản</label
+              >
+              <InputText
+                v-model="accountNumber"
+                class="mt-2 w-full"
+                placeholder="Nhập số tài khoản"
+              />
             </div>
             <div>
-              <label class="text-sm font-semibold text-gray-700">Chủ tài khoản</label>
-              <InputText v-model="accountHolder" class="mt-2 w-full" placeholder="Nhập tên chủ tài khoản" />
+              <label class="text-sm font-semibold text-gray-700"
+                >Chủ tài khoản</label
+              >
+              <InputText
+                v-model="accountHolder"
+                class="mt-2 w-full"
+                placeholder="Nhập tên chủ tài khoản"
+              />
             </div>
           </div>
         </div>
 
-        <!-- MINH CHỨNG -->
         <div class="space-y-3">
-          <label class="text-sm font-semibold text-gray-700">
-            Minh chứng (bắt buộc ít nhất 1 ảnh)
-          </label>
+          <label class="text-sm font-semibold text-gray-700"
+            >Minh chứng (bắt buộc ít nhất 1 ảnh/video)</label
+          >
           <div class="flex items-center gap-3">
             <FileUpload
               name="evidence"
               mode="basic"
-              :chooseLabel="
-                isUploadingEvidence ? 'Đang tải lên...' : 'Chọn ảnh/video'
-              "
-              customUpload
+              choose-label="Chọn ảnh/video"
+              custom-upload
               :auto="true"
               :multiple="true"
               accept="image/*,video/*"
-              :maxFileSize="10485760"
-              :disabled="isUploadingEvidence || isRejected"
+              :max-file-size="10485760"
+              :disabled="isRejected"
               @select="onSelectEvidence"
             />
-            <span
-              v-if="isUploadingEvidence"
-              class="flex items-center gap-2 text-sm text-gray-500"
-            >
-              <i class="pi pi-spin pi-spinner text-[#f47f20]"></i>
-              Đang tải lên...
-            </span>
           </div>
 
           <div v-if="uploadedImages.length" class="grid gap-3 md:grid-cols-3">
@@ -480,7 +499,6 @@ const submitRefundRequest = () => {
           </div>
         </div>
 
-        <!-- ACTIONS -->
         <div class="flex justify-end gap-3">
           <button
             class="rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50"

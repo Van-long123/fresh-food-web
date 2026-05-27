@@ -8,7 +8,7 @@ import type { BankInfoPayload, CreateRefundPayload } from "~/types/refund.type";
 
 export const refundService = {
   uploadEvidence: (formData: FormData) => uploadRefundEvidenceRequest(formData),
-  createRefund: (payload: CreateRefundPayload) => createRefundRequest(payload),
+  createRefund: (payload: FormData) => createRefundRequest(payload),
   getByOrder: (orderId: string) => getRefundRequestByOrder(orderId),
   submitBankInfo: (id: string, payload: BankInfoPayload) =>
     submitRefundBankInfo(id, payload),

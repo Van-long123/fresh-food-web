@@ -223,46 +223,6 @@ const cancelEditStatus = () => {
           </select>
         </div>
       </div>
-
-      <!-- Bulk status actions -->
-      <div
-        v-if="selectedIds.length"
-        class="flex flex-wrap items-center gap-2 bg-primary-50 dark:bg-primary-950/20 px-3 py-1.5 rounded-lg border border-primary-100 dark:border-primary-900/50"
-      >
-        <span
-          class="text-sm font-medium text-primary-700 dark:text-primary-300"
-        >
-          {{ selectedIds.length }} đã chọn
-        </span>
-        <button
-          @click="handleBulkStatusChange('confirmed')"
-          :disabled="isBulkUpdatingStatus"
-          class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
-        >
-          Xác nhận
-        </button>
-        <button
-          @click="handleBulkStatusChange('processing')"
-          :disabled="isBulkUpdatingStatus"
-          class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
-        >
-          Xử lý
-        </button>
-        <button
-          @click="handleBulkStatusChange('shipping')"
-          :disabled="isBulkUpdatingStatus"
-          class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
-        >
-          Giao hàng
-        </button>
-        <button
-          @click="handleBulkStatusChange('delivered')"
-          :disabled="isBulkUpdatingStatus"
-          class="rounded bg-white border border-slate-200 px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
-        >
-          Hoàn tất giao
-        </button>
-      </div>
     </div>
 
     <!-- Error state -->
@@ -279,12 +239,9 @@ const cancelEditStatus = () => {
       :total="total"
       v-model:page="page"
       v-model:perPage="perPage"
-      :selectable="true"
-      :selection="selectedIds"
       :sortable="true"
       :sort="sortState"
       @update:sort="handleSortChange"
-      @selection-change="handleSelectionChange"
     >
       <template #title>Danh sách đơn hàng</template>
       <template #subtitle

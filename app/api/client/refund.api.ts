@@ -1,7 +1,7 @@
 import { API_ENDPOINTS } from "~/constants/api";
 import { getAuthorizedAxios } from "~/utils/authorizedAxios";
 
-import type { BankInfoPayload, CreateRefundPayload } from "~/types/refund.type";
+import type { BankInfoPayload } from "~/types/refund.type";
 
 export const uploadRefundEvidenceRequest = async (formData: FormData) => {
   const response = await getAuthorizedAxios().post(
@@ -12,10 +12,11 @@ export const uploadRefundEvidenceRequest = async (formData: FormData) => {
   return response.data.data;
 };
 
-export const createRefundRequest = async (payload: CreateRefundPayload) => {
+export const createRefundRequest = async (formData: FormData) => {
   const response = await getAuthorizedAxios().post(
     API_ENDPOINTS.REFUND.CREATE,
-    payload,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } },
   );
   return response.data.data;
 };
