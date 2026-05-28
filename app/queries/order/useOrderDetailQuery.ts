@@ -49,3 +49,21 @@ export const useConfirmReceivedMutation = (orderId: string) => {
     }
   })
 }
+
+export const useRepayOrderMutation = () => {
+  return useMutation({
+    mutationFn: (id: string) => orderService.repayOrder(id),
+  })
+}
+
+export const useSwitchToCodMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => orderService.switchToCod(id),
+    onSuccess: (_data: any, orderId: string) => {
+      queryClient.invalidateQueries({ queryKey: ['order-detail', orderId] })
+      queryClient.invalidateQueries({ queryKey: ['my-orders'] })
+    },
+  })
+}

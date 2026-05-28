@@ -21,3 +21,13 @@ export const confirmOrderReceivedRequest = async (id: string): Promise<any> => {
   const response = await getAuthorizedAxios().put(API_ENDPOINTS.ORDER.RECEIVED(id))
   return response.data
 }
+
+export const repayOrderRequest = async (id: string): Promise<{ checkoutUrl: string }> => {
+  const response = await getAuthorizedAxios().post(API_ENDPOINTS.ORDER.REPAY(id))
+  return response.data.data
+}
+
+export const switchOrderToCodRequest = async (id: string): Promise<any> => {
+  const response = await getAuthorizedAxios().patch(API_ENDPOINTS.ORDER.SWITCH_TO_COD(id))
+  return response.data.data
+}

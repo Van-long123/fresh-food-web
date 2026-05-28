@@ -380,8 +380,7 @@ const confirmCodReceived = () => {
           <!-- COD / PayOS pending: xác nhận đã nhận tiền -->
           <template
             v-if="
-              ['COD', 'PayOS'].includes(row.paymentMethod) &&
-              row.status === 'pending'
+              ['COD'].includes(row.paymentMethod) && row.status === 'pending'
             "
           >
             <button

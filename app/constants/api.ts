@@ -72,7 +72,9 @@ export const API_ENDPOINTS = {
     MY_ORDERS: '/v1/client/orders/my-orders',
     DETAIL: (id: string) => `/v1/client/orders/${id}`,
     CANCEL: (id: string) => `/v1/client/orders/${id}/cancel`,
-    RECEIVED: (id: string) => `/v1/client/orders/${id}/received`
+    RECEIVED: (id: string) => `/v1/client/orders/${id}/received`,
+    REPAY: (id: string) => `/v1/client/orders/${id}/repay`,
+    SWITCH_TO_COD: (id: string) => `/v1/client/orders/${id}/switch-to-cod`
   },
   REFUND: {
     UPLOAD: '/v1/client/refund-requests/upload',

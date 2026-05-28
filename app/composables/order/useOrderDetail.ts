@@ -6,6 +6,8 @@ import {
   useOrderDetailQuery as useOrderQuery,
   useCancelOrderMutation,
   useConfirmReceivedMutation,
+  useRepayOrderMutation,
+  useSwitchToCodMutation,
 } from "~/queries/order/useOrderDetailQuery";
 import { useMergeCartMutation } from "~/mutations/cart/useCartMutations";
 import {
@@ -23,11 +25,21 @@ export const useOrderDetail = (orderId: string) => {
   const { data: orderData, isLoading, error } = useOrderQuery(orderId);
   const { mutate: cancelOrder, isPending: isCancelling } = useCancelOrderMutation(orderId);
   const { mutate: confirmReceivedMutation, isPending: isConfirmingReceived } = useConfirmReceivedMutation(orderId);
+  const { mutateAsync: repayOrderMutateAsync, isPending: isRepaying } = useRepayOrderMutation();
+  const { mutateAsync: switchToCodMutateAsync, isPending: isSwitchingToCod } = useSwitchToCodMutation();
   const { mutate: mergeCart, isPending: isMergingCart } = useMergeCartMutation();
  
   const order = computed(() => orderData.value || {});
   const items = computed(() => order.value.items || []);
   const payment = computed(() => order.value.payment || {});
+  const paymentMethodValue = computed(() => String((payment.value as any).paymentMethod || (payment.value as any).method || ""));
+  const paymentStatusValue = computed(() => String((payment.value as any).status || ""));
+
+  const isUnpaidOnlineOrder = computed(() => {
+    return order.value.status === "pending" && paymentMethodValue.value.toLowerCase() === "payos" && paymentStatusValue.value === "pending";
+  });
+
+  const isProcessing = computed(() => isCancelling.value || isConfirmingReceived.value || isRepaying.value || isSwitchingToCod.value);
 
   const showCancelConfirm = ref(false);
   const cancelMessage = "Bạn có chắc muốn hủy đơn hàng này? Hành động không thể hoàn tác.";
@@ -222,6 +234,51 @@ export const useOrderDetail = (orderId: string) => {
     });
   }
 
+  const repayNow = async () => {
+    try {
+      const result = await repayOrderMutateAsync(orderId);
+      if (result?.checkoutUrl) {
+        window.location.href = result.checkoutUrl;
+      }
+    } catch (error: any) {
+      toast.add({
+        severity: "error",
+        summary: "Lỗi",
+        detail: error?.response?.data?.message || "Không thể tạo lại link thanh toán. Vui lòng thử lại.",
+        life: 3000,
+      });
+    }
+  };
+
+  const switchToCod = () => {
+    confirm.require({
+      message: "Bạn có chắc muốn đổi sang thanh toán khi nhận hàng không?",
+      header: "Đổi phương thức thanh toán",
+      icon: "pi pi-exclamation-triangle",
+      acceptLabel: "Xác nhận đổi",
+      rejectLabel: "Hủy bỏ",
+      acceptClass: "p-button-secondary",
+      accept: async () => {
+        try {
+          await switchToCodMutateAsync(orderId);
+          toast.add({
+            severity: "success",
+            summary: "Thành công",
+            detail: "Đã đổi sang COD",
+            life: 3000,
+          });
+        } catch (error: any) {
+          toast.add({
+            severity: "error",
+            summary: "Lỗi",
+            detail: error?.response?.data?.message || "Không thể đổi sang COD. Vui lòng thử lại.",
+            life: 3000,
+          });
+        }
+      },
+    });
+  };
+
   function openRefundDialog() {
     showRefundDialog.value = true;
   }
@@ -255,6 +312,10 @@ export const useOrderDetail = (orderId: string) => {
     paymentMeta,
     paymentStatusClass,
     paymentMethodMeta,
+    isUnpaidOnlineOrder,
+    isProcessing,
+    isRepaying,
+    isSwitchingToCod,
     formatDateTime,
     copyTransactionId,
     reviewProduct,
@@ -264,6 +325,8 @@ export const useOrderDetail = (orderId: string) => {
     onConfirmCancelWithRefund,
     triggerCancel,
     confirmReceived,
+    repayNow,
+    switchToCod,
     openRefundDialog,
     closeRefundDialog,
     router

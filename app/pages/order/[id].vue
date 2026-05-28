@@ -457,13 +457,33 @@
           <div class="flex items-center gap-2">
             <button
               v-if="order.status === 'pending' || order.status === 'confirmed'"
-              @click="triggerCancel"
-              :disabled="isCancelling"
+              :disabled="isProcessing"
               class="text-sm text-red-500 border border-red-200 rounded-full px-4 py-2 hover:bg-red-50 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              @click="triggerCancel"
             >
               <i v-if="isCancelling" class="pi pi-spinner animate-spin"></i>
               <span v-else>✕</span>
               Hủy đơn
+            </button>
+            <button
+              v-if="isUnpaidOnlineOrder"
+              :disabled="isProcessing"
+              class="text-sm border border-gray-300 text-gray-700 rounded-full px-4 py-2 hover:bg-gray-50 transition font-medium disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+              @click="switchToCod"
+            >
+              <i v-if="isSwitchingToCod" class="pi pi-spinner animate-spin"></i>
+              <span v-else>🔄</span>
+              {{ isSwitchingToCod ? "Đang xử lý..." : "Đổi sang COD" }}
+            </button>
+            <button
+              v-if="isUnpaidOnlineOrder"
+              :disabled="isProcessing"
+              class="text-sm bg-blue-600 text-white rounded-full px-4 py-2 hover:bg-blue-700 transition font-semibold shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+              @click="repayNow"
+            >
+              <i v-if="isRepaying" class="pi pi-spinner animate-spin"></i>
+              <span v-else>💳</span>
+              {{ isRepaying ? "Đang xử lý..." : "Thanh toán ngay" }}
             </button>
             <button
               v-if="order.status === 'shipping'"
@@ -531,11 +551,13 @@ const {
   isCancelling,
   isConfirmingReceived,
   isMergingCart,
+  isUnpaidOnlineOrder,
+  isProcessing,
+  isRepaying,
+  isSwitchingToCod,
   order,
   items,
   payment,
-  showCancelConfirm,
-  cancelMessage,
   showRefundDialog,
   showCancelRefundDialog,
   subtotal,
@@ -548,16 +570,15 @@ const {
   paymentStatusClass,
   paymentMethodMeta,
   isRefundable,
-  isPaidViaPayOS,
   formatDateTime,
   copyTransactionId,
   reviewProduct,
-  buyAgain,
   reorderAll,
-  onAcceptCancel,
   onConfirmCancelWithRefund,
   triggerCancel,
   confirmReceived,
+  repayNow,
+  switchToCod,
   openRefundDialog,
   router,
 } = useOrderDetail(orderId);
