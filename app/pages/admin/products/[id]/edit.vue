@@ -152,9 +152,8 @@ watch(
   () => {
     if (!formInitialized.value) return;
     if (form.discountPercentage > 0) {
-      form.originalPrice = Math.round(
-        form.price / (1 - form.discountPercentage / 100),
-      );
+      const calculated = form.price / (1 - form.discountPercentage / 100);
+      form.originalPrice = Math.round(calculated / 1000) * 1000;
     } else {
       form.originalPrice = form.price;
     }

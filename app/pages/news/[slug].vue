@@ -1,10 +1,5 @@
 <template>
   <div class="article-shell">
-    <div
-      class="fixed left-0 top-0 z-50 h-1 bg-linear-to-r from-orange-500 via-orange-600 to-green-600 transition-[width] duration-150"
-      :style="{ width: `${readingProgress}%` }"
-    />
-
     <main
       v-if="loading"
       class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8"
@@ -428,7 +423,9 @@ const submitComment = async () => {
     toast.add({
       severity: "error",
       summary: "Lỗi",
-      detail: error?.response?.data?.message || "Không thể gửi bình luận, vui lòng thử lại.",
+      detail:
+        error?.response?.data?.message ||
+        "Không thể gửi bình luận, vui lòng thử lại.",
       life: 3000,
     });
   }

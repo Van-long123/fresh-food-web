@@ -34,9 +34,9 @@ export const HOME_CAMPAIGN_BADGE_FALLBACKS = [
     textColor: 'text-white'
   },
   {
-    id: 'goi_y',
-    name: 'Gợi ý cho bạn',
-    slug: 'goi-y',
+    id: 'noi_bat',
+    name: 'Nổi bật',
+    slug: 'noi-bat',
     color: 'bg-[#0bb5d8]',
     textColor: 'text-white'
   }
