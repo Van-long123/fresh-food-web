@@ -187,34 +187,34 @@
       </div>
     </section>
 
-    <!-- SECTION 5: Stats -->
+    <!-- SECTION 5: Highlights -->
     <section
-      ref="statsSection"
       class="section-reveal py-20 px-6 bg-linear-to-b from-[#FFF7ED] to-white"
     >
       <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div
-            v-for="(stat, idx) in stats"
-            :key="stat.label"
-            class="text-center px-4 py-4"
-            :class="{
-              'lg:border-r lg:border-[#E5E7EB]': idx < stats.length - 1,
-            }"
+            v-for="item in stats"
+            :key="item.label"
+            class="text-center px-6 py-8 bg-white rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col items-center hover:shadow-md transition duration-300"
           >
-            <p class="text-[#F97316] text-4xl md:text-5xl font-extrabold">
-              {{ formatCount(stat.current) }}{{ stat.suffix }}
+            <span class="text-4xl mb-3">{{ item.icon }}</span>
+            <p class="text-[#F97316] text-2xl font-extrabold">
+              {{ item.value }}
             </p>
-            <p class="mt-2 text-[#16A34A] font-semibold text-sm md:text-base">
-              {{ stat.label }}
+            <p class="mt-1.5 text-[#16A34A] font-bold text-sm">
+              {{ item.label }}
+            </p>
+            <p class="mt-2 text-xs text-[#6B7280] leading-relaxed">
+              {{ item.desc }}
             </p>
           </div>
         </div>
 
-        <div class="mt-10 flex justify-center">
+        <div class="mt-12 flex justify-center">
           <NuxtLink
             :to="ROUTES.HOME"
-            class="w-full max-w-xs text-center bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold py-3 px-6 rounded-xl transition"
+            class="w-full max-w-xs text-center bg-[#F97316] hover:bg-[#EA580C] text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-lg shadow-[#F97316]/25 hover:shadow-xl hover:shadow-[#F97316]/35"
           >
             Khám phá sản phẩm của chúng tôi ->
           </NuxtLink>
@@ -245,7 +245,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { ROUTES } from "~/constants/routes";
 
 // Du lieu mock cho particles
@@ -312,36 +312,32 @@ const commitments = [
   },
 ];
 
-const statsSection = ref<HTMLElement | null>(null);
-const hasCounted = ref(false);
 const stats = ref([
-  { label: "Khách hàng tin tưởng", target: 300, current: 0, suffix: "+" },
-  { label: "Sản phẩm chất lượng", target: 500, current: 0, suffix: "+" },
-  { label: "Nhà cung cấp uy tín", target: 20, current: 0, suffix: "+" },
-  { label: "Khách hàng hài lòng", target: 98, current: 0, suffix: "%" },
+  {
+    label: "Khách hàng",
+    value: "Đồng hành",
+    desc: "Cung cấp bữa ăn sạch cho các gia đình Việt",
+    icon: "👥",
+  },
+  {
+    label: "Sản phẩm",
+    value: "Đa dạng",
+    desc: "Danh mục thực phẩm phong phú, an toàn",
+    icon: "🥦",
+  },
+  {
+    label: "Nhà cung cấp",
+    value: "Uy tín",
+    desc: "Hợp tác chặt chẽ cùng các nhà vườn đạt chuẩn",
+    icon: "🏡",
+  },
+  {
+    label: "Dịch vụ",
+    value: "Tận tâm",
+    desc: "Luôn đặt sự hài lòng của khách hàng lên đầu",
+    icon: "💚",
+  },
 ]);
-
-const formatCount = (value: number) => value.toLocaleString("vi-VN");
-
-const animateCountUp = () => {
-  if (hasCounted.value) return;
-  hasCounted.value = true;
-  const duration = 1500;
-  const start = performance.now();
-
-  const frame = (now: number) => {
-    const progress = Math.min((now - start) / duration, 1);
-    stats.value = stats.value.map((item) => ({
-      ...item,
-      current: Math.floor(item.target * progress),
-    }));
-    if (progress < 1) requestAnimationFrame(frame);
-  };
-
-  requestAnimationFrame(frame);
-};
-
-let observer: IntersectionObserver | null = null;
 
 onMounted(() => {
   // Hieu ung mount hero theo delay tung item
@@ -364,22 +360,6 @@ onMounted(() => {
     { threshold: 0.2 },
   );
   reveals.forEach((el) => revealObserver.observe(el));
-
-  // Trigger countup
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) animateCountUp();
-      });
-    },
-    { threshold: 0.35 },
-  );
-
-  if (statsSection.value) observer.observe(statsSection.value);
-});
-
-onBeforeUnmount(() => {
-  if (observer && statsSection.value) observer.unobserve(statsSection.value);
 });
 </script>
 

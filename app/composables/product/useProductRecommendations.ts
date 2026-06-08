@@ -11,8 +11,8 @@ const mapRecommendationToHomeProduct = (item: ProductRecommendationItem): HomePr
   id: item._id,
   slug: item.slug || '',
   name: item.title,
-  // Python service returns images[], use first as card image
-  image: item.images?.[0] || '',
+  // Prefer images[0], fallback to thumbnail
+  image: item.thumbnail || item.images?.[0] || '',
   price: item.price,
   originalPrice: null,
   discountPercent: null,

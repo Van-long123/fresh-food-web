@@ -195,11 +195,6 @@
               :key="step.title"
               class="relative rounded-xl border p-4 border-[#E5E7EB] bg-[#F9FAFB]"
             >
-              <div
-                class="mb-3 grid h-9 w-9 place-items-center rounded-full text-sm font-bold"
-              >
-                {{ idx + 1 }}
-              </div>
               <p class="text-sm font-semibold">{{ step.title }}</p>
               <p class="mt-2 text-sm text-[#6B7280]">{{ step.desc }}</p>
               <div
@@ -215,7 +210,7 @@
           class="spy-section rounded-2xl border border-[#E5E7EB] bg-white p-5"
         >
           <h2 class="text-xl font-bold">§4 - Hình thức hoàn tiền</h2>
-          <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
             <article
               v-for="item in refundMethods"
               :key="item.title"
@@ -366,28 +361,27 @@ const timelines = [
 ];
 
 const processSteps = [
-  { title: "📸 Bước 1", desc: "Chụp ảnh sản phẩm lỗi + giữ hóa đơn" },
+  { title: "📸 Bước 1", desc: "Chụp ảnh sản phẩm lỗi, giữ hóa đơn mua hàng" },
   {
-    title: "📞 Bước 2",
-    desc: "Liên hệ hotline hoặc gửi yêu cầu hỗ trợ qua zalo",
+    title: "💻 Bước 2",
+    desc: "Gửi yêu cầu hoàn tiền trực tiếp từ trang chi tiết đơn hàng (sau khi giao hàng thành công) hoặc liên hệ Hotline/Zalo OA",
   },
-  // { title: "📞 Bước 2", desc: "Liên hệ hotline hoặc gửi yêu cầu hỗ trợ" },
-  { title: "🚚 Bước 3", desc: "Shipper đến thu hồi hoặc giao hàng mới" },
-  { title: "✅ Bước 4", desc: "Hoàn tất - Hoàn tiền hoặc đổi hàng mới" },
+  { title: "🚚 Bước 3", desc: "Shipper đến thu hồi sản phẩm miễn phí" },
+  { title: "✅ Bước 4", desc: "Tiến hành đổi sản phẩm mới hoặc hoàn tiền" },
 ];
 
 const refundMethods = [
   {
     icon: "🏦",
-    title: "Chuyển khoản ngân hàng",
-    time: "1-3 ngày làm việc",
-    note: "Áp dụng theo thông tin tài khoản khách hàng",
+    title: "Chuyển khoản ngân hàng (COD)",
+    time: "Trong vòng 24 giờ làm việc",
+    note: "Áp dụng đối với các đơn hàng thanh toán COD hoặc qua chuyển khoản trực tiếp.",
   },
   {
-    icon: "💰",
-    title: "Tiền mặt khi thu hồi",
-    time: "Trong ngày",
-    note: "Áp dụng với khu vực nội thành",
+    icon: "💳",
+    title: "Hoàn qua cổng PayOS (VietQR)",
+    time: "Từ 1-2 ngày làm việc",
+    note: "Áp dụng đối với các đơn hàng thanh toán online thành công qua PayOS.",
   },
 ];
 

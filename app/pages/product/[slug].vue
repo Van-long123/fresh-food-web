@@ -208,7 +208,7 @@
             class="mt-5 grid grid-cols-1 gap-3 rounded-2xl bg-white p-4 text-sm sm:grid-cols-2"
           >
             <p><span class="text-[#4caf50]">✓</span> Giao hàng 2h</p>
-            <p><span class="text-[#4caf50]">✓</span> Đổi trả 7 ngày</p>
+            <p><span class="text-[#4caf50]">✓</span> Đổi trả trong vòng 24</p>
             <p><span class="text-[#4caf50]">✓</span> Chứng nhận VSATTP</p>
             <p><span class="text-[#4caf50]">✓</span> Xuất xứ rõ ràng</p>
           </div>

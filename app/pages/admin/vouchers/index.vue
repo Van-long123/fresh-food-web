@@ -255,7 +255,7 @@ const cancelDelete = () => {
             <option value="all">Tất cả trạng thái</option>
             <option value="active">Hoạt động</option>
             <option value="inactive">Ngừng hoạt động</option>
-            <option value="expired">Hết hạn</option>
+            <!-- <option value="expired">Hết hạn</option> -->
           </select>
         </div>
       </div>

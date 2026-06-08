@@ -88,6 +88,10 @@ export const API_ENDPOINTS = {
   SETTINGS: {
     GET: '/v1/client/settings'
   },
+  CHATBOT: {
+    MESSAGE: '/v1/client/chatbot/message',
+    HISTORY: '/v1/client/chatbot/history',
+  },
   // Admin
   ADMIN: {
     AUTH: {

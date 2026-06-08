@@ -1,9 +1,5 @@
 <template>
   <div ref="pageRef" class="font-sans text-gray-800 bg-white min-h-screen">
-    <div
-      class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-600 z-[9999] transition-[width] duration-150 ease-linear rounded-r-sm"
-      :style="{ width: readingProgress + '%' }"
-    />
     <section class="hero-banner" :class="{ visible: heroVisible }">
       <!-- SVG dấu check pattern mờ -->
       <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -235,8 +231,8 @@
                 dung được cung cấp qua Nền tảng SmartFood.
               </li>
               <li>
-                <strong>Nền tảng</strong>: Website smartfood.vn, ứng dụng di
-                động SmartFood và các kênh phân phối chính thức khác.
+                <strong>Nền tảng</strong>: Website smartfood và các kênh phân
+                phối chính thức khác.
               </li>
               <li>
                 <strong>Đơn hàng</strong>: Yêu cầu mua hàng được Người dùng tạo
@@ -398,9 +394,10 @@
                 dụng.
               </li>
               <li>
-                <strong>Phương thức thanh toán:</strong> Thẻ VISA/Mastercard
-                quốc tế, thẻ American Express, thẻ JCB, Apple Pay, Google Pay,
-                chuyển khoản ngân hàng quốc tế (SEPA/ACH tùy khu vực).
+                <strong>Phương thức thanh toán:</strong> SmartFood hỗ trợ thanh
+                toán khi nhận hàng (COD) và chuyển khoản qua mã VietQR của PayOS
+                (khách hàng có thể thực hiện thanh toán bằng hầu hết các ứng
+                dụng Mobile Banking của các ngân hàng Việt Nam).
               </li>
               <!-- <li>
                 <strong>Hóa đơn điện tử:</strong> Được gửi qua email trong vòng
@@ -444,7 +441,7 @@
             <ul class="term-list">
               <li>
                 <strong>Phạm vi giao hàng:</strong> Hiện tại phục vụ nội thành
-                Đà Nẵng (giao trong ngày).
+                Đà Nẵng.
               </li>
               <li>
                 <strong>Thời gian giao:</strong> Đơn đặt trước 18:00 được giao
@@ -452,8 +449,10 @@
                 chọn khung giờ giao thuận tiện khi thanh toán.
               </li>
               <li>
-                <strong>Phí giao hàng:</strong> Miễn phí với đơn từ 200.000đ
-                (nội thành).
+                <strong>Phí giao hàng:</strong> Phí giao hàng được tính tự động
+                dựa trên khoảng cách từ cửa hàng đến địa chỉ giao nhận của bạn
+                và sẽ hiển thị chi tiết tại bước thanh toán khi bạn đặt hàng
+                (không có chính sách miễn phí giao hàng).
               </li>
               <li>
                 <strong>Giao hàng thất bại:</strong> Nếu shipper không thể liên
@@ -497,14 +496,11 @@
                 so với đơn đặt.
               </li>
               <li>
-                <strong>Quy trình:</strong> Chụp ảnh sản phẩm → Liên hệ hotline
-                hoặc chat Zalo OA → Được xác nhận → Shipper đến lấy (miễn phí) →
-                Đổi hàng mới hoặc hoàn tiền.
+                <strong>Quy trình:</strong> Sau khi đơn hàng được giao hàng thành công, bạn có thể gửi yêu cầu trả hàng / hoàn tiền trực tiếp từ trang chi tiết đơn hàng trên hệ thống (hoặc liên hệ Hotline/Zalo OA). Quy trình thực hiện: Gửi yêu cầu trên hệ thống (kèm hình ảnh minh chứng) → Ban quản trị duyệt yêu cầu → Nhân viên giao hàng thu hồi sản phẩm miễn phí → Thực hiện đổi sản phẩm mới hoặc hoàn tiền cho khách hàng.
               </li>
               <li>
-                <strong>Thời gian hoàn tiền:</strong> Ví điện tử: 5–15 phút. Thẻ
-                ngân hàng: 3–7 ngày làm việc. COD: Chuyển khoản trong 24 giờ làm
-                việc.
+                <strong>Thời gian hoàn tiền:</strong> Thẻ ngân hàng: 1–2 ngày
+                làm việc. COD: Chuyển khoản trong 24 giờ làm việc.
               </li>
             </ul>
             <div class="highlight-box">

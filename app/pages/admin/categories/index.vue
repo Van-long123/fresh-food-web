@@ -199,7 +199,7 @@ const cancelDelete = () => {
         label: 'Thêm danh mục',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.CATEGORY_CREATE),
-        permission: PERMISSIONS.CATEGORIES.CREATE
+        permission: PERMISSIONS.CATEGORIES.CREATE,
       }"
     />
 

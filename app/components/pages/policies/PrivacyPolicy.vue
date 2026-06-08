@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="font-sans text-gray-900 bg-white"
-    style="font-family: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;"
-  >
+  <div class="font-sans text-gray-900 bg-white">
     <section class="csb-hero">
       <!-- Animated SVG pattern background -->
       <svg
@@ -54,12 +51,18 @@
         </div>
 
         <div>
-          <div class="inline-flex items-center gap-2 text-[12px] text-white/75 bg-white/[0.12] border border-white/20 rounded-full px-[14px] py-1 mb-3 tracking-[0.03em]">
+          <div
+            class="inline-flex items-center gap-2 text-[12px] text-white/75 bg-white/[0.12] border border-white/20 rounded-full px-[14px] py-1 mb-3 tracking-[0.03em]"
+          >
             <span>Hiệu lực từ 01/01/2025</span>
             <span class="opacity-50">•</span>
             <span>Phiên bản 2.0</span>
           </div>
-          <h1 class="text-[clamp(24px,4vw,36px)] font-extrabold text-white leading-[1.2] mb-[10px] tracking-[-0.02em]">Chính Sách Bảo Mật</h1>
+          <h1
+            class="text-[clamp(24px,4vw,36px)] font-extrabold text-white leading-[1.2] mb-[10px] tracking-[-0.02em]"
+          >
+            Chính Sách Bảo Mật
+          </h1>
           <p class="text-white/80 text-[15px] leading-[1.6] m-0 max-w-[500px]">
             Chúng tôi cam kết bảo vệ quyền riêng tư và minh bạch tuyệt đối về
             cách xử lý dữ liệu của bạn.
@@ -68,8 +71,14 @@
       </div>
 
       <!-- Trust badges strip -->
-      <div class="relative flex justify-center flex-wrap gap-2 px-6 pt-4 pb-5 bg-black/[0.15]">
-        <div v-for="(badge, i) in trustBadges" :key="i" class="flex items-center gap-[6px] text-[12px] font-semibold text-white bg-white/[0.12] border border-white/20 rounded-full px-[14px] py-[6px] hover:bg-white/20 transition-colors duration-200 cursor-default">
+      <div
+        class="relative flex justify-center flex-wrap gap-2 px-6 pt-4 pb-5 bg-black/[0.15]"
+      >
+        <div
+          v-for="(badge, i) in trustBadges"
+          :key="i"
+          class="flex items-center gap-[6px] text-[12px] font-semibold text-white bg-white/[0.12] border border-white/20 rounded-full px-[14px] py-[6px] hover:bg-white/20 transition-colors duration-200 cursor-default"
+        >
           <span class="text-[14px]">{{ badge.icon }}</span>
           <span>{{ badge.text }}</span>
         </div>
@@ -80,8 +89,13 @@
          QUICK SUMMARY CARD
     ══════════════════════════════════════════════════════ -->
     <div class="max-w-[1200px] mx-auto px-6">
-      <div class="my-8 bg-green-50 border-[1.5px] border-green-200 rounded-2xl overflow-hidden reveal" style="transition-delay: 150ms">
-        <div class="flex items-center gap-[10px] px-6 py-[14px] bg-green-600 text-white">
+      <div
+        class="my-8 bg-green-50 border-[1.5px] border-green-200 rounded-2xl overflow-hidden reveal"
+        style="transition-delay: 150ms"
+      >
+        <div
+          class="flex items-center gap-[10px] px-6 py-[14px] bg-green-600 text-white"
+        >
           <svg viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 shrink-0">
             <path
               fill-rule="evenodd"
@@ -89,19 +103,27 @@
               clip-rule="evenodd"
             />
           </svg>
-          <h2 class="text-[15px] font-bold m-0">📋 Tóm tắt chính sách (TL;DR)</h2>
+          <h2 class="text-[15px] font-bold m-0">📋 Tóm tắt chính sách</h2>
         </div>
-        <div class="grid gap-0 px-5 py-4" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div
+          class="grid gap-0 px-5 py-4"
+          style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))"
+        >
           <div
             v-for="(item, i) in summaryItems"
             :key="i"
             class="flex items-start gap-[10px] p-[10px] text-[13.5px] text-green-800 leading-[1.5] rounded-lg hover:bg-white/50 transition-colors duration-200 cursor-default"
           >
-            <span class="shrink-0 w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center text-[11px] font-bold mt-[1px]">✓</span>
+            <span
+              class="shrink-0 w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center text-[11px] font-bold mt-[1px]"
+              >✓</span
+            >
             <span>{{ item }}</span>
           </div>
         </div>
-        <p class="px-6 py-[10px] pb-[14px] text-[12px] text-[#4b7a5a] italic border-t border-green-200 m-0">
+        <p
+          class="px-6 py-[10px] pb-[14px] text-[12px] text-[#4b7a5a] italic border-t border-green-200 m-0"
+        >
           * Đây là bản tóm tắt ngắn gọn. Vui lòng đọc đầy đủ nội dung bên dưới
           để hiểu rõ hơn.
         </p>
@@ -116,9 +138,17 @@
       <aside class="w-[260px] shrink-0">
         <div class="csb-sidebar-sticky">
           <!-- Table of contents -->
-          <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-            <div class="flex items-center gap-2 px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.08em] text-gray-500 bg-gray-50 border-b border-gray-200">
-              <svg viewBox="0 0 20 20" fill="currentColor" class="w-[15px] h-[15px]">
+          <div
+            class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+          >
+            <div
+              class="flex items-center gap-2 px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.08em] text-gray-500 bg-gray-50 border-b border-gray-200"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="w-[15px] h-[15px]"
+              >
                 <path
                   fill-rule="evenodd"
                   d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
@@ -144,9 +174,17 @@
           </div>
 
           <!-- Privacy rights quick actions -->
-          <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)] p-4">
-            <div class="flex items-center gap-2 mb-2 text-[12px] font-extrabold uppercase tracking-[0.06em] text-green-700">
-              <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-green-600">
+          <div
+            class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)] p-4"
+          >
+            <div
+              class="flex items-center gap-2 mb-2 text-[12px] font-extrabold uppercase tracking-[0.06em] text-green-700"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="w-4 h-4 text-green-600"
+              >
                 <path
                   fill-rule="evenodd"
                   d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -171,92 +209,147 @@
           class="csb-section section-observe reveal"
         >
           <div class="flex items-start gap-5 mb-7">
-            <div class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1">01</div>
+            <div
+              class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1"
+            >
+              01
+            </div>
             <div>
-              <h2 class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]">Thông tin chúng tôi thu thập</h2>
+              <h2
+                class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]"
+              >
+                Thông tin chúng tôi thu thập
+              </h2>
               <p class="text-[14px] text-gray-500 m-0 leading-[1.5]">
                 Minh bạch về loại dữ liệu được thu thập khi bạn sử dụng dịch vụ
               </p>
             </div>
           </div>
 
-          <div class="grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+          <div
+            class="grid gap-4"
+            style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))"
+          >
             <div
               class="csb-info-card csb-info-card--provided reveal"
               style="transition-delay: 100ms"
             >
               <div class="flex items-center gap-[10px] mb-[14px]">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-green-600">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="w-5 h-5 text-green-600"
+                >
                   <path
                     fill-rule="evenodd"
                     d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
                     clip-rule="evenodd"
                   />
                 </svg>
-                <h3 class="text-[14px] font-bold m-0 text-gray-900">Dữ liệu bạn cung cấp</h3>
+                <h3 class="text-[14px] font-bold m-0 text-gray-900">
+                  Dữ liệu bạn cung cấp
+                </h3>
               </div>
               <ul class="list-none p-0 m-0 flex flex-col gap-2">
-                <li v-for="item in providedData" :key="item" class="flex items-center gap-[10px] text-[13.5px] text-gray-500">
-                  <span class="w-[6px] h-[6px] rounded-full bg-green-600 shrink-0" />
+                <li
+                  v-for="item in providedData"
+                  :key="item"
+                  class="flex items-center gap-[10px] text-[13.5px] text-gray-500"
+                >
+                  <span
+                    class="w-[6px] h-[6px] rounded-full bg-green-600 shrink-0"
+                  />
                   {{ item }}
                 </li>
               </ul>
             </div>
-            <div
+            <!-- <div
               class="csb-info-card csb-info-card--auto reveal"
               style="transition-delay: 200ms"
             >
               <div class="flex items-center gap-[10px] mb-[14px]">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-orange-500">
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="w-5 h-5 text-orange-500"
+                >
                   <path
                     fill-rule="evenodd"
                     d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z"
                     clip-rule="evenodd"
                   />
                 </svg>
-                <h3 class="text-[14px] font-bold m-0 text-gray-900">Thông tin hệ thống ghi nhận</h3>
+                <h3 class="text-[14px] font-bold m-0 text-gray-900">
+                  Thông tin hệ thống ghi nhận
+                </h3>
               </div>
               <ul class="list-none p-0 m-0 flex flex-col gap-2">
-                <li v-for="item in autoData" :key="item" class="flex items-center gap-[10px] text-[13.5px] text-gray-500">
-                  <span class="w-[6px] h-[6px] rounded-full bg-orange-500 shrink-0" />
+                <li
+                  v-for="item in autoData"
+                  :key="item"
+                  class="flex items-center gap-[10px] text-[13.5px] text-gray-500"
+                >
+                  <span
+                    class="w-[6px] h-[6px] rounded-full bg-orange-500 shrink-0"
+                  />
                   {{ item }}
                 </li>
               </ul>
-            </div>
+            </div> -->
           </div>
         </section>
 
         <!-- SECTION 2: Mục đích sử dụng -->
         <section id="purpose" class="csb-section section-observe reveal">
           <div class="flex items-start gap-5 mb-7">
-            <div class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1">02</div>
+            <div
+              class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1"
+            >
+              02
+            </div>
             <div>
-              <h2 class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]">Mục đích sử dụng dữ liệu</h2>
+              <h2
+                class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]"
+              >
+                Mục đích sử dụng dữ liệu
+              </h2>
               <p class="text-[14px] text-gray-500 m-0 leading-[1.5]">
                 Dữ liệu của bạn được dùng đúng mục đích, không vượt quá phạm vi
               </p>
             </div>
           </div>
 
-          <div class="border border-gray-200 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+          <div
+            class="border border-gray-200 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+          >
             <table class="w-full border-collapse text-[13.5px]">
               <thead>
                 <tr class="bg-gray-50">
-                  <th class="px-4 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.06em] text-gray-500 border-b border-gray-200">Mục đích</th>
-                  <th class="px-4 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.06em] text-gray-500 border-b border-gray-200">Loại dữ liệu sử dụng</th>
-                  <th class="px-4 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.06em] text-gray-500 border-b border-gray-200">Cơ sở pháp lý</th>
+                  <th
+                    class="px-4 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.06em] text-gray-500 border-b border-gray-200"
+                  >
+                    Mục đích
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-[11px] font-extrabold uppercase tracking-[0.06em] text-gray-500 border-b border-gray-200"
+                  >
+                    Loại dữ liệu sử dụng
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(row, i) in purposeRows" :key="i" class="hover:bg-green-50 transition-colors duration-150 [&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-gray-100">
-                  <td class="px-4 py-[13px] font-semibold text-gray-900 align-middle">{{ row.purpose }}</td>
-                  <td class="px-4 py-[13px] text-gray-500 align-middle">{{ row.type }}</td>
-                  <td class="px-4 py-[13px] align-middle">
-                    <span
-                      class="inline-block px-[10px] py-[3px] rounded-full text-[11px] font-bold whitespace-nowrap"
-                      :class="`csb-legal--${row.legalClass}`"
-                      >{{ row.legal }}</span
-                    >
+                <tr
+                  v-for="(row, i) in purposeRows"
+                  :key="i"
+                  class="hover:bg-green-50 transition-colors duration-150 [&:not(:last-child)>td]:border-b [&:not(:last-child)>td]:border-gray-100"
+                >
+                  <td
+                    class="px-4 py-[13px] font-semibold text-gray-900 align-middle"
+                  >
+                    {{ row.purpose }}
+                  </td>
+                  <td class="px-4 py-[13px] text-gray-500 align-middle">
+                    {{ row.type }}
                   </td>
                 </tr>
               </tbody>
@@ -267,9 +360,17 @@
         <!-- SECTION 3: Chia sẻ thông tin -->
         <section id="sharing" class="csb-section section-observe reveal">
           <div class="flex items-start gap-5 mb-7">
-            <div class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1">03</div>
+            <div
+              class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1"
+            >
+              03
+            </div>
             <div>
-              <h2 class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]">Chia sẻ thông tin</h2>
+              <h2
+                class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]"
+              >
+                Chia sẻ thông tin
+              </h2>
               <p class="text-[14px] text-gray-500 m-0 leading-[1.5]">
                 Chúng tôi chỉ chia sẻ dữ liệu khi thực sự cần thiết và có kiểm
                 soát
@@ -277,20 +378,35 @@
             </div>
           </div>
 
-          <div class="grid gap-4 mb-5" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+          <div
+            class="grid gap-4 mb-5"
+            style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"
+          >
             <div
               v-for="(s, i) in sharingOptions"
               :key="i"
               class="csb-share-card reveal"
               :style="{ transitionDelay: `${(i + 1) * 100}ms` }"
             >
-              <div class="w-11 h-11 bg-green-50 rounded-[10px] flex items-center justify-center text-[22px] mb-[14px]">
+              <div
+                class="w-11 h-11 bg-green-50 rounded-[10px] flex items-center justify-center text-[22px] mb-[14px]"
+              >
                 <span>{{ s.emoji }}</span>
               </div>
-              <h4 class="text-[14px] font-bold m-0 mb-2 text-gray-900">{{ s.title }}</h4>
-              <p class="text-[13px] text-gray-500 leading-[1.55] m-0 mb-3">{{ s.description }}</p>
-              <div class="flex items-center gap-[6px] text-[11.5px] font-semibold text-green-700">
-                <svg viewBox="0 0 20 20" fill="currentColor" class="w-[14px] h-[14px] text-green-600 shrink-0">
+              <h4 class="text-[14px] font-bold m-0 mb-2 text-gray-900">
+                {{ s.title }}
+              </h4>
+              <p class="text-[13px] text-gray-500 leading-[1.55] m-0 mb-3">
+                {{ s.description }}
+              </p>
+              <div
+                class="flex items-center gap-[6px] text-[11.5px] font-semibold text-green-700"
+              >
+                <svg
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="w-[14px] h-[14px] text-green-600 shrink-0"
+                >
                   <path
                     fill-rule="evenodd"
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -303,9 +419,17 @@
           </div>
 
           <!-- No-sell guarantee -->
-          <div class="flex items-start gap-4 px-6 py-5 bg-red-50 border-[1.5px] border-red-200 rounded-2xl">
-            <div class="shrink-0 w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-              <svg viewBox="0 0 20 20" fill="currentColor" class="w-[22px] h-[22px] text-red-600">
+          <div
+            class="flex items-start gap-4 px-6 py-5 bg-red-50 border-[1.5px] border-red-200 rounded-2xl"
+          >
+            <div
+              class="shrink-0 w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="w-[22px] h-[22px] text-red-600"
+              >
                 <path
                   fill-rule="evenodd"
                   d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
@@ -314,7 +438,10 @@
               </svg>
             </div>
             <div>
-              <strong class="block text-[14px] font-extrabold text-red-900 mb-[6px]">Cam kết tuyệt đối: KHÔNG BÁN DỮ LIỆU</strong>
+              <strong
+                class="block text-[14px] font-extrabold text-red-900 mb-[6px]"
+                >Cam kết tuyệt đối: KHÔNG BÁN DỮ LIỆU</strong
+              >
               <p class="text-[13px] text-red-700 leading-[1.55] m-0">
                 SmartFood không bao giờ bán, cho thuê hoặc trao đổi thông tin cá
                 nhân của bạn cho bất kỳ bên thứ ba nào vì mục đích thương mại mà
@@ -327,16 +454,27 @@
         <!-- SECTION 4 (formerly 5): Bảo mật -->
         <section id="security" class="csb-section section-observe reveal">
           <div class="flex items-start gap-5 mb-7">
-            <div class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1">04</div>
+            <div
+              class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1"
+            >
+              04
+            </div>
             <div>
-              <h2 class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]">Bảo mật dữ liệu</h2>
+              <h2
+                class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]"
+              >
+                Bảo mật dữ liệu
+              </h2>
               <p class="text-[14px] text-gray-500 m-0 leading-[1.5]">
                 Hệ thống bảo mật đa lớp bảo vệ thông tin của bạn 24/7
               </p>
             </div>
           </div>
 
-          <div class="grid gap-4 mb-5" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+          <div
+            class="grid gap-4 mb-5"
+            style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))"
+          >
             <div
               v-for="(sec, i) in securityMeasures"
               :key="i"
@@ -344,13 +482,23 @@
               :style="{ transitionDelay: `${(i + 1) * 100}ms` }"
             >
               <div class="text-[28px] mb-3">{{ sec.emoji }}</div>
-              <h4 class="text-[14px] font-bold text-gray-900 m-0 mb-2">{{ sec.title }}</h4>
-              <p class="text-[13px] text-gray-500 leading-[1.55] m-0">{{ sec.description }}</p>
+              <h4 class="text-[14px] font-bold text-gray-900 m-0 mb-2">
+                {{ sec.title }}
+              </h4>
+              <p class="text-[13px] text-gray-500 leading-[1.55] m-0">
+                {{ sec.description }}
+              </p>
             </div>
           </div>
 
-          <div class="flex items-center flex-wrap gap-3 px-5 py-4 bg-gray-100 rounded-[10px]">
-            <div class="text-[12px] font-bold text-gray-500 uppercase tracking-[0.06em]">Chứng nhận & Tiêu chuẩn:</div>
+          <div
+            class="flex items-center flex-wrap gap-3 px-5 py-4 bg-gray-100 rounded-[10px]"
+          >
+            <div
+              class="text-[12px] font-bold text-gray-500 uppercase tracking-[0.06em]"
+            >
+              Tiêu chuẩn bảo mật:
+            </div>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="cert in certifications"
@@ -365,9 +513,17 @@
         <!-- SECTION 5 (formerly 6): Quyền lợi -->
         <section id="rights" class="csb-section section-observe reveal">
           <div class="flex items-start gap-5 mb-7">
-            <div class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1">05</div>
+            <div
+              class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1"
+            >
+              05
+            </div>
             <div>
-              <h2 class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]">Quyền lợi của bạn</h2>
+              <h2
+                class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]"
+              >
+                Quyền lợi của bạn
+              </h2>
               <p class="text-[14px] text-gray-500 m-0 leading-[1.5]">
                 Bạn có đầy đủ quyền kiểm soát dữ liệu cá nhân theo quy định pháp
                 luật
@@ -375,7 +531,10 @@
             </div>
           </div>
 
-          <div class="grid gap-[14px]" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+          <div
+            class="grid gap-[14px]"
+            style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr))"
+          >
             <div
               v-for="(right, i) in userRights"
               :key="i"
@@ -384,8 +543,12 @@
             >
               <div class="text-[26px]">{{ right.emoji }}</div>
               <div>
-                <h4 class="text-[14px] font-bold text-gray-900 m-0 mb-[6px]">{{ right.title }}</h4>
-                <p class="text-[13px] text-gray-500 leading-[1.5] m-0">{{ right.description }}</p>
+                <h4 class="text-[14px] font-bold text-gray-900 m-0 mb-[6px]">
+                  {{ right.title }}
+                </h4>
+                <p class="text-[13px] text-gray-500 leading-[1.5] m-0">
+                  {{ right.description }}
+                </p>
               </div>
             </div>
           </div>
@@ -394,9 +557,17 @@
         <!-- SECTION 6 (formerly 7): Lưu giữ dữ liệu -->
         <section id="retention" class="csb-section section-observe reveal">
           <div class="flex items-start gap-5 mb-7">
-            <div class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1">06</div>
+            <div
+              class="shrink-0 w-11 h-11 bg-green-50 text-green-700 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold tracking-[0.05em] mt-1"
+            >
+              06
+            </div>
             <div>
-              <h2 class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]">Thời gian lưu giữ dữ liệu</h2>
+              <h2
+                class="text-[22px] font-extrabold text-gray-900 mb-[6px] tracking-[-0.01em] leading-[1.3]"
+              >
+                Thời gian lưu giữ dữ liệu
+              </h2>
               <p class="text-[14px] text-gray-500 m-0 leading-[1.5]">
                 Chúng tôi chỉ giữ dữ liệu trong thời gian cần thiết tối thiểu
               </p>
@@ -413,11 +584,18 @@
               <div class="flex items-start gap-[14px]">
                 <span class="text-[22px] shrink-0 mt-[2px]">{{ r.emoji }}</span>
                 <div>
-                  <strong class="block text-[14px] font-bold text-gray-900 mb-[3px]">{{ r.type }}</strong>
+                  <strong
+                    class="block text-[14px] font-bold text-gray-900 mb-[3px]"
+                    >{{ r.type }}</strong
+                  >
                   <p class="text-[12.5px] text-gray-400 m-0">{{ r.note }}</p>
                 </div>
               </div>
-              <div class="shrink-0 text-[12.5px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-[14px] py-[5px] whitespace-nowrap">{{ r.period }}</div>
+              <div
+                class="shrink-0 text-[12.5px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-[14px] py-[5px] whitespace-nowrap"
+              >
+                {{ r.period }}
+              </div>
             </div>
           </div>
         </section>
@@ -429,7 +607,9 @@
          FOOTER CTA
     ══════════════════════════════════════════════════════ -->
     <div class="bg-gray-900 px-6 py-12">
-      <div class="max-w-[800px] mx-auto flex flex-col items-center gap-4 text-center">
+      <div
+        class="max-w-[800px] mx-auto flex flex-col items-center gap-4 text-center"
+      >
         <div class="w-[52px] h-[52px] text-white opacity-90">
           <svg viewBox="0 0 64 64" fill="currentColor">
             <path
@@ -446,18 +626,34 @@
           </svg>
         </div>
         <div>
-          <h3 class="text-[20px] font-extrabold text-white m-0">Dữ liệu của bạn được bảo vệ tại SmartFood</h3>
-          <p class="text-[14px] text-gray-400 m-0 leading-[1.6] max-w-[500px] mt-1">
+          <h3 class="text-[20px] font-extrabold text-white m-0">
+            Dữ liệu của bạn được bảo vệ tại SmartFood
+          </h3>
+          <p
+            class="text-[14px] text-gray-400 m-0 leading-[1.6] max-w-[500px] mt-1"
+          >
             Chúng tôi định kỳ cập nhật chính sách để tuân thủ các quy định bảo
             vệ dữ liệu mới nhất.
           </p>
         </div>
         <div class="flex items-center gap-[10px]">
-          <NuxtLink :to="ROUTES.TERMS_OF_SERVICE" class="text-[13px] text-gray-500 no-underline font-medium hover:text-green-500 transition-colors duration-200">Điều khoản dịch vụ</NuxtLink>
+          <NuxtLink
+            :to="ROUTES.TERMS_OF_SERVICE"
+            class="text-[13px] text-gray-500 no-underline font-medium hover:text-green-500 transition-colors duration-200"
+            >Điều khoản dịch vụ</NuxtLink
+          >
           <span class="text-gray-700">·</span>
-          <NuxtLink :to="ROUTES.LEGAL" class="text-[13px] text-gray-500 no-underline font-medium hover:text-green-500 transition-colors duration-200">Pháp lý & Tuân thủ</NuxtLink>
+          <NuxtLink
+            :to="ROUTES.LEGAL"
+            class="text-[13px] text-gray-500 no-underline font-medium hover:text-green-500 transition-colors duration-200"
+            >Pháp lý & Tuân thủ</NuxtLink
+          >
           <span class="text-gray-700">·</span>
-          <a href="#" class="text-[13px] text-gray-500 no-underline font-medium hover:text-green-500 transition-colors duration-200">Tải PDF</a>
+          <a
+            href="#"
+            class="text-[13px] text-gray-500 no-underline font-medium hover:text-green-500 transition-colors duration-200"
+            >Tải PDF</a
+          >
         </div>
       </div>
     </div>
@@ -490,12 +686,12 @@ const trustBadges = [
 ];
 
 const summaryItems = [
-  "Thu thập: Tên, Email, SĐT, Địa chỉ giao hàng, IP thiết bị và lịch sử mua hàng.",
+  "Thu thập: Tên, Email, SĐT, Địa chỉ giao hàng và lịch sử mua hàng.",
   "Sử dụng: Chỉ dùng để xử lý đơn hàng, thanh toán và cải thiện trải nghiệm mua sắm.",
   "Chia sẻ: Chỉ với đối tác vận chuyển và cổng thanh toán — có ràng buộc bảo mật chặt chẽ.",
   "Không bao giờ bán, cho thuê hoặc trao đổi dữ liệu vì mục đích thương mại.",
   "Bạn có quyền xem, sửa, xuất hoặc yêu cầu xóa dữ liệu bất kỳ lúc nào.",
-  "Mọi dữ liệu được mã hóa SSL 256-bit và lưu tại máy chủ bảo mật tại Việt Nam.",
+  "Mọi dữ liệu được mã hóa và lưu tại máy chủ bảo mật tại Việt Nam.",
 ];
 
 const navItems = [
@@ -529,32 +725,22 @@ const purposeRows = [
   {
     purpose: "Xử lý đơn hàng",
     type: "Cá nhân + Địa chỉ + Liên hệ",
-    legal: "Hợp đồng",
-    legalClass: "contract",
   },
   {
     purpose: "Thanh toán an toàn",
-    type: "Giao dịch + Thẻ (mã hóa)",
-    legal: "Hợp đồng",
-    legalClass: "contract",
+    type: "Thông tin giao dịch và thanh toán",
   },
   {
     purpose: "Cải tiến dịch vụ",
     type: "Hành vi duyệt + Phản hồi",
-    legal: "Lợi ích hợp pháp",
-    legalClass: "legitimate",
   },
   {
     purpose: "Gửi khuyến mãi",
     type: "Email + Lịch sử mua hàng",
-    legal: "Sự đồng ý",
-    legalClass: "consent",
   },
   {
     purpose: "Phòng chống gian lận",
     type: "IP + Thiết bị + Giao dịch",
-    legal: "Nghĩa vụ pháp lý",
-    legalClass: "legal",
   },
 ];
 
@@ -570,7 +756,7 @@ const sharingOptions = [
     emoji: "💳",
     title: "Cổng Thanh toán",
     description:
-      "Kết nối qua VNPay/MoMo/ZaloPay với tiêu chuẩn bảo mật PCI DSS cấp độ quốc tế.",
+      "Kết nối qua cổng thanh toán PayOS đảm bảo an toàn giao dịch trực tuyến.",
     limit: "Chỉ thông tin giao dịch",
   },
   {
@@ -585,35 +771,34 @@ const sharingOptions = [
 const securityMeasures = [
   {
     emoji: "🔐",
-    title: "Mã hóa SSL/TLS 256-bit",
+    title: "Mã hóa truyền tải (HTTPS)",
     description:
-      "Toàn bộ dữ liệu truyền tải giữa bạn và máy chủ đều được mã hóa end-to-end.",
+      "Toàn bộ dữ liệu truyền tải giữa trình duyệt của bạn và máy chủ đều được mã hóa an toàn qua giao thức HTTPS.",
   },
   {
-    emoji: "📱",
-    title: "Xác thực 2 lớp (2FA)",
+    emoji: "🔑",
+    title: "Mã hóa mật khẩu",
     description:
-      "Bảo vệ tài khoản bằng mã OTP khi đăng nhập hoặc thay đổi thông tin quan trọng.",
+      "Mật khẩu tài khoản của bạn được mã hóa bảo mật một chiều trước khi lưu vào cơ sở dữ liệu.",
   },
   {
-    emoji: "🧱",
-    title: "Tường lửa WAF",
+    emoji: "🛡️",
+    title: "Bảo mật phiên JWT",
     description:
-      "Hàng rào bảo mật tiên tiến ngăn chặn DDoS, SQL Injection và XSS attacks.",
+      "Sử dụng mã thông báo (JSON Web Token) để xác thực và bảo vệ phiên làm việc của bạn an toàn.",
   },
   {
-    emoji: "🔄",
-    title: "Kiểm toán định kỳ",
+    emoji: "💾",
+    title: "Sao lưu định kỳ",
     description:
-      "Hệ thống được quét lỗ hổng và audit bảo mật hàng tuần bởi đội ngũ chuyên gia.",
+      "Dữ liệu hệ thống được sao lưu định kỳ để phòng ngừa sự cố và đảm bảo tính liên tục.",
   },
 ];
 
 const certifications = [
-  "ISO 27001",
-  "PCI DSS Level 1",
-  "SSL Secured",
-  "GDPR Compliant",
+  "Chuẩn bảo mật HTTPS",
+  "Mã hóa mật khẩu mật",
+  "Xác thực Token (JWT)",
 ];
 
 const userRights = [
@@ -660,31 +845,25 @@ const retentionItems = [
     emoji: "👤",
     type: "Thông tin tài khoản",
     period: "Suốt vòng đời tài khoản",
-    note: "Xóa trong 30 ngày sau khi đóng tài khoản",
+    note: "Xóa ngay sau khi người dùng yêu cầu hủy tài khoản",
   },
   {
     emoji: "🛒",
     type: "Lịch sử đơn hàng",
-    period: "5 năm",
-    note: "Theo yêu cầu kế toán và pháp lý",
+    period: "Theo vòng đời hệ thống",
+    note: "Lưu trữ để đối soát và thống kê doanh thu",
   },
   {
     emoji: "💳",
     type: "Dữ liệu thanh toán",
-    period: "3 năm",
-    note: "Mã hóa toàn bộ, không lưu số thẻ đầy đủ",
-  },
-  {
-    emoji: "📊",
-    type: "Dữ liệu phân tích",
-    period: "24 tháng",
-    note: "Ẩn danh hóa hoàn toàn sau khi lưu",
+    period: "Theo lịch sử đơn hàng",
+    note: "Không lưu thông tin thẻ/tài khoản ngân hàng, chỉ lưu mã giao dịch và trạng thái",
   },
   {
     emoji: "📝",
-    type: "Nhật ký truy cập",
-    period: "12 tháng",
-    note: "Phục vụ bảo mật và điều tra sự cố",
+    type: "Nhật ký hệ thống",
+    period: "6 tháng",
+    note: "Phục vụ bảo mật, tối ưu hóa và giám sát sự cố",
   },
 ];
 

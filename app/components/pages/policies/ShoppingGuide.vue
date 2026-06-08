@@ -50,7 +50,7 @@
       <div class="max-w-250 mx-auto">
         <h2 class="text-center text-3xl font-extrabold">Tổng Quan Quy Trình</h2>
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <article
+          <div
             v-for="(step, idx) in flowSteps"
             :key="step.title"
             class="flow-item relative rounded-2xl border border-[#E5E7EB] bg-white p-4 text-center"
@@ -64,13 +64,13 @@
             <h3 class="mt-3 font-bold">{{ step.title }}</h3>
             <p class="text-sm text-[#6B7280] mt-1">{{ step.subtitle }}</p>
             <p class="tooltip">{{ step.tip }}</p>
-          </article>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- SECTION 3: Detail with sidebar -->
-    <section class="py-10 px-4 md:px-6 bg-[#F9FAFB]">
+    <div class="py-10 px-4 md:px-6 bg-[#F9FAFB]">
       <div
         class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[28%_72%] gap-6"
       >
@@ -111,24 +111,24 @@
           >
             <h3 class="text-xl font-bold">§1 - Tìm kiếm & khám phá sản phẩm</h3>
             <div class="mt-4 space-y-3">
-              <article class="rounded-xl border border-[#E5E7EB] p-4">
+              <div class="rounded-xl border border-[#E5E7EB] p-4">
                 🔍 Tìm kiếm theo tên -
                 <span class="text-sm text-[#6B7280]"
                   >ô search giúp truy cập nhanh sản phẩm cần mua.</span
                 >
-              </article>
-              <article class="rounded-xl border border-[#E5E7EB] p-4">
+              </div>
+              <div class="rounded-xl border border-[#E5E7EB] p-4">
                 📂 Duyệt theo danh mục -
                 <span class="text-sm text-[#6B7280]"
                   >xem theo nhóm rau củ, thịt cá, đồ khô...</span
                 >
-              </article>
-              <article class="rounded-xl border border-[#E5E7EB] p-4">
+              </div>
+              <div class="rounded-xl border border-[#E5E7EB] p-4">
                 🏷️ Lọc theo giá -
                 <span class="text-sm text-[#6B7280]"
                   >rút gọn kết quả theo nhu cầu.</span
                 >
-              </article>
+              </div>
             </div>
             <p
               class="mt-3 rounded-lg bg-[#FFF7ED] border border-[#FED7AA] p-3 text-sm text-[#B45309]"
@@ -221,7 +221,7 @@
               class="mt-4 rounded-xl border border-[#E5E7EB] p-4 bg-[#f8fafc]"
             >
               <div class="space-y-3">
-                <article
+                <div
                   v-for="item in 2"
                   :key="item"
                   class="flex items-center gap-3 sm:gap-4 rounded-xl border bg-white p-3 sm:p-4 relative"
@@ -235,12 +235,13 @@
                         : 'border-gray-300 bg-white'
                     "
                   >
-                    <span
+                    <svg
                       v-if="item === 1"
-                      class="text-[10px] font-bold fill-current"
-                      ><svg viewBox="0 0 14 14" class="w-3 h-3">
-                        <path d="M5 10L2 7l1-1 2 2 6-6 1 1-7 7z" /></svg
-                    ></span>
+                      viewBox="0 0 14 14"
+                      class="w-3 h-3 text-[10px] font-bold fill-current"
+                    >
+                      <path d="M5 10L2 7l1-1 2 2 6-6 1 1-7 7z" />
+                    </svg>
                   </div>
                   <div
                     class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-300 border border-gray-50 shadow-inner"
@@ -297,7 +298,7 @@
                       🗑
                     </button>
                   </div>
-                </article>
+                </div>
               </div>
               <div class="mt-4 flex gap-2">
                 <input
@@ -323,7 +324,7 @@
           >
             <h3 class="text-xl font-bold">§4 - Thanh toán</h3>
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-              <article
+              <div
                 v-for="item in payments"
                 :key="item.title"
                 class="pay-card rounded-xl border border-[#E5E7EB] p-4 bg-[#F9FAFB]"
@@ -336,7 +337,7 @@
                   {{ item.badge }}
                 </p>
                 <p class="mt-2 text-sm text-[#6B7280]">{{ item.desc }}</p>
-              </article>
+              </div>
             </div>
             <p
               class="mt-4 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] text-[#166534] p-3 text-sm"
@@ -375,7 +376,7 @@
           </section>
         </div>
       </div>
-    </section>
+    </div>
 
     <!-- SECTION 4 delivery methods -->
     <section class="py-14 px-4 md:px-6 section-reveal">
@@ -384,7 +385,7 @@
           Phương Thức Giao Hàng
         </h2>
         <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <article
+          <div
             v-for="item in shippingMethods"
             :key="item.title"
             class="rounded-2xl border border-[#E5E7EB] p-5 bg-white"
@@ -392,34 +393,14 @@
             <p class="text-3xl">{{ item.icon }}</p>
             <h3 class="mt-2 font-bold">{{ item.title }}</h3>
             <p class="mt-1 text-sm text-[#6B7280]">{{ item.desc }}</p>
-          </article>
-        </div>
-
-        <div class="mt-6 overflow-x-auto rounded-xl border border-[#E5E7EB]">
-          <table class="w-full text-sm">
-            <thead class="bg-[#FFF7ED]">
-              <tr>
-                <th class="text-left px-4 py-2">Khoảng cách</th>
-                <th class="text-left px-4 py-2">Phí giao</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="row in fees"
-                :key="row.distance"
-                class="border-t border-[#E5E7EB]"
-              >
-                <td class="px-4 py-2">{{ row.distance }}</td>
-                <td class="px-4 py-2">{{ row.fee }}</td>
-              </tr>
-            </tbody>
-          </table>
+          </div>
         </div>
 
         <p
-          class="mt-3 text-center rounded-lg bg-[#FFF7ED] border border-[#FDBA74] p-3 text-[#C2410C] font-semibold"
+          class="mt-6 text-center rounded-lg bg-[#FFF7ED] border border-[#FDBA74] p-3 text-[#C2410C] font-semibold"
         >
-          Miễn phí giao hàng khi đơn >= 200.000đ
+          Lưu ý: Phí giao hàng được tính tự động dựa trên khoảng cách thực tế từ
+          cửa hàng và sẽ hiển thị chi tiết tại bước thanh toán khi bạn đặt hàng.
         </p>
       </div>
     </section>
@@ -463,7 +444,7 @@
       <div class="max-w-4xl mx-auto">
         <h2 class="text-3xl font-extrabold">FAQ mua sắm</h2>
         <div class="mt-5 space-y-3">
-          <article
+          <div
             v-for="(faq, idx) in faqs"
             :key="faq.q"
             class="border border-[#E5E7EB] rounded-xl overflow-hidden"
@@ -482,7 +463,7 @@
             <div class="faq-body" :class="{ open: openFaq === idx }">
               <p class="px-4 pb-4 text-sm text-[#6B7280]">{{ faq.a }}</p>
             </div>
-          </article>
+          </div>
         </div>
       </div>
     </section>
@@ -573,16 +554,10 @@ const shippingMethods = [
   },
 ];
 
-const fees = [
-  { distance: "< 5km", fee: "15.000đ" },
-  { distance: "5-10km", fee: "25.000đ" },
-  { distance: "> 10km", fee: "35.000đ" },
-];
-
 const faqs = [
   {
     q: "Đặt hàng xong bao lâu thì nhận được?",
-    a: "Nội thành có thể giao trong 2h, ngoài khu vực tùy khung giờ bạn chọn.",
+    a: "SmartFood chỉ hỗ trợ giao hàng trong khu vực Đà Nẵng, thời gian giao nhanh trong vòng 2h.",
   },
   {
     q: "Tôi có thể thay đổi / hủy đơn hàng không?",
@@ -590,19 +565,15 @@ const faqs = [
   },
   {
     q: "Đơn hàng tối thiểu là bao nhiêu?",
-    a: "SmartFood không áp mức tối thiểu, nhưng freeship áp dụng theo ngưỡng.",
+    a: "SmartFood không áp mức tối thiểu cho mỗi đơn hàng. Phí vận chuyển sẽ được tính dựa trên khoảng cách giao hàng thực tế.",
   },
   {
     q: "Tôi ở ngoại thành có giao không?",
     a: "Hiện tại chưa hỗ trợ giao hàng đến khu vực ngoại thành.",
   },
   {
-    q: "Làm sao biết shipper đang giao đến đâu?",
-    a: "Bạn theo dõi realtime trong phần đơn hàng của tài khoản.",
-  },
-  {
     q: "Đặt hàng qua app và web có khác nhau không?",
-    a: "Giá và chương trình cơ bản giống nhau, một số ưu đãi có thể áp dụng riêng theo kênh.",
+    a: "Giá và chương trình cơ bản giống nhau.",
   },
 ];
 

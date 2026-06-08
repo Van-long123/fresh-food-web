@@ -189,6 +189,8 @@ const validateForm = () => {
   if (!form.slug.trim()) errs.slug = "Vui lòng nhập slug sản phẩm.";
   if (!form.primary_category_id)
     errs.primary_category_id = "Vui lòng chọn danh mục chính.";
+  if (!form.category_ids || form.category_ids.length === 0)
+    errs.category_ids = "Vui lòng chọn ít nhất 1 danh mục phụ.";
   if (form.price <= 0) errs.price = "Giá phải lớn hơn 0 VND.";
   if (form.originalPrice > 0 && form.originalPrice < form.price)
     errs.originalPrice = "Giá gốc không được thấp hơn giá bán.";
@@ -426,6 +428,9 @@ const submitForm = () => {
                   filter
                   display="chip"
                 />
+                <p v-if="errors.category_ids" class="mt-1 text-xs text-red-500">
+                  {{ errors.category_ids }}
+                </p>
               </div>
 
               <!-- Đơn vị bán -->

@@ -139,6 +139,8 @@ const validateForm = () => {
   if (!form.authorName.trim()) errs.authorName = "Vui lòng nhập tên tác giả.";
   if (!form.primary_category_id)
     errs.primary_category_id = "Vui lòng chọn danh mục.";
+  if (!form.category_ids || form.category_ids.length === 0)
+    errs.category_ids = "Vui lòng chọn ít nhất 1 danh mục phụ.";
   if (!form.shortDescription.trim())
     errs.shortDescription = "Vui lòng nhập mô tả ngắn.";
   if (!form.content.trim()) errs.content = "Vui lòng nhập nội dung bài viết.";
@@ -350,6 +352,9 @@ const submitForm = async () => {
                   filter
                   display="chip"
                 />
+                <p v-if="errors.category_ids" class="mt-1 text-xs text-red-500">
+                  {{ errors.category_ids }}
+                </p>
               </div>
 
               <div class="md:col-span-2">

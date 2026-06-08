@@ -218,7 +218,7 @@ const handleBulkStatusChange = (status: "active" | "inactive") => {
         label: 'Thêm sản phẩm',
         icon: 'pi pi-plus',
         onClick: () => router.push(ROUTES.ADMIN.PRODUCT_CREATE),
-        permission: PERMISSIONS.PRODUCTS.CREATE
+        permission: PERMISSIONS.PRODUCTS.CREATE,
       }"
     />
 

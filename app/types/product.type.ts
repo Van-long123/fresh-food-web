@@ -122,6 +122,7 @@ export interface ProductRecommendationItem {
   slug: string | null
   price: number
   images: string[]
+  thumbnail?: string | null
   ratings: {
     totalRating: number
     numberOfRatings: number

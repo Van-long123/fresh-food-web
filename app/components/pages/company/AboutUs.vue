@@ -1,8 +1,5 @@
 <template>
   <div class="font-sans text-gray-800 bg-white overflow-x-hidden">
-    <!-- ═══════════════════════════════════════
-         SECTION 1 — HERO CINEMATIC
-         ═══════════════════════════════════════ -->
     <section ref="heroRef" class="hero">
       <!-- SVG Pattern lá cây mờ nhạt -->
       <div
@@ -22,7 +19,7 @@
         <div
           class="flex justify-center gap-12 border-t border-white/20 pt-6 mt-2 flex-wrap"
         >
-          <div
+          <!-- <div
             v-for="s in heroStats"
             :key="s.label"
             class="flex flex-col items-center gap-[0.2rem]"
@@ -34,7 +31,7 @@
             <span class="text-[0.8rem] text-white/75 font-medium">{{
               s.label
             }}</span>
-          </div>
+          </div> -->
         </div>
       </div>
     </section>
@@ -116,9 +113,9 @@
               với cam kết kết nối trực tiếp nông trại đến bàn ăn.
             </p>
             <p class="text-[0.9375rem] text-gray-600 leading-[1.8] mb-4">
-              Hôm nay, SmartFood phục vụ hơn 300 gia đình, hợp tác cùng 20+ nhà
-              cung cấp được kiểm định nghiêm ngặt, và tiên phong xây dựng hệ
-              thống thương mại điện tử thực phẩm sạch hàng đầu miền Trung.
+              Hôm nay, SmartFood tự hào đồng hành cùng nhiều hộ gia đình, hợp tác chặt chẽ với các
+              nhà cung cấp uy tín được kiểm định nghiêm ngặt, và không ngừng phát triển hệ thống
+              thương mại điện tử thực phẩm sạch tiện lợi, an toàn.
             </p>
             <ul class="list-none p-0 my-4 mb-7 flex flex-col gap-[0.625rem]">
               <li
@@ -132,8 +129,8 @@
               </li>
             </ul>
             <div class="flex gap-4 flex-wrap">
-              <button class="btn-primary-au">Xem sản phẩm của chúng tôi</button>
-              <button class="btn-outline-au">Liên hệ</button>
+              <NuxtLink :to="ROUTES.HOME" class="btn-primary-au no-underline">Xem sản phẩm của chúng tôi</NuxtLink>
+              <NuxtLink :to="ROUTES.SUPPORT" class="btn-outline-au no-underline">Liên hệ</NuxtLink>
             </div>
           </div>
         </div>
@@ -301,7 +298,7 @@
           :ref="(el) => observeEl(el)"
           class="text-center text-base text-gray-500 reveal"
         >
-          Cùng <strong class="text-orange-500">+20 nhân viên</strong> tận tâm
+          Cùng <strong class="text-orange-500">đội ngũ nhân sự</strong> tận tâm
         </p>
       </div>
     </section>
@@ -373,6 +370,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
+import { ROUTES } from "~/constants/routes";
 
 // ═══ CÁC REFS ════════════════════════════════════════════
 const heroRef = ref<HTMLElement | null>(null);
@@ -410,7 +408,7 @@ const missionCards = [
   {
     title: "Tầm Nhìn",
     icon: `<svg viewBox="0 0 48 48" fill="none" class="mc-svg"><ellipse cx="24" cy="24" rx="20" ry="12" stroke="#F97316" stroke-width="3"/><circle cx="24" cy="24" r="5" fill="#F97316"/><path d="M4 24C4 24 10 10 24 10C38 10 44 24 44 24" stroke="#F97316" stroke-width="2" stroke-dasharray="3 3"/></svg>`,
-    text: "Trở thành nền tảng thương mại điện tử thực phẩm sạch số 1 Việt Nam vào năm 2029, phục vụ 2 triệu gia đình với hơn 5.000 sản phẩm hữu cơ được chứng nhận.",
+    text: "Trở thành một trong những nền tảng thương mại điện tử thực phẩm sạch uy tín hàng đầu, phục vụ đông đảo các gia đình Việt với danh mục sản phẩm hữu cơ chất lượng và đa dạng.",
   },
   {
     title: "Giá Trị",
@@ -436,17 +434,17 @@ const timeline = [
   {
     year: "2026",
     title: "Mở rộng danh mục",
-    desc: "Ra mắt hơn 200 sản phẩm từ rau củ, trái cây đến thịt cá hữu cơ.",
+    desc: "Cung cấp đa dạng các dòng sản phẩm từ rau củ, trái cây đến thịt cá hữu cơ chất lượng.",
   },
   {
     year: "2026",
     title: "Nền tảng online ra đời",
-    desc: "Ứng dụng SmartFood ra mắt, mang đến trải nghiệm mua sắm thực phẩm sạch 24/7 ngay trên điện thoại.",
+    desc: "Ứng dụng SmartFood ra mắt, mang đến trải nghiệm mua sắm thực phẩm sạch tiện lợi ngay trên điện thoại.",
   },
   {
     year: "2026",
-    title: "Hệ sinh thái 10+ đối tác",
-    desc: "Hợp tác 10+ nhà cung cấp toàn quốc, đạt chứng nhận VSATTP, triển khai chuỗi lạnh tiêu chuẩn quốc tế.",
+    title: "Phát triển hệ sinh thái đối tác",
+    desc: "Hợp tác cùng nhiều nhà cung cấp uy tín, đạt chứng nhận VSATTP, triển khai chuỗi lạnh tiêu chuẩn quốc tế.",
   },
 ];
 
@@ -458,7 +456,7 @@ const team = [
     initials: "PVL",
     gradient: "linear-gradient(135deg, #F97316, #EA580C)",
     quote: "Thực phẩm sạch không phải xa xỉ phẩm — đó là quyền cơ bản",
-    bio: "10 năm kinh nghiệm ngành FMCG, từng làm việc tại Vincommerce và Big C trước khi sáng lập SmartFood.",
+    bio: "Nhiều năm kinh nghiệm trong ngành FMCG, từng làm việc tại các hệ thống bán lẻ lớn trước khi đồng sáng lập SmartFood.",
     socials: ["LinkedIn", "Twitter"],
   },
   {
@@ -468,7 +466,7 @@ const team = [
     gradient: "linear-gradient(135deg, #16A34A, #15803D)",
     quote:
       "Vận hành tốt là khi khách hàng nhận hàng mà không nghĩ đến vận hành",
-    bio: "Chuyên gia chuỗi cung ứng lạnh với 8 năm kinh nghiệm tại Masan Consumer và Cargill Việt Nam.",
+    bio: "Chuyên gia chuỗi cung ứng lạnh với nhiều năm kinh nghiệm tại các tập đoàn và doanh nghiệp lớn.",
     socials: ["LinkedIn"],
   },
   {
@@ -477,7 +475,7 @@ const team = [
     initials: "PVL",
     gradient: "linear-gradient(135deg, #6366F1, #4F46E5)",
     quote: "Công nghệ là cầu nối giữa nông trại và bàn ăn",
-    bio: "Senior Engineer với kinh nghiệm tại Grab và Tiki, chủ trì xây dựng toàn bộ platform SmartFood từ đầu.",
+    bio: "Kỹ sư công nghệ với kinh nghiệm xây dựng hệ thống tại các công ty công nghệ lớn, chịu trách nhiệm chính về nền tảng SmartFood.",
     socials: ["GitHub", "LinkedIn"],
   },
   {
@@ -486,7 +484,7 @@ const team = [
     initials: "PVL",
     gradient: "linear-gradient(135deg, #F59E0B, #D97706)",
     quote: "Mỗi sản phẩm tốt bắt đầu từ mảnh đất tốt",
-    bio: "Kỹ sư nông nghiệp, 12 năm làm việc với nông dân trên khắp Tây Nguyên và miền Trung, am hiểu sâu về canh tác hữu cơ.",
+    bio: "Kỹ sư nông nghiệp với nhiều năm đồng hành cùng nông dân, am hiểu sâu sắc về phương thức canh tác hữu cơ bền vững.",
     socials: ["LinkedIn"],
   },
 ];
@@ -515,7 +513,7 @@ const certs = [
     icon: "♻️",
     title: "Bao bì sinh thái",
     badge: "Eco-friendly packaging",
-    desc: "Sử dụng túi sinh học phân hủy và hộp tái chế, giảm 70% rác thải nhựa.",
+    desc: "Sử dụng túi sinh học phân hủy và hộp tái chế, hướng tới giảm thiểu tối đa rác thải nhựa.",
   },
 ];
 

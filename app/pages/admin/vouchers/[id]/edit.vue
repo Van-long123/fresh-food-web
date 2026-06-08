@@ -50,7 +50,7 @@ const categoryOptions = computed(() =>
 const statusOptions = [
   { label: "Hoạt động", value: "active" },
   { label: "Ngừng hoạt động", value: "inactive" },
-  { label: "Hết hạn", value: "expired" },
+  // { label: "Hết hạn", value: "expired" },
 ];
 
 const form = reactive<AdminVoucherFormValues>({

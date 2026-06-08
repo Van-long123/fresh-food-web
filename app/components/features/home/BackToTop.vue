@@ -2,7 +2,7 @@
   <button
     v-show="isVisible"
     aria-label="Back to Top"
-    class="fixed bottom-8 right-4 w-11 h-11 bg-white border border-gray-100 text-gray-500 hover:text-[#f47f20] hover:border-[#f47f20] rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_16px_rgba(244,127,32,0.15)] flex items-center justify-center transition-all duration-300 z-50 group origin-center hover:-translate-y-1"
+    class="fixed bottom-8 right-5 w-11 h-11 bg-white border border-gray-100 text-gray-500 hover:text-[#f47f20] hover:border-[#f47f20] rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_16px_rgba(244,127,32,0.15)] flex items-center justify-center transition-all duration-300 z-50 group origin-center hover:-translate-y-1"
     @click="scrollToTop"
   >
     <svg
