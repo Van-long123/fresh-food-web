@@ -1,23 +1,23 @@
 import { ref, computed } from 'vue'
 import {
-  useSendChatbotMessageMutation,
   useClearChatbotHistoryMutation,
 } from '~/mutations/chat/useSendChatbotMessageMutation'
 import { chatbotService } from '~/services/chatbot.service'
+import { streamChatbotMessageRequest } from '~/api/client/chat.api'
 import { getChatSessionId, resetChatSessionId, formatChatTime } from '~/utils/chat'
 import type { ChatMessage } from '~/types/chat.type'
 
 /**
  * Composable quản lý state và data flow của chatbox.
- * - Không dùng lifecycle hooks (onMounted, v.v.) — chỉ xử lý data flow.
- * - Lifecycle hooks đặt trong component .vue.
+ * Sử dụng SSE streaming (fetch + ReadableStream) thay cho axios mutation.
  */
 export const useChatbot = () => {
   const messages = ref<ChatMessage[]>([])
   const inputText = ref('')
   const sessionId = ref<string>('')
+  const isSending = ref(false)
+  const streamingContent = ref('') // Nội dung đang stream từng chữ
 
-  const { mutateAsync: sendMessageAsync, isPending: isSending } = useSendChatbotMessageMutation()
   const { mutateAsync: clearHistoryAsync, isPending: isClearing } = useClearChatbotHistoryMutation()
 
   // Computed: danh sách tin nhắn có thêm thời gian format
@@ -29,9 +29,7 @@ export const useChatbot = () => {
   )
 
   const isProcessing = computed(() => isSending.value || isClearing.value)
-
   const hasMessages = computed(() => messages.value.length > 0)
-
   const isLoadingHistory = ref(false)
 
   // Khởi tạo session (gọi trong onMounted của component)
@@ -59,31 +57,68 @@ export const useChatbot = () => {
     }
   }
 
-  // Thêm tin nhắn optimistically (user) trước khi gọi API
+  // Thêm tin nhắn vào danh sách
   const addMessage = (msg: ChatMessage) => {
     messages.value.push({ ...msg, createdAt: new Date() })
   }
 
-  // Gửi tin nhắn
+  // Gửi tin nhắn — dùng SSE streaming
   const sendMessage = async () => {
     const text = inputText.value.trim()
     if (!text || isSending.value) return
 
-    // Thêm tin nhắn user vào UI ngay lập tức (optimistic)
+    // 1. Thêm tin nhắn user ngay lập tức (optimistic)
     addMessage({ role: 'user', content: text })
     inputText.value = ''
+    isSending.value = true
+    streamingContent.value = ''
+
+    // 2. Thêm placeholder cho AI (sẽ cập nhật từng chunk)
+    const placeholderIndex = messages.value.length
+    messages.value.push({
+      role: 'assistant',
+      content: '',
+      createdAt: new Date(),
+      isStreaming: true, // Flag để component hiện hiệu ứng typing
+    } as any)
 
     try {
-      const response = await sendMessageAsync({
-        message: text,
-        sessionId: sessionId.value,
-      })
+      // 3. Gọi SSE stream — onChunk được gọi mỗi khi nhận 1 đoạn chữ
+      const fullReply = await streamChatbotMessageRequest(
+        { message: text, sessionId: sessionId.value },
+        (chunk: string) => {
+          streamingContent.value += chunk // Cập nhật để UI ẩn dấu 3 chấm
+          // Cập nhật trực tiếp nội dung placeholder trong mảng
+          if (messages.value[placeholderIndex]) {
+            messages.value[placeholderIndex] = {
+              ...messages.value[placeholderIndex],
+              content: (messages.value[placeholderIndex].content || '') + chunk,
+            }
+          }
+        }
+      )
 
-      // Thêm reply của AI
-      addMessage({ role: 'assistant', content: response.reply })
+      // 4. Đảm bảo nội dung cuối cùng đầy đủ và tắt flag streaming
+      if (messages.value[placeholderIndex]) {
+        messages.value[placeholderIndex] = {
+          role: 'assistant',
+          content: fullReply,
+          createdAt: messages.value[placeholderIndex].createdAt,
+        }
+      }
+
     } catch (error: any) {
-      const errMsg = error?.response?.data?.message || 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!'
-      addMessage({ role: 'assistant', content: errMsg })
+      const errMsg = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!'
+      if (messages.value[placeholderIndex]) {
+        messages.value[placeholderIndex] = {
+          role: 'assistant',
+          content: errMsg,
+          createdAt: messages.value[placeholderIndex].createdAt,
+        }
+      }
+    } finally {
+      isSending.value = false
+      streamingContent.value = ''
     }
   }
 
@@ -96,6 +131,7 @@ export const useChatbot = () => {
     }
     messages.value = []
     sessionId.value = resetChatSessionId()
+    initWelcomeMessage()
   }
 
   // Gửi tin nhắn chào mừng ban đầu từ bot
@@ -119,6 +155,7 @@ export const useChatbot = () => {
     isProcessing,
     isLoadingHistory,
     hasMessages,
+    streamingContent,
     initSession,
     initWelcomeMessage,
     sendMessage,

@@ -69,25 +69,11 @@
             aria-live="polite"
             @click="onMessagesClick"
           >
-            <!-- Welcome / empty state -->
-            <div v-if="!hasMessages" class="chat-panel__empty">
-              <div class="chat-panel__suggestions">
-                <p class="chat-panel__suggestions-label">Gợi ý câu hỏi:</p>
-                <div class="chat-panel__suggestions-list">
-                  <Chip
-                    v-for="(suggestion, idx) in QUICK_SUGGESTIONS"
-                    :key="idx"
-                    :label="suggestion"
-                    class="chat-suggestion-chip"
-                    @click="onQuickSuggestion(suggestion)"
-                  />
-                </div>
-              </div>
-            </div>
 
             <!-- Messages list -->
             <template v-for="(msg, idx) in formattedMessages" :key="idx">
               <div
+                v-show="msg.content !== ''"
                 class="chat-message"
                 :class="[
                   msg.role === 'user'
@@ -116,8 +102,8 @@
               </div>
             </template>
 
-            <!-- Typing indicator -->
-            <div v-if="isSending" class="chat-message chat-message--bot">
+            <!-- Typing indicator (chỉ hiện khi đang gửi và chưa có chữ nào được stream về) -->
+            <div v-if="isSending && !streamingContent" class="chat-message chat-message--bot">
               <Avatar
                 image="/icons/chatbot-avatar.svg"
                 shape="circle"
@@ -173,6 +159,7 @@ const {
   isSending,
   isClearing,
   hasMessages,
+  streamingContent,
   initSession,
   sendMessage,
   clearHistory,
@@ -184,14 +171,6 @@ const unreadCount = ref(0);
 const messagesContainerRef = ref<HTMLElement | null>(null);
 const router = useRouter();
 
-// ─── Quick suggestions ────────────────────────────────────────────────────────
-const QUICK_SUGGESTIONS = [
-  "Sản phẩm hữu cơ nào đang có?",
-  "Có voucher giảm giá không?",
-  "Kiểm tra đơn hàng của tôi",
-  "Thực phẩm tốt cho người giảm cân",
-  "Rau củ tươi hôm nay có gì?",
-];
 
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(async () => {
@@ -230,11 +209,6 @@ const onSendMessage = async () => {
 
 const onClearHistory = async () => {
   await clearHistory();
-};
-
-const onQuickSuggestion = (text: string) => {
-  inputText.value = text;
-  sendMessage();
 };
 
 /**

@@ -26,3 +26,67 @@ export const getChatbotHistoryRequest = async (
   })
   return response.data
 }
+
+/**
+ * Gọi endpoint SSE /chatbot/stream bằng fetch + ReadableStream.
+ * Mỗi khi backend gửi một chunk, callback onChunk(text) được gọi ngay.
+ * Khi stream kết thúc, Promise resolve với toàn bộ reply.
+ *
+ * @param payload   - { message, sessionId }
+ * @param onChunk   - Callback nhận từng đoạn chữ (streaming)
+ * @param signal    - AbortSignal để hủy request nếu cần
+ */
+export const streamChatbotMessageRequest = async (
+  payload: ChatSendPayload,
+  onChunk: (text: string) => void,
+  signal?: AbortSignal
+): Promise<string> => {
+  const config = useRuntimeConfig()
+  const baseUrl = config.public.apiBaseUrl as string
+  const url = `${baseUrl}${API_ENDPOINTS.CHATBOT.STREAM}`
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include', // Gửi cookie để xác thực (giống withCredentials: true)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal,
+  })
+
+  if (!response.ok || !response.body) {
+    throw new Error(`Lỗi kết nối stream: ${response.status}`)
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder('utf-8')
+  let fullReply = ''
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    buffer += decoder.decode(value, { stream: true })
+
+    // Tách từng dòng SSE (kết thúc bằng \n\n)
+    const lines = buffer.split('\n\n')
+    buffer = lines.pop() ?? '' // Phần chưa đủ — giữ lại cho lần đọc tiếp
+
+    for (const line of lines) {
+      const rawData = line.startsWith('data: ') ? line.slice(6) : line
+      if (!rawData.trim()) continue
+      try {
+        const parsed = JSON.parse(rawData)
+        if (parsed.type === 'chunk' && parsed.content) {
+          fullReply += parsed.content
+          onChunk(parsed.content) // Gọi callback ngay lập tức
+        }
+        // type === 'done' | 'error' → bỏ qua, vòng lặp while sẽ tự kết thúc
+      } catch {
+        // Bỏ qua dòng JSON lỗi
+      }
+    }
+  }
+
+  return fullReply
+}

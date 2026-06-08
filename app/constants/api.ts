@@ -90,6 +90,7 @@ export const API_ENDPOINTS = {
   },
   CHATBOT: {
     MESSAGE: '/v1/client/chatbot/message',
+    STREAM: '/v1/client/chatbot/stream',
     HISTORY: '/v1/client/chatbot/history',
   },
   // Admin
