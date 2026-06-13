@@ -45,13 +45,29 @@ export const streamChatbotMessageRequest = async (
   const baseUrl = config.public.apiBaseUrl as string
   const url = `${baseUrl}${API_ENDPOINTS.CHATBOT.STREAM}`
 
-  const response = await fetch(url, {
+  let response = await fetch(url, {
     method: 'POST',
     credentials: 'include', // Gửi cookie để xác thực (giống withCredentials: true)
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
     signal,
   })
+
+  // Nếu token hết hạn (410), mượn axios để trigger interceptor làm mới token, sau đó gọi lại fetch
+  if (response.status === 410) {
+    try {
+      await getChatbotHistoryRequest(payload.sessionId)
+    } catch (e) {
+      // Bỏ qua lỗi, miễn là quá trình refresh diễn ra
+    }
+    response = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal,
+    })
+  }
 
   if (!response.ok || !response.body) {
     throw new Error(`Lỗi kết nối stream: ${response.status}`)

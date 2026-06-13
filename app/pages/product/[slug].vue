@@ -515,6 +515,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+
 import { useToast } from "primevue/usetoast";
 import Rating from "primevue/rating";
 import ProgressSpinner from "primevue/progressspinner";
@@ -527,6 +528,10 @@ import { useAuthStore } from "~/stores/useAuthStore";
 import SkProductDetailPage from "~/components/skeletons/SkProductDetailPage.vue";
 import { ROUTES } from "~/constants/routes";
 import type { HomeProduct } from "~/types/home.type";
+
+definePageMeta({
+  key: route => route.fullPath
+});
 
 useHead({
   title: "Chi tiết sản phẩm - SmartFood",

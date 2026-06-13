@@ -232,8 +232,21 @@ const onMessagesClick = (e: MouseEvent) => {
   const target = e.target as HTMLElement;
   if (target.matches('.chat-link')) {
     e.preventDefault();
-    const href = target.getAttribute('href');
+    let href = target.getAttribute('href');
     if (href) {
+      href = href.trim();
+      // Đảm bảo là đường dẫn tuyệt đối bắt đầu từ root và loại bỏ domain nếu AI lỡ sinh ra
+      try {
+        // Parse URL, nếu href đã là absolute thì nó tự động lấy domain cũ, nếu relative thì lấy origin hiện tại
+        const urlObj = new URL(href, window.location.origin);
+        // Chỉ lấy phần sau domain
+        href = urlObj.pathname + urlObj.search + urlObj.hash;
+      } catch (e) {
+        if (!href.startsWith('/')) {
+          href = '/' + href;
+        }
+      }
+      
       router.push(href);
       closeChat(); 
     }

@@ -533,6 +533,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+
 import { useRoute } from "vue-router";
 import ConfirmDialog from "primevue/confirmdialog";
 import RefundRequestDialog from "~/components/pages/order/RefundRequestDialog.vue";
@@ -541,6 +542,10 @@ import { useRefundRequestQuery } from "~/queries/refund/useRefundQuery";
 import { useOrderDetail } from "~/composables/order/useOrderDetail";
 import { formatVnd } from "~/utils/currency";
 import { ROUTES } from "~/constants/routes";
+
+definePageMeta({
+  key: route => route.fullPath
+});
 
 const route = useRoute();
 const orderId = route.params.id as string;
