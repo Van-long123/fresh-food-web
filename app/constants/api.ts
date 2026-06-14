@@ -83,7 +83,8 @@ export const API_ENDPOINTS = {
     BANK_INFO: (id: string) => `/v1/client/refund-requests/${id}/bank-info`
   },
   UPLOAD: {
-    EDITOR_IMAGE: '/v1/upload/editor-image'
+    EDITOR_IMAGE: '/v1/upload/editor-image',
+    REVIEW_IMAGES: '/v1/upload/review-images'
   },
   SETTINGS: {
     GET: '/v1/client/settings'

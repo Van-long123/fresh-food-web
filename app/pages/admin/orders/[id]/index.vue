@@ -7,7 +7,7 @@ import { ROUTES } from "~/constants/routes";
 import { useAdminOrderDetailQuery } from "~/queries/order/useAdminOrdersQuery";
 import { useUpdateAdminOrderStatus } from "~/mutations/order/useUpdateAdminOrderStatus";
 import { formatDateTime, formatVND } from "~/utils/formatters";
-import { NEXT_STATUS_MAP, type OrderStatus } from "~/types/order.type";
+import { NEXT_STATUS_MAP, ORDER_STATUSES, type OrderStatus } from "~/types/order.type";
 
 definePageMeta({ layout: "admin", middleware: ["auth", "admin"] });
 
@@ -43,6 +43,11 @@ const nextStatuses = computed(
 
 // Computed: order items
 const orderItems = computed(() => order.value?.items ?? []);
+
+const getStatusLabel = (status: string) => {
+  const found = ORDER_STATUSES.find(s => s.value === status);
+  return found ? found.label : status;
+};
 
 // Computed: payment info
 const payment = computed(() => order.value?.payment ?? null);
@@ -594,7 +599,7 @@ const submitStatus = () => {
                 class="rounded-lg bg-slate-50 p-3 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400 text-center"
               >
                 <i class="pi pi-lock mr-1"></i>
-                Đơn hàng ở trạng thái <strong>{{ order.status }}</strong> —
+                Đơn hàng ở trạng thái <strong>{{ getStatusLabel(order.status) }}</strong> —
                 không thể thay đổi thêm.
               </div>
               <div>

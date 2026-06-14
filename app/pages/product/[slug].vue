@@ -306,19 +306,81 @@
                     />
                   </div>
 
+                  <!-- ── Upload ảnh review ─────────────────────────── -->
+                  <div class="review-image-upload">
+                    <p class="mb-2 text-sm font-semibold text-gray-700">
+                      Thêm hình ảnh
+                      <span class="font-normal text-gray-400">(tối đa 3 ảnh, sẽ được gửi cùng đánh giá)</span>
+                    </p>
+
+                    <!-- Khu vực preview + nút thêm ảnh -->
+                    <div class="flex flex-wrap gap-2">
+                      <!-- Preview ảnh cũ (URL) -->
+                      <div
+                        v-for="(url, idx) in reviewImages"
+                        :key="'old-'+idx"
+                        class="review-img-thumb"
+                      >
+                        <img :src="url" alt="review image" class="h-full w-full rounded-lg object-cover" />
+                        <button
+                          type="button"
+                          class="review-img-remove"
+                          title="Xóa ảnh"
+                          @click="removeOldReviewImage(idx)"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <!-- Preview ảnh đã chọn mới (File local) -->
+                      <div
+                        v-for="(file, idx) in reviewImageFiles"
+                        :key="'new-'+idx"
+                        class="review-img-thumb"
+                      >
+                        <img :src="createObjectURL(file)" alt="review image" class="h-full w-full rounded-lg object-cover" />
+                        <button
+                          type="button"
+                          class="review-img-remove"
+                          title="Xóa ảnh"
+                          @click="removeReviewImage(idx)"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <!-- Nút thêm ảnh (ẩn khi đủ 3 ảnh) -->
+                      <label
+                        v-if="(reviewImages.length + reviewImageFiles.length) < 3"
+                        class="review-img-add"
+                      >
+                        <input
+                          id="review-image-input"
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png"
+                          multiple
+                          class="hidden"
+                          @change="handleImageFiles"
+                        />
+                        <span class="text-2xl text-gray-400">+</span>
+                        <span class="mt-1 text-xs text-gray-400">Thêm ảnh</span>
+                      </label>
+                    </div>
+                  </div>
+                  <!-- ─────────────────────────────────────────────── -->
+
                   <button
                     class="review-submit"
-                    :disabled="isSubmitting"
+                    :disabled="isSubmitting || isUploadingImages"
                     @click="submitReview"
                   >
                     <ProgressSpinner
-                      v-if="isSubmitting"
-                      style="width: 18px; height: 18px"
-                      strokeWidth="6"
+                      v-if="isSubmitting || isUploadingImages"
+                      class="!m-0 shrink-0"
+                      style="width: 20px; height: 20px"
+                      strokeWidth="5"
                     />
-                    <span>{{
-                      isUpdateMode ? "Cập nhật ngay" : "Gửi đánh giá"
-                    }}</span>
+                    <span>{{ isUpdateMode ? "Cập nhật ngay" : (isUploadingImages ? "Đang tải ảnh..." : "Gửi đánh giá") }}</span>
                   </button>
                 </div>
               </div>
@@ -527,7 +589,7 @@ import { useCart } from "~/composables/cart/useCart";
 import { useAuthStore } from "~/stores/useAuthStore";
 import SkProductDetailPage from "~/components/skeletons/SkProductDetailPage.vue";
 import { ROUTES } from "~/constants/routes";
-import type { HomeProduct } from "~/types/home.type";
+import { uploadReviewImagesRequest } from "~/api/client/product.api";
 
 definePageMeta({
   key: route => route.fullPath
@@ -753,7 +815,9 @@ const roundedAverage = computed(() =>
 
 const reviewRating = ref(0);
 const reviewComment = ref("");
-const reviewImages = ref<string[]>([]);
+const reviewImages = ref<string[]>([]); // URL ảnh hiện tại (existing review)
+const reviewImageFiles = ref<File[]>([]); // File chọn mới (chưa upload)
+const isUploadingImages = ref(false);
 const reviewRatingText = computed(() =>
   reviewRating.value > 0
     ? `Bạn chọn ${reviewRating.value} sao`
@@ -767,11 +831,13 @@ watch(
       reviewRating.value = Number(review.rating || 0);
       reviewComment.value = review.comment || "";
       reviewImages.value = Array.isArray(review.images) ? review.images : [];
+      reviewImageFiles.value = []; // reset file mới
       return;
     }
     reviewRating.value = 0;
     reviewComment.value = "";
     reviewImages.value = [];
+    reviewImageFiles.value = [];
   },
   { immediate: true },
 );
@@ -792,6 +858,9 @@ const getRatingPercent = (score: number) => {
 const formatVnd = (value: number) => value.toLocaleString("vi-VN");
 
 const { addToCart: pushToCart } = useCart();
+
+// Helper cho template
+const createObjectURL = (file: File) => URL.createObjectURL(file);
 
 const toast = useToast();
 const { mutateAsync: submitReviewMutation, isPending: isSubmitting } =
@@ -838,11 +907,55 @@ const submitReview = async () => {
     return;
   }
 
+  // Upload ảnh mới (nếu có) trước khi gửi
+  let uploadedUrls: string[] = [];
+  if (reviewImageFiles.value.length > 0) {
+    isUploadingImages.value = true;
+    try {
+      const result = await uploadReviewImagesRequest(reviewImageFiles.value);
+      uploadedUrls = result.urls;
+    } catch {
+      toast.add({
+        severity: 'error',
+        summary: 'Upload ảnh thất bại',
+        detail: 'Không thể tải ảnh lên. Vui lòng thử lại.',
+        life: 3000,
+      });
+      isUploadingImages.value = false;
+      return;
+    }
+    isUploadingImages.value = false;
+  }
+
   await submitReviewMutation({
     rating: reviewRating.value,
     comment: reviewComment.value.trim(),
-    images: reviewImages.value,
+    images: [...reviewImages.value, ...uploadedUrls],
   });
+
+  // Reset sau khi gửi xong
+  reviewImageFiles.value = [];
+};
+
+const handleImageFiles = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) return;
+
+  const currentCount = reviewImages.value.length + reviewImageFiles.value.length;
+  const remaining = 3 - currentCount;
+  if (remaining <= 0) return;
+
+  const selected = Array.from(input.files).slice(0, remaining);
+  input.value = ''; // reset để có thể chọn lại cùng file
+  reviewImageFiles.value = [...reviewImageFiles.value, ...selected];
+};
+
+const removeOldReviewImage = (index: number) => {
+  reviewImages.value = reviewImages.value.filter((_, i) => i !== index);
+};
+
+const removeReviewImage = (index: number) => {
+  reviewImageFiles.value = reviewImageFiles.value.filter((_, i) => i !== index);
 };
 
 const reviewEligibilityMessage = computed(() => {
@@ -1162,5 +1275,64 @@ watch(
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ── Review Image Upload ──────────────────────────────── */
+.review-image-upload {
+  padding: 12px;
+  border-radius: 12px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+}
+
+.review-img-thumb {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.review-img-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.review-img-remove:hover {
+  background: rgba(239, 68, 68, 0.85);
+}
+
+.review-img-add {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 2px dashed #d1d5db;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.review-img-add:hover {
+  border-color: #f47f20;
+  background: #fff7ed;
 }
 </style>

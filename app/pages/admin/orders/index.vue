@@ -60,7 +60,9 @@ const {
   isError,
 } = useAdminOrdersQuery(queryParams);
 
-const orders = computed(() => ordersData.value?.data ?? []);
+const orders = computed<Record<string, any>[]>(
+  () => (ordersData.value?.data ?? []) as Record<string, any>[],
+);
 const total = computed(() => ordersData.value?.pagination?.total ?? 0);
 
 // Reset page on filter change
@@ -86,6 +88,11 @@ const columns = [
 ];
 
 // Computed helpers (no logic in template)
+const getStatusLabel = (status: string) => {
+  const found = ORDER_STATUSES.find((s) => s.value === status);
+  return found ? found.label : status;
+};
+
 const getNextStatuses = (currentStatus: string) => {
   const allowed = NEXT_STATUS_VALUES[currentStatus as OrderStatus] ?? [];
   return ORDER_STATUSES.filter((s) => allowed.includes(s.value));
@@ -306,7 +313,7 @@ const cancelEditStatus = () => {
             class="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
           >
             <option :value="row.status" disabled>
-              — Hiện tại: {{ row.status }} —
+              — Hiện tại: {{ getStatusLabel(row.status) }} —
             </option>
             <option
               v-for="s in getNextStatuses(row.status)"

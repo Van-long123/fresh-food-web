@@ -37,3 +37,12 @@ export const submitProductReviewRequest = async (slug: string, payload: SubmitRe
   const response = await getAuthorizedAxios().post(API_ENDPOINTS.PRODUCT.CREATE_REVIEW(slug), payload)
   return response.data
 }
+
+export const uploadReviewImagesRequest = async (files: File[]): Promise<{ urls: string[] }> => {
+  const formData = new FormData()
+  files.forEach((file) => formData.append('images', file))
+  const response = await getAuthorizedAxios().post(API_ENDPOINTS.UPLOAD.REVIEW_IMAGES, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+  return response.data as { urls: string[] }
+}
