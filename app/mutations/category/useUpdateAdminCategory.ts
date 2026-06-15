@@ -9,10 +9,7 @@ export const useUpdateAdminCategory = () => {
     mutationFn: ({ id, payload }: { id: string; payload: FormData }) =>
       adminCategoryService.update(id, payload),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: adminCategoryKeys.all,
-        refetchType: 'all'
-      })
+      queryClient.removeQueries({ queryKey: adminCategoryKeys.all })
 
       if (data?._id) {
         queryClient.setQueryData(adminCategoryKeys.detail(data._id), data)

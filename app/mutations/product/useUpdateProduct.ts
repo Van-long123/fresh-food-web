@@ -9,11 +9,8 @@ export const useUpdateAdminProduct = () => {
     mutationFn: ({ id, payload }: { id: string; payload: FormData }) =>
       adminProductService.update(id, payload),
     onSuccess: async (data) => {
-      // Invalidate cả list lẫn detail cụ thể
-      await queryClient.invalidateQueries({ 
-        queryKey: adminProductKeys.all,
-        refetchType: 'all' 
-      })
+      // Xóa toàn bộ cache list để tránh stale-while-revalidate hiển thị sai trang
+      queryClient.removeQueries({ queryKey: adminProductKeys.all })
       if (data?._id) {
         queryClient.setQueryData(adminProductKeys.detail(data._id), data)
       }

@@ -10,10 +10,7 @@ export const useUpdateAdminRole = () => {
     mutationFn: ({ id, payload }: { id: string; payload: Partial<AdminRolePayload> }) =>
       adminRoleService.update(id, payload),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: adminRoleKeys.all,
-        refetchType: 'all'
-      })
+      queryClient.removeQueries({ queryKey: adminRoleKeys.all })
       if (data?._id) {
         queryClient.setQueryData(adminRoleKeys.detail(data._id), data)
       }

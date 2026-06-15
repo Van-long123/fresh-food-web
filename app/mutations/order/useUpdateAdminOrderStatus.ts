@@ -10,10 +10,7 @@ export const useUpdateAdminOrderStatus = () => {
       adminOrderService.updateStatus(id, status),
     onSuccess: (data) => {
       // Invalidate list + update detail cache optimistically
-      queryClient.invalidateQueries({
-        queryKey: adminOrderKeys.all,
-        refetchType: 'all'
-      })
+      queryClient.removeQueries({ queryKey: adminOrderKeys.all })
       if (data?._id) {
         queryClient.setQueryData(adminOrderKeys.detail(data._id), data)
       }

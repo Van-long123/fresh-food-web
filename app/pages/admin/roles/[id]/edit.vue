@@ -223,7 +223,7 @@ const submitForm = () => {
           life: 3000,
         });
 
-        // router.push(ROUTES.ADMIN.ROLES);
+        router.back();
       },
       onError: (error: any) => {
         toast.add({

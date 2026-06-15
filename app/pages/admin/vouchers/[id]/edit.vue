@@ -132,7 +132,7 @@ const submitForm = async () => {
         });
 
         // Delay việc chuyển trang để người dùng kịp nhìn thấy toast
-        // router.push(ROUTES.ADMIN.VOUCHERS);
+        router.back();
       },
       onError: (error: any) => {
         toast.add({

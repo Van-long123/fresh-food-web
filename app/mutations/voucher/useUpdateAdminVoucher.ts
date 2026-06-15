@@ -10,10 +10,7 @@ export const useUpdateAdminVoucher = () => {
     mutationFn: ({ id, payload }: { id: string; payload: AdminVoucherFormValues }) =>
       adminVoucherService.update(id, payload),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: adminVoucherKeys.all,
-        refetchType: 'all',
-      })
+      queryClient.removeQueries({ queryKey: adminVoucherKeys.all })
       if (data?._id) {
         queryClient.setQueryData(adminVoucherKeys.detail(data._id), data)
       }

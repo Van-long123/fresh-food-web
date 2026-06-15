@@ -26,13 +26,18 @@ definePageMeta({
 useHead({ title: "Danh sách đơn hàng - Quản trị SmartFood" });
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 
 // Filter state
 const searchQuery = ref("");
 const statusFilter = ref<string>("all");
-const page = ref(1);
-const perPage = ref(10);
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  router.replace({ query: { ...route.query, ...patch } });
+};
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 const selectedIds = ref<string[]>([]);
 
@@ -67,7 +72,7 @@ const total = computed(() => ordersData.value?.pagination?.total ?? 0);
 
 // Reset page on filter change
 watch([searchQuery, statusFilter], () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
 });
 
 // Mutations
@@ -244,8 +249,10 @@ const cancelEditStatus = () => {
       :columns="columns"
       :data="orders"
       :total="total"
-      v-model:page="page"
-      v-model:perPage="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       :sortable="true"
       :sort="sortState"
       @update:sort="handleSortChange"

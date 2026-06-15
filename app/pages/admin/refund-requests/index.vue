@@ -13,12 +13,17 @@ definePageMeta({ layout: "admin", middleware: ["auth", "admin"] });
 useHead({ title: "Danh sách yêu cầu hoàn tiền - Quản trị SmartFood" });
 
 const router = useRouter();
+const route = useRoute();
 
 const searchQuery = ref("");
 const statusFilter = ref<string>("all");
 const methodFilter = ref<string>("all");
-const page = ref(1);
-const perPage = ref(10);
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  router.replace({ query: { ...route.query, ...patch } });
+};
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 
 const columns = [
@@ -85,7 +90,7 @@ const totalAmountLabel = computed(() =>
 );
 
 watch([searchQuery, statusFilter, methodFilter], () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
 });
 </script>
 
@@ -222,8 +227,10 @@ watch([searchQuery, statusFilter, methodFilter], () => {
       :columns="columns"
       :data="tableRows"
       :total="total"
-      v-model:page="page"
-      v-model:perPage="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       :sortable="true"
       :sort="sortState"
       :loading="isTableLoading"

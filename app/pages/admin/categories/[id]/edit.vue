@@ -174,7 +174,7 @@ const submitForm = () => {
           detail: `Đã cập nhật danh mục ${form.title}.`,
           life: 3000,
         });
-        // router.push(ROUTES.ADMIN.CATEGORIES);
+        router.back();
       },
       onError: () => {
         toast.add({

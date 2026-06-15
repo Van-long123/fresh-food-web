@@ -27,6 +27,7 @@ useHead({
 });
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 const { hasPermission } = usePermissions();
 
@@ -35,8 +36,12 @@ const statusFilter = ref<string>("all");
 const categoryFilter = ref<string>("all");
 const selectedIds = ref<string[]>([]);
 const isBulkDeleting = ref(false);
-const page = ref(1);
-const perPage = ref(10);
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  router.replace({ query: { ...route.query, ...patch } });
+};
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>({
   key: "publishedAt",
   direction: "desc",
@@ -93,7 +98,7 @@ const getCategoryTitle = (catId: string) => {
 };
 
 watch([searchQuery, statusFilter, categoryFilter], () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
 });
 
 const handleSortChange = (
@@ -106,7 +111,7 @@ const handleSortChange = (
     return;
   }
   sortState.value = sort || { key: "publishedAt", direction: "desc" };
-  page.value = 1;
+  updateQuery({ page: undefined });
 };
 
 const handleSelectionChange = (ids: Array<string | number>) => {
@@ -309,8 +314,10 @@ const formatDate = (dateStr?: string | null) => {
       :columns="columns"
       :data="articles"
       :total="total"
-      v-model:page="page"
-      v-model:perPage="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       :loading="isLoading || isFetching"
       :selectable="true"
       :selection="selectedIds"

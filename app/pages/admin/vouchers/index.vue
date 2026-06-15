@@ -28,6 +28,7 @@ useHead({
 });
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 const { hasPermission } = usePermissions();
 
@@ -37,8 +38,12 @@ const typeFilter = ref<string>("all");
 const selectedIds = ref<string[]>([]);
 
 // Pagination
-const page = ref(1);
-const perPage = ref(10);
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  router.replace({ query: { ...route.query, ...patch } });
+};
 
 // Sorting
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
@@ -101,7 +106,7 @@ const handleSelectionChange = (ids: Array<string | number>) => {
 };
 
 watch([searchQuery, statusFilter, typeFilter], () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
   selectedIds.value = [];
 });
 
@@ -297,8 +302,10 @@ const cancelDelete = () => {
       :data="paginatedVouchers"
       :total="total"
       :loading="isLoading || isFetching"
-      v-model:page="page"
-      v-model:perPage="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       :selectable="true"
       :selection="selectedIds"
       :sortable="true"

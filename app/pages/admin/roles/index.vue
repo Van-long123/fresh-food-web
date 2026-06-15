@@ -25,6 +25,7 @@ useHead({
 });
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 const { hasPermission } = usePermissions();
 
@@ -33,8 +34,12 @@ const selectedIds = ref<string[]>([]);
 const isBulkDeleting = ref(false);
 
 // Pagination
-const page = ref(1);
-const perPage = ref(10);
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  router.replace({ query: { ...route.query, ...patch } });
+};
 
 // Sorting
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
@@ -81,14 +86,14 @@ const deleteLoading = computed(
 );
 
 watch(searchQuery, () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
 });
 
 const handleSortChange = (
   sort: { key: string; direction: "asc" | "desc" } | null,
 ) => {
   sortState.value = sort;
-  page.value = 1;
+  updateQuery({ page: undefined });
 };
 
 const handleSelectionChange = (ids: Array<string | number>) => {
@@ -216,8 +221,10 @@ const cancelDelete = () => {
       :columns="columns"
       :data="roles"
       :total="total"
-      v-model:page="page"
-      v-model:perPage="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       :selectable="true"
       :selection="selectedIds"
       :sortable="true"

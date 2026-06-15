@@ -11,14 +11,8 @@ export const useUpdateAdminUser = () => {
     mutationFn: ({ id, payload }: { id: string; payload: Partial<AdminUserPayload> | FormData }) =>
       adminUserService.update(id, payload),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: adminUserKeys.all,
-        refetchType: 'all'
-      })
-      await queryClient.invalidateQueries({
-        queryKey: adminRoleKeys.all,
-        refetchType: 'all'
-      })
+      queryClient.removeQueries({ queryKey: adminUserKeys.all })
+      queryClient.removeQueries({ queryKey: adminRoleKeys.all })
       if (data?._id) {
         queryClient.setQueryData(adminUserKeys.detail(data._id), data)
       }

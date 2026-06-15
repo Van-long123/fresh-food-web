@@ -25,6 +25,7 @@ definePageMeta({ layout: "admin", middleware: ["auth", "admin"] });
 useHead({ title: "Danh sách thanh toán - Quản trị SmartFood" });
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 
 // Filter state
@@ -33,8 +34,12 @@ const statusFilter = ref<AdminPaymentQueryParams["status"] | "all">("all");
 const methodFilter = ref<AdminPaymentQueryParams["paymentMethod"] | "all">(
   "all",
 );
-const page = ref(1);
-const perPage = ref(10);
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  router.replace({ query: { ...route.query, ...patch } });
+};
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 
 // COD confirm dialog
@@ -81,7 +86,7 @@ const stats = computed(() => ({
 
 // Reset page on filter changes
 watch([searchQuery, statusFilter, methodFilter], () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
 });
 
 // Mutations
@@ -282,8 +287,10 @@ const confirmCodReceived = () => {
     </div>
 
     <AppDataTable
-      v-model:page="page"
-      v-model:per-page="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       :columns="columns"
       :data="tablePayments"
       :total="total"

@@ -16,7 +16,7 @@ export const useApproveAdminRefundRequestMutation = () => {
         detail: 'Đã duyệt yêu cầu hoàn tiền',
         life: 3000
       })
-      queryClient.invalidateQueries({ queryKey: adminRefundKeys.all, refetchType: 'all' })
+      queryClient.removeQueries({ queryKey: adminRefundKeys.all })
       queryClient.invalidateQueries({ queryKey: adminRefundKeys.detail(requestId) })
     },
     onError: (error: any) => {
@@ -44,7 +44,7 @@ export const useRejectAdminRefundRequestMutation = () => {
         detail: 'Yêu cầu hoàn tiền đã bị từ chối',
         life: 3000
       })
-      queryClient.invalidateQueries({ queryKey: adminRefundKeys.all, refetchType: 'all' })
+      queryClient.removeQueries({ queryKey: adminRefundKeys.all })
       queryClient.invalidateQueries({ queryKey: adminRefundKeys.detail(variables.id) })
     },
     onError: (error: any) => {
@@ -72,7 +72,7 @@ export const useCompleteAdminRefundRequestMutation = () => {
         detail: 'Yêu cầu hoàn tiền đã hoàn tất',
         life: 3000
       })
-      queryClient.invalidateQueries({ queryKey: adminRefundKeys.all, refetchType: 'all' })
+      queryClient.removeQueries({ queryKey: adminRefundKeys.all })
       queryClient.invalidateQueries({ queryKey: adminRefundKeys.detail(variables.id) })
     },
     onError: (error: any) => {

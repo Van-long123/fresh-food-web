@@ -9,10 +9,7 @@ export const useUpdateAdminArticle = () => {
     mutationFn: ({ id, payload }: { id: string; payload: FormData }) =>
       adminArticleService.update(id, payload),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({
-        queryKey: adminArticleKeys.all,
-        refetchType: "all",
-      });
+      queryClient.removeQueries({ queryKey: adminArticleKeys.all });
       if (data?._id) {
         queryClient.setQueryData(adminArticleKeys.detail(data._id), data);
       }

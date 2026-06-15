@@ -18,12 +18,17 @@ useHead({
 });
 
 const router = useRouter();
+const route = useRoute();
 
 const searchQuery = ref("");
 const statusFilter = ref<"all" | "pending" | "approved" | "rejected">("all");
 const ratingFilter = ref<number | "all">("all");
-const page = ref(1);
-const perPage = ref(10);
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  router.replace({ query: { ...route.query, ...patch } });
+};
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>(null);
 
 const columns = [
@@ -63,7 +68,7 @@ const ratingStats = computed(() => {
 });
 
 watch([searchQuery, statusFilter, ratingFilter], () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
 });
 </script>
 
@@ -151,8 +156,10 @@ watch([searchQuery, statusFilter, ratingFilter], () => {
       :columns="columns"
       :data="reviews"
       :total="total"
-      v-model:page="page"
-      v-model:perPage="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       v-model:sort="sortState"
       :sortable="true"
       :loading="isLoading"

@@ -180,6 +180,7 @@ const submitForm = async () => {
             detail: `Đã cập nhật bài viết '${form.title}'`,
             life: 3000,
           });
+          router.back();
         },
         onError: (error: any) => {
           toast.add({

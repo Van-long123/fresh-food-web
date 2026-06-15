@@ -224,7 +224,7 @@ const submitForm = () => {
           detail: `Đã cập nhật ${result.title}.`,
           life: 3000,
         });
-        // router.push(ROUTES.ADMIN.PRODUCTS);
+        router.back();
       },
       onError: (error: any) => {
         toast.add({

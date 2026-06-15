@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import AppDataTable from "~/components/admin/DataTable.vue";
 import PageHeader from "~/components/admin/PageHeader.vue";
 import SearchToolbar from "~/components/admin/SearchToolbar.vue";
@@ -31,26 +31,37 @@ useHead({
 });
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 const { hasPermission } = usePermissions();
 
-// State
+// State — URL là source of truth duy nhất, tránh 2 chiều watcher gây xung đột
 const searchQuery = ref("");
 const statusFilter = ref<string>("all");
-const page = ref(1);
-const perPage = ref(10);
+
+// page/perPage lấy thẳng từ URL, không dùng ref riêng — khi navigate về từ edit page sẽ tự đặt lại
+const page = computed(() => Number(route.query.page) || 1);
+const perPage = computed(() => Number(route.query.limit) || 10);
+
 const sortState = ref<{ key: string; direction: "asc" | "desc" } | null>({
   key: "position",
   direction: "asc",
 });
 const selectedIds = ref<string[]>([]);
 
+// Helper: cập nhật URL query khi user thay đổi pagination
+const updateQuery = (patch: Record<string, string | undefined>) => {
+  // Dùng ...route.query để giữ lại TẤT CẢ param trên URL hiện tại (vd: limit, keyword...)
+  // Vue Router sẽ tự động xóa các param có giá trị là undefined trong patch
+  router.replace({ query: { ...route.query, ...patch } });
+};
+
 // Delete state
 const deleteTarget = ref<AdminProduct | null>(null);
 const showDeleteDialog = ref(false);
 const isBulkDeleting = ref(false);
 
-// Query Params (reactive)
+// Query Params (reactive) — lấy thẳng từ URL
 const queryParams = computed<AdminProductQueryParams>(() => {
   const params: AdminProductQueryParams = {
     page: page.value,
@@ -94,7 +105,7 @@ const columns = [
 // Handlers
 // Reset page về 1 khi search/filter thay đổi
 watch([searchQuery, statusFilter], () => {
-  page.value = 1;
+  updateQuery({ page: undefined });
 });
 
 const handleSortChange = (
@@ -107,7 +118,7 @@ const handleSortChange = (
     return;
   }
   sortState.value = sort || { key: "position", direction: "asc" };
-  page.value = 1;
+  updateQuery({ page: undefined });
 };
 
 const handleSelectionChange = (ids: Array<string | number>) => {
@@ -288,8 +299,10 @@ const handleBulkStatusChange = (status: "active" | "inactive") => {
       :columns="columns"
       :data="products"
       :total="total"
-      v-model:page="page"
-      v-model:perPage="perPage"
+      :page="page"
+      :perPage="perPage"
+      @update:page="(p) => updateQuery({ page: p > 1 ? String(p) : undefined })"
+      @update:perPage="(l) => updateQuery({ limit: String(l), page: undefined })"
       :selectable="true"
       :selection="selectedIds"
       :sortable="true"
