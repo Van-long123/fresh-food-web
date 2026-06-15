@@ -14,6 +14,7 @@ import { useAdminCategoriesQuery } from '~/queries/category/useAdminCategoriesQu
 import { useCreateAdminCategory } from '~/mutations/category/useCreateAdminCategory'
 import { buildCreateCategoryPayload } from '~/services/admin/category.service'
 import type { CategoryFormData } from '~/types/category.type'
+import { useAiContentGenerator } from '~/composables/useAiContentGenerator'
 
 definePageMeta({
   layout: 'admin',
@@ -66,6 +67,14 @@ const parentQueryParams = computed(() => ({
 
 const { data: categoriesData, isLoading: isCategoriesLoading } = useAdminCategoriesQuery(parentQueryParams)
 const { mutate: createCategory } = useCreateAdminCategory()
+const { isGenerating, generate } = useAiContentGenerator()
+
+const generateCategoryContent = async () => {
+  const result = await generate(form.title, 'category')
+  if (!result) return
+  if ('badge' in result) form.badgeText = result.badge
+  if ('description' in result) form.description = result.description
+}
 
 const parentOptions = computed(() => {
   const categories = categoriesData.value?.data ?? []
@@ -154,6 +163,20 @@ const submitForm = () => {
           <p class="mt-1 text-sm text-slate-500 dark:text-slate-300">Tạo một nhóm mới để phân loại sản phẩm hoặc bài viết.</p>
         </div>
         <div class="flex items-center gap-2">
+          <button
+            type="button"
+            :disabled="isGenerating || !form.title.trim()"
+            class="flex items-center gap-1.5 rounded-full bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-900/30 dark:text-violet-300 dark:hover:bg-violet-900/50"
+            @click="generateCategoryContent"
+            v-tooltip.bottom="'Tự động tạo Nhãn hiển thị và Mô tả dựa vào tên danh mục'"
+          >
+            <i :class="isGenerating ? 'pi pi-spin pi-spinner' : 'pi pi-sparkles'" />
+            <span class="hidden sm:inline">{{ isGenerating ? 'Đang tạo nội dung AI...' : 'Tự động viết nội dung' }}</span>
+            <span class="sm:hidden">AI</span>
+          </button>
+          
+          <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
           <button
             class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
             @click="router.back()"

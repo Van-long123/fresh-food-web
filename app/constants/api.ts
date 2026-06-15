@@ -186,6 +186,9 @@ export const API_ENDPOINTS = {
       APPROVE: (id: string) => `/v1/admin/refund-requests/${id}/approve`,
       REJECT: (id: string) => `/v1/admin/refund-requests/${id}/reject`,
       COMPLETE: (id: string) => `/v1/admin/refund-requests/${id}/complete`,
+    },
+    AI_CONTENT: {
+      GENERATE: '/v1/admin/ai-content/generate'
     }
   }
 } as const

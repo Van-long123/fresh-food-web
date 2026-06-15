@@ -14,6 +14,7 @@ import { useAdminCategoriesQuery } from "~/queries/product/useAdminCategoriesQue
 import { useCreateAdminProduct } from "~/mutations/product/useCreateProduct";
 import { buildCreateProductPayload } from "~/services/admin/product.service";
 import { slugify } from "~/utils/formatters";
+import { useAiContentGenerator } from "~/composables/useAiContentGenerator";
 
 definePageMeta({
   layout: "admin",
@@ -32,6 +33,14 @@ const { data: categoriesData, isLoading: isCategoriesLoading } =
   useAdminCategoriesQuery();
 const { mutate: createProduct, isPending: isSubmitting } =
   useCreateAdminProduct();
+const { isGenerating, generate } = useAiContentGenerator();
+
+const generateProductContent = async () => {
+  const result = await generate(form.title, 'product');
+  if (!result) return;
+  if ('description' in result) form.description = result.description;
+  if ('tags' in result) tagInput.value = result.tags.join(', ');
+};
 
 // State
 const slugEdited = ref(false);
@@ -206,6 +215,20 @@ const submitForm = () => {
           </p>
         </div>
         <div class="flex items-center gap-2">
+          <button
+            type="button"
+            :disabled="isGenerating || !form.title.trim()"
+            class="flex items-center gap-1.5 rounded-full bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-900/30 dark:text-violet-300 dark:hover:bg-violet-900/50"
+            @click="generateProductContent"
+            v-tooltip.bottom="'Tự động tạo Mô tả và Thẻ (Tags) dựa vào tên sản phẩm'"
+          >
+            <i :class="isGenerating ? 'pi pi-spin pi-spinner' : 'pi pi-sparkles'" />
+            <span class="hidden sm:inline">{{ isGenerating ? 'Đang tạo nội dung AI...' : 'Tự động viết nội dung' }}</span>
+            <span class="sm:hidden">AI</span>
+          </button>
+          
+          <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
           <button
             class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
             @click="router.back()"

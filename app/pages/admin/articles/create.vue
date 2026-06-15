@@ -16,6 +16,7 @@ import { useAdminArticleCategoriesQuery } from "~/queries/article/useAdminArticl
 import { useCreateAdminArticle } from "~/mutations/article/useCreateAdminArticle";
 import { buildCreateArticlePayload } from "~/services/admin/article.service";
 import { slugify } from "~/utils/formatters";
+import { useAiContentGenerator } from "~/composables/useAiContentGenerator";
 
 definePageMeta({
   layout: "admin",
@@ -32,13 +33,22 @@ const { data: categoriesData, isLoading: isCategoriesLoading } =
   useAdminArticleCategoriesQuery();
 const { mutate: createArticle, isPending: isSubmitting } =
   useCreateAdminArticle();
+const { isGenerating, generate } = useAiContentGenerator();
+
+const generateArticleContent = async () => {
+  const result = await generate(form.title, 'article');
+  if (!result) return;
+  if ('shortDescription' in result) form.shortDescription = result.shortDescription;
+  if ('content' in result) form.content = result.content;
+  if ('tags' in result) tagsInput.value = result.tags.join(', ');
+};
 
 const slugEdited = ref(false);
 const tagsInput = ref("");
 const errors = ref<Record<string, string>>({});
 
 const articleCategories = computed(() =>
-  (categoriesData.value ?? []).map((c) => ({ label: c.title, value: c._id })),
+  (categoriesData.value ?? []).map((c: any) => ({ label: c.title, value: c._id })),
 );
 
 const form = reactive({
@@ -178,6 +188,20 @@ const submitForm = async () => {
           </p>
         </div>
         <div class="flex items-center gap-2">
+          <button
+            type="button"
+            :disabled="isGenerating || !form.title.trim()"
+            class="flex items-center gap-1.5 rounded-full bg-violet-50 px-4 py-2 text-sm font-semibold text-violet-700 transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-violet-900/30 dark:text-violet-300 dark:hover:bg-violet-900/50"
+            @click="generateArticleContent"
+            v-tooltip.bottom="'Tự động tạo Tóm tắt, Nội dung và Thẻ (Tags) dựa vào tiêu đề bài viết'"
+          >
+            <i :class="isGenerating ? 'pi pi-spin pi-spinner' : 'pi pi-sparkles'" />
+            <span class="hidden sm:inline">{{ isGenerating ? 'Đang tạo nội dung AI...' : 'Tự động viết nội dung' }}</span>
+            <span class="sm:hidden">AI</span>
+          </button>
+          
+          <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
           <button
             :disabled="isSubmitting"
             class="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
