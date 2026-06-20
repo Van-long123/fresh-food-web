@@ -1,4 +1,3 @@
-<img width="1896" height="863" alt="image" src="https://github.com/user-attachments/assets/0d9e1cb9-f3af-46da-be97-111c8dc3533b" /><img width="433" height="622" alt="image" src="https://github.com/user-attachments/assets/e853e0a4-9055-44fd-9575-8098d448f2e7" /># SmartFood — Nền tảng Thương mại điện tử Thực phẩm Tích hợp AI
 
 <p align="center">
 	<img src="app/assets/images/logo.png" alt="SmartFood Logo" width="120" />
