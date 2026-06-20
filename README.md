@@ -41,8 +41,10 @@ SmartFood là hệ thống thương mại điện tử chuyên cung cấp thực
 ### 🤖 Tích hợp AI & Dữ liệu
 - **AI Agent Chatbot:** Sử dụng OpenAI `gpt-4o-mini` kết hợp với kĩ thuật **Function Calling** và pipeline **RAG** (Retrieval-Augmented Generation) thông qua MongoDB Atlas Vector Search và Redis cache. Chatbot có khả năng tư vấn sản phẩm, tra cứu đơn hàng và trả về kết quả theo luồng thời gian thực (SSE - Server-Sent Events).
 - **Hệ thống gợi ý (Recommendation Engine):** Dịch vụ độc lập viết bằng Python/FastAPI, sử dụng thuật toán **TF-IDF** và **Cosine Similarity** để gợi ý các sản phẩm liên quan dựa trên nội dung.
+- **AI Content & Moderation (Admin):** Tích hợp AI để hỗ trợ quản trị viên tự động viết nội dung bài đăng/mô tả sản phẩm và tự động kiểm duyệt đánh giá của khách hàng.
 
 ### 🛍️ Tính năng Thương mại điện tử
+- **Real-Time Order Tracking:** Theo dõi trạng thái đơn hàng theo thời gian thực (sử dụng Socket.IO), tự động cập nhật tiến trình giao hàng ngay lập tức mà không cần tải lại trang.
 - **Thanh toán & Vận chuyển:** Tích hợp cổng thanh toán **PayOS** (chuyển khoản VietQR tự động) và API vận chuyển **Giao Hàng Nhanh (GHN)**.
 - **Xác thực & Phân quyền:** Hỗ trợ đăng nhập xã hội (OAuth 2.0 với Google, Facebook), xác thực bảo mật qua JWT và phân quyền người dùng (RBAC).
 - **Mua sắm thông minh:** Tìm kiếm, lọc sản phẩm, quản lý giỏ hàng, áp dụng mã giảm giá (Voucher).
