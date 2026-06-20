@@ -163,11 +163,12 @@ const revenueChartData = computed(() => {
     labels,
     datasets: [
       {
-        label: "Doanh thu (triệu đ)",
+        label: "Doanh thu",
         data,
         borderColor: "#2563eb",
         backgroundColor: "rgba(37, 99, 235, 0.12)",
         tension: 0.35,
+        cubicInterpolationMode: "monotone",
         fill: true,
       },
     ],
@@ -233,6 +234,60 @@ const baseChartOptions = {
     y: {
       grid: { color: "rgba(148, 163, 184, 0.2)" },
       ticks: { color: "#94a3b8" },
+      beginAtZero: true,
+    },
+  },
+};
+
+const revenueChartOptions = {
+  ...baseChartOptions,
+  plugins: {
+    ...baseChartOptions.plugins,
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          let label = context.dataset.label || "";
+          if (label) {
+            label += ": ";
+          }
+          if (context.parsed.y !== null) {
+            label += new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(context.parsed.y);
+          }
+          return label;
+        },
+      },
+    },
+  },
+  scales: {
+    ...baseChartOptions.scales,
+    y: {
+      ...baseChartOptions.scales.y,
+      ticks: {
+        ...baseChartOptions.scales.y.ticks,
+        callback: function (value: any) {
+          if (value >= 1000000000) return value / 1000000000 + " Tỷ";
+          if (value >= 1000000) return value / 1000000 + " Tr";
+          if (value >= 1000) return value / 1000 + " k";
+          return value;
+        },
+      },
+    },
+  },
+};
+
+const ordersChartOptions = {
+  ...baseChartOptions,
+  scales: {
+    ...baseChartOptions.scales,
+    y: {
+      ...baseChartOptions.scales.y,
+      ticks: {
+        ...baseChartOptions.scales.y.ticks,
+        stepSize: 1,
+      },
     },
   },
 };
@@ -344,7 +399,8 @@ const topProductChartOptions = {
             v-else
             type="line"
             :data="revenueChartData"
-            :options="baseChartOptions"
+            :options="revenueChartOptions"
+            class="h-full w-full"
           />
         </div>
       </section>
@@ -374,7 +430,8 @@ const topProductChartOptions = {
             v-else
             type="bar"
             :data="ordersChartData"
-            :options="baseChartOptions"
+            :options="ordersChartOptions"
+            class="h-full w-full"
           />
         </div>
       </section>

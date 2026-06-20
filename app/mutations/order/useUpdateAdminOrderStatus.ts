@@ -9,11 +9,23 @@ export const useUpdateAdminOrderStatus = () => {
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       adminOrderService.updateStatus(id, status),
     onSuccess: (data) => {
-      // Invalidate list + update detail cache optimistically
-      queryClient.removeQueries({ queryKey: adminOrderKeys.all })
       if (data?._id) {
         queryClient.setQueryData(adminOrderKeys.detail(data._id), data)
+        
+        queryClient.setQueriesData(
+          { queryKey: ['admin-orders', 'list'] },
+          (oldData: any) => {
+            if (!oldData || !oldData.data) return oldData
+            return {
+              ...oldData,
+              data: oldData.data.map((item: any) =>
+                item._id === data._id ? { ...item, ...data } : item
+              ),
+            }
+          }
+        )
       }
+      queryClient.invalidateQueries({ queryKey: adminOrderKeys.all })
     },
   })
 }

@@ -10,7 +10,7 @@ export const useUpdateAdminReviewStatus = () => {
     mutationFn: ({ id, payload }: { id: string; payload: AdminReviewStatusPayload }) =>
       adminReviewService.updateStatus(id, payload),
     onSuccess: async (data) => {
-      await queryClient.removeQueries({ queryKey: adminReviewKeys.all })
+      queryClient.removeQueries({ queryKey: ['admin-reviews', 'list'] })
       if (data?.id) {
         queryClient.setQueryData(adminReviewKeys.detail(data.id), data)
       }

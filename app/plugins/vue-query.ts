@@ -15,6 +15,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         refetchOnReconnect: true,
 
+        // Nếu trong Cache (RAM) đã có sẵn dữ liệu của trang này rồi, thì khi người dùng quay lại trang, CỨ LẤY DỮ LIỆU TỪ CACHE RA MÀ DÙNG, TUYỆT ĐỐI KHÔNG ĐƯỢC GỌI LẠI API MỚI NỮA
         refetchOnMount: false,
       },
 

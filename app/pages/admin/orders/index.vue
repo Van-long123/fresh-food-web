@@ -167,10 +167,14 @@ const startEditStatus = (row: any) => {
   editingStatusValue.value = row.status;
 };
 
-const applyInlineStatus = (orderId: string) => {
-  if (!editingStatusValue.value) return;
+const applyInlineStatus = (row: any) => {
+  if (!editingStatusValue.value || editingStatusValue.value === row.status) {
+    editingStatusId.value = null;
+    return;
+  }
+  
   updateStatus(
-    { id: orderId, status: editingStatusValue.value },
+    { id: row._id, status: editingStatusValue.value },
     {
       onSuccess: () => {
         toast.add({
@@ -331,7 +335,7 @@ const cancelEditStatus = () => {
             </option>
           </select>
           <button
-            @click="applyInlineStatus(row._id)"
+            @click="applyInlineStatus(row)"
             :disabled="isUpdatingStatus"
             class="rounded bg-primary-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-primary-700 disabled:opacity-50"
             title="Lưu"
