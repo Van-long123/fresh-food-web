@@ -117,4 +117,5 @@ Truy cập tại: `http://localhost:3000`
 
 ## 🖼️ Hình ảnh và video minh họa
 
-*(Cập nhật thêm các ảnh chụp màn hình hoặc link video demo tại đây)*
+<img width="1897" height="866" alt="image" src="https://github.com/user-attachments/assets/9ae632e4-937c-47fd-a9a5-426598f0099f" />
+
