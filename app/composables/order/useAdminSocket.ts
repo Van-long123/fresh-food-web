@@ -17,20 +17,33 @@ export const useAdminSocket = () => {
 
     // Invalidate list orders của admin để cập nhật realtime
     queryClient.invalidateQueries({ queryKey: ['admin-orders'] })
+    queryClient.invalidateQueries({ queryKey: ['admin-payments'] })
     if (payload.orderId) {
       queryClient.invalidateQueries({ queryKey: ['admin-order-detail', payload.orderId] })
     }
 
-    const statusInfo = STATUS_MAP[payload.status as keyof typeof STATUS_MAP]
-    const statusLabel = statusInfo?.label || payload.status
+    const shortId = payload.orderCode || payload.orderId?.slice(-6)?.toUpperCase() || ''
 
-    toast.add({
-      severity: 'info',
-      summary: '🔔 Đơn hàng được cập nhật',
-      detail: `Đơn hàng #${payload.orderId?.slice(-6)?.toUpperCase() || ''} vừa chuyển sang: ${statusLabel}`,
-      life: 5000,
-    })
+    // Phân biệt: Đơn hàng MỚI vs Đơn hàng ĐỔI TRẠNG THÁI
+    if (payload.status === 'pending') {
+      toast.add({
+        severity: 'success',
+        summary: '🛒 Đơn hàng mới!',
+        detail: `Khách vừa đặt đơn hàng #${shortId} — Kiểm tra ngay!`,
+        life: 6000,
+      })
+    } else {
+      const statusInfo = STATUS_MAP[payload.status as keyof typeof STATUS_MAP]
+      const statusLabel = statusInfo?.label || payload.status
+      toast.add({
+        severity: 'info',
+        summary: '🔔 Đơn hàng được cập nhật',
+        detail: `Đơn hàng #${shortId} vừa chuyển sang: ${statusLabel}`,
+        life: 5000,
+      })
+    }
   }
+
 
   const setupSocket = () => {
     if (!import.meta.client) return
