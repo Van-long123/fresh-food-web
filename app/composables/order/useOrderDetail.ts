@@ -130,11 +130,15 @@ export const useOrderDetail = (orderId: string) => {
   }
 
   function reviewProduct(item: any) {
-    router.push({ path: `/product/${item.productId}` });
+    // Dùng slug để navigate đúng URL product detail.
+    // Fallback sang productId cho đơn hàng cũ chưa lưu slug.
+    const identifier = item.slug || item.productId
+    router.push({ path: `/product/${identifier}` })
   }
 
   function buyAgain(item: any) {
-    router.push({ path: `/product/${item.productId}` });
+    const identifier = item.slug || item.productId
+    router.push({ path: `/product/${identifier}` })
   }
 
   function reorderAll() {
@@ -213,14 +217,6 @@ export const useOrderDetail = (orderId: string) => {
       acceptClass: "p-button-success",
       accept: () => {
         confirmReceivedMutation(undefined, {
-          onSuccess: () => {
-            toast.add({
-              severity: "success",
-              summary: "Thành công",
-              detail: "Đơn hàng đã được xác nhận giao thành công",
-              life: 3000,
-            });
-          },
           onError: (error: any) => {
             toast.add({
               severity: "error",

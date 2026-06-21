@@ -532,7 +532,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, onUnmounted } from "vue";
 
 import { useRoute } from "vue-router";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -540,6 +540,7 @@ import RefundRequestDialog from "~/components/pages/order/RefundRequestDialog.vu
 import CancelWithRefundDialog from "~/components/pages/order/CancelWithRefundDialog.vue";
 import { useRefundRequestQuery } from "~/queries/refund/useRefundQuery";
 import { useOrderDetail } from "~/composables/order/useOrderDetail";
+import { useOrderSocket } from "~/composables/order/useOrderSocket";
 import { formatVnd } from "~/utils/currency";
 import { ROUTES } from "~/constants/routes";
 
@@ -620,6 +621,18 @@ const goToPrintPage = () => {
     router.push(`/print/order/${order.value._id}`);
   }
 };
+
+// ─── Real-Time Order Tracking ─────────────────────────────────────────────────
+// Lifecycle Hooks đặt tại đây (trong .vue) theo đúng Rule — KHÔNG đặt trong composable
+const { setupSocket, cleanupSocket } = useOrderSocket(orderId);
+
+onMounted(() => {
+  setupSocket();
+});
+
+onUnmounted(() => {
+  cleanupSocket();
+});
 </script>
 
 <style scoped>

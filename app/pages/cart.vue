@@ -337,13 +337,9 @@
           <h3 class="m-0 mb-2.5">🎁 Sản Phẩm Ưu Đãi</h3>
           <Carousel
             :value="suggestItems"
-            :num-visible="6"
+            :num-visible="5"
             :num-scroll="1"
-            responsive-options="[
-              { breakpoint: '1024px', numVisible: 4, numScroll: 1 },
-              { breakpoint: '768px', numVisible: 2, numScroll: 1 },
-              { breakpoint: '480px', numVisible: 1, numScroll: 1 }
-            ]"
+            :responsive-options="suggestResponsiveOptions"
             circular
             :show-indicators="false"
             :show-navigation-pane="false"
@@ -781,6 +777,14 @@ const suggestItems = computed(() => {
         b.originalPrice - b.price - (a.originalPrice - a.price),
     );
 });
+
+const suggestResponsiveOptions = [
+  { breakpoint: '1400px', numVisible: 5, numScroll: 1 },
+  { breakpoint: '1024px', numVisible: 4, numScroll: 1 },
+  { breakpoint: '768px', numVisible: 3, numScroll: 1 },
+  { breakpoint: '576px', numVisible: 2, numScroll: 1 },
+  { breakpoint: '400px', numVisible: 1, numScroll: 1 },
+];
 
 const quickAdd = async (item: (typeof suggestItems.value)[number]) => {
   await addToCart({

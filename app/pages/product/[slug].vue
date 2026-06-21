@@ -551,7 +551,7 @@
           :showIndicators="false"
         >
           <template #item="slotProps">
-            <div class="px-2">
+            <div class="px-2 h-full">
               <ProductCard :product="slotProps.data" bg="#f5f5f5" />
             </div>
           </template>

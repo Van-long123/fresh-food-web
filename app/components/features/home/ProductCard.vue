@@ -67,20 +67,13 @@
             >đ</span
           >
         </div>
-        <div
-          v-if="product.originalPrice"
-          class="flex items-center gap-1.5 mb-3"
-        >
-          <span class="text-[11px] text-gray-400 line-through"
-            >{{ formatPrice(product.originalPrice) }} đ</span
-          >
-          <span class="text-[11px] font-medium text-[#10b981]"
-            >Tiết kiệm
-            {{ calculateSaving(product.originalPrice, product.price) }}</span
-          >
+        <!-- Giá gốc & tiết kiệm: luôn chiếm chiều cao cố định để nút Mua căn đáy đều -->
+        <div class="h-[34px] flex items-center mb-1">
+          <template v-if="product.originalPrice">
+            <span class="text-[11px] text-gray-400 line-through">{{ formatPrice(product.originalPrice) }} đ</span>
+            <span class="ml-1.5 text-[11px] font-medium text-[#10b981]">Tiết kiệm {{ calculateSaving(product.originalPrice, product.price) }}</span>
+          </template>
         </div>
-        <div v-if="!product.originalPrice" class="h-4 mb-3" />
-        <!-- Spacer for alignment if no original price -->
 
         <!-- Action Button -->
         <button

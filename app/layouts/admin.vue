@@ -1,6 +1,18 @@
 <script setup lang="ts">
+import { onMounted, onUnmounted } from "vue";
 import AdminHeader from "~/components/admin/AdminHeader.vue";
 import AdminSidebar from "~/components/admin/AdminSidebar.vue";
+import { useAdminSocket } from "~/composables/order/useAdminSocket";
+
+const { setupSocket, cleanupSocket } = useAdminSocket();
+
+onMounted(() => {
+  setupSocket();
+});
+
+onUnmounted(() => {
+  cleanupSocket();
+});
 </script>
 
 <template>

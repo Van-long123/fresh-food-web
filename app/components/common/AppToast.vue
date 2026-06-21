@@ -5,7 +5,11 @@
     :pt="{ closeButton: { style: 'display: none' } }"
   >
     <template #message="slotProps">
-      <div class="toast-card" :data-severity="slotProps.message.severity">
+      <div 
+        class="toast-card" 
+        :data-severity="slotProps.message.severity"
+        :style="{ '--toast-life': (slotProps.message.life || 3000) + 'ms' }"
+      >
         <div class="toast-accent" />
 
         <div class="toast-icon">
