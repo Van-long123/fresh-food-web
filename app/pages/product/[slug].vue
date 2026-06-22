@@ -677,8 +677,6 @@ watch(
 );
 
 const shareItems = [
-  { key: "facebook", icon: "f", label: "Facebook" },
-  { key: "zalo", icon: "Z", label: "Zalo" },
   { key: "copy", icon: "⧉", label: "Copy link" },
 ];
 

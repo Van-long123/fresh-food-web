@@ -5,6 +5,7 @@
  */
 export const SOCKET_EVENTS = {
   ORDER_STATUS_UPDATED: 'ORDER_STATUS_UPDATED',
+  REFUND_STATUS_UPDATED: 'REFUND_STATUS_UPDATED',
 } as const
 
 export type SocketEventName = typeof SOCKET_EVENTS[keyof typeof SOCKET_EVENTS]

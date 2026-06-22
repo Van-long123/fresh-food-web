@@ -228,11 +228,14 @@
                 class="flex gap-3 py-3 hover:bg-gray-50/70 rounded-xl -mx-2 px-2 transition-colors"
               >
                 <!-- Fixed size image container: FIXED -->
-                <div class="flex-shrink-0 relative">
+                <NuxtLink
+                  :to="ROUTES.PRODUCT_DETAIL(item.slug || item.productId)"
+                  class="flex-shrink-0 relative block group"
+                >
                   <img
                     :src="item.thumbnail"
                     :alt="item.title"
-                    class="w-16 h-16 rounded-xl object-cover border border-gray-100 block"
+                    class="w-16 h-16 rounded-xl object-cover border border-gray-100 block group-hover:border-[#f47f20] transition-colors"
                   />
                   <div
                     v-if="item.quantity > 1"
@@ -240,15 +243,20 @@
                   >
                     {{ item.quantity }}
                   </div>
-                </div>
+                </NuxtLink>
 
                 <!-- Info -->
                 <div class="flex-1 min-w-0 flex flex-col justify-center">
-                  <p
-                    class="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug"
+                  <NuxtLink
+                    :to="ROUTES.PRODUCT_DETAIL(item.slug || item.productId)"
+                    class="inline-block w-fit"
                   >
-                    {{ item.title }}
-                  </p>
+                    <p
+                      class="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug hover:text-[#f47f20] transition-colors"
+                    >
+                      {{ item.title }}
+                    </p>
+                  </NuxtLink>
                   <div class="flex items-center gap-2 mt-1.5 flex-wrap">
                     <span
                       class="text-xs text-gray-400 bg-gray-50 rounded px-1.5 py-0.5"
@@ -545,7 +553,7 @@ import { formatVnd } from "~/utils/currency";
 import { ROUTES } from "~/constants/routes";
 
 definePageMeta({
-  key: route => route.fullPath
+  key: (route) => route.fullPath,
 });
 
 const route = useRoute();
@@ -622,7 +630,7 @@ const goToPrintPage = () => {
   }
 };
 
-// ─── Real-Time Order Tracking ─────────────────────────────────────────────────
+// Real-Time Order Tracking
 // Lifecycle Hooks đặt tại đây (trong .vue) theo đúng Rule — KHÔNG đặt trong composable
 const { setupSocket, cleanupSocket } = useOrderSocket(orderId);
 
