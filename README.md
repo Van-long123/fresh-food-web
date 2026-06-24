@@ -115,6 +115,11 @@ Truy cập tại: `http://localhost:3000`
 ---
 
 ## 🖼️ Hình ảnh và video minh họa
+## Demo Video
+🎥 [Watch demo on YouTube](https://youtu.be/qPax5UTvyCM)
+
+## Demo Images
+
 <img width="900" height="405" alt="image" src="https://github.com/user-attachments/assets/5c894182-0be7-4a7d-8eb2-563291e2bf70" />
 <img width="900" height="385" alt="image" src="https://github.com/user-attachments/assets/ef2bd2bd-23fb-4736-8abd-6e294e872847" />
 <img width="945" height="414" alt="image" src="https://github.com/user-attachments/assets/b0019aa3-e339-4523-bc35-dcd40848c0a8" />
