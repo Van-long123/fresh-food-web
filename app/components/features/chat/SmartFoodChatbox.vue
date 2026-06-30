@@ -11,9 +11,9 @@
         @click="openChat"
       >
         <i class="pi pi-comments chat-fab__icon" />
-        <span class="chat-fab__badge" v-if="unreadCount > 0">{{
+        <!-- <span class="chat-fab__badge" v-if="unreadCount > 0">{{
           unreadCount
-        }}</span>
+        }}</span> -->
       </button>
     </Transition>
 
@@ -69,7 +69,6 @@
             aria-live="polite"
             @click="onMessagesClick"
           >
-
             <!-- Messages list -->
             <template v-for="(msg, idx) in formattedMessages" :key="idx">
               <div
@@ -103,7 +102,10 @@
             </template>
 
             <!-- Typing indicator (chỉ hiện khi đang gửi và chưa có chữ nào được stream về) -->
-            <div v-if="isSending && !streamingContent" class="chat-message chat-message--bot">
+            <div
+              v-if="isSending && !streamingContent"
+              class="chat-message chat-message--bot"
+            >
               <Avatar
                 image="/icons/chatbot-avatar.svg"
                 shape="circle"
@@ -127,11 +129,20 @@
               @keydown.enter.exact.prevent="onSendMessage"
             />
             <Button
+              v-if="isSending"
+              id="chatbox-stop-btn"
+              icon="pi pi-stop"
+              rounded
+              aria-label="Dừng tạo câu trả lời"
+              class="chat-panel__stop-btn"
+              @click="onStopMessage"
+            />
+            <Button
+              v-else
               id="chatbox-send-btn"
               icon="pi pi-send"
               rounded
               aria-label="Gửi tin nhắn"
-              :loading="isSending"
               :disabled="!inputText.trim()"
               class="chat-panel__send-btn"
               @click="onSendMessage"
@@ -152,7 +163,7 @@ import Chip from "primevue/chip";
 import Textarea from "primevue/textarea";
 import { useChatbot } from "~/composables/chat/useChatbot";
 
-// ─── Composable ───────────────────────────────────────────────────────────────
+//  Composable
 const {
   formattedMessages,
   inputText,
@@ -162,22 +173,22 @@ const {
   streamingContent,
   initSession,
   sendMessage,
+  stopMessage,
   clearHistory,
 } = useChatbot();
 
-// ─── Local state ──────────────────────────────────────────────────────────────
+//  Local state
 const isOpen = ref(false);
-const unreadCount = ref(0);
+// const unreadCount = ref(0);
 const messagesContainerRef = ref<HTMLElement | null>(null);
 const router = useRouter();
 
-
-// ─── Lifecycle ────────────────────────────────────────────────────────────────
+//  Lifecycle
 onMounted(async () => {
   await initSession();
 });
 
-// ─── Watch messages → auto scroll ────────────────────────────────────────────
+//  Watch messages → auto scroll
 watch(
   () => formattedMessages.value.length,
   () => {
@@ -185,10 +196,10 @@ watch(
   },
 );
 
-// ─── Methods ──────────────────────────────────────────────────────────────────
+//  Methods
 const openChat = () => {
   isOpen.value = true;
-  unreadCount.value = 0;
+  // unreadCount.value = 0;
   nextTick(() => scrollToBottom());
 };
 
@@ -207,6 +218,10 @@ const onSendMessage = async () => {
   await sendMessage();
 };
 
+const onStopMessage = () => {
+  stopMessage();
+};
+
 const onClearHistory = async () => {
   await clearHistory();
 };
@@ -215,24 +230,31 @@ const onClearHistory = async () => {
  * Chuyển đổi newline thành <br> và giữ an toàn.
  */
 const formatMessageContent = (content: string): string => {
-  return content
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(
-      /\[([^\]]+)\]\(([^)]+)\)/g,
-      '<a href="$2" class="chat-link">$1</a>',
-    )
-    .replace(/\n/g, "<br>");
+  return (
+    content
+      // Chặn tấn công bảo mật (XSS Prevention)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      // Chuyển đổi chữ in đậm (Bold)
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      // Chuyển đổi chữ in nghiêng (Italic)
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+      // Chuyển đổi liên kết (Link)
+      .replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        '<a href="$2" class="chat-link">$1</a>',
+      )
+      // Chuyển đổi xuống dòng
+      .replace(/\n/g, "<br>")
+  );
 };
 
 const onMessagesClick = (e: MouseEvent) => {
   const target = e.target as HTMLElement;
-  if (target.matches('.chat-link')) {
+  if (target.matches(".chat-link")) {
     e.preventDefault();
-    let href = target.getAttribute('href');
+    let href = target.getAttribute("href");
     if (href) {
       href = href.trim();
       // Đảm bảo là đường dẫn tuyệt đối bắt đầu từ root và loại bỏ domain nếu AI lỡ sinh ra
@@ -242,20 +264,20 @@ const onMessagesClick = (e: MouseEvent) => {
         // Chỉ lấy phần sau domain
         href = urlObj.pathname + urlObj.search + urlObj.hash;
       } catch (e) {
-        if (!href.startsWith('/')) {
-          href = '/' + href;
+        if (!href.startsWith("/")) {
+          href = "/" + href;
         }
       }
-      
+
       router.push(href);
-      closeChat(); 
+      closeChat();
     }
   }
 };
 </script>
 
 <style scoped>
-/* ─── FAB Button ──────────────────────────────────────────────────────────── */
+/*  FAB Button  */
 .chatbox-wrapper {
   position: fixed;
   bottom: 5.5rem; /* Nằm trên nút scrolltop (scrolltop = bottom-8 = 2rem + h-11 = 2.75rem => 4.75rem) */
@@ -622,6 +644,19 @@ const onMessagesClick = (e: MouseEvent) => {
 }
 
 .chat-panel__send-btn:not(:disabled):hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.chat-panel__stop-btn {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+  border: none !important;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.chat-panel__stop-btn:hover {
   transform: scale(1.05);
   filter: brightness(1.1);
 }

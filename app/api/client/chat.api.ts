@@ -72,18 +72,21 @@ export const streamChatbotMessageRequest = async (
   if (!response.ok || !response.body) {
     throw new Error(`Lỗi kết nối stream: ${response.status}`)
   }
-
+  // đón các luồng dữ liệu đổ về qua mạng.
   const reader = response.body.getReader()
+  // Dữ liệu truyền qua mạng Internet là các byte nhị phân (binary data). Trình duyệt không đọc được.
+  // TextDecoder có nhiệm vụ dịch đống byte nhị phân đó thành chữ tiếng Việt có dấu hoàn chỉnh.
   const decoder = new TextDecoder('utf-8')
   let fullReply = ''
   let buffer = ''
 
   while (true) {
+    // reader.read() sẽ "đợi" (await) cho đến khi có một gói dữ liệu mới truyền từ Backend tới.
     const { done, value } = await reader.read()
-    if (done) break
+    if (done) break // Nếu Server tắt luồng (done = true) thì thoát vòng lặp.
 
+    // Dùng decoder dịch byte → text
     buffer += decoder.decode(value, { stream: true })
-
     // Tách từng dòng SSE (kết thúc bằng \n\n)
     const lines = buffer.split('\n\n')
     buffer = lines.pop() ?? '' // Phần chưa đủ — giữ lại cho lần đọc tiếp

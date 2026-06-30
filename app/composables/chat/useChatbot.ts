@@ -17,6 +17,7 @@ export const useChatbot = () => {
   const sessionId = ref<string>('')
   const isSending = ref(false)
   const streamingContent = ref('') // Nội dung đang stream từng chữ
+  let abortController: AbortController | null = null
 
   const { mutateAsync: clearHistoryAsync, isPending: isClearing } = useClearChatbotHistoryMutation()
 
@@ -83,6 +84,8 @@ export const useChatbot = () => {
     } as any)
 
     try {
+      abortController = new AbortController()
+      
       // 3. Gọi SSE stream — onChunk được gọi mỗi khi nhận 1 đoạn chữ
       const fullReply = await streamChatbotMessageRequest(
         { message: text, sessionId: sessionId.value },
@@ -95,7 +98,8 @@ export const useChatbot = () => {
               content: (messages.value[placeholderIndex].content || '') + chunk,
             }
           }
-        }
+        },
+        abortController.signal
       )
 
       // 4. Đảm bảo nội dung cuối cùng đầy đủ và tắt flag streaming
@@ -108,17 +112,38 @@ export const useChatbot = () => {
       }
 
     } catch (error: any) {
-      const errMsg = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!'
-      if (messages.value[placeholderIndex]) {
-        messages.value[placeholderIndex] = {
-          role: 'assistant',
-          content: errMsg,
-          createdAt: messages.value[placeholderIndex].createdAt,
+      if (error.name === 'AbortError') {
+        // Đã bị hủy bởi người dùng
+        if (messages.value[placeholderIndex]) {
+          messages.value[placeholderIndex] = {
+            role: 'assistant',
+            content: (messages.value[placeholderIndex].content || ''),
+            createdAt: messages.value[placeholderIndex].createdAt,
+          }
+        }
+      } else {
+        const errMsg = 'Xin lỗi, có lỗi xảy ra. Vui lòng thử lại!'
+        if (messages.value[placeholderIndex]) {
+          messages.value[placeholderIndex] = {
+            role: 'assistant',
+            content: errMsg,
+            createdAt: messages.value[placeholderIndex].createdAt,
+          }
         }
       }
     } finally {
       isSending.value = false
       streamingContent.value = ''
+      abortController = null
+    }
+  }
+
+  // Dừng tạo câu trả lời
+  const stopMessage = () => {
+    if (abortController) {
+      abortController.abort()
+      abortController = null
+      isSending.value = false
     }
   }
 
@@ -159,6 +184,7 @@ export const useChatbot = () => {
     initSession,
     initWelcomeMessage,
     sendMessage,
+    stopMessage,
     clearHistory,
     addMessage,
   }
