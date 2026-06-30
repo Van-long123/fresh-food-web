@@ -389,7 +389,7 @@ const submitForm = () => {
               <InputText
                 v-model="tagInput"
                 class="mt-2 w-full"
-                placeholder="fresh, diet, organic"
+                placeholder="tươi sống, ăn kiêng, hữu cơ"
               />
             </div>
 
