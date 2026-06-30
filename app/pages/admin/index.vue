@@ -386,12 +386,12 @@ const topProductChartOptions = {
               Hiệu suất doanh thu trong 12 tháng gần nhất.
             </p>
           </div>
-          <button
+          <!-- <button
             class="text-sm font-medium text-primary-600 hover:underline"
             @click="router.push(ROUTES.ADMIN.PAYMENTS)"
           >
             Xem báo cáo
-          </button>
+          </button> -->
         </div>
         <div class="mt-6 h-72">
           <Skeleton v-if="isLoading" height="100%" />
