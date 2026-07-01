@@ -3,8 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
+    "build": "cross-env BUILD_MODE=production nuxt build",
+    "dev": "cross-env BUILD_MODE=dev nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -20,6 +20,7 @@
     "@vueuse/core": "^14.3.0",
     "axios": "^1.13.6",
     "chart.js": "^4.5.1",
+    "cross-env": "^10.1.0",
     "dayjs": "^1.11.20",
     "lodash": "^4.17.23",
     "nuxt": "^4.4.2",
@@ -37,6 +38,7 @@
     "@nuxtjs/google-fonts": "^3.2.0",
     "@tailwindcss/vite": "^4.2.2",
     "@types/lodash": "^4.17.24",
+    "@types/node": "^26.1.0",
     "eslint": "^10.1.0",
     "tailwindcss": "^4.2.2"
   }
