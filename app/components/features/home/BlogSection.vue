@@ -54,12 +54,14 @@
       >
         <!-- Ảnh -->
         <div class="w-full overflow-hidden rounded mb-3">
-          <img
-            :src="primaryPost.image"
-            :alt="primaryPost.title"
-            class="w-full aspect-4/3 object-cover group-hover:scale-[1.02] transition-transform duration-500"
-            loading="lazy"
-          />
+          <NuxtLink :to="ROUTES.NEWS_DETAIL(primaryPost.slug)" class="block w-full h-full">
+            <img
+              :src="primaryPost.image"
+              :alt="primaryPost.title"
+              class="w-full aspect-4/3 object-cover group-hover:scale-[1.02] transition-transform duration-500"
+              loading="lazy"
+            />
+          </NuxtLink>
         </div>
         <!-- Title -->
         <NuxtLink :to="ROUTES.NEWS_DETAIL(primaryPost.slug)">
@@ -99,12 +101,14 @@
           <div
             class="w-25 sm:w-30 h-17.5 sm:h-20.5 shrink-0 overflow-hidden rounded bg-gray-100"
           >
-            <img
-              :src="post.image"
-              :alt="post.title"
-              class="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
-              loading="lazy"
-            />
+            <NuxtLink :to="ROUTES.NEWS_DETAIL(post.slug)" class="block w-full h-full">
+              <img
+                :src="post.image"
+                :alt="post.title"
+                class="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                loading="lazy"
+              />
+            </NuxtLink>
           </div>
 
           <!-- Text -->
