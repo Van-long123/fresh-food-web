@@ -38,7 +38,7 @@ import Aura from '@primevue/themes/aura';
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.BUILD_MODE === 'production' ? 'http://localhost:8017' : 'http://localhost:8017'
+      apiBaseUrl: process.env.BUILD_MODE === 'production' ? 'https://food-ecommerce-api-71sx.onrender.com' : 'http://localhost:8017'
     }
   },
 
