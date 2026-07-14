@@ -1,8 +1,8 @@
 export const HOME_DEFAULTS = {
-  campaignProductLimit: 30,
-  categorySectionLimit: 100,
-  categoryProductLimit: 30,
-  blogLimit: 9
+  campaignProductLimit: 12,  // Đủ hiển thị trên slider (giảm từ 30)
+  categorySectionLimit: 5,   // Hiển thị 5 category section ở main
+  categoryProductLimit: 12,  // 12 sản phẩm/category
+  blogLimit: 4               // 4 bài blog
 } as const
 
 export const HOME_QUERY_KEYS = {
