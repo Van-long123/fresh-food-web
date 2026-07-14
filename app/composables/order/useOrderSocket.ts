@@ -62,8 +62,9 @@ export const useOrderSocket = (watchOrderId: string) => {
     queryClient.invalidateQueries({ queryKey: ['order-detail', watchOrderId] })
     queryClient.invalidateQueries({ queryKey: ['my-orders'] })
 
-    // Bỏ qua toast nếu status = 'returned' vì sự kiện REFUND_STATUS_UPDATED sẽ hiển thị toast chi tiết hơn, tránh bị double toast
-    if (payload.status === 'returned') return
+    // Bỏ qua toast nếu status = 'returned' hoặc 'cancelled' để tránh double toast 
+    // (returned dùng toast của refund, cancelled dùng toast của mutation)
+    if (payload.status === 'returned' || payload.status === 'cancelled') return
 
     // Lấy label từ STATUS_MAP đã có sẵn trong constants/order — không hardcode
     const statusInfo = STATUS_MAP[payload.status as keyof typeof STATUS_MAP]
