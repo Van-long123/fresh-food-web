@@ -350,7 +350,7 @@
           <!-- Demo Login Buttons -->
           <div class="mt-4 fade-up" style="--delay: 650ms">
             <p class="text-center text-[0.7rem] font-semibold text-gray-400 uppercase tracking-widest mb-2.5">
-              🎯 Demo nhanh
+              🎯 TRẢI NGHIỆM NHANH (CHO HR)
             </p>
             <div class="grid grid-cols-2 gap-2.5">
               <button
@@ -365,7 +365,7 @@
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
                 <span v-else>👤</span>
-                Demo User
+                Khách Hàng (User)
               </button>
               <button
                 id="btn-demo-admin"
@@ -379,7 +379,7 @@
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
                 <span v-else>🛡️</span>
-                Demo Admin
+                Quản Trị (Admin)
               </button>
             </div>
           </div>
