@@ -155,6 +155,34 @@ export const useLoginForm = () => {
     }
   }
 
+  // Gọi API login trực tiếp — dùng cho demo buttons, bypass form validation
+  const loginWithCredentials = async (email: string, password: string) => {
+    if (loading.value) return
+    try {
+      const result = await loginMutation.mutateAsync({ email, password })
+      authStore.setUserFromApi(result)
+      try {
+        await syncAfterLogin()
+      } catch {
+        toast.add({ severity: 'error', summary: 'Lỗi', detail: 'Lỗi đồng bộ giỏ hàng sau đăng nhập', life: 3000 })
+      }
+      toast.add({
+        severity: 'success',
+        summary: 'Đăng nhập thành công',
+        detail: `Chào mừng ${result.displayName || 'bạn'} đến với SmartFood! 🎉`,
+        life: 3500
+      })
+      await router.push(getRedirectPathByRole(result.role))
+    } catch (error: any) {
+      toast.add({
+        severity: 'error',
+        summary: 'Lỗi',
+        detail: error?.response?.data?.message || 'Đăng nhập thất bại, vui lòng thử lại.',
+        life: 3000
+      })
+    }
+  }
+
   return {
     form,
     errors,
@@ -162,6 +190,7 @@ export const useLoginForm = () => {
     loading,
     validate,
     handleSubmit,
+    loginWithCredentials,
     processQueryToast
   }
 }

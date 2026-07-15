@@ -347,6 +347,43 @@
             </button>
           </div>
 
+          <!-- Demo Login Buttons -->
+          <div class="mt-4 fade-up" style="--delay: 650ms">
+            <p class="text-center text-[0.7rem] font-semibold text-gray-400 uppercase tracking-widest mb-2.5">
+              🎯 Demo nhanh
+            </p>
+            <div class="grid grid-cols-2 gap-2.5">
+              <button
+                id="btn-demo-user"
+                type="button"
+                :disabled="loading || demoLoading"
+                class="group relative flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border-[1.5px] border-dashed border-emerald-300 bg-emerald-50/60 text-emerald-700 text-[0.8rem] font-semibold cursor-pointer transition-all duration-200 hover:bg-emerald-100 hover:border-emerald-400 hover:shadow-[0_4px_12px_rgba(16,185,129,0.18)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-55 disabled:cursor-not-allowed"
+                @click="loginAsDemo('user')"
+              >
+                <svg v-if="demoLoading === 'user'" class="w-3.5 h-3.5 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span v-else>👤</span>
+                Demo User
+              </button>
+              <button
+                id="btn-demo-admin"
+                type="button"
+                :disabled="loading || demoLoading"
+                class="group relative flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border-[1.5px] border-dashed border-violet-300 bg-violet-50/60 text-violet-700 text-[0.8rem] font-semibold cursor-pointer transition-all duration-200 hover:bg-violet-100 hover:border-violet-400 hover:shadow-[0_4px_12px_rgba(139,92,246,0.18)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-55 disabled:cursor-not-allowed"
+                @click="loginAsDemo('admin')"
+              >
+                <svg v-if="demoLoading === 'admin'" class="w-3.5 h-3.5 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span v-else>🛡️</span>
+                Demo Admin
+              </button>
+            </div>
+          </div>
+
           <!-- Register link -->
           <p
             class="text-center text-sm text-gray-500 mt-2 fade-up"
@@ -366,7 +403,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { ROUTES } from "~/constants/routes";
 import { useLoginForm } from "~/composables/auth/useLoginForm";
 import { useSocialAuth } from "~/composables/auth/useSocialAuth";
@@ -378,7 +415,7 @@ useHead({
 
 definePageMeta({ layout: false, middleware: "guest" });
 
-const { form, errors, benefits, loading, handleSubmit, processQueryToast } = useLoginForm();
+const { form, errors, benefits, loading, handleSubmit, loginWithCredentials, processQueryToast } = useLoginForm();
 
 const {
   isLoading: socialLoading,
@@ -386,6 +423,22 @@ const {
   loginWithFacebook,
   handleOAuthError
 } = useSocialAuth();
+
+// Demo login — sử dụng runtimeConfig để lấy từ env
+const config = useRuntimeConfig()
+const demoLoading = ref<'user' | 'admin' | null>(null)
+
+const loginAsDemo = async (type: 'user' | 'admin') => {
+  if (loading.value || demoLoading.value) return
+  demoLoading.value = type
+  try {
+    const email = type === 'user' ? config.public.demoUserEmail : config.public.demoAdminEmail
+    const password = type === 'user' ? config.public.demoUserPassword : config.public.demoAdminPassword
+    await loginWithCredentials(email as string, password as string)
+  } finally {
+    demoLoading.value = null
+  }
+}
 
 // Lifecycle hooks đặt tại đây theo đúng quy tắc composable
 onMounted(async () => {
