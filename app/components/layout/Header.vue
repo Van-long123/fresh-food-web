@@ -364,7 +364,7 @@
                   >
                     <button
                       class="qty-btn"
-                      :disabled="isItemUpdating(item.id) || item.isOutOfStock"
+                      :disabled="isItemUpdating(item.id) || item.isOutOfStock || item.quantity <= 1"
                       :aria-label="`Decrease quantity for ${item.name}`"
                       @click="decreaseQty(item.id)"
                     >

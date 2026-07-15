@@ -148,7 +148,7 @@
                   <div class="mt-2.5 flex items-center gap-2.5">
                     <button
                       type="button"
-                      :disabled="item.isUpdating || item.isOutOfStock"
+                      :disabled="item.isUpdating || item.isOutOfStock || item.quantity <= 1"
                       class="w-7 h-7 rounded-lg border border-[#d1d5db] bg-white hover:enabled:bg-[#f97316] hover:enabled:border-[#f97316] hover:enabled:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       @click="changeQty(item.id, -1)"
                     >
