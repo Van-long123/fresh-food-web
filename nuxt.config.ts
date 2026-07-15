@@ -38,7 +38,11 @@ import Aura from '@primevue/themes/aura';
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.BUILD_MODE === 'production' ? 'https://site--food-ecommerce-api--4kdt94dnrr9z.code.run' : 'http://localhost:8017'
+      apiBaseUrl: process.env.BUILD_MODE === 'production' ? 'https://site--food-ecommerce-api--4kdt94dnrr9z.code.run' : 'http://localhost:8017',
+      demoUserEmail: process.env.NUXT_PUBLIC_DEMO_USER_EMAIL || '',
+      demoUserPassword: process.env.NUXT_PUBLIC_DEMO_USER_PASSWORD || '',
+      demoAdminEmail: process.env.NUXT_PUBLIC_DEMO_ADMIN_EMAIL || '',
+      demoAdminPassword: process.env.NUXT_PUBLIC_DEMO_ADMIN_PASSWORD || ''
     }
   },
 
